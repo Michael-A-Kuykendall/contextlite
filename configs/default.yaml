@@ -1,0 +1,56 @@
+# ContextLite Default Configuration
+server:
+  port: 8080
+  host: "127.0.0.1"
+  cors_enabled: false
+  auth_token: ""
+  
+storage:
+  database_path: "./contextlite.db"
+  cache_size_mb: 64
+  
+optimization:
+  solver_timeout_ms: 250
+  max_opt_gap: 0.05
+  max_candidates: 200
+  max_pairs_per_doc: 5
+  integer_scaling: 1000
+  objective_style: "weighted-sum"
+  
+# 7D Feature Weights (per-workspace adaptive)
+weights:
+  relevance: 0.30
+  recency: 0.20
+  entanglement: 0.15
+  prior: 0.15
+  authority: 0.10
+  specificity: 0.05
+  uncertainty: 0.05
+  redundancy_penalty: 0.3
+  coherence_bonus: 0.2
+  weight_update_rate: 0.01
+  weight_caps: [0.01, 0.5]
+
+# Lexicographic tier multipliers (computed at runtime from bounds)
+lexicographic:
+  compute_at_runtime: true
+  
+# ε-budget thresholds (when objective_style = "epsilon-budget")
+epsilon_budget:
+  max_redundancy: 0.4
+  min_coherence: 0.3
+  min_recency: 0.2
+  
+tokenizer:
+  model_id: "gpt-4"
+  max_tokens_default: 4000
+  
+cache:
+  l1_size: 1000
+  l2_ttl_minutes: 30
+  l3_enabled: true
+  
+logging:
+  level: "info"
+  include_timings: true
+  include_optimization_metrics: true
