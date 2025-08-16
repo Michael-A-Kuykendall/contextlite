@@ -1,0 +1,45 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+contextlite-cli
+contextlite
+build/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# Config files with sensitive data
+config.local.yaml
+.env.local
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
