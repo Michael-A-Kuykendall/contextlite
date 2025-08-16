@@ -31,19 +31,23 @@ func (fe *FeatureExtractor) ExtractFeatures(ctx context.Context, docs []types.Do
 	// Build term frequency maps for all documents
 	docTerms := make([]map[string]int, len(docs))
 	allTerms := make(map[string]int)
+	docFreq := make(map[string]int) // Document frequency for each term
 	
 	for i, doc := range docs {
 		terms := extractTerms(doc.Content)
 		docTerms[i] = terms
 		for term, count := range terms {
 			allTerms[term] += count
+			if count > 0 {
+				docFreq[term]++
+			}
 		}
 	}
 
 	queryTerms := extractTerms(query)
 	
 	for i, doc := range docs {
-		features := fe.extractRawFeatures(doc, query, queryTerms, docTerms[i], allTerms, len(docs))
+		features := fe.extractRawFeatures(doc, query, queryTerms, docTerms[i], docFreq, len(docs))
 		normalizedFeatures := fe.normalizeFeatures(features)
 		
 		scored = append(scored, types.ScoredDocument{
@@ -57,20 +61,20 @@ func (fe *FeatureExtractor) ExtractFeatures(ctx context.Context, docs []types.Do
 }
 
 // extractRawFeatures extracts raw feature values (before normalization)
-func (fe *FeatureExtractor) extractRawFeatures(doc types.Document, query string, queryTerms, docTerms, allTerms map[string]int, totalDocs int) types.FeatureVector {
+func (fe *FeatureExtractor) extractRawFeatures(doc types.Document, query string, queryTerms, docTerms map[string]int, docFreq map[string]int, totalDocs int) types.FeatureVector {
 	return types.FeatureVector{
-		Relevance:    fe.computeRelevance(query, queryTerms, docTerms, allTerms, totalDocs),
+		Relevance:    fe.computeRelevance(query, queryTerms, docTerms, docFreq, totalDocs),
 		Recency:      fe.computeRecency(doc.ModifiedTime),
-		Entanglement: fe.computeEntanglement(docTerms, allTerms, totalDocs),
+		Entanglement: fe.computeEntanglement(docTerms, docFreq, totalDocs),
 		Prior:        fe.computePrior(doc),
-		Uncertainty:  fe.computeUncertainty(query, docTerms, allTerms, totalDocs),
+		Uncertainty:  fe.computeUncertainty(query, docTerms, docFreq, totalDocs),
 		Authority:    fe.computeAuthority(doc),
 		Specificity:  fe.computeSpecificity(query, queryTerms, docTerms),
 	}
 }
 
 // computeRelevance computes BM25 relevance score
-func (fe *FeatureExtractor) computeRelevance(query string, queryTerms, docTerms, allTerms map[string]int, totalDocs int) float64 {
+func (fe *FeatureExtractor) computeRelevance(query string, queryTerms, docTerms map[string]int, docFreq map[string]int, totalDocs int) float64 {
 	// BM25 parameters
 	k1 := 1.5
 	b := 0.75
@@ -82,20 +86,27 @@ func (fe *FeatureExtractor) computeRelevance(query string, queryTerms, docTerms,
 	}
 	
 	// Average document length (approximation)
-	avgDocLen := float64(len(allTerms)) / float64(totalDocs)
+	avgDocLen := float64(docLen) // For single doc, use its own length
+	if totalDocs > 1 {
+		// Better estimation would need all doc lengths, but this is a reasonable approximation
+		avgDocLen = float64(docLen)
+	}
 	
 	score := 0.0
 	for term := range queryTerms {
 		if tf, exists := docTerms[term]; exists {
-			df := 0
-			for _, doc := range allTerms {
-				if doc > 0 {
-					df++
-				}
+			df := docFreq[term]
+			if df == 0 {
+				continue // Skip if term doesn't appear in any documents
 			}
 			
-			// IDF component
-			idf := math.Log((float64(totalDocs) - float64(df) + 0.5) / (float64(df) + 0.5))
+			// IDF component - handle edge cases
+			numerator := float64(totalDocs - df) + 0.5
+			denominator := float64(df) + 0.5
+			if denominator <= 0 {
+				denominator = 0.5
+			}
+			idf := math.Log(numerator / denominator)
 			
 			// TF component with normalization
 			tfNorm := float64(tf) * (k1 + 1) / (float64(tf) + k1*(1-b+b*float64(docLen)/avgDocLen))
@@ -122,7 +133,7 @@ func (fe *FeatureExtractor) computeRecency(mtime int64) float64 {
 }
 
 // computeEntanglement computes PMI-based concept density
-func (fe *FeatureExtractor) computeEntanglement(docTerms, allTerms map[string]int, totalDocs int) float64 {
+func (fe *FeatureExtractor) computeEntanglement(docTerms, docFreq map[string]int, totalDocs int) float64 {
 	if len(docTerms) < 2 {
 		return 0.0
 	}
@@ -158,8 +169,8 @@ func (fe *FeatureExtractor) computeEntanglement(docTerms, allTerms map[string]in
 			
 			// Simple co-occurrence approximation (both terms in same doc)
 			coOccur := 1.0 // Both are in this document
-			prob1 := float64(allTerms[term1]) / float64(totalDocs)
-			prob2 := float64(allTerms[term2]) / float64(totalDocs)
+			prob1 := float64(docFreq[term1]) / float64(totalDocs)
+			prob2 := float64(docFreq[term2]) / float64(totalDocs)
 			jointProb := coOccur / float64(totalDocs)
 			
 			if prob1 > 0 && prob2 > 0 && jointProb > 0 {
@@ -207,12 +218,12 @@ func (fe *FeatureExtractor) computePrior(doc types.Document) float64 {
 }
 
 // computeUncertainty computes score variance across estimators
-func (fe *FeatureExtractor) computeUncertainty(query string, docTerms, allTerms map[string]int, totalDocs int) float64 {
+func (fe *FeatureExtractor) computeUncertainty(query string, docTerms, docFreq map[string]int, totalDocs int) float64 {
 	// Compute different scoring methods
 	queryTerms := extractTerms(query)
 	
 	// BM25 score
-	bm25 := fe.computeRelevance(query, queryTerms, docTerms, allTerms, totalDocs)
+	bm25 := fe.computeRelevance(query, queryTerms, docTerms, docFreq, totalDocs)
 	
 	// TF-IDF score (simplified)
 	tfidf := 0.0
@@ -223,7 +234,7 @@ func (fe *FeatureExtractor) computeUncertainty(query string, docTerms, allTerms 
 	
 	for term := range queryTerms {
 		if tf, exists := docTerms[term]; exists {
-			df := float64(allTerms[term])
+			df := float64(docFreq[term])
 			idf := math.Log(float64(totalDocs) / (df + 1))
 			tfidf += (float64(tf) / float64(docLen)) * idf
 		}

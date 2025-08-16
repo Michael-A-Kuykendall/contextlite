@@ -8,58 +8,56 @@ import (
 	"time"
 
 	"contextlite/internal/features"
+	"contextlite/internal/solve"
+	"contextlite/pkg/config"
 	"contextlite/pkg/types"
 )
 
-// SMTSolver provides SMT-optimized context selection
+// SMTSolver provides SMT-optimized context selection using Z3
 type SMTSolver struct {
-	config SMTConfig
-}
-
-// SMTConfig represents SMT solver configuration
-type SMTConfig struct {
-	TimeoutMs       int
-	MaxOptGap       float64
-	MaxCandidates   int
-	MaxPairsPerDoc  int
-	IntegerScaling  int
-	ObjectiveStyle  string
-	Weights         WeightConfig
-}
-
-// WeightConfig represents the 7D weight configuration
-type WeightConfig struct {
-	Relevance         float64
-	Recency          float64
-	Entanglement     float64
-	Prior            float64
-	Authority        float64
-	Specificity      float64
-	Uncertainty      float64
-	RedundancyPenalty float64
-	CoherenceBonus   float64
+	config      *config.Config
+	z3Optimizer *solve.Z3Optimizer
+	verifier    *solve.BruteForceVerifier
 }
 
 // SMTResult represents the result of SMT optimization
 type SMTResult struct {
 	SelectedDocs    []int               `json:"selected_docs"`
 	ObjectiveValue  float64             `json:"objective_value"`
-	OptimalityGap   float64             `json:"optimality_gap"`
+	Objective       int                 `json:"objective"`        // Integer objective from Z3
 	SolveTimeMs     int                 `json:"solve_time_ms"`
 	VariableCount   int                 `json:"variable_count"`
 	ConstraintCount int                 `json:"constraint_count"`
+	KCandidates     int                 `json:"K_candidates"`
+	PairsCount      int                 `json:"pairs_count"`
+	BudgetTokens    int                 `json:"budget_tokens"`
+	MaxDocs         int                 `json:"max_docs"`
 	SolverUsed      string              `json:"solver_used"`
+	Z3Status        string              `json:"z3_status,omitempty"`      // Z3 result: sat/unsat/unknown/timeout
 	FallbackReason  string              `json:"fallback_reason,omitempty"`
+	TimedOut        bool                `json:"timed_out"`
+	Verified        bool                `json:"verified,omitempty"`
 }
 
 // NewSMTSolver creates a new SMT solver
-func NewSMTSolver(config SMTConfig) *SMTSolver {
-	return &SMTSolver{
-		config: config,
+func NewSMTSolver(cfg *config.Config) (*SMTSolver, error) {
+	// Verify Z3 is available if configured
+	if cfg.SMT.Z3.BinaryPath != "" {
+		if err := solve.CheckZ3Available(cfg.SMT.Z3.BinaryPath); err != nil {
+			return nil, fmt.Errorf("Z3 not available: %w", err)
+		}
 	}
+
+	solver := &SMTSolver{
+		config:      cfg,
+		z3Optimizer: solve.NewZ3Optimizer(cfg.SMT.Z3.BinaryPath, cfg.SMT.SolverTimeoutMs),
+		verifier:    solve.NewBruteForceVerifier(),
+	}
+	
+	return solver, nil
 }
 
-// OptimizeSelection performs SMT-optimized document selection
+// OptimizeSelection performs SMT-optimized document selection using Z3
 func (s *SMTSolver) OptimizeSelection(ctx context.Context, 
 	scoredDocs []types.ScoredDocument, 
 	maxTokens int, 
@@ -69,47 +67,88 @@ func (s *SMTSolver) OptimizeSelection(ctx context.Context,
 	
 	// Limit candidates to keep SMT model manageable
 	candidates := scoredDocs
-	if len(candidates) > s.config.MaxCandidates {
-		candidates = s.selectTopCandidates(scoredDocs, s.config.MaxCandidates)
+	if len(candidates) > s.config.SMT.MaxCandidates {
+		candidates = s.selectTopCandidates(scoredDocs, s.config.SMT.MaxCandidates)
 	}
 	
-	// Compute pairwise similarities
-	simComputer := features.NewSimilarityComputer(s.config.MaxPairsPerDoc)
+	// Compute pairwise similarities for top-M neighbors
+	simComputer := features.NewSimilarityComputer(s.config.SMT.MaxPairsPerDoc)
 	pairs := simComputer.ComputePairwiseScores(candidates)
 	
-	// Try SMT optimization based on objective style
+	// Convert to Z3 format
+	z3Pairs := s.convertPairsForZ3(pairs)
+	
+	// Try Z3 optimization first
+	z3Result, err := s.z3Optimizer.OptimizeDocumentSelection(ctx, candidates, z3Pairs, maxTokens, maxDocs)
+	
 	var result *SMTResult
-	var err error
-	
-	switch s.config.ObjectiveStyle {
-	case "weighted-sum":
-		result, err = s.solveWeightedSum(candidates, pairs, maxTokens, maxDocs)
-	case "lexicographic":
-		result, err = s.solveLexicographic(candidates, pairs, maxTokens, maxDocs)
-	case "epsilon-constraint":
-		result, err = s.solveEpsilonConstraint(candidates, pairs, maxTokens, maxDocs)
-	default:
-		result, err = s.solveWeightedSum(candidates, pairs, maxTokens, maxDocs)
-	}
-	
-	// If SMT fails or times out, fall back to MMR-greedy
-	if err != nil || result == nil {
+	if err != nil || z3Result.Status != "sat" {
+		// Fallback to greedy selection
+		fallbackReason := fmt.Sprintf("Z3 failed: %v", err)
+		if z3Result != nil {
+			if z3Result.TimedOut {
+				fallbackReason = "Z3 timeout"
+			} else if z3Result.Status == "unsat" {
+				fallbackReason = "Problem unsatisfiable"
+			}
+		}
+		
 		result = s.fallbackMMR(candidates, pairs, maxTokens, maxDocs)
-		result.FallbackReason = fmt.Sprintf("SMT failed: %v", err)
-		result.SolverUsed = "fallback"
+		result.FallbackReason = fallbackReason
+		result.SolverUsed = "mmr-fallback"
+	} else {
+		// Z3 succeeded
+		result = &SMTResult{
+			SelectedDocs:    z3Result.SelectedDocs,
+			ObjectiveValue:  float64(z3Result.ObjectiveValue) / 10000.0, // Unscaled for compatibility
+			Objective:       z3Result.ObjectiveValue,                    // Integer objective from Z3
+			SolveTimeMs:     z3Result.SolveTimeMs,
+			VariableCount:   z3Result.VariableCount,
+			ConstraintCount: z3Result.ConstraintCount,
+			KCandidates:     len(candidates),
+			PairsCount:      len(pairs),
+			BudgetTokens:    maxTokens,
+			MaxDocs:         maxDocs,
+			SolverUsed:      "z3opt",
+			Z3Status:        z3Result.Status,
+			TimedOut:        z3Result.TimedOut,
+		}
+		
+		// Optional verification for small problems
+		if s.config.SMT.Z3.EnableVerification && len(candidates) <= s.config.SMT.Z3.MaxVerificationDocs {
+			if verification, err := s.verifier.VerifyOptimality(candidates, z3Pairs, maxTokens, maxDocs, z3Result); err == nil {
+				result.Verified = verification.IsOptimal
+				// Note: OptimalityGap removed - Z3 doesn't provide MIP-style gaps
+			}
+		}
 	}
 	
 	result.SolveTimeMs = int(time.Since(startTime).Milliseconds())
 	return result, nil
 }
 
-// solveWeightedSum implements weighted-sum scalarization
+// convertPairsForZ3 converts feature pairs to Z3 format
+func (s *SMTSolver) convertPairsForZ3(pairs []features.DocumentPair) []solve.DocumentPair {
+	z3Pairs := make([]solve.DocumentPair, len(pairs))
+	for i, pair := range pairs {
+		z3Pairs[i] = solve.DocumentPair{
+			DocI:             pair.DocI,
+			DocJ:             pair.DocJ,
+			Similarity:       pair.Similarity,
+			RedundancyPenalty: s.config.Weights.RedundancyPenalty * pair.Redundancy,
+			CoherenceBonus:   s.config.Weights.CoherenceBonus * pair.Coherence,
+		}
+	}
+	return z3Pairs
+}
+
+// solveWeightedSum implements weighted-sum scalarization (LEGACY FALLBACK)
 func (s *SMTSolver) solveWeightedSum(docs []types.ScoredDocument, 
 	pairs []features.DocumentPair, 
 	maxTokens, maxDocs int) (*SMTResult, error) {
 	
-	// For now, implement using greedy approximation
-	// TODO: Replace with actual SMT solver (Z3/CVC5) integration
+	// Legacy greedy implementation for backwards compatibility
+	// Primary optimization now uses Z3 in OptimizeSelection()
 	
 	return s.greedyWeightedSelection(docs, pairs, maxTokens, maxDocs, "weighted-sum")
 }
@@ -226,10 +265,16 @@ func (s *SMTSolver) greedyWeightedSelection(docs []types.ScoredDocument,
 	return &SMTResult{
 		SelectedDocs:    selected,
 		ObjectiveValue:  s.computeObjectiveValue(docs, selected, pairs),
-		OptimalityGap:   0.0, // Greedy is not guaranteed optimal
-		VariableCount:   len(docs) + len(pairs),
-		ConstraintCount: 3, // Budget, max docs, linking
+		Objective:       0,  // No integer objective for fallback
+		SolveTimeMs:     0,
+		VariableCount:   0,  // No SMT variables for fallback
+		ConstraintCount: 0,  // No SMT constraints for fallback
+		KCandidates:     len(docs),
+		PairsCount:      len(pairs),
+		BudgetTokens:    maxTokens,
+		MaxDocs:         maxDocs,
 		SolverUsed:      method,
+		FallbackReason:  "z3_not_available",
 	}, nil
 }
 
@@ -297,10 +342,16 @@ func (s *SMTSolver) greedyConstrainedSelection(docs []types.ScoredDocument,
 	return &SMTResult{
 		SelectedDocs:    selected,
 		ObjectiveValue:  s.computeObjectiveValue(docs, selected, pairs),
-		OptimalityGap:   0.0,
-		VariableCount:   len(docs) + len(pairs),
-		ConstraintCount: 5, // Budget, max docs, redundancy, coherence, recency
+		Objective:       0,  // No integer objective for fallback
+		SolveTimeMs:     0,
+		VariableCount:   0,  // No SMT variables for fallback
+		ConstraintCount: 0,  // No SMT constraints for fallback
+		KCandidates:     len(docs),
+		PairsCount:      len(pairs),
+		BudgetTokens:    maxTokens,
+		MaxDocs:         maxDocs,
 		SolverUsed:      "epsilon-constraint",
+		FallbackReason:  "z3_not_available",
 	}, nil
 }
 
@@ -364,10 +415,16 @@ func (s *SMTSolver) fallbackMMR(docs []types.ScoredDocument,
 	return &SMTResult{
 		SelectedDocs:    selected,
 		ObjectiveValue:  s.computeObjectiveValue(docs, selected, pairs),
-		OptimalityGap:   0.1, // Approximation gap
-		VariableCount:   len(docs),
-		ConstraintCount: 2,
+		Objective:       0,  // No integer objective for fallback
+		SolveTimeMs:     0,
+		VariableCount:   0,  // No SMT variables for fallback
+		ConstraintCount: 0,  // No SMT constraints for fallback
+		KCandidates:     len(docs),
+		PairsCount:      len(pairs),
+		BudgetTokens:    maxTokens,
+		MaxDocs:         maxDocs,
 		SolverUsed:      "mmr-fallback",
+		FallbackReason:  "z3_not_available",
 	}
 }
 

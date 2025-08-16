@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"crypto/sha256"
 	"database/sql"
 	"embed"
 	"encoding/hex"
@@ -11,8 +10,10 @@ import (
 	"strings"
 	"time"
 
+	"contextlite/internal/features"
 	"contextlite/pkg/types"
 
+	"crypto/sha256"
 	_ "modernc.org/sqlite"
 )
 
@@ -53,6 +54,11 @@ func New(dbPath string) (*Storage, error) {
 		return nil, fmt.Errorf("failed to initialize schema: %w", err)
 	}
 
+	// Apply migrations
+	if err := storage.applyMigrations(); err != nil {
+		return nil, fmt.Errorf("failed to apply migrations: %w", err)
+	}
+
 	return storage, nil
 }
 
@@ -75,6 +81,22 @@ func (s *Storage) initSchema() error {
 		if stmt == "" {
 			continue
 		}
+		
+		// Special handling for FTS tables since IF NOT EXISTS doesn't work with them
+		if strings.Contains(stmt, "CREATE VIRTUAL TABLE") && strings.Contains(stmt, "documents_fts") {
+			// Check if FTS table exists
+			var count int
+			err := s.db.QueryRow("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='documents_fts'").Scan(&count)
+			if err != nil {
+				return fmt.Errorf("failed to check FTS table existence: %w", err)
+			}
+			if count > 0 {
+				continue // Skip creating FTS table if it already exists
+			}
+			// Remove IF NOT EXISTS from FTS statement
+			stmt = strings.Replace(stmt, "IF NOT EXISTS ", "", 1)
+		}
+		
 		if _, err := s.db.Exec(stmt); err != nil {
 			return fmt.Errorf("failed to execute schema statement: %w", err)
 		}
@@ -94,6 +116,12 @@ func (s *Storage) AddDocument(ctx context.Context, doc *types.Document) error {
 	// Generate content hash
 	hash := sha256.Sum256([]byte(doc.Content))
 	doc.ContentHash = hex.EncodeToString(hash[:])
+
+	// Estimate token count if not provided
+	if doc.TokenCount == 0 {
+		tokenCounter := features.NewTokenCounter("gpt-4") // Default model
+		doc.TokenCount = tokenCounter.CountTokens(doc.Content)
+	}
 
 	// Set timestamps
 	now := time.Now()
@@ -288,7 +316,7 @@ func (s *Storage) SaveQueryCache(ctx context.Context, queryHash, corpusHash, mod
 		 solve_time_ms, fallback_used, expires_at)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		queryHash, corpusHash, modelID, tokenizerVersion, string(resultJSON),
-		string(metricsJSON), "", result.CoherenceScore, result.SMTMetrics.OptimalityGap,
+		string(metricsJSON), "", result.CoherenceScore, 0.0, // OptimalityGap removed
 		result.SMTMetrics.SolveTimeMs, result.SMTMetrics.FallbackReason != "", expiresAt)
 	return err
 }
@@ -297,6 +325,7 @@ func (s *Storage) SaveQueryCache(ctx context.Context, queryHash, corpusHash, mod
 func (s *Storage) GetQueryCache(ctx context.Context, queryHash, corpusHash, modelID, tokenizerVersion string) (*types.QueryResult, error) {
 	var resultJSON, metricsJSON string
 	var result types.QueryResult
+	var tempGap float64 // Unused - OptimalityGap field removed
 	
 	err := s.db.QueryRowContext(ctx, `
 		SELECT result_context, quantum_metrics, coherence_score, 
@@ -306,7 +335,7 @@ func (s *Storage) GetQueryCache(ctx context.Context, queryHash, corpusHash, mode
 		      AND tokenizer_version = ? AND expires_at > CURRENT_TIMESTAMP`,
 		queryHash, corpusHash, modelID, tokenizerVersion).Scan(
 		&resultJSON, &metricsJSON, &result.CoherenceScore,
-		&result.SMTMetrics.OptimalityGap, &result.SMTMetrics.SolveTimeMs,
+		&tempGap, &result.SMTMetrics.SolveTimeMs, // OptimalityGap removed
 		&result.SMTMetrics.FallbackReason)
 	if err != nil {
 		return nil, err
@@ -349,4 +378,141 @@ func (s *Storage) GetCorpusHash(ctx context.Context) (string, error) {
 		hash = hex.EncodeToString(h.Sum(nil))
 	}
 	return hash, nil
+}
+
+// applyMigrations applies database migrations for schema changes
+func (s *Storage) applyMigrations() error {
+	// Check if cache_key column exists in query_cache table
+	rows, err := s.db.Query("PRAGMA table_info(query_cache)")
+	if err != nil {
+		return fmt.Errorf("failed to check table info: %w", err)
+	}
+	defer rows.Close()
+
+	hasCacheKey := false
+	for rows.Next() {
+		var cid int
+		var name, dataType string
+		var notNull, pk int
+		var defaultValue sql.NullString
+		if err := rows.Scan(&cid, &name, &dataType, &notNull, &defaultValue, &pk); err != nil {
+			return fmt.Errorf("failed to scan table info: %w", err)
+		}
+		if name == "cache_key" {
+			hasCacheKey = true
+			break
+		}
+	}
+
+	// Add cache_key column if it doesn't exist
+	if !hasCacheKey {
+		_, err := s.db.Exec("ALTER TABLE query_cache ADD COLUMN cache_key TEXT")
+		if err != nil {
+			return fmt.Errorf("failed to add cache_key column: %w", err)
+		}
+		
+		// Add index for cache_key
+		_, err = s.db.Exec("CREATE INDEX IF NOT EXISTS idx_query_cache_key ON query_cache(cache_key)")
+		if err != nil {
+			return fmt.Errorf("failed to create cache_key index: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// GetCachedResultByKey retrieves cached result by cache key
+func (s *Storage) GetCachedResultByKey(ctx context.Context, cacheKey string) (*types.QueryResult, error) {
+	query := `
+		SELECT result_context, quantum_metrics, document_scores, coherence_score, 
+		       solve_time_ms, fallback_used, created_at
+		FROM query_cache 
+		WHERE cache_key = ? AND expires_at > ?
+	`
+	
+	row := s.db.QueryRowContext(ctx, query, cacheKey, time.Now())
+	
+	var resultContext, quantumMetrics, documentScores string
+	var coherenceScore float64
+	var solveTimeMs sql.NullInt64
+	var fallbackUsed bool
+	var createdAt time.Time
+	
+	err := row.Scan(&resultContext, &quantumMetrics, &documentScores, 
+		&coherenceScore, &solveTimeMs, &fallbackUsed, &createdAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil // Cache miss
+		}
+		return nil, fmt.Errorf("failed to scan cached result: %w", err)
+	}
+	
+	// Deserialize the cached result
+	var result types.QueryResult
+	if err := json.Unmarshal([]byte(resultContext), &result); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal cached result: %w", err)
+	}
+	
+	return &result, nil
+}
+
+// SaveQueryCacheWithKey saves a query result to cache with cache key
+func (s *Storage) SaveQueryCacheWithKey(ctx context.Context, queryHash, corpusHash, modelID, tokenizerVersion, cacheKey string,
+	result *types.QueryResult, expiresAt time.Time) error {
+	
+	resultJSON, err := json.Marshal(result.Documents)
+	if err != nil {
+		return err
+	}
+	
+	metricsJSON, err := json.Marshal(result.SMTMetrics)
+	if err != nil {
+		return err
+	}
+
+	// Check if cache_key column exists
+	rows, err := s.db.Query("PRAGMA table_info(query_cache)")
+	if err != nil {
+		return fmt.Errorf("failed to check table info: %w", err)
+	}
+	defer rows.Close()
+
+	hasCacheKey := false
+	for rows.Next() {
+		var cid int
+		var name, dataType string
+		var notNull, pk int
+		var defaultValue sql.NullString
+		if err := rows.Scan(&cid, &name, &dataType, &notNull, &defaultValue, &pk); err != nil {
+			return fmt.Errorf("failed to scan table info: %w", err)
+		}
+		if name == "cache_key" {
+			hasCacheKey = true
+			break
+		}
+	}
+
+	if hasCacheKey {
+		_, err = s.db.ExecContext(ctx, `
+			INSERT OR REPLACE INTO query_cache 
+			(query_hash, corpus_hash, model_id, tokenizer_version, result_context,
+			 quantum_metrics, document_scores, coherence_score, optimization_gap,
+			 solve_time_ms, fallback_used, expires_at, cache_key)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			queryHash, corpusHash, modelID, tokenizerVersion, string(resultJSON),
+			string(metricsJSON), "", result.CoherenceScore, 0.0, // OptimalityGap removed
+			result.SMTMetrics.SolveTimeMs, result.SMTMetrics.FallbackReason != "", expiresAt, cacheKey)
+	} else {
+		// Fallback to old method without cache_key
+		_, err = s.db.ExecContext(ctx, `
+			INSERT OR REPLACE INTO query_cache 
+			(query_hash, corpus_hash, model_id, tokenizer_version, result_context,
+			 quantum_metrics, document_scores, coherence_score, optimization_gap,
+			 solve_time_ms, fallback_used, expires_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			queryHash, corpusHash, modelID, tokenizerVersion, string(resultJSON),
+			string(metricsJSON), "", result.CoherenceScore, 0.0, // OptimalityGap removed
+			result.SMTMetrics.SolveTimeMs, result.SMTMetrics.FallbackReason != "", expiresAt)
+	}
+	return err
 }

@@ -3,10 +3,16 @@ package types
 // SMTMetrics represents SMT solver performance metrics
 type SMTMetrics struct {
 	SolverUsed      string  `json:"solver_used"`
-	OptimalityGap   float64 `json:"optimality_gap"`
+	Z3Status        string  `json:"z3_status,omitempty"`
+	Objective       int64   `json:"objective,omitempty"`
 	SolveTimeMs     int     `json:"solve_time_ms"`
+	SMTWallMs       int     `json:"smt_wall_ms"`        // Total wall-clock time for SMT (includes I/O + parsing)
 	VariableCount   int     `json:"variable_count"`
 	ConstraintCount int     `json:"constraint_count"`
+	KCandidates     int     `json:"K_candidates"`
+	PairsCount      int     `json:"pairs_count"`
+	BudgetTokens    int     `json:"budget_tokens"`
+	MaxDocs         int     `json:"max_docs"`
 	FallbackReason  string  `json:"fallback_reason,omitempty"`
 }
 
@@ -14,7 +20,7 @@ type SMTMetrics struct {
 type StageTimings struct {
 	FTSHarvestMs   int `json:"fts_harvest_ms"`
 	FeatureBuildMs int `json:"feature_build_ms"`
-	SMTSolverMs    int `json:"smt_solver_ms"`
+	SMTWallMs      int `json:"smt_wall_ms"`    // Total wall-clock time for SMT (includes I/O + parsing)
 	TotalMs        int `json:"total_ms"`
 }
 
@@ -64,4 +70,5 @@ type QueryResult struct {
 	SMTMetrics     SMTMetrics          `json:"smt_metrics"`
 	Timings        StageTimings        `json:"timings"`
 	CacheHit       bool                `json:"cache_hit"`
+	CacheKey       string              `json:"cache_key_fingerprint"`
 }
