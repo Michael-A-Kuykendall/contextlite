@@ -1,0 +1,48 @@
+[package]
+name = "contextlite-client"
+version = "0.1.0"
+edition = "2021"
+authors = ["ContextLite Team"]
+description = "High-performance Rust client for ContextLite context engine"
+license = "MIT"
+repository = "https://github.com/your-org/contextlite"
+keywords = ["search", "context", "ai", "indexing", "retrieval"]
+categories = ["api-bindings", "database", "text-processing"]
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.38", features = ["full"] }
+
+# HTTP client with async support
+reqwest = { version = "0.12", features = ["json", "stream"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Date/time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID support
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# URL handling
+url = "2.5"
+urlencoding = "2.1"
+
+[dev-dependencies]
+# Testing utilities
+tokio-test = "0.4"
+
+[features]
+default = []
+
+# Enable additional logging and debug features
+debug = []
+
+# Enable experimental features
+experimental = []
