@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 )
 
 // UserService handles user-related operations
@@ -24,7 +23,7 @@ func (us *UserService) CreateUser(name, email string) (*User, error) {
 	}
 	
 	user := &User{
-		ID:    generateID(),
+		ID:    generateID(us.users),
 		Name:  name,
 		Email: email,
 	}
@@ -42,7 +41,7 @@ func (us *UserService) GetUser(id string) (*User, error) {
 	return user, nil
 }
 
-func generateID() string {
+func generateID(users map[string]*User) string {
 	// Simple ID generation for demo
 	return fmt.Sprintf("user_%d", len(users))
 }
