@@ -3,6 +3,7 @@ package solve
 import (
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -308,4 +309,87 @@ func TestCheckZ3Available_EdgeCases(t *testing.T) {
 	if customOptimizer.z3Path == "/custom/z3/path" {
 		t.Log("Custom Z3 path properly set")
 	}
+}
+
+func TestCheckZ3Available_Comprehensive(t *testing.T) {
+	// Test case 1: Empty path
+	t.Run("empty_path", func(t *testing.T) {
+		err := CheckZ3Available("")
+		if err == nil {
+			t.Error("CheckZ3Available should return error for empty path")
+		}
+		t.Logf("Empty path error: %v", err)
+	})
+	
+	// Test case 2: Non-existent binary
+	t.Run("nonexistent_binary", func(t *testing.T) {
+		err := CheckZ3Available("/definitely/does/not/exist/z3")
+		if err == nil {
+			t.Error("CheckZ3Available should return error for non-existent binary")
+		}
+		
+		expectedSubstring := "Z3 not found"
+		if !strings.Contains(err.Error(), expectedSubstring) {
+			t.Errorf("Error should contain '%s', got: %v", expectedSubstring, err)
+		}
+		t.Logf("Non-existent binary error: %v", err)
+	})
+	
+	// Test case 3: Invalid binary (not Z3)
+	t.Run("invalid_binary", func(t *testing.T) {
+		// Try with a known system binary that's not Z3 (like 'echo' on Unix or 'cmd' on Windows)
+		invalidBinaries := []string{
+			"/bin/echo",     // Unix
+			"/usr/bin/echo", // Unix
+			"echo",          // May work if in PATH
+			"cmd",           // Windows
+			"notepad",       // Windows
+		}
+		
+		for _, binary := range invalidBinaries {
+			err := CheckZ3Available(binary)
+			if err != nil {
+				// This is expected - the binary exists but doesn't output "Z3" on -version
+				if strings.Contains(err.Error(), "invalid Z3 binary") {
+					t.Logf("Correctly identified invalid Z3 binary %s: %v", binary, err)
+					return // Found one that works for this test
+				} else {
+					t.Logf("Binary %s not found or other error: %v", binary, err)
+				}
+			}
+		}
+		t.Log("No suitable invalid binary found for testing")
+	})
+	
+	// Test case 4: Try with actual Z3 if available
+	t.Run("real_z3", func(t *testing.T) {
+		z3Path := findZ3Binary()
+		if z3Path == "" {
+			t.Skip("Z3 binary not found, skipping real Z3 test")
+		}
+		
+		err := CheckZ3Available(z3Path)
+		if err != nil {
+			t.Errorf("CheckZ3Available should succeed with real Z3 binary: %v", err)
+		} else {
+			t.Logf("Successfully verified Z3 at: %s", z3Path)
+		}
+	})
+	
+	// Test case 5: Path with spaces and special characters
+	t.Run("special_path", func(t *testing.T) {
+		specialPaths := []string{
+			"/path with spaces/z3",
+			"/path-with-dashes/z3",
+			"/path_with_underscores/z3",
+			"./relative/path/z3",
+		}
+		
+		for _, path := range specialPaths {
+			err := CheckZ3Available(path)
+			if err != nil {
+				t.Logf("Special path %s properly returns error: %v", path, err)
+			}
+		}
+	})
 }

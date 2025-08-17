@@ -259,3 +259,545 @@ func TestBruteForceVerifier_VerifyOptimality(t *testing.T) {
 	t.Logf("Verification completed: BF=%d, Z3=%d, Optimal=%v", 
 		verification.BruteForceOptimum, verification.Z3ObjectiveValue, verification.IsOptimal)
 }
+
+func TestBruteForceVerifier_OptimizeExhaustiveComplete(t *testing.T) {
+	verifier := NewBruteForceVerifier()
+	
+	// Test case 1: Empty documents
+	t.Run("empty_documents", func(t *testing.T) {
+		docs := []types.ScoredDocument{}
+		pairs := []DocumentPair{}
+		
+		result, err := verifier.OptimizeExhaustive(docs, pairs, 100, 5)
+		if err != nil {
+			t.Fatalf("OptimizeExhaustive should handle empty docs: %v", err)
+		}
+		
+		if result == nil {
+			t.Fatal("Result should not be nil")
+		}
+		
+		t.Logf("Empty docs result: Feasible=%v, ObjectiveValue=%d, SolutionsChecked=%d, SelectedDocs=%v", 
+			result.Feasible, result.ObjectiveValue, result.SolutionsChecked, result.SelectedDocs)
+		
+		if result.SolutionsChecked != 1 {
+			t.Errorf("Expected 1 solution checked for empty set, got %d", result.SolutionsChecked)
+		}
+	})
+	
+	// Test case 2: Single document
+	t.Run("single_document", func(t *testing.T) {
+		docs := []types.ScoredDocument{
+			{
+				Document: types.Document{
+					ID:         "doc1",
+					TokenCount: 50,
+				},
+				UtilityScore: 100,
+			},
+		}
+		pairs := []DocumentPair{}
+		
+		result, err := verifier.OptimizeExhaustive(docs, pairs, 100, 5)
+		if err != nil {
+			t.Fatalf("OptimizeExhaustive failed for single doc: %v", err)
+		}
+		
+		if !result.Feasible {
+			t.Error("Single document within limits should be feasible")
+		}
+		
+		if len(result.SelectedDocs) != 1 || result.SelectedDocs[0] != 0 {
+			t.Errorf("Expected single document selected, got %v", result.SelectedDocs)
+		}
+		
+		if result.SolutionsChecked != 2 {
+			t.Errorf("Expected 2 solutions checked (empty + single), got %d", result.SolutionsChecked)
+		}
+	})
+	
+	// Test case 3: Token budget constraint
+	t.Run("token_budget_constraint", func(t *testing.T) {
+		docs := []types.ScoredDocument{
+			{
+				Document: types.Document{
+					ID:         "doc1",
+					TokenCount: 60,
+				},
+				UtilityScore: 100,
+			},
+			{
+				Document: types.Document{
+					ID:         "doc2", 
+					TokenCount: 80,
+				},
+				UtilityScore: 90,
+			},
+		}
+		pairs := []DocumentPair{}
+		
+		// Set budget that allows only one document
+		result, err := verifier.OptimizeExhaustive(docs, pairs, 100, 5)
+		if err != nil {
+			t.Fatalf("OptimizeExhaustive failed: %v", err)
+		}
+		
+		if !result.Feasible {
+			t.Error("Should find feasible solution within token budget")
+		}
+		
+		// Should select the first document (higher utility)
+		if len(result.SelectedDocs) != 1 || result.SelectedDocs[0] != 0 {
+			t.Errorf("Expected doc 0 selected due to higher utility, got %v", result.SelectedDocs)
+		}
+		
+		if result.SolutionsChecked != 4 {
+			t.Errorf("Expected 4 solutions checked (2^2), got %d", result.SolutionsChecked)
+		}
+	})
+	
+	// Test case 4: MaxDocs constraint
+	t.Run("max_docs_constraint", func(t *testing.T) {
+		docs := []types.ScoredDocument{
+			{
+				Document: types.Document{
+					ID:         "doc1",
+					TokenCount: 10,
+				},
+				UtilityScore: 100,
+			},
+			{
+				Document: types.Document{
+					ID:         "doc2",
+					TokenCount: 10,
+				},
+				UtilityScore: 90,
+			},
+			{
+				Document: types.Document{
+					ID:         "doc3",
+					TokenCount: 10,
+				},
+				UtilityScore: 80,
+			},
+		}
+		pairs := []DocumentPair{}
+		
+		// Set maxDocs to 2
+		result, err := verifier.OptimizeExhaustive(docs, pairs, 1000, 2)
+		if err != nil {
+			t.Fatalf("OptimizeExhaustive failed: %v", err)
+		}
+		
+		if !result.Feasible {
+			t.Error("Should find feasible solution within doc limit")
+		}
+		
+		// Should select top 2 documents
+		if len(result.SelectedDocs) != 2 {
+			t.Errorf("Expected 2 docs selected due to maxDocs constraint, got %d", len(result.SelectedDocs))
+		}
+		
+		if result.SolutionsChecked != 8 {
+			t.Errorf("Expected 8 solutions checked (2^3), got %d", result.SolutionsChecked)
+		}
+	})
+	
+	// Test case 5: With pairwise interactions
+	t.Run("with_pairwise_interactions", func(t *testing.T) {
+		docs := []types.ScoredDocument{
+			{
+				Document: types.Document{
+					ID:         "doc1",
+					TokenCount: 30,
+				},
+				UtilityScore: 50,
+			},
+			{
+				Document: types.Document{
+					ID:         "doc2",
+					TokenCount: 30,
+				},
+				UtilityScore: 50,
+			},
+		}
+		
+		// Add pairwise interaction that makes selecting both better
+		pairs := []DocumentPair{
+			{
+				DocI:           0,
+				DocJ:           1,
+				Similarity:     0.8,
+				CoherenceBonus: 100, // High synergy
+			},
+		}
+		
+		result, err := verifier.OptimizeExhaustive(docs, pairs, 100, 5)
+		if err != nil {
+			t.Fatalf("OptimizeExhaustive failed: %v", err)
+		}
+		
+		if !result.Feasible {
+			t.Error("Should find feasible solution")
+		}
+		
+		// Should select both documents due to pairwise synergy
+		if len(result.SelectedDocs) != 2 {
+			t.Errorf("Expected both docs selected due to synergy, got %v", result.SelectedDocs)
+		}
+		
+		if result.SolutionsChecked != 4 {
+			t.Errorf("Expected 4 solutions checked (2^2), got %d", result.SolutionsChecked)
+		}
+	})
+	
+	// Test case 6: Error case - too many documents
+	t.Run("too_many_documents", func(t *testing.T) {
+		docs := make([]types.ScoredDocument, 15) // More than 12
+		for i := range docs {
+			docs[i] = types.ScoredDocument{
+				Document: types.Document{
+					ID:         fmt.Sprintf("doc%d", i),
+					TokenCount: 10,
+				},
+				UtilityScore: float64(100 - i),
+			}
+		}
+		pairs := []DocumentPair{}
+		
+		result, err := verifier.OptimizeExhaustive(docs, pairs, 1000, 10)
+		if err == nil {
+			t.Error("OptimizeExhaustive should return error for > 12 documents")
+		}
+		
+		if result != nil {
+			t.Error("Result should be nil when error occurs")
+		}
+		
+		expectedError := "brute force limited to N ≤ 12 documents, got 15"
+		if err.Error() != expectedError {
+			t.Errorf("Expected error '%s', got '%s'", expectedError, err.Error())
+		}
+	})
+	
+	// Test case 7: Edge case - maxTokens = 0 (unlimited)
+	t.Run("unlimited_tokens", func(t *testing.T) {
+		docs := []types.ScoredDocument{
+			{
+				Document: types.Document{
+					ID:         "doc1",
+					TokenCount: 1000,
+				},
+				UtilityScore: 100,
+			},
+			{
+				Document: types.Document{
+					ID:         "doc2",
+					TokenCount: 2000,
+				},
+				UtilityScore: 90,
+			},
+		}
+		pairs := []DocumentPair{}
+		
+		result, err := verifier.OptimizeExhaustive(docs, pairs, 0, 5) // 0 = unlimited tokens
+		if err != nil {
+			t.Fatalf("OptimizeExhaustive failed: %v", err)
+		}
+		
+		if !result.Feasible {
+			t.Error("Should find feasible solution with unlimited tokens")
+		}
+		
+		// Should select both documents
+		if len(result.SelectedDocs) != 2 {
+			t.Errorf("Expected both docs selected with unlimited tokens, got %v", result.SelectedDocs)
+		}
+	})
+	
+	// Test case 8: Complex scenario with multiple constraints
+	t.Run("complex_scenario", func(t *testing.T) {
+		docs := []types.ScoredDocument{
+			{
+				Document: types.Document{
+					ID:         "doc1",
+					TokenCount: 40,
+				},
+				UtilityScore: 100,
+			},
+			{
+				Document: types.Document{
+					ID:         "doc2",
+					TokenCount: 35,
+				},
+				UtilityScore: 95,
+			},
+			{
+				Document: types.Document{
+					ID:         "doc3",
+					TokenCount: 30,
+				},
+				UtilityScore: 90,
+			},
+			{
+				Document: types.Document{
+					ID:         "doc4",
+					TokenCount: 25,
+				},
+				UtilityScore: 85,
+			},
+		}
+		
+		pairs := []DocumentPair{
+			{DocI: 0, DocJ: 1, Similarity: 0.8, CoherenceBonus: 50},
+			{DocI: 1, DocJ: 2, Similarity: 0.6, CoherenceBonus: 30},
+			{DocI: 2, DocJ: 3, Similarity: 0.7, CoherenceBonus: 40},
+		}
+		
+		result, err := verifier.OptimizeExhaustive(docs, pairs, 100, 3)
+		if err != nil {
+			t.Fatalf("OptimizeExhaustive failed: %v", err)
+		}
+		
+		if !result.Feasible {
+			t.Error("Should find feasible solution in complex scenario")
+		}
+		
+		if result.SolutionsChecked != 16 {
+			t.Errorf("Expected 16 solutions checked (2^4), got %d", result.SolutionsChecked)
+		}
+		
+		// Verify all selected docs are within bounds
+		for _, idx := range result.SelectedDocs {
+			if idx < 0 || idx >= len(docs) {
+				t.Errorf("Invalid document index %d", idx)
+			}
+		}
+		
+		t.Logf("Complex scenario result: selected %v, objective %d", 
+			result.SelectedDocs, result.ObjectiveValue)
+	})
+}
+
+func TestBruteForceVerifier_VerifyOptimalityComplete(t *testing.T) {
+	verifier := NewBruteForceVerifier()
+	
+	// Helper to create test documents
+	createDocs := func(count int) []types.ScoredDocument {
+		docs := make([]types.ScoredDocument, count)
+		for i := 0; i < count; i++ {
+			docs[i] = types.ScoredDocument{
+				Document: types.Document{
+					ID:         fmt.Sprintf("doc%d", i),
+					TokenCount: 50,
+				},
+				UtilityScore: float64(100 - i*10),
+			}
+		}
+		return docs
+	}
+	
+	// Test case 1: Z3 finds optimal solution
+	t.Run("z3_optimal", func(t *testing.T) {
+		docs := createDocs(3)
+		pairs := []DocumentPair{}
+		
+		// Create Z3 result that matches optimal
+		z3Result := &OptimizeResult{
+			SelectedDocs:    []int{0, 1}, // Best 2 docs
+			ObjectiveValue:  1900000,     // (100 + 90) * 10000 scale
+			Status:          "sat",
+			SolveTimeMs:     50,
+		}
+		
+		verification, err := verifier.VerifyOptimality(docs, pairs, 200, 2, z3Result)
+		if err != nil {
+			t.Fatalf("VerifyOptimality failed: %v", err)
+		}
+		
+		if verification == nil {
+			t.Fatal("Verification result should not be nil")
+		}
+		
+		if !verification.IsOptimal {
+			t.Error("Z3 result should be verified as optimal")
+		}
+		
+		if verification.Gap != 0.0 {
+			t.Errorf("Gap should be 0 for optimal solution, got %f", verification.Gap)
+		}
+		
+		if verification.Z3ObjectiveValue != z3Result.ObjectiveValue {
+			t.Errorf("Z3 objective mismatch: expected %d, got %d", 
+				z3Result.ObjectiveValue, verification.Z3ObjectiveValue)
+		}
+		
+		t.Logf("Optimal verification: BF=%d, Z3=%d, Gap=%f", 
+			verification.BruteForceOptimum, verification.Z3ObjectiveValue, verification.Gap)
+	})
+	
+	// Test case 2: Z3 finds suboptimal solution
+	t.Run("z3_suboptimal", func(t *testing.T) {
+		docs := createDocs(3)
+		pairs := []DocumentPair{}
+		
+		// Create Z3 result that is suboptimal
+		z3Result := &OptimizeResult{
+			SelectedDocs:    []int{1, 2}, // Suboptimal selection
+			ObjectiveValue:  1700000,     // (90 + 80) * 10000 scale
+			Status:          "sat",
+			SolveTimeMs:     50,
+		}
+		
+		verification, err := verifier.VerifyOptimality(docs, pairs, 200, 2, z3Result)
+		if err != nil {
+			t.Fatalf("VerifyOptimality failed: %v", err)
+		}
+		
+		if verification.IsOptimal {
+			t.Error("Z3 result should be verified as suboptimal")
+		}
+		
+		if verification.Gap <= 0.0 {
+			t.Errorf("Gap should be positive for suboptimal solution, got %f", verification.Gap)
+		}
+		
+		expectedGap := float64(verification.BruteForceOptimum - z3Result.ObjectiveValue) / float64(verification.BruteForceOptimum)
+		if verification.Gap != expectedGap {
+			t.Errorf("Gap calculation incorrect: expected %f, got %f", expectedGap, verification.Gap)
+		}
+		
+		t.Logf("Suboptimal verification: BF=%d, Z3=%d, Gap=%f", 
+			verification.BruteForceOptimum, verification.Z3ObjectiveValue, verification.Gap)
+	})
+	
+	// Test case 3: Z3 returns unsat
+	t.Run("z3_unsat", func(t *testing.T) {
+		docs := createDocs(2)
+		pairs := []DocumentPair{}
+		
+		// Create Z3 result with unsat status
+		z3Result := &OptimizeResult{
+			SelectedDocs:    []int{},
+			ObjectiveValue:  0,
+			Status:          "unsat",
+			SolveTimeMs:     50,
+		}
+		
+		verification, err := verifier.VerifyOptimality(docs, pairs, 200, 2, z3Result)
+		if err != nil {
+			t.Fatalf("VerifyOptimality failed: %v", err)
+		}
+		
+		if verification.IsOptimal {
+			t.Error("Unsat Z3 result should not be marked as optimal")
+		}
+		
+		t.Logf("Unsat verification: BF=%d, Z3=%d, Status=%s", 
+			verification.BruteForceOptimum, verification.Z3ObjectiveValue, z3Result.Status)
+	})
+	
+	// Test case 4: Zero objective value edge case
+	t.Run("zero_objective", func(t *testing.T) {
+		docs := []types.ScoredDocument{
+			{
+				Document: types.Document{
+					ID:         "doc1",
+					TokenCount: 1000, // Too large for budget
+				},
+				UtilityScore: 100,
+			},
+		}
+		pairs := []DocumentPair{}
+		
+		// Create Z3 result with zero objective (no feasible selection)
+		z3Result := &OptimizeResult{
+			SelectedDocs:    []int{},
+			ObjectiveValue:  0,
+			Status:          "sat",
+			SolveTimeMs:     50,
+		}
+		
+		verification, err := verifier.VerifyOptimality(docs, pairs, 100, 1, z3Result) // Very tight budget
+		if err != nil {
+			t.Fatalf("VerifyOptimality failed: %v", err)
+		}
+		
+		// With zero brute force optimum, gap calculation should handle division by zero
+		if verification.Gap != 0.0 {
+			t.Errorf("Gap should be 0 when brute force optimum is 0, got %f", verification.Gap)
+		}
+		
+		t.Logf("Zero objective verification: BF=%d, Z3=%d, Gap=%f", 
+			verification.BruteForceOptimum, verification.Z3ObjectiveValue, verification.Gap)
+	})
+	
+	// Test case 5: Brute force optimization error propagation
+	t.Run("brute_force_error", func(t *testing.T) {
+		docs := createDocs(15) // Too many documents for brute force
+		pairs := []DocumentPair{}
+		
+		z3Result := &OptimizeResult{
+			SelectedDocs:    []int{0, 1},
+			ObjectiveValue:  1900000, // Scaled value
+			Status:          "sat",
+			SolveTimeMs:     50,
+		}
+		
+		verification, err := verifier.VerifyOptimality(docs, pairs, 200, 2, z3Result)
+		if err == nil {
+			t.Error("VerifyOptimality should propagate brute force error for too many documents")
+		}
+		
+		if verification != nil {
+			t.Error("Verification result should be nil when error occurs")
+		}
+		
+		expectedError := "brute force limited to N ≤ 12 documents, got 15"
+		if err.Error() != expectedError {
+			t.Errorf("Expected error '%s', got '%s'", expectedError, err.Error())
+		}
+	})
+	
+	// Test case 6: Infeasible brute force result
+	t.Run("infeasible_brute_force", func(t *testing.T) {
+		docs := []types.ScoredDocument{
+			{
+				Document: types.Document{
+					ID:         "doc1",
+					TokenCount: 200,
+				},
+				UtilityScore: 100,
+			},
+			{
+				Document: types.Document{
+					ID:         "doc2",
+					TokenCount: 200,
+				},
+				UtilityScore: 90,
+			},
+		}
+		pairs := []DocumentPair{}
+		
+		z3Result := &OptimizeResult{
+			SelectedDocs:    []int{},
+			ObjectiveValue:  0,
+			Status:          "unsat",
+			SolveTimeMs:     50,
+		}
+		
+		// Very tight budget - no document can fit
+		verification, err := verifier.VerifyOptimality(docs, pairs, 100, 1, z3Result)
+		if err != nil {
+			t.Fatalf("VerifyOptimality failed: %v", err)
+		}
+		
+		// When brute force finds no feasible solution, IsOptimal should remain false
+		if verification.IsOptimal {
+			t.Error("Should not be optimal when brute force finds no feasible solution")
+		}
+		
+		t.Logf("Infeasible verification: BF=%d feasible=%v, Z3=%d status=%s", 
+			verification.BruteForceOptimum, verification.BruteForceOptimum > 0, verification.Z3ObjectiveValue, z3Result.Status)
+	})
+}
