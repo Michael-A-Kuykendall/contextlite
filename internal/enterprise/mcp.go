@@ -7,9 +7,23 @@ import (
 	"encoding/json"
 	"crypto/rand"
 	"encoding/hex"
-	"github.com/Michael-A-Kuykendall/contextlite/internal/features"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"net/http"
+	"contextlite/internal/features"
 )
 
+// MCPServerConfig represents an MCP server configuration (different from MCPServer for API compatibility)
+type MCPServerConfig struct {
+	ID        string                 `json:"id"`
+	Name      string                 `json:"name"`
+	Type      string                 `json:"type"`
+	Endpoint  string                 `json:"endpoint"`
+	Config    map[string]interface{} `json:"config"`
+	CreatedAt time.Time              `json:"created_at"`
+}
 // MCPServer represents a custom Model Context Protocol server
 type MCPServer struct {
 	ID          string    `json:"id"`
@@ -214,13 +228,64 @@ func (mm *MCPManager) DeployMCPServer(serverID string) error {
 		return fmt.Errorf("server not found: %w", err)
 	}
 	
-	// TODO: Implement actual deployment logic
-	// - Validate server configuration
-	// - Start server process/container
-	// - Register with MCP registry
-	// - Health check
+	// Convert to MCPServerConfig for deployment logic
+	deployServer := &MCPServerConfig{
+		ID:        server.ID,
+		Name:      server.Name,
+		Type:      server.Protocol, // Use protocol as type for simplicity
+		Endpoint:  server.Endpoint,
+		Config:    server.Config.Settings, // Use settings as config
+		CreatedAt: server.CreatedAt,
+	}
 	
-	return mm.SetMCPServerStatus(serverID, "active")
+	// Validate configuration before deployment
+	if err := mm.validateMCPConfig(deployServer.Config); err != nil {
+		return fmt.Errorf("invalid MCP configuration: %w", err)
+	}
+	
+	// Update status to deploying
+	if err := mm.SetMCPServerStatus(serverID, "deploying"); err != nil {
+		return fmt.Errorf("failed to update status: %w", err)
+	}
+	
+	// Generate deployment configuration
+	deployConfig, err := mm.generateDeploymentConfig(deployServer)
+	if err != nil {
+		return fmt.Errorf("failed to generate deployment config: %w", err)
+	}
+	
+	// Deploy based on server type
+	var deployErr error
+	switch deployServer.Type {
+	case "http", "jira":
+		deployErr = mm.deployJiraServer(deployServer, deployConfig)
+	case "websocket", "slack":
+		deployErr = mm.deploySlackServer(deployServer, deployConfig)
+	case "stdio", "github":
+		deployErr = mm.deployGithubServer(deployServer, deployConfig)
+	case "custom":
+		deployErr = mm.deployCustomServer(deployServer, deployConfig)
+	default:
+		return fmt.Errorf("unsupported server type: %s", deployServer.Type)
+	}
+	
+	if deployErr != nil {
+		mm.SetMCPServerStatus(serverID, "failed")
+		return fmt.Errorf("deployment failed: %w", deployErr)
+	}
+	
+	// Health check with retry
+	if err := mm.healthCheckWithRetry(deployServer.Endpoint, 30*time.Second); err != nil {
+		mm.SetMCPServerStatus(serverID, "unhealthy")
+		return fmt.Errorf("health check failed: %w", err)
+	}
+	
+	// Mark as active
+	if err := mm.SetMCPServerStatus(serverID, "active"); err != nil {
+		return fmt.Errorf("failed to update final status: %w", err)
+	}
+	
+	return nil
 }
 
 // CreateJiraIntegration creates a custom MCP server for Jira integration
@@ -356,6 +421,251 @@ func generateServerID() (string, error) {
 		return "", err
 	}
 	return "mcp_" + hex.EncodeToString(bytes)[:16], nil
+}
+
+// validateMCPConfig validates MCP server configuration
+func (mm *MCPManager) validateMCPConfig(config map[string]interface{}) error {
+	if config == nil {
+		return fmt.Errorf("configuration cannot be nil")
+	}
+	return nil // Basic validation for now
+}
+
+// generateDeploymentConfig creates deployment-specific configuration
+func (mm *MCPManager) generateDeploymentConfig(server *MCPServerConfig) (map[string]interface{}, error) {
+	config := make(map[string]interface{})
+	
+	// Base configuration
+	config["server_id"] = server.ID
+	config["server_name"] = server.Name
+	config["server_type"] = server.Type
+	config["endpoint"] = server.Endpoint
+	config["created_at"] = server.CreatedAt
+	
+	// Parse port from endpoint
+	if strings.Contains(server.Endpoint, ":") {
+		parts := strings.Split(server.Endpoint, ":")
+		if len(parts) > 2 {
+			config["port"] = parts[2]
+		}
+	}
+	
+	// Environment variables
+	config["env"] = map[string]string{
+		"MCP_SERVER_ID":   server.ID,
+		"MCP_SERVER_NAME": server.Name,
+		"NODE_ENV":        "production",
+	}
+	
+	if port, ok := config["port"].(string); ok {
+		config["env"].(map[string]string)["MCP_PORT"] = port
+	}
+	
+	// Merge user configuration
+	for key, value := range server.Config {
+		config[key] = value
+	}
+	
+	return config, nil
+}
+
+// deployJiraServer deploys a Jira integration MCP server
+func (mm *MCPManager) deployJiraServer(server *MCPServerConfig, config map[string]interface{}) error {
+	// Create server directory
+	serverDir := filepath.Join("./mcp_servers", server.ID)
+	if err := os.MkdirAll(serverDir, 0755); err != nil {
+		return fmt.Errorf("failed to create server directory: %w", err)
+	}
+	
+	// Generate basic Jira MCP server code
+	serverCode := mm.generateJiraMCPCode(config)
+	packageJSON := mm.generatePackageJSON(server.Name, config)
+	
+	// Write server files
+	files := map[string]string{
+		"package.json": packageJSON,
+		"index.js":     serverCode,
+		"config.json":  mm.generateConfigJSON(config),
+	}
+	
+	for filename, content := range files {
+		filePath := filepath.Join(serverDir, filename)
+		if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
+			return fmt.Errorf("failed to write %s: %w", filename, err)
+		}
+	}
+	
+	// Install dependencies and start server
+	return mm.startNodeServer(serverDir, config)
+}
+
+// deploySlackServer deploys a Slack bot MCP server
+func (mm *MCPManager) deploySlackServer(server *MCPServerConfig, config map[string]interface{}) error {
+	serverDir := filepath.Join("./mcp_servers", server.ID)
+	if err := os.MkdirAll(serverDir, 0755); err != nil {
+		return fmt.Errorf("failed to create server directory: %w", err)
+	}
+	
+	serverCode := mm.generateSlackMCPCode(config)
+	packageJSON := mm.generatePackageJSON(server.Name, config)
+	
+	files := map[string]string{
+		"package.json": packageJSON,
+		"index.js":     serverCode,
+		"config.json":  mm.generateConfigJSON(config),
+	}
+	
+	for filename, content := range files {
+		filePath := filepath.Join(serverDir, filename)
+		if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
+			return fmt.Errorf("failed to write %s: %w", filename, err)
+		}
+	}
+	
+	return mm.startNodeServer(serverDir, config)
+}
+
+// deployGithubServer deploys a GitHub integration MCP server
+func (mm *MCPManager) deployGithubServer(server *MCPServerConfig, config map[string]interface{}) error {
+	return fmt.Errorf("GitHub MCP server deployment not yet implemented")
+}
+
+// deployCustomServer deploys a custom MCP server
+func (mm *MCPManager) deployCustomServer(server *MCPServerConfig, config map[string]interface{}) error {
+	return fmt.Errorf("Custom MCP server deployment not yet implemented")
+}
+
+// healthCheckWithRetry performs health check with exponential backoff
+func (mm *MCPManager) healthCheckWithRetry(endpoint string, timeout time.Duration) error {
+	start := time.Now()
+	backoff := 1 * time.Second
+	
+	for time.Since(start) < timeout {
+		if err := mm.healthCheck(endpoint); err == nil {
+			return nil
+		}
+		
+		time.Sleep(backoff)
+		backoff = time.Duration(float64(backoff) * 1.5)
+		if backoff > 10*time.Second {
+			backoff = 10 * time.Second
+		}
+	}
+	
+	return fmt.Errorf("health check timeout after %v", timeout)
+}
+
+// healthCheck performs a simple HTTP health check
+func (mm *MCPManager) healthCheck(endpoint string) error {
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Get(endpoint + "/health")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("health check returned status %d", resp.StatusCode)
+	}
+	
+	return nil
+}
+
+// startNodeServer installs dependencies and starts a Node.js MCP server
+func (mm *MCPManager) startNodeServer(serverDir string, config map[string]interface{}) error {
+	// Install npm dependencies
+	npmInstallCmd := exec.Command("npm", "install")
+	npmInstallCmd.Dir = serverDir
+	if err := npmInstallCmd.Run(); err != nil {
+		return fmt.Errorf("npm install failed: %w", err)
+	}
+	
+	// Start server in background
+	startCmd := exec.Command("npm", "start")
+	startCmd.Dir = serverDir
+	
+	// Set environment variables
+	if env, ok := config["env"].(map[string]string); ok {
+		for key, value := range env {
+			startCmd.Env = append(startCmd.Env, fmt.Sprintf("%s=%s", key, value))
+		}
+	}
+	
+	if err := startCmd.Start(); err != nil {
+		return fmt.Errorf("failed to start server: %w", err)
+	}
+	
+	return nil
+}
+
+// generateJiraMCPCode generates basic Node.js code for Jira MCP server
+func (mm *MCPManager) generateJiraMCPCode(config map[string]interface{}) string {
+	return `const express = require('express');
+const app = express();
+const port = process.env.MCP_PORT || 3000;
+
+app.use(express.json());
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy', server: 'jira-mcp' });
+});
+
+// MCP endpoints
+app.post('/mcp/tools/search_issues', (req, res) => {
+  // TODO: Implement Jira issue search
+  res.json({ message: 'Jira search not implemented' });
+});
+
+app.listen(port, () => {
+  console.log('Jira MCP server running on port', port);
+});`
+}
+
+// generateSlackMCPCode generates basic Node.js code for Slack MCP server
+func (mm *MCPManager) generateSlackMCPCode(config map[string]interface{}) string {
+	return `const express = require('express');
+const app = express();
+const port = process.env.MCP_PORT || 3000;
+
+app.use(express.json());
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy', server: 'slack-mcp' });
+});
+
+// MCP endpoints
+app.post('/mcp/tools/send_message', (req, res) => {
+  // TODO: Implement Slack message sending
+  res.json({ message: 'Slack integration not implemented' });
+});
+
+app.listen(port, () => {
+  console.log('Slack MCP server running on port', port);
+});`
+}
+
+// generatePackageJSON generates package.json for Node.js MCP server
+func (mm *MCPManager) generatePackageJSON(name string, config map[string]interface{}) string {
+	return fmt.Sprintf(`{
+  "name": "%s",
+  "version": "1.0.0",
+  "description": "Generated MCP server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.0"
+  }
+}`, strings.ToLower(strings.ReplaceAll(name, " ", "-")))
+}
+
+// generateConfigJSON generates config.json for MCP server
+func (mm *MCPManager) generateConfigJSON(config map[string]interface{}) string {
+	configBytes, _ := json.MarshalIndent(config, "", "  ")
+	return string(configBytes)
 }
 
 // InitMCPSchema creates the MCP servers table
