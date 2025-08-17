@@ -4,11 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"math"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -1430,4 +1433,232 @@ func TestServer_HandleScanWorkspaceComprehensive(t *testing.T) {
 	server.router.ServeHTTP(w, req)
 	
 	t.Logf("Scan with invalid JSON returned status: %d", w.Code)
+}
+
+func TestServer_HandleScanWorkspaceEdgeCases(t *testing.T) {
+	server, _, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	// Test with extremely large max_files value
+	payload := map[string]interface{}{
+		"path":      "/test/workspace",
+		"max_files": 1000000,
+	}
+	body, _ := json.Marshal(payload)
+	
+	req := httptest.NewRequest("POST", "/api/v1/documents/workspace", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Scan with large max_files returned status: %d", w.Code)
+	
+	// Test with zero max_files (should use default)
+	payload = map[string]interface{}{
+		"path":      "/test/workspace",
+		"max_files": 0,
+	}
+	body, _ = json.Marshal(payload)
+	
+	req = httptest.NewRequest("POST", "/api/v1/documents/workspace", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Scan with zero max_files returned status: %d", w.Code)
+	
+	// Test with custom include patterns
+	payload = map[string]interface{}{
+		"path":             "/test/workspace",
+		"include_patterns": []string{"*.custom", "*.special"},
+		"exclude_patterns": []string{"*.exclude", "temp*"},
+	}
+	body, _ = json.Marshal(payload)
+	
+	req = httptest.NewRequest("POST", "/api/v1/documents/workspace", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Scan with custom patterns returned status: %d", w.Code)
+	
+	// Test with empty patterns (should use defaults)
+	payload = map[string]interface{}{
+		"path":             "/test/workspace",
+		"include_patterns": []string{},
+		"exclude_patterns": []string{},
+	}
+	body, _ = json.Marshal(payload)
+	
+	req = httptest.NewRequest("POST", "/api/v1/documents/workspace", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Scan with empty patterns returned status: %d", w.Code)
+	
+	// Test with path containing special characters
+	payload = map[string]interface{}{
+		"path": "/test/workspace with spaces/special-chars_123",
+	}
+	body, _ = json.Marshal(payload)
+	
+	req = httptest.NewRequest("POST", "/api/v1/documents/workspace", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Scan with special chars path returned status: %d", w.Code)
+}
+
+func TestServer_HandleGetWeightsEdgeCases(t *testing.T) {
+	server, _, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	// Test with missing workspace parameter
+	req := httptest.NewRequest("GET", "/api/v1/weights", nil)
+	w := httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Get weights without workspace returned status: %d", w.Code)
+	
+	// Test with empty workspace parameter
+	req = httptest.NewRequest("GET", "/api/v1/weights?workspace=", nil)
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Get weights with empty workspace returned status: %d", w.Code)
+	
+	// Test with workspace that doesn't exist
+	req = httptest.NewRequest("GET", "/api/v1/weights?workspace=/nonexistent/workspace", nil)
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Get weights for nonexistent workspace returned status: %d", w.Code)
+	
+	// Test with workspace path containing URL-encoded characters
+	encodedPath := url.QueryEscape("/test/workspace with spaces")
+	req = httptest.NewRequest("GET", "/api/v1/weights?workspace="+encodedPath, nil)
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Get weights with encoded path returned status: %d", w.Code)
+	
+	// Test with very long workspace path
+	longPath := "/test/" + strings.Repeat("very-long-path-segment-", 20) + "workspace"
+	req = httptest.NewRequest("GET", "/api/v1/weights?workspace="+url.QueryEscape(longPath), nil)
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Get weights with long path returned status: %d", w.Code)
+}
+
+func TestServer_HandleCacheAndStorageInfoEdgeCases(t *testing.T) {
+	server, _, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	// Test cache invalidation multiple times
+	for i := 0; i < 3; i++ {
+		req := httptest.NewRequest("DELETE", "/api/v1/cache", nil)
+		w := httptest.NewRecorder()
+		
+		server.router.ServeHTTP(w, req)
+		t.Logf("Cache invalidation %d returned status: %d", i+1, w.Code)
+	}
+	
+	// Test cache stats multiple times
+	for i := 0; i < 3; i++ {
+		req := httptest.NewRequest("GET", "/api/v1/cache/stats", nil)
+		w := httptest.NewRecorder()
+		
+		server.router.ServeHTTP(w, req)
+		t.Logf("Cache stats %d returned status: %d", i+1, w.Code)
+	}
+	
+	// Test storage info multiple times
+	for i := 0; i < 3; i++ {
+		req := httptest.NewRequest("GET", "/api/v1/storage/info", nil)
+		w := httptest.NewRecorder()
+		
+		server.router.ServeHTTP(w, req)
+		t.Logf("Storage info %d returned status: %d", i+1, w.Code)
+	}
+}
+
+func TestServer_ScanWorkspaceFilesEdgeCases(t *testing.T) {
+	server, _, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	// Create a temporary directory structure for testing
+	tempDir := filepath.Join(os.TempDir(), fmt.Sprintf("api-scan-test-%d", time.Now().UnixNano()))
+	err := os.MkdirAll(tempDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create temp directory: %v", err)
+	}
+	defer os.RemoveAll(tempDir)
+	
+	// Create test files
+	testFiles := []struct {
+		path    string
+		content string
+	}{
+		{filepath.Join(tempDir, "test.go"), "package main\nfunc main() {}"},
+		{filepath.Join(tempDir, "test.js"), "console.log('hello');"},
+		{filepath.Join(tempDir, "test.py"), "print('hello')"},
+		{filepath.Join(tempDir, "README.md"), "# Test Project"},
+		{filepath.Join(tempDir, "test.log"), "log file content"},
+		{filepath.Join(tempDir, "test.tmp"), "temp file content"},
+	}
+	
+	for _, tf := range testFiles {
+		err = os.WriteFile(tf.path, []byte(tf.content), 0644)
+		if err != nil {
+			t.Fatalf("Failed to create test file %s: %v", tf.path, err)
+		}
+	}
+	
+	// Create subdirectory with files
+	subDir := filepath.Join(tempDir, "subdir")
+	err = os.MkdirAll(subDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create subdirectory: %v", err)
+	}
+	
+	err = os.WriteFile(filepath.Join(subDir, "nested.go"), []byte("package nested"), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create nested file: %v", err)
+	}
+	
+	// Test scan with the real directory
+	payload := map[string]interface{}{
+		"path":             tempDir,
+		"include_patterns": []string{"*.go", "*.js", "*.py", "*.md"},
+		"exclude_patterns": []string{"*.log", "*.tmp"},
+		"max_files":        100,
+	}
+	body, _ := json.Marshal(payload)
+	
+	req := httptest.NewRequest("POST", "/api/v1/documents/workspace", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Scan with real files returned status: %d", w.Code)
+	
+	if w.Code == http.StatusOK {
+		var response map[string]interface{}
+		json.Unmarshal(w.Body.Bytes(), &response)
+		t.Logf("Scan found %v files", response["scanned_files"])
+	}
+	
+	// Test with very restrictive max_files
+	payload["max_files"] = 1
+	body, _ = json.Marshal(payload)
+	
+	req = httptest.NewRequest("POST", "/api/v1/documents/workspace", bytes.NewBuffer(body))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Scan with max_files=1 returned status: %d", w.Code)
 }
