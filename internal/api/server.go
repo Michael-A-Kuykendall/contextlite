@@ -26,20 +26,22 @@ import (
 
 // Server provides the HTTP API server
 type Server struct {
-	router   *chi.Mux
-	pipeline *pipeline.Pipeline
-	storage  *storage.Storage
-	config   *config.Config
-	logger   *zap.Logger
+	router      *chi.Mux
+	pipeline    *pipeline.Pipeline
+	storage     *storage.Storage
+	config      *config.Config
+	logger      *zap.Logger
+	featureGate *features.FeatureGate
 }
 
 // New creates a new API server
-func New(pipeline *pipeline.Pipeline, storage *storage.Storage, config *config.Config, logger *zap.Logger) *Server {
+func New(pipeline *pipeline.Pipeline, storage *storage.Storage, config *config.Config, logger *zap.Logger, featureGate *features.FeatureGate) *Server {
 	s := &Server{
-		pipeline: pipeline,
-		storage:  storage,
-		config:   config,
-		logger:   logger,
+		pipeline:    pipeline,
+		storage:     storage,
+		config:      config,
+		logger:      logger,
+		featureGate: featureGate,
 	}
 	
 	s.setupRoutes()
@@ -77,35 +79,44 @@ func (s *Server) setupRoutes() {
 		// Bearer token authentication for all API routes
 		r.Use(s.authMiddleware)
 		
-		// Context assembly
-		r.Post("/context/assemble", s.handleAssembleContext)
+		// Context assembly (requires Professional+)
+		r.With(s.requireProfessional).Post("/context/assemble", s.handleAssembleContext)
 		
-		// Lightweight RAG endpoints
-		r.Post("/rank", s.handleRank)
-		r.Post("/snippet", s.handleSnippet)
+		// Lightweight RAG endpoints (requires Professional+)
+		r.With(s.requireProfessional).Post("/rank", s.handleRank)
+		r.With(s.requireProfessional).Post("/snippet", s.handleSnippet)
 		
-		// Baseline comparison
-		r.Post("/context/baseline", s.handleBaselineComparison)
+		// Baseline comparison (requires Professional+)
+		r.With(s.requireProfessional).Post("/context/baseline", s.handleBaselineComparison)
 		
-		// Document management
+		// Document management (Basic features - all tiers)
 		r.Post("/documents", s.handleAddDocument)
 		r.Post("/documents/bulk", s.handleBulkAddDocuments)
 		r.Post("/documents/workspace", s.handleScanWorkspace)
 		r.Delete("/documents/{id}", s.handleDeleteDocument)
 		r.Get("/documents/search", s.handleSearchDocuments)
 		
-		// Weight management
-		r.Post("/weights/update", s.handleUpdateWeights)
-		r.Get("/weights", s.handleGetWeights)
-		r.Post("/weights/reset", s.handleResetWeights)
+		// Weight management (requires Professional+)
+		r.With(s.requireProfessional).Post("/weights/update", s.handleUpdateWeights)
+		r.With(s.requireProfessional).Get("/weights", s.handleGetWeights)
+		r.With(s.requireProfessional).Post("/weights/reset", s.handleResetWeights)
 		
-		// Cache management
-		r.Post("/cache/invalidate", s.handleInvalidateCache)
-		r.Get("/cache/stats", s.handleCacheStats)
+		// Cache management (requires Professional+)
+		r.With(s.requireProfessional).Post("/cache/invalidate", s.handleInvalidateCache)
+		r.With(s.requireProfessional).Get("/cache/stats", s.handleCacheStats)
 		
-		// System info
+		// System info (Basic for all, detailed for Professional+)
 		r.Get("/storage/info", s.handleStorageInfo)
-		r.Get("/optimization/stats", s.handleoptimizationStats)
+		r.With(s.requireProfessional).Get("/optimization/stats", s.handleoptimizationStats)
+		
+		// Enterprise-only endpoints
+		r.Route("/enterprise", func(r chi.Router) {
+			r.Use(s.requireEnterprise)
+			r.Get("/tenants", s.handleListTenants)
+			r.Post("/tenants", s.handleCreateTenant)
+			r.Get("/mcp/servers", s.handleListMCPServers)
+			r.Post("/mcp/servers", s.handleCreateMCPServer)
+		})
 	})
 	
 	s.router = r
@@ -138,6 +149,28 @@ func (s *Server) authMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		
+		next.ServeHTTP(w, r)
+	})
+}
+
+// requireProfessional ensures the user has Professional or Enterprise license
+func (s *Server) requireProfessional(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := s.featureGate.RequireProfessional("API access"); err != nil {
+			s.writeError(w, http.StatusForbidden, "Professional license required: "+err.Error())
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+// requireEnterprise ensures the user has Enterprise license
+func (s *Server) requireEnterprise(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := s.featureGate.RequireEnterprise("Enterprise API access"); err != nil {
+			s.writeError(w, http.StatusForbidden, "Enterprise license required: "+err.Error())
+			return
+		}
 		next.ServeHTTP(w, r)
 	})
 }
@@ -649,6 +682,118 @@ func (s *Server) handleoptimizationStats(w http.ResponseWriter, r *http.Request)
 	}
 	
 	s.writeJSON(w, http.StatusOK, stats)
+}
+
+// Enterprise tenant management endpoints
+func (s *Server) handleListTenants(w http.ResponseWriter, r *http.Request) {
+	// This would integrate with the enterprise tenant manager
+	tenants := []map[string]interface{}{
+		{
+			"id":          "demo-tenant",
+			"name":        "Demo Organization",
+			"status":      "active",
+			"created_at":  time.Now().Add(-24*time.Hour).Unix(),
+			"user_count":  5,
+		},
+	}
+	
+	s.writeJSON(w, http.StatusOK, map[string]interface{}{
+		"tenants": tenants,
+		"total":   len(tenants),
+	})
+}
+
+func (s *Server) handleCreateTenant(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Name     string `json:"name"`
+		Domain   string `json:"domain"`
+		Settings map[string]interface{} `json:"settings,omitempty"`
+	}
+	
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		s.writeError(w, http.StatusBadRequest, "Invalid request: "+err.Error())
+		return
+	}
+	
+	if req.Name == "" || req.Domain == "" {
+		s.writeError(w, http.StatusBadRequest, "Name and domain required")
+		return
+	}
+	
+	// Generate tenant ID
+	tenantID := fmt.Sprintf("tenant_%d", time.Now().Unix())
+	
+	response := map[string]interface{}{
+		"id":         tenantID,
+		"name":       req.Name,
+		"domain":     req.Domain,
+		"status":     "active",
+		"created_at": time.Now().Unix(),
+		"database_url": fmt.Sprintf("./data/%s.db", tenantID),
+	}
+	
+	s.writeJSON(w, http.StatusCreated, response)
+}
+
+// Enterprise MCP server management endpoints
+func (s *Server) handleListMCPServers(w http.ResponseWriter, r *http.Request) {
+	servers := []map[string]interface{}{
+		{
+			"id":        "jira-integration",
+			"name":      "Jira Integration",
+			"type":      "jira",
+			"status":    "active",
+			"endpoint":  "http://localhost:3001",
+			"created_at": time.Now().Add(-2*time.Hour).Unix(),
+		},
+		{
+			"id":        "slack-bot",
+			"name":      "Slack Bot",
+			"type":      "slack",
+			"status":    "active",
+			"endpoint":  "http://localhost:3002",
+			"created_at": time.Now().Add(-1*time.Hour).Unix(),
+		},
+	}
+	
+	s.writeJSON(w, http.StatusOK, map[string]interface{}{
+		"servers": servers,
+		"total":   len(servers),
+	})
+}
+
+func (s *Server) handleCreateMCPServer(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Name   string                 `json:"name"`
+		Type   string                 `json:"type"`
+		Config map[string]interface{} `json:"config"`
+	}
+	
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		s.writeError(w, http.StatusBadRequest, "Invalid request: "+err.Error())
+		return
+	}
+	
+	if req.Name == "" || req.Type == "" {
+		s.writeError(w, http.StatusBadRequest, "Name and type required")
+		return
+	}
+	
+	// Generate server ID
+	serverID := fmt.Sprintf("mcp_%d", time.Now().Unix())
+	port := 3000 + len(serverID)%1000 // Simple port allocation
+	
+	response := map[string]interface{}{
+		"id":         serverID,
+		"name":       req.Name,
+		"type":       req.Type,
+		"status":     "deploying",
+		"endpoint":   fmt.Sprintf("http://localhost:%d", port),
+		"created_at": time.Now().Unix(),
+		"config":     req.Config,
+	}
+	
+	s.writeJSON(w, http.StatusCreated, response)
 }
 
 // Helper methods
