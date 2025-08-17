@@ -5,8 +5,10 @@ type SMTMetrics struct {
 	SolverUsed      string  `json:"solver_used"`
 	Z3Status        string  `json:"z3_status,omitempty"`
 	Objective       int64   `json:"objective,omitempty"`
-	SolveTimeMs     int     `json:"solve_time_ms"`
-	SMTWallMs       int     `json:"smt_wall_ms"`        // Total wall-clock time for SMT (includes I/O + parsing)
+	SolveTimeUs     int64   `json:"solve_time_us"`      // Pure solver time in microseconds
+	SolveTimeMs     float64 `json:"solve_time_ms"`      // Pure solver time in milliseconds (float)
+	SMTWallUs       int64   `json:"smt_wall_us"`        // Total wall-clock time for SMT (includes I/O + parsing)
+	SMTWallMs       float64 `json:"smt_wall_ms"`        // Total wall-clock time in milliseconds (float)
 	VariableCount   int     `json:"variable_count"`
 	ConstraintCount int     `json:"constraint_count"`
 	KCandidates     int     `json:"K_candidates"`
@@ -18,10 +20,19 @@ type SMTMetrics struct {
 
 // StageTimings represents timing information for each pipeline stage
 type StageTimings struct {
-	FTSHarvestMs   int `json:"fts_harvest_ms"`
-	FeatureBuildMs int `json:"feature_build_ms"`
-	SMTWallMs      int `json:"smt_wall_ms"`    // Total wall-clock time for SMT (includes I/O + parsing)
-	TotalMs        int `json:"total_ms"`
+	// Microsecond precision timings (primary values)
+	FTSHarvestUs   int64   `json:"fts_harvest_us"`
+	FeatureBuildUs int64   `json:"feature_build_us"`
+	SMTSolverUs    int64   `json:"smt_solver_us"`    // Pure solver time
+	SMTWallUs      int64   `json:"smt_wall_us"`      // Total wall-clock time for SMT (includes I/O + parsing)
+	TotalUs        int64   `json:"total_us"`
+	
+	// Float millisecond convenience fields (derived from microseconds)
+	FTSHarvestMs   float64 `json:"fts_harvest_ms"`
+	FeatureBuildMs float64 `json:"feature_build_ms"`
+	SMTSolverMs    float64 `json:"smt_solver_ms"`
+	SMTWallMs      float64 `json:"smt_wall_ms"`
+	TotalMs        float64 `json:"total_ms"`
 }
 
 // AssembleRequest represents a context assembly request

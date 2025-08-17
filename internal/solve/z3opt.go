@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"contextlite/internal/timing"
 	"contextlite/pkg/types"
 )
 
@@ -32,10 +33,11 @@ func NewZ3Optimizer(z3Path string, timeoutMs int) *Z3Optimizer {
 type OptimizeResult struct {
 	SelectedDocs    []int
 	ObjectiveValue  int
-	SolveTimeMs     int
+	SolveTimeUs     int64   // Microsecond precision timing
+	SolveTimeMs     int     // Legacy millisecond timing for compatibility
 	VariableCount   int
 	ConstraintCount int
-	Status          string // "sat", "unknown", "unsat"
+	Status          string  // "sat", "unknown", "unsat"
 	TimedOut        bool
 }
 
@@ -47,7 +49,7 @@ func (z *Z3Optimizer) OptimizeDocumentSelection(
 	maxTokens int,
 	maxDocs int) (*OptimizeResult, error) {
 
-	startTime := time.Now()
+	totalTimer := timing.Start()
 
 	// Build SMT-LIB2 model
 	smtModel := z.buildSMTModel(docs, pairs, maxTokens, maxDocs)
@@ -57,12 +59,17 @@ func (z *Z3Optimizer) OptimizeDocumentSelection(
 	defer cancel()
 
 	// Run Z3 with the model
+	z3Timer := timing.Start()
 	result, err := z.runZ3(ctxTimeout, smtModel)
 	if err != nil {
 		return nil, fmt.Errorf("Z3 execution failed: %w", err)
 	}
+	z3Us := z3Timer.Us()
 
-	result.SolveTimeMs = int(time.Since(startTime).Milliseconds())
+	// Set timing information with microsecond precision
+	totalUs := totalTimer.Us()
+	result.SolveTimeUs = z3Us
+	result.SolveTimeMs = int(float64(totalUs) / 1_000.0) // Total wall time for legacy compatibility
 	result.VariableCount = len(docs) + len(pairs)
 	result.ConstraintCount = z.countConstraints(docs, pairs, maxTokens > 0, maxDocs > 0)
 

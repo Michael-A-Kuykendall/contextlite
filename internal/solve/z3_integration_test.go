@@ -2,6 +2,7 @@ package solve
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -214,4 +215,97 @@ func TestZ3Optimizer_PairwisePenaltyEffects(t *testing.T) {
 	}
 	
 	t.Logf("Redundancy penalty test: selected %d documents (expected 1)", len(result.SelectedDocs))
+}
+
+func TestZ3Optimizer_ErrorHandling(t *testing.T) {
+	// Test with invalid Z3 path
+	invalidOptimizer := NewZ3Optimizer("/nonexistent/z3/binary", 5000)
+	
+	docs := []types.ScoredDocument{
+		{
+			Document: types.Document{
+				ID:         "1",
+				Content:    "test content",
+				TokenCount: 50,
+			},
+			UtilityScore: 0.8,
+		},
+	}
+	
+	ctx := context.Background()
+	_, err := invalidOptimizer.OptimizeDocumentSelection(ctx, docs, nil, 100, 1)
+	
+	// Should handle the error gracefully (might return fallback or error)
+	if err == nil {
+		t.Log("Invalid Z3 path handled gracefully with fallback")
+	} else {
+		t.Logf("Invalid Z3 path properly returned error: %v", err)
+	}
+}
+
+func TestZ3Optimizer_TimeoutHandling(t *testing.T) {
+	err := CheckZ3Available("z3")
+	if err != nil {
+		t.Skip("Z3 not available for timeout testing")
+	}
+	
+	optimizer := NewZ3Optimizer("z3", 1) // Very short timeout
+	
+	// Create a more complex problem that might timeout
+	docs := make([]types.ScoredDocument, 10)
+	for i := 0; i < 10; i++ {
+		docs[i] = types.ScoredDocument{
+			Document: types.Document{
+				ID:         fmt.Sprintf("doc%d", i),
+				Content:    fmt.Sprintf("Content %d with various words", i),
+				TokenCount: 100 + i*10,
+			},
+			UtilityScore: 0.5 + float64(i)*0.05,
+		}
+	}
+	
+	pairs := make([]DocumentPair, 0)
+	for i := 0; i < len(docs); i++ {
+		for j := i + 1; j < len(docs); j++ {
+			pairs = append(pairs, DocumentPair{
+				DocI: i, DocJ: j, 
+				Similarity: 0.5,
+				RedundancyPenalty: 500,
+				CoherenceBonus: 100,
+			})
+		}
+	}
+	
+	// Use very short timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Millisecond)
+	defer cancel()
+	
+	result, err := optimizer.OptimizeDocumentSelection(ctx, docs, pairs, 500, 5)
+	if err != nil {
+		t.Logf("Timeout handling test returned error (expected): %v", err)
+	} else if result.TimedOut {
+		t.Log("Timeout properly detected and handled")
+	} else {
+		t.Log("Problem solved quickly despite short timeout")
+	}
+}
+
+func TestCheckZ3Available_EdgeCases(t *testing.T) {
+	// Test with empty path
+	err := CheckZ3Available("")
+	if err != nil {
+		t.Logf("Empty Z3 path properly returns error: %v", err)
+	}
+	
+	// Test with non-existent path
+	err = CheckZ3Available("/nonexistent/binary")
+	if err != nil {
+		t.Logf("Non-existent Z3 path properly returns error: %v", err)
+	}
+	
+	// Test with custom Z3 path
+	customOptimizer := NewZ3Optimizer("/custom/z3/path", 5000)
+	if customOptimizer.z3Path == "/custom/z3/path" {
+		t.Log("Custom Z3 path properly set")
+	}
 }

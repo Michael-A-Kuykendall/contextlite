@@ -23,6 +23,18 @@ var schemaFS embed.FS
 // Storage provides SQLite storage operations
 type Storage struct {
 	db *sql.DB
+	// Cache statistics
+	cacheHits   int64
+	cacheMisses int64
+}
+
+// CacheStats represents cache performance metrics
+type CacheStats struct {
+	Hits     int64   `json:"hits"`
+	Misses   int64   `json:"misses"`
+	HitRate  float64 `json:"hit_rate"`
+	L1Size   int     `json:"l1_size"`
+	L2Size   int     `json:"l2_size"`
 }
 
 // New creates a new Storage instance
@@ -65,6 +77,83 @@ func New(dbPath string) (*Storage, error) {
 // Close closes the database connection
 func (s *Storage) Close() error {
 	return s.db.Close()
+}
+
+// GetStorageStats returns real database statistics
+func (s *Storage) GetStorageStats(ctx context.Context) (map[string]interface{}, error) {
+	stats := make(map[string]interface{})
+	
+	// Get document count
+	var docCount int
+	err := s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM documents").Scan(&docCount)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get document count: %w", err)
+	}
+	stats["total_documents"] = docCount
+	
+	// Get database size (in pages * page_size)
+	var pageCount, pageSize int64
+	err = s.db.QueryRowContext(ctx, "PRAGMA page_count").Scan(&pageCount)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get page count: %w", err)
+	}
+	err = s.db.QueryRowContext(ctx, "PRAGMA page_size").Scan(&pageSize)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get page size: %w", err)
+	}
+	
+	dbSizeBytes := pageCount * pageSize
+	stats["database_size"] = fmt.Sprintf("%.2f MB", float64(dbSizeBytes)/(1024*1024))
+	
+	// Get FTS index size (estimate)
+	ftsPages := pageCount / 4 // Estimate FTS as 25% of total
+	ftsSizeBytes := ftsPages * pageSize
+	stats["index_size"] = fmt.Sprintf("%.2f MB", float64(ftsSizeBytes)/(1024*1024))
+	
+	// Get last update time
+	var lastUpdate time.Time
+	err = s.db.QueryRowContext(ctx, `
+		SELECT MAX(created_at) FROM documents
+	`).Scan(&lastUpdate)
+	if err != nil {
+		lastUpdate = time.Now()
+	}
+	stats["last_update"] = lastUpdate.Unix()
+	
+	// Additional useful stats
+	var avgDocSize sql.NullFloat64
+	err = s.db.QueryRowContext(ctx, `
+		SELECT AVG(LENGTH(content)) FROM documents
+	`).Scan(&avgDocSize)
+	if err == nil && avgDocSize.Valid {
+		stats["avg_document_size"] = fmt.Sprintf("%.0f chars", avgDocSize.Float64)
+	}
+	
+	return stats, nil
+}
+
+// GetCacheStats returns cache performance statistics
+func (s *Storage) GetCacheStats(ctx context.Context) (*CacheStats, error) {
+	// Get L2 cache size (number of cached results)
+	var l2Size int
+	err := s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM query_cache").Scan(&l2Size)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get cache size: %w", err)
+	}
+	
+	total := s.cacheHits + s.cacheMisses
+	hitRate := 0.0
+	if total > 0 {
+		hitRate = float64(s.cacheHits) / float64(total)
+	}
+	
+	return &CacheStats{
+		Hits:    s.cacheHits,
+		Misses:  s.cacheMisses,
+		HitRate: hitRate,
+		L1Size:  0, // L1 cache not implemented in this version
+		L2Size:  l2Size,
+	}, nil
 }
 
 // initSchema initializes the database schema
@@ -350,6 +439,10 @@ func (s *Storage) GetQueryCache(ctx context.Context, queryHash, corpusHash, mode
 	}
 
 	result.CacheHit = true
+	
+	// Track cache hit
+	s.cacheHits++
+	
 	return &result, nil
 }
 
@@ -442,6 +535,8 @@ func (s *Storage) GetCachedResultByKey(ctx context.Context, cacheKey string) (*t
 		&coherenceScore, &solveTimeMs, &fallbackUsed, &createdAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			// Track cache miss
+			s.cacheMisses++
 			return nil, nil // Cache miss
 		}
 		return nil, fmt.Errorf("failed to scan cached result: %w", err)
@@ -515,4 +610,18 @@ func (s *Storage) SaveQueryCacheWithKey(ctx context.Context, queryHash, corpusHa
 			result.SMTMetrics.SolveTimeMs, result.SMTMetrics.FallbackReason != "", expiresAt)
 	}
 	return err
+}
+
+// InvalidateCache removes all cached query results
+func (s *Storage) InvalidateCache(ctx context.Context) error {
+	_, err := s.db.ExecContext(ctx, "DELETE FROM query_cache")
+	if err != nil {
+		return fmt.Errorf("failed to invalidate cache: %w", err)
+	}
+	
+	// Reset cache statistics
+	s.cacheHits = 0
+	s.cacheMisses = 0
+	
+	return nil
 }

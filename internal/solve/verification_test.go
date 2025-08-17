@@ -189,3 +189,73 @@ func BenchmarkBruteForceVerifier_Scale(b *testing.B) {
 		})
 	}
 }
+
+func TestBruteForceVerifier_VerifyOptimality(t *testing.T) {
+	verifier := NewBruteForceVerifier()
+	
+	// Create test documents using the existing pattern
+	docs := []types.ScoredDocument{
+		{
+			Document: types.Document{
+				ID:         "doc1",
+				Content:    "First test document",
+				TokenCount: 100,
+			},
+			UtilityScore: 0.8,
+		},
+		{
+			Document: types.Document{
+				ID:         "doc2", 
+				Content:    "Second test document",
+				TokenCount: 150,
+			},
+			UtilityScore: 0.6,
+		},
+		{
+			Document: types.Document{
+				ID:         "doc3",
+				Content:    "Third test document", 
+				TokenCount: 120,
+			},
+			UtilityScore: 0.7,
+		},
+	}
+	
+	pairs := []DocumentPair{
+		{DocI: 0, DocJ: 1, Similarity: 0.5, RedundancyPenalty: 200, CoherenceBonus: 100},
+		{DocI: 1, DocJ: 2, Similarity: 0.4, RedundancyPenalty: 300, CoherenceBonus: 120},
+		{DocI: 0, DocJ: 2, Similarity: 0.3, RedundancyPenalty: 150, CoherenceBonus: 90},
+	}
+	
+	// Create a mock Z3 result to verify against
+	z3Result := &OptimizeResult{
+		Status:          "sat",
+		ObjectiveValue:  15000, // Some objective value
+		SelectedDocs:    []int{0, 2},
+		VariableCount:   3,
+		ConstraintCount: 10,
+		SolveTimeMs:     50,
+	}
+	
+	// Test verification
+	verification, err := verifier.VerifyOptimality(docs, pairs, 300, 2, z3Result)
+	if err != nil {
+		t.Fatalf("Verification failed: %v", err)
+	}
+	
+	if verification == nil {
+		t.Errorf("Verification result should not be nil")
+	}
+	
+	if verification.BruteForceOptimum <= 0 {
+		t.Errorf("Brute force optimum should be positive, got %d", verification.BruteForceOptimum)
+	}
+	
+	if verification.Z3ObjectiveValue != z3Result.ObjectiveValue {
+		t.Errorf("Z3 objective value mismatch: expected %d, got %d", 
+			z3Result.ObjectiveValue, verification.Z3ObjectiveValue)
+	}
+	
+	t.Logf("Verification completed: BF=%d, Z3=%d, Optimal=%v", 
+		verification.BruteForceOptimum, verification.Z3ObjectiveValue, verification.IsOptimal)
+}

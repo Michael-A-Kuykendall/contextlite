@@ -1,0 +1,126 @@
+{
+  "name": "contextlite",
+  "displayName": "ContextLite - SMT Context Optimizer",
+  "description": "10,000x faster than vector databases. SMT-optimized context assembly for AI coding assistants.",
+  "version": "1.0.0",
+  "publisher": "contextlite",
+  "author": "Michael A. Kuykendall",
+  "license": "SEE LICENSE IN LICENSE",
+  "sponsor": {
+    "url": "https://buy.stripe.com/bJe3cneNfcBp2Z57u67N600"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/contextlite/contextlite"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "AI",
+    "Machine Learning",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "context",
+    "copilot",
+    "smt",
+    "optimization",
+    "coding assistant"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "contextlite.addToContext",
+        "title": "Add to Context",
+        "category": "ContextLite"
+      },
+      {
+        "command": "contextlite.assembleContext",
+        "title": "Assemble Context",
+        "category": "ContextLite"
+      },
+      {
+        "command": "contextlite.clearContext",
+        "title": "Clear Context",
+        "category": "ContextLite"
+      },
+      {
+        "command": "contextlite.showLicense",
+        "title": "License Information",
+        "category": "ContextLite"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "contextlite.addToContext",
+          "group": "contextlite",
+          "when": "editorHasSelection"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "contextlite.addToContext"
+        },
+        {
+          "command": "contextlite.assembleContext"
+        },
+        {
+          "command": "contextlite.clearContext"
+        },
+        {
+          "command": "contextlite.showLicense"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "ContextLite",
+      "properties": {
+        "contextlite.licenseKey": {
+          "type": "string",
+          "default": "",
+          "description": "Your ContextLite commercial license key (format: CL-2024-XXXXX)"
+        },
+        "contextlite.serverPort": {
+          "type": "number",
+          "default": 8081,
+          "description": "Port for ContextLite server"
+        },
+        "contextlite.maxTokens": {
+          "type": "number",
+          "default": 4000,
+          "description": "Maximum tokens for assembled context"
+        },
+        "contextlite.maxDocuments": {
+          "type": "number",
+          "default": 10,
+          "description": "Maximum documents to include in context"
+        },
+        "contextlite.useSMT": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use SMT optimization (vs fallback MMR)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^18.x",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}

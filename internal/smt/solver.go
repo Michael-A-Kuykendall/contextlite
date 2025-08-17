@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"math"
 	"sort"
-	"time"
 
 	"contextlite/internal/features"
 	"contextlite/internal/solve"
+	"contextlite/internal/timing"
 	"contextlite/pkg/config"
 	"contextlite/pkg/types"
 )
@@ -25,7 +25,8 @@ type SMTResult struct {
 	SelectedDocs    []int               `json:"selected_docs"`
 	ObjectiveValue  float64             `json:"objective_value"`
 	Objective       int                 `json:"objective"`        // Integer objective from Z3
-	SolveTimeMs     int                 `json:"solve_time_ms"`
+	SolveTimeUs     int64               `json:"solve_time_us"`    // Pure solver time in microseconds
+	SolveTimeMs     int                 `json:"solve_time_ms"`    // Legacy compatibility
 	VariableCount   int                 `json:"variable_count"`
 	ConstraintCount int                 `json:"constraint_count"`
 	KCandidates     int                 `json:"K_candidates"`
@@ -63,8 +64,6 @@ func (s *SMTSolver) OptimizeSelection(ctx context.Context,
 	maxTokens int, 
 	maxDocs int) (*SMTResult, error) {
 	
-	startTime := time.Now()
-	
 	// Limit candidates to keep SMT model manageable
 	candidates := scoredDocs
 	if len(candidates) > s.config.SMT.MaxCandidates {
@@ -83,7 +82,8 @@ func (s *SMTSolver) OptimizeSelection(ctx context.Context,
 	
 	var result *SMTResult
 	if err != nil || z3Result.Status != "sat" {
-		// Fallback to greedy selection
+		// Fallback to appropriate algorithm based on ObjectiveStyle
+		fallbackTimer := timing.Start()
 		fallbackReason := fmt.Sprintf("Z3 failed: %v", err)
 		if z3Result != nil {
 			if z3Result.TimedOut {
@@ -93,16 +93,42 @@ func (s *SMTSolver) OptimizeSelection(ctx context.Context,
 			}
 		}
 		
-		result = s.fallbackMMR(candidates, pairs, maxTokens, maxDocs)
+		// Dispatch to appropriate solver based on ObjectiveStyle
+		var solverErr error
+		switch s.config.SMT.ObjectiveStyle {
+		case "weighted-sum":
+			result, solverErr = s.solveWeightedSum(candidates, pairs, maxTokens, maxDocs)
+		case "lexicographic":
+			result, solverErr = s.solveLexicographic(candidates, pairs, maxTokens, maxDocs)
+		case "epsilon-constraint":
+			result, solverErr = s.solveEpsilonConstraint(candidates, pairs, maxTokens, maxDocs)
+		case "greedy-weighted":
+			result, solverErr = s.greedyWeightedSelection(candidates, pairs, maxTokens, maxDocs, "greedy-weighted")
+		case "greedy-constrained":
+			result, solverErr = s.greedyConstrainedSelection(candidates, pairs, maxTokens, maxDocs)
+		default:
+			// Default to MMR fallback for unknown styles
+			result = s.fallbackMMR(candidates, pairs, maxTokens, maxDocs)
+			solverErr = nil
+		}
+		
+		// If solver failed, use MMR fallback
+		if solverErr != nil {
+			result = s.fallbackMMR(candidates, pairs, maxTokens, maxDocs)
+		}
+		
+		fallbackUs := fallbackTimer.Us()
 		result.FallbackReason = fallbackReason
-		result.SolverUsed = "mmr-fallback"
+		result.SolveTimeUs = fallbackUs
+		result.SolveTimeMs = int(float64(fallbackUs) / 1_000.0)
 	} else {
 		// Z3 succeeded
 		result = &SMTResult{
 			SelectedDocs:    z3Result.SelectedDocs,
 			ObjectiveValue:  float64(z3Result.ObjectiveValue) / 10000.0, // Unscaled for compatibility
 			Objective:       z3Result.ObjectiveValue,                    // Integer objective from Z3
-			SolveTimeMs:     z3Result.SolveTimeMs,
+			SolveTimeUs:     z3Result.SolveTimeUs,
+			SolveTimeMs:     int(float64(z3Result.SolveTimeUs) / 1_000.0),
 			VariableCount:   z3Result.VariableCount,
 			ConstraintCount: z3Result.ConstraintCount,
 			KCandidates:     len(candidates),
@@ -118,12 +144,10 @@ func (s *SMTSolver) OptimizeSelection(ctx context.Context,
 		if s.config.SMT.Z3.EnableVerification && len(candidates) <= s.config.SMT.Z3.MaxVerificationDocs {
 			if verification, err := s.verifier.VerifyOptimality(candidates, z3Pairs, maxTokens, maxDocs, z3Result); err == nil {
 				result.Verified = verification.IsOptimal
-				// Note: OptimalityGap removed - Z3 doesn't provide MIP-style gaps
 			}
 		}
 	}
 	
-	result.SolveTimeMs = int(time.Since(startTime).Milliseconds())
 	return result, nil
 }
 
@@ -416,7 +440,8 @@ func (s *SMTSolver) fallbackMMR(docs []types.ScoredDocument,
 		SelectedDocs:    selected,
 		ObjectiveValue:  s.computeObjectiveValue(docs, selected, pairs),
 		Objective:       0,  // No integer objective for fallback
-		SolveTimeMs:     0,
+		SolveTimeUs:     0,  // Will be set by caller
+		SolveTimeMs:     0,  // Will be set by caller
 		VariableCount:   0,  // No SMT variables for fallback
 		ConstraintCount: 0,  // No SMT constraints for fallback
 		KCandidates:     len(docs),

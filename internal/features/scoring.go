@@ -150,6 +150,9 @@ func (fe *FeatureExtractor) computeEntanglement(docTerms, docFreq map[string]int
 	}
 	
 	sort.Slice(terms, func(i, j int) bool {
+		if terms[i].freq == terms[j].freq {
+			return terms[i].term < terms[j].term // Deterministic ordering for equal frequencies
+		}
 		return terms[i].freq > terms[j].freq
 	})
 	

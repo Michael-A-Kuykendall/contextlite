@@ -1,9 +1,14 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -368,8 +373,52 @@ func (s *Server) handleBulkAddDocuments(w http.ResponseWriter, r *http.Request) 
 
 // Scan workspace directory
 func (s *Server) handleScanWorkspace(w http.ResponseWriter, r *http.Request) {
-	// TODO: Implement workspace scanning
-	s.writeError(w, http.StatusNotImplemented, "Workspace scanning not yet implemented")
+	var req struct {
+		Path           string   `json:"path"`
+		IncludePatterns []string `json:"include_patterns,omitempty"`
+		ExcludePatterns []string `json:"exclude_patterns,omitempty"`
+		MaxFiles       int      `json:"max_files,omitempty"`
+	}
+	
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		s.writeError(w, http.StatusBadRequest, "Invalid request: "+err.Error())
+		return
+	}
+	
+	if req.Path == "" {
+		s.writeError(w, http.StatusBadRequest, "Workspace path required")
+		return
+	}
+	
+	if req.MaxFiles == 0 {
+		req.MaxFiles = 1000 // Default limit
+	}
+	
+	// Default include patterns for code files
+	if len(req.IncludePatterns) == 0 {
+		req.IncludePatterns = []string{"*.go", "*.js", "*.ts", "*.py", "*.java", "*.cpp", "*.h", "*.md", "*.txt"}
+	}
+	
+	// Default exclude patterns
+	if len(req.ExcludePatterns) == 0 {
+		req.ExcludePatterns = []string{"node_modules", ".git", "build", "dist", "*.log", "*.tmp"}
+	}
+	
+	ctx := r.Context()
+	files, err := s.scanWorkspaceFiles(ctx, req.Path, req.IncludePatterns, req.ExcludePatterns, req.MaxFiles)
+	if err != nil {
+		s.logger.Error("Failed to scan workspace", zap.String("path", req.Path), zap.Error(err))
+		s.writeError(w, http.StatusInternalServerError, "Failed to scan workspace: "+err.Error())
+		return
+	}
+	
+	response := map[string]interface{}{
+		"scanned_files": len(files),
+		"indexed_files": 0, // Will be updated as files are processed
+		"files":         files,
+	}
+	
+	s.writeJSON(w, http.StatusOK, response)
 }
 
 // Delete document
@@ -429,8 +478,63 @@ func (s *Server) handleUpdateWeights(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	// TODO: Implement weight update logic
-	s.writeError(w, http.StatusNotImplemented, "Weight updates not yet implemented")
+	ctx := r.Context()
+	
+	// Get current workspace weights
+	weights, err := s.storage.GetWorkspaceWeights(ctx, feedback.WorkspacePath)
+	if err != nil {
+		// Create default weights if not found
+		weights = &types.WorkspaceWeights{
+			WorkspacePath:      feedback.WorkspacePath,
+			RelevanceWeight:    0.3,
+			RecencyWeight:      0.2,
+			EntanglementWeight: 0.15,
+			DiversityWeight:    0.15,
+			RedundancyPenalty:  0.2,
+			UpdateCount:        0,
+		}
+	}
+	
+	// Apply learning rate adjustments based on feedback
+	learningRate := 0.1
+	
+	// Positive feedback (accepted docs) - increase relevance-related weights
+	if len(feedback.AcceptedDocs) > 0 {
+		weights.RelevanceWeight *= (1 + learningRate)
+		weights.RecencyWeight *= (1 + learningRate * 0.5)
+		weights.EntanglementWeight *= (1 + learningRate * 0.3)
+	}
+	
+	// Negative feedback (rejected docs) - decrease weights and increase diversity
+	if len(feedback.RejectedDocs) > 0 {
+		weights.RelevanceWeight *= (1 - learningRate * 0.5)
+		weights.DiversityWeight *= (1 + learningRate * 0.3)
+		weights.RedundancyPenalty *= (1 + learningRate * 0.2)
+	}
+	
+	// Normalize weights to reasonable ranges
+	total := weights.RelevanceWeight + weights.RecencyWeight + weights.EntanglementWeight + weights.DiversityWeight
+	if total > 0 {
+		weights.RelevanceWeight /= total
+		weights.RecencyWeight /= total
+		weights.EntanglementWeight /= total
+		weights.DiversityWeight /= total
+	}
+	
+	// Update metadata
+	weights.UpdateCount++
+	weights.LastUpdated = time.Now().Format(time.RFC3339)
+	
+	// Save updated weights
+	if err := s.storage.SaveWorkspaceWeights(ctx, weights); err != nil {
+		s.writeError(w, http.StatusInternalServerError, "Failed to save weights: "+err.Error())
+		return
+	}
+	
+	s.writeJSON(w, http.StatusOK, map[string]interface{}{
+		"status": "weights updated",
+		"weights": weights,
+	})
 }
 
 // Get workspace weights
@@ -453,25 +557,64 @@ func (s *Server) handleGetWeights(w http.ResponseWriter, r *http.Request) {
 
 // Reset workspace weights
 func (s *Server) handleResetWeights(w http.ResponseWriter, r *http.Request) {
-	// TODO: Implement weight reset
-	s.writeError(w, http.StatusNotImplemented, "Weight reset not yet implemented")
+	workspacePath := r.URL.Query().Get("workspace")
+	if workspacePath == "" {
+		s.writeError(w, http.StatusBadRequest, "Workspace path required")
+		return
+	}
+	
+	ctx := r.Context()
+	
+	// Create default weights
+	defaultWeights := &types.WorkspaceWeights{
+		WorkspacePath:      workspacePath,
+		RelevanceWeight:    0.3,
+		RecencyWeight:      0.2,
+		EntanglementWeight: 0.15,
+		DiversityWeight:    0.15,
+		RedundancyPenalty:  0.2,
+		UpdateCount:        0,
+		LastUpdated:        time.Now().Format(time.RFC3339),
+	}
+	
+	// Save default weights
+	if err := s.storage.SaveWorkspaceWeights(ctx, defaultWeights); err != nil {
+		s.writeError(w, http.StatusInternalServerError, "Failed to reset weights: "+err.Error())
+		return
+	}
+	
+	s.writeJSON(w, http.StatusOK, map[string]interface{}{
+		"status": "weights reset to defaults",
+		"weights": defaultWeights,
+	})
 }
 
 // Invalidate cache
 func (s *Server) handleInvalidateCache(w http.ResponseWriter, r *http.Request) {
-	// TODO: Implement cache invalidation
-	s.writeJSON(w, http.StatusOK, map[string]string{"status": "cache invalidated"})
+	ctx := r.Context()
+	
+	// Execute cache invalidation by deleting all cache entries
+	err := s.storage.InvalidateCache(ctx)
+	if err != nil {
+		s.logger.Error("Failed to invalidate cache", zap.Error(err))
+		s.writeError(w, http.StatusInternalServerError, "Failed to invalidate cache: "+err.Error())
+		return
+	}
+	
+	s.writeJSON(w, http.StatusOK, map[string]string{
+		"status": "cache invalidated",
+		"message": "All cached results have been cleared",
+	})
 }
 
 // Cache stats
 func (s *Server) handleCacheStats(w http.ResponseWriter, r *http.Request) {
-	// TODO: Implement cache statistics
-	stats := map[string]interface{}{
-		"l1_size":     0,
-		"l2_size":     0,
-		"hit_rate":    0.0,
-		"total_hits":  0,
-		"total_miss":  0,
+	ctx := r.Context()
+	stats, err := s.storage.GetCacheStats(ctx)
+	if err != nil {
+		s.logger.Error("Failed to get cache stats", zap.Error(err))
+		s.writeError(w, http.StatusInternalServerError, "Failed to get cache stats: "+err.Error())
+		return
 	}
 	
 	s.writeJSON(w, http.StatusOK, stats)
@@ -479,12 +622,12 @@ func (s *Server) handleCacheStats(w http.ResponseWriter, r *http.Request) {
 
 // Storage info
 func (s *Server) handleStorageInfo(w http.ResponseWriter, r *http.Request) {
-	// TODO: Get actual storage statistics
-	info := map[string]interface{}{
-		"total_documents": 0,
-		"database_size":   "0 MB",
-		"index_size":      "0 MB",
-		"last_update":     time.Now().Unix(),
+	ctx := r.Context()
+	info, err := s.storage.GetStorageStats(ctx)
+	if err != nil {
+		s.logger.Error("Failed to get storage info", zap.Error(err))
+		s.writeError(w, http.StatusInternalServerError, "Failed to get storage info: "+err.Error())
+		return
 	}
 	
 	s.writeJSON(w, http.StatusOK, info)
@@ -508,8 +651,89 @@ func (s *Server) handleSMTStats(w http.ResponseWriter, r *http.Request) {
 // getZ3Version returns the Z3 solver version information
 func (s *Server) getZ3Version() string {
 	// Try to get Z3 version by running z3 --version
-	// This is a simplified implementation - in production you might cache this
-	return "4.15.2" // Known version from our installation
+	cmd := exec.Command("z3", "--version")
+	output, err := cmd.Output()
+	if err != nil {
+		// Fallback if z3 not available
+		return "Z3 not available"
+	}
+	
+	// Parse version from output like "Z3 version 4.15.2 - 64 bit"
+	version := strings.TrimSpace(string(output))
+	if strings.Contains(version, "Z3 version") {
+		parts := strings.Fields(version)
+		if len(parts) >= 3 {
+			return parts[2] // Extract version number
+		}
+	}
+	
+	return strings.TrimSpace(version)
+}
+
+// scanWorkspaceFiles scans a directory for relevant files
+func (s *Server) scanWorkspaceFiles(ctx context.Context, workspacePath string, includePatterns, excludePatterns []string, maxFiles int) ([]map[string]interface{}, error) {
+	var files []map[string]interface{}
+	
+	err := filepath.Walk(workspacePath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil // Skip files we can't read
+		}
+		
+		if info.IsDir() {
+			// Check if directory should be excluded
+			dirName := filepath.Base(path)
+			for _, pattern := range excludePatterns {
+				if matched, _ := filepath.Match(pattern, dirName); matched {
+					return filepath.SkipDir
+				}
+			}
+			return nil
+		}
+		
+		// Check file size (skip very large files)
+		if info.Size() > 100*1024 { // 100KB limit
+			return nil
+		}
+		
+		// Check if file matches include patterns
+		fileName := filepath.Base(path)
+		matched := false
+		for _, pattern := range includePatterns {
+			if m, _ := filepath.Match(pattern, fileName); m {
+				matched = true
+				break
+			}
+		}
+		
+		if !matched {
+			return nil
+		}
+		
+		// Check exclude patterns
+		for _, pattern := range excludePatterns {
+			if matched, _ := filepath.Match(pattern, fileName); matched {
+				return nil
+			}
+		}
+		
+		// Stop if we've hit the file limit
+		if len(files) >= maxFiles {
+			return filepath.SkipDir
+		}
+		
+		relPath, _ := filepath.Rel(workspacePath, path)
+		files = append(files, map[string]interface{}{
+			"path":         relPath,
+			"full_path":    path,
+			"size_bytes":   info.Size(),
+			"modified_at":  info.ModTime().Unix(),
+			"extension":    filepath.Ext(path),
+		})
+		
+		return nil
+	})
+	
+	return files, err
 }
 
 // getDatabaseStats returns basic database statistics

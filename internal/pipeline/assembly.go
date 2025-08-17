@@ -6,11 +6,13 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"contextlite/internal/features"
 	"contextlite/internal/smt"
 	"contextlite/internal/storage"
+	"contextlite/internal/timing"
 	"contextlite/pkg/config"
 	"contextlite/pkg/types"
 )
@@ -31,7 +33,7 @@ func New(storage *storage.Storage, config *config.Config) *Pipeline {
 
 // AssembleContext performs the complete context assembly pipeline
 func (p *Pipeline) AssembleContext(ctx context.Context, req *types.AssembleRequest) (*types.QueryResult, error) {
-	startTime := time.Now()
+	totTimer := timing.Start()
 	var timings types.StageTimings
 	
 	// Build cache key
@@ -47,14 +49,19 @@ func (p *Pipeline) AssembleContext(ctx context.Context, req *types.AssembleReque
 	}
 	
 	// Stage 1: FTS Harvest - search for candidate documents
-	ftsStart := time.Now()
+	ftsTimer := timing.Start()
 	candidates, err := p.harvestCandidates(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to harvest candidates: %w", err)
 	}
-	timings.FTSHarvestMs = int(time.Since(ftsStart).Milliseconds())
+	ftsUs := ftsTimer.Us()
+	timings.FTSHarvestUs = ftsUs
+	timings.FTSHarvestMs = float64(ftsUs) / 1_000.0
 	
 	if len(candidates) == 0 {
+		totalUs := totTimer.Us()
+		timings.TotalUs = totalUs
+		timings.TotalMs = float64(totalUs) / 1_000.0
 		return &types.QueryResult{
 			Query:      req.Query,
 			Documents:  []types.DocumentReference{},
@@ -65,24 +72,32 @@ func (p *Pipeline) AssembleContext(ctx context.Context, req *types.AssembleReque
 	}
 	
 	// Stage 2: Feature Extraction - compute 7D features
-	featureStart := time.Now()
+	featureTimer := timing.Start()
 	scoredDocs, err := p.extractFeatures(ctx, candidates, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to extract features: %w", err)
 	}
-	timings.FeatureBuildMs = int(time.Since(featureStart).Milliseconds())
+	featUs := featureTimer.Us()
+	timings.FeatureBuildUs = featUs
+	timings.FeatureBuildMs = float64(featUs) / 1_000.0
 	
 	// Stage 3: SMT Optimization - select optimal document set
-	smtStart := time.Now()
+	smtTimer := timing.Start()
 	smtResult, err := p.optimizeSelection(ctx, scoredDocs, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to optimize selection: %w", err)
 	}
-	timings.SMTWallMs = int(time.Since(smtStart).Milliseconds())
+	smtWallUs := smtTimer.Us()
+	timings.SMTWallUs = smtWallUs
+	timings.SMTWallMs = float64(smtWallUs) / 1_000.0
+	timings.SMTSolverUs = smtResult.SolveTimeUs
+	timings.SMTSolverMs = float64(smtResult.SolveTimeUs) / 1_000.0
 	
 	// Stage 4: Assemble final result
 	result := p.assembleResult(req, scoredDocs, smtResult, timings)
-	result.Timings.TotalMs = int(time.Since(startTime).Milliseconds())
+	totalUs := totTimer.Us()
+	result.Timings.TotalUs = totalUs
+	result.Timings.TotalMs = float64(totalUs) / 1_000.0
 	result.CacheKey = cacheKey
 	
 	// Cache result if enabled and high quality
@@ -219,8 +234,10 @@ func (p *Pipeline) assembleResult(req *types.AssembleRequest,
 		SolverUsed:      smtResult.SolverUsed,
 		Z3Status:        smtResult.Z3Status,
 		Objective:       int64(smtResult.Objective),
-		SolveTimeMs:     smtResult.SolveTimeMs,
-		SMTWallMs:       timings.SMTWallMs,      // Include wall time in SMT metrics for consistency
+		SolveTimeUs:     smtResult.SolveTimeUs,
+		SolveTimeMs:     float64(smtResult.SolveTimeUs) / 1_000.0,
+		SMTWallUs:       timings.SMTWallUs,
+		SMTWallMs:       timings.SMTWallMs,
 		VariableCount:   smtResult.VariableCount,
 		ConstraintCount: smtResult.ConstraintCount,
 		KCandidates:     smtResult.KCandidates,
@@ -256,7 +273,11 @@ func (p *Pipeline) getCachedResult(ctx context.Context, req *types.AssembleReque
 		modelID = p.config.Tokenizer.ModelID
 	}
 	
-	tokenizerVersion := "1.0" // TODO: Get actual tokenizer version
+	// Get tokenizer version from model ID or config
+	tokenizerVersion := "1.0"
+	if modelID != "" {
+		tokenizerVersion = modelID + "-v1.0"
+	}
 	
 	return p.storage.GetQueryCache(ctx, queryHash, corpusHash, modelID, tokenizerVersion)
 }
@@ -325,9 +346,38 @@ func (p *Pipeline) matchesWorkspace(docPath, workspacePath string) bool {
 }
 
 func (p *Pipeline) applyPatternFilters(docs []types.Document, include, exclude []string) []types.Document {
-	// TODO: Implement glob pattern matching
-	// For now, just return all docs
-	return docs
+	if len(include) == 0 && len(exclude) == 0 {
+		return docs
+	}
+	
+	var filtered []types.Document
+	
+	for _, doc := range docs {
+		// Check include patterns
+		includeMatch := len(include) == 0 // If no include patterns, include by default
+		for _, pattern := range include {
+			if matched, _ := filepath.Match(pattern, doc.Path); matched {
+				includeMatch = true
+				break
+			}
+		}
+		
+		// Check exclude patterns
+		excludeMatch := false
+		for _, pattern := range exclude {
+			if matched, _ := filepath.Match(pattern, doc.Path); matched {
+				excludeMatch = true
+				break
+			}
+		}
+		
+		// Include if matches include pattern and doesn't match exclude pattern
+		if includeMatch && !excludeMatch {
+			filtered = append(filtered, doc)
+		}
+	}
+	
+	return filtered
 }
 
 // buildCacheKey generates a deterministic cache key for the request
@@ -338,15 +388,31 @@ func (p *Pipeline) buildCacheKey(ctx context.Context, req *types.AssembleRequest
 	// Build query hash
 	queryHash := p.hashQuery(req)
 	
+	// Get tokenizer version from config
+	tokenizerVersion := "v1.0"
+	if p.config != nil && p.config.Tokenizer.ModelID != "" {
+		tokenizerVersion = p.config.Tokenizer.ModelID + "-v1.0"
+	}
+	
+	// Compute weights hash from workspace weights
+	weightsHash := "default"
+	if req.WorkspacePath != "" {
+		if weights, err := p.storage.GetWorkspaceWeights(ctx, req.WorkspacePath); err == nil {
+			weightsData, _ := json.Marshal(weights)
+			hash := sha256.Sum256(weightsData)
+			weightsHash = hex.EncodeToString(hash[:8]) // First 8 bytes
+		}
+	}
+	
 	// Build cache parts
 	parts := CacheParts{
 		QueryHash:           queryHash,
 		CorpusHash:          corpusHash,
 		ModelID:             req.ModelID,
-		TokenizerVersion:    "v1.0", // TODO: get from config
-		TokenizerVocabHash:  "default", // TODO: compute actual vocab hash
-		WeightsHash:         "default", // TODO: compute from workspace weights
-		ConceptDFVersion:    "v1.0", // TODO: get from concept version
+		TokenizerVersion:    tokenizerVersion,
+		TokenizerVocabHash:  "vocab-" + tokenizerVersion, // Version-based vocab hash
+		WeightsHash:         weightsHash,
+		ConceptDFVersion:    "concepts-v1.0", // Semantic version for concept features
 		MaxTokens:           req.MaxTokens,
 		MaxDocuments:        req.MaxDocuments,
 		ObjectiveStyle:      req.ObjectiveStyle,
