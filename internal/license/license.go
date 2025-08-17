@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	mathrand "math/rand"
 	"net"
 	"os"
 	"runtime"
@@ -227,6 +228,17 @@ func (lm *LicenseManager) GetMaxDocuments() int {
 	return lm.license.MaxDocuments
 }
 
+// GetTier returns the current license tier
+func (lm *LicenseManager) GetTier() LicenseTier {
+	if lm.license == nil {
+		if lm.IsInGracePeriod() {
+			return TierDeveloper // Grace period gets developer features
+		}
+		return TierDeveloper // Default to most restrictive
+	}
+	return lm.license.Tier
+}
+
 // Feature definitions
 func getDeveloperFeatures() []string {
 	return []string{
@@ -328,7 +340,7 @@ QIDAQAB
 }
 
 // License generation (for your license server)
-func GenerateLicense(email string, tier LicenseTier, hardwareID string, privateKey *rsa.PrivateKey) (*License, error) {
+func GenerateBasicLicense(email string, tier LicenseTier, hardwareID string, privateKey *rsa.PrivateKey) (*License, error) {
 	license := &License{
 		Key:          generateLicenseKey(),
 		Email:        email,
@@ -376,7 +388,7 @@ func generateLicenseKey() string {
 	
 	for i := 0; i < 4; i++ {
 		for j := 0; j < 4; j++ {
-			key[i*5+j] = chars[rand.Intn(len(chars))]
+			key[i*5+j] = chars[mathrand.Intn(len(chars))]
 		}
 		if i < 3 {
 			key[i*5+4] = '-'
@@ -384,4 +396,69 @@ func generateLicenseKey() string {
 	}
 	
 	return string(key)
+}
+
+// GenerateLicense creates a new signed license for the given parameters
+func GenerateLicense(email string, tier LicenseTier, hardwareID string, privateKey *rsa.PrivateKey) (string, error) {
+	now := time.Now()
+	
+	// Create license data
+	license := &License{
+		Key:         generateLicenseKey(),
+		Email:       email,
+		Tier:        tier,
+		IssuedAt:    now,
+		ExpiresAt:   &[]time.Time{now.AddDate(1, 0, 0)}[0], // 1 year expiration
+		HardwareID:  hardwareID,
+		Features:    getDefaultFeatures(tier),
+	}
+	
+	// Set tier-specific limits
+	switch tier {
+	case TierDeveloper:
+		license.MaxDocuments = 1000
+		license.MaxUsers = 1
+	case TierPro:
+		license.MaxDocuments = 100000
+		license.MaxUsers = 10
+	case TierEnterprise:
+		license.MaxDocuments = 0 // unlimited
+		license.MaxUsers = 0     // unlimited
+	}
+	
+	// Generate signature
+	payload := fmt.Sprintf("%s:%s:%s:%d:%d:%d:%s",
+		license.Key, license.Email, license.Tier,
+		license.IssuedAt.Unix(), license.MaxDocuments,
+		license.MaxUsers, license.HardwareID)
+
+	hash := sha256.Sum256([]byte(payload))
+	signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, hash[:])
+	if err != nil {
+		return "", fmt.Errorf("failed to sign license: %w", err)
+	}
+
+	license.Signature = base64.StdEncoding.EncodeToString(signature)
+	
+	// Convert license to JSON and encode as base64 for transport
+	licenseJSON, err := json.Marshal(license)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal license: %w", err)
+	}
+	
+	return base64.StdEncoding.EncodeToString(licenseJSON), nil
+}
+
+// getDefaultFeatures returns default features for a given tier
+func getDefaultFeatures(tier LicenseTier) []string {
+	switch tier {
+	case TierDeveloper:
+		return getDeveloperFeatures()
+	case TierPro:
+		return getProFeatures()
+	case TierEnterprise:
+		return getEnterpriseFeatures()
+	default:
+		return getDeveloperFeatures()
+	}
 }

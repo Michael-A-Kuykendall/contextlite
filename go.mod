@@ -11,11 +11,13 @@ require (
 )
 
 require (
+	github.com/denisbrodbeck/machineid v1.0.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+	github.com/stripe/stripe-go/v74 v74.30.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/mod v0.3.0 // indirect
 	golang.org/x/sys v0.9.0 // indirect
