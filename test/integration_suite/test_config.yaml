@@ -1,0 +1,38 @@
+# ContextLite Test Configuration for Integration Suite
+server:
+  port: 8083
+  host: "127.0.0.1"
+  cors_enabled: true
+  auth_token: "test-token-integration-2025"
+
+storage:
+  database_path: "./test_integration.db"
+  cache_size_mb: 32
+
+smt:
+  solver_timeout_ms: 100
+  max_opt_gap: 0.1
+  max_candidates: 50
+  objective_style: "weighted-sum"
+
+weights:
+  relevance: 0.30
+  recency: 0.20
+  entanglement: 0.15
+  prior: 0.15
+  authority: 0.10
+  specificity: 0.05
+  uncertainty: 0.05
+
+tokenizer:
+  model_id: "gpt-4"
+  max_tokens_default: 2000
+
+cache:
+  l1_size: 100
+  l2_ttl_minutes: 5
+  l3_enabled: false
+
+logging:
+  level: "info"
+  include_timings: false

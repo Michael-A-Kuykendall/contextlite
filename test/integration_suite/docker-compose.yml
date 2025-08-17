@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  contextlite:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      - CONTEXTLITE_PORT=8083
+      - CONTEXTLITE_DATABASE=/data/test.db
+    volumes:
+      - test_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  go_tests:
+    image: golang:1.21
+    depends_on:
+      contextlite:
+        condition: service_healthy
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - ../..:/contextlite
+    command: ["go", "test", "-v", "./go_test.go"]
+
+  python_tests:
+    image: python:3.11
+    depends_on:
+      contextlite:
+        condition: service_healthy
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - ../..:/contextlite
+    environment:
+      - PYTHONPATH=/contextlite/adapters/python/contextlite_langchain:/contextlite/adapters/python/contextlite_llamaindex
+    command: ["python3", "python_test.py"]
+
+  node_tests:
+    image: node:18
+    depends_on:
+      contextlite:
+        condition: service_healthy
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - ../..:/contextlite
+    command: ["node", "mcp_test.js"]
+
+volumes:
+  test_data:

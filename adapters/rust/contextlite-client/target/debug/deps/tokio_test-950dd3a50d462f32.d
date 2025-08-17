@@ -1,0 +1,11 @@
+C:\Users\micha\repos\contextlite\adapters\rust\contextlite-client\target\debug\deps\tokio_test-950dd3a50d462f32.d: C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\lib.rs C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\io.rs C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\stream_mock.rs C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\macros.rs C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\task.rs
+
+C:\Users\micha\repos\contextlite\adapters\rust\contextlite-client\target\debug\deps\libtokio_test-950dd3a50d462f32.rlib: C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\lib.rs C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\io.rs C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\stream_mock.rs C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\macros.rs C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\task.rs
+
+C:\Users\micha\repos\contextlite\adapters\rust\contextlite-client\target\debug\deps\libtokio_test-950dd3a50d462f32.rmeta: C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\lib.rs C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\io.rs C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\stream_mock.rs C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\macros.rs C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\task.rs
+
+C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\lib.rs:
+C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\io.rs:
+C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\stream_mock.rs:
+C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\macros.rs:
+C:\Users\micha\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-test-0.4.4\src\task.rs:

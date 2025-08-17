@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"os/exec"
@@ -79,14 +80,12 @@ func (s *Server) setupRoutes() {
 		// Context assembly
 		r.Post("/context/assemble", s.handleAssembleContext)
 		
-<<<<<<< HEAD
 		// Lightweight RAG endpoints
 		r.Post("/rank", s.handleRank)
 		r.Post("/snippet", s.handleSnippet)
-=======
+		
 		// Baseline comparison
 		r.Post("/context/baseline", s.handleBaselineComparison)
->>>>>>> feat/copilot-context-provider
 		
 		// Document management
 		r.Post("/documents", s.handleAddDocument)
@@ -744,9 +743,37 @@ func (s *Server) scanWorkspaceFiles(ctx context.Context, workspacePath string, i
 
 // getDatabaseStats returns basic database statistics
 func (s *Server) getDatabaseStats() map[string]interface{} {
-	// In a production system, you would query actual database stats
+	ctx := context.Background()
+	
+	// Get real storage stats
+	storageStats, err := s.storage.GetStorageStats(ctx)
+	if err != nil {
+		// Fallback to default stats if query fails
+		return map[string]interface{}{
+			"documents_indexed": "0",
+			"cache_entries":     "active", 
+			"fts_enabled":       true,
+			"last_optimized":    time.Now().Add(-1 * time.Hour).Unix(),
+		}
+	}
+	
+	// Extract document count and format appropriately
+	docCount, ok := storageStats["total_documents"].(int)
+	if !ok {
+		docCount = 0
+	}
+	
+	var docCountStr string
+	if docCount == 0 {
+		docCountStr = "0"
+	} else if docCount >= 10000 {
+		docCountStr = "10000+"
+	} else {
+		docCountStr = fmt.Sprintf("%d", docCount)
+	}
+	
 	return map[string]interface{}{
-		"documents_indexed": "10000+",
+		"documents_indexed": docCountStr,
 		"cache_entries":     "active", 
 		"fts_enabled":       true,
 		"last_optimized":    time.Now().Add(-1 * time.Hour).Unix(),
