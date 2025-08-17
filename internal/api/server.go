@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -69,6 +70,10 @@ func (s *Server) setupRoutes() {
 	r.Route("/api/v1", func(r chi.Router) {
 		// Context assembly
 		r.Post("/context/assemble", s.handleAssembleContext)
+		
+		// Lightweight RAG endpoints
+		r.Post("/rank", s.handleRank)
+		r.Post("/snippet", s.handleSnippet)
 		
 		// Document management
 		r.Post("/documents", s.handleAddDocument)
@@ -357,4 +362,119 @@ func (s *Server) writeJSON(w http.ResponseWriter, status int, data interface{}) 
 
 func (s *Server) writeError(w http.ResponseWriter, status int, message string) {
 	s.writeJSON(w, status, map[string]string{"error": message})
+}
+
+// --- RAG convenience types ---
+type rankRequest struct {
+	Query     string `json:"query"`
+	K         int    `json:"k"`
+	BudgetMs  int    `json:"budget_ms"`
+	MaxTokens int    `json:"max_tokens,omitempty"`
+	UseCache  bool   `json:"use_cache,omitempty"`
+}
+
+type position struct { Line int `json:"line"`; Character int `json:"character"` }
+
+type rangeJSON struct { Start position `json:"start"`; End position `json:"end"` }
+
+type rankItem struct {
+	File    string     `json:"file"`
+	Range   *rangeJSON `json:"range,omitempty"`
+	Snippet string     `json:"snippet"`
+	Score   float64    `json:"score"`
+	Why     string     `json:"why"`
+}
+
+type rankResponse struct {
+	Items []rankItem `json:"items"`
+	P99Ms int        `json:"p99_ms"`
+}
+
+type snippetRequest struct {
+	File  string   `json:"file"`
+	Start position `json:"start"`
+	End   position `json:"end"`
+}
+
+type snippetResponse struct {
+	Snippet string `json:"snippet"`
+}
+
+// --- /api/v1/rank ---
+func (s *Server) handleRank(w http.ResponseWriter, r *http.Request) {
+	var reqBody rankRequest
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		s.writeError(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
+		return
+	}
+	if reqBody.Query == "" { 
+		s.writeError(w, http.StatusBadRequest, "query required")
+		return 
+	}
+
+	// Map to AssembleRequest
+	ar := types.AssembleRequest{
+		Query:        reqBody.Query,
+		MaxTokens:    s.config.Tokenizer.MaxTokensDefault,
+		MaxDocuments: 10,
+		UseSMT:       true,
+		UseCache:     reqBody.UseCache,
+	}
+	if reqBody.K > 0 { ar.MaxDocuments = reqBody.K }
+	if reqBody.MaxTokens > 0 { ar.MaxTokens = reqBody.MaxTokens }
+
+	ctx := r.Context()
+	res, err := s.pipeline.AssembleContext(ctx, &ar)
+	if err != nil {
+		s.logger.Error("rank assembly failed", zap.Error(err))
+		s.writeError(w, http.StatusInternalServerError, "assembly failed: "+err.Error())
+		return
+	}
+
+	items := make([]rankItem, 0, len(res.Documents))
+	for _, d := range res.Documents {
+		score := d.UtilityScore
+		if score == 0 && d.RelevanceScore > 0 { score = d.RelevanceScore }
+		items = append(items, rankItem{
+			File:    d.Path,
+			Range:   nil,                   // precise line ranges unavailable here; use /snippet for exact slicing
+			Snippet: d.Content,             // SMT/packing already trimmed content
+			Score:   score,
+			Why:     d.InclusionReason,
+		})
+	}
+
+	out := rankResponse{ Items: items, P99Ms: int(res.Timings.TotalMs) }
+	s.writeJSON(w, http.StatusOK, out)
+}
+
+// --- /api/v1/snippet ---
+func (s *Server) handleSnippet(w http.ResponseWriter, r *http.Request) {
+	var req snippetRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		s.writeError(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
+		return
+	}
+	if req.File == "" { 
+		s.writeError(w, http.StatusBadRequest, "file required")
+		return 
+	}
+
+	ctx := r.Context()
+	// Fast path: read from storage by path
+	doc, err := s.storage.GetDocumentByPath(ctx, req.File)
+	if err != nil || doc == nil { 
+		s.writeError(w, http.StatusNotFound, "file not indexed: "+req.File)
+		return 
+	}
+
+	lines := strings.Split(doc.Content, "\n")
+	// clamp indices
+	sLine := req.Start.Line; eLine := req.End.Line
+	if sLine < 0 { sLine = 0 }
+	if eLine <= 0 || eLine > len(lines) { eLine = len(lines) }
+	if sLine > eLine { sLine, eLine = eLine, sLine }
+
+	snippet := strings.Join(lines[sLine:eLine], "\n")
+	s.writeJSON(w, http.StatusOK, snippetResponse{ Snippet: snippet })
 }
