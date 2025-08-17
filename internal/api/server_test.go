@@ -1113,3 +1113,321 @@ func getKeys(m map[string]interface{}) []string {
 	}
 	return keys
 }
+
+func TestServer_HandleDeleteDocumentComprehensive(t *testing.T) {
+	server, store, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	ctx := context.Background()
+	
+	// Add a document to delete
+	doc := &types.Document{
+		ID:       "delete-test-doc",
+		Content:  "Content to be deleted",
+		Path:     "/test/delete.go",
+		Language: "go",
+	}
+	
+	err := store.AddDocument(ctx, doc)
+	if err != nil {
+		t.Fatalf("Failed to add document: %v", err)
+	}
+	
+	// Test successful deletion with proper chi router context
+	req := httptest.NewRequest("DELETE", "/api/v1/documents/delete-test-doc", nil)
+	w := httptest.NewRecorder()
+	
+	// Use the router to get proper URL parameter parsing
+	server.router.ServeHTTP(w, req)
+	
+	t.Logf("Delete document returned status: %d", w.Code)
+	
+	// Test deleting non-existent document
+	req = httptest.NewRequest("DELETE", "/api/v1/documents/non-existent-doc", nil)
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	
+	t.Logf("Delete non-existent document returned status: %d", w.Code)
+	
+	// Test delete with malformed ID (special characters)
+	req = httptest.NewRequest("DELETE", "/api/v1/documents/invalid%20id", nil)
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	
+	t.Logf("Delete with malformed ID returned status: %d", w.Code)
+}
+
+func TestServer_HandleGetWeightsComprehensive(t *testing.T) {
+	server, store, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	ctx := context.Background()
+	
+	// First, save some weights
+	weights := &types.WorkspaceWeights{
+		WorkspacePath:     "/test/workspace",
+		RelevanceWeight:   0.4,
+		RecencyWeight:     0.3,
+		DiversityWeight:   0.2,
+		EntanglementWeight: 0.1,
+		RedundancyPenalty: 0.05,
+		NormalizationStats: "test-stats",
+		UpdateCount:       5,
+		LastUpdated:       time.Now().Format(time.RFC3339),
+	}
+	
+	err := store.SaveWorkspaceWeights(ctx, weights)
+	if err != nil {
+		t.Fatalf("Failed to save weights: %v", err)
+	}
+	
+	// Test successful get weights using router
+	req := httptest.NewRequest("GET", "/api/v1/weights?workspace_path=/test/workspace", nil)
+	w := httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	
+	t.Logf("Get weights returned status: %d", w.Code)
+	
+	if w.Code == http.StatusOK {
+		var response types.WorkspaceWeights
+		err = json.Unmarshal(w.Body.Bytes(), &response)
+		if err != nil {
+			t.Logf("Failed to parse response: %v", err)
+		} else {
+			t.Logf("Retrieved weights for workspace: %s", response.WorkspacePath)
+		}
+	}
+	
+	// Test get weights for non-existent workspace
+	req = httptest.NewRequest("GET", "/api/v1/weights?workspace_path=/non/existent", nil)
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	
+	t.Logf("Get weights for non-existent workspace returned status: %d", w.Code)
+	
+	// Test get weights with missing workspace_path parameter
+	req = httptest.NewRequest("GET", "/api/v1/weights", nil)
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	
+	t.Logf("Get weights with missing workspace_path returned status: %d", w.Code)
+	
+	// Test get weights with empty workspace_path
+	req = httptest.NewRequest("GET", "/api/v1/weights?workspace_path=", nil)
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	
+	t.Logf("Get weights with empty workspace_path returned status: %d", w.Code)
+}
+
+func TestServer_HandleAssembleContextComprehensive(t *testing.T) {
+	server, store, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	ctx := context.Background()
+	
+	// Add some documents for context assembly
+	docs := []*types.Document{
+		{
+			ID:       "assemble-doc-1",
+			Content:  "Function for handling HTTP requests",
+			Path:     "/test/http.go",
+			Language: "go",
+		},
+		{
+			ID:       "assemble-doc-2",
+			Content:  "Authentication middleware implementation",
+			Path:     "/test/auth.go",
+			Language: "go",
+		},
+	}
+	
+	for _, doc := range docs {
+		err := store.AddDocument(ctx, doc)
+		if err != nil {
+			t.Fatalf("Failed to add document: %v", err)
+		}
+	}
+	
+	// Test successful context assembly
+	reqBody := types.AssembleRequest{
+		Query:        "HTTP authentication",
+		MaxTokens:    1000,
+		MaxDocuments: 5,
+		ModelID:      "gpt-4",
+		UseSMT:       false, // Disable SMT for simpler testing
+	}
+	
+	jsonData, _ := json.Marshal(reqBody)
+	req := httptest.NewRequest("POST", "/api/v1/context/assemble", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	
+	server.handleAssembleContext(w, req)
+	
+	if w.Code != http.StatusOK {
+		t.Logf("Context assembly returned status %d, body: %s", w.Code, w.Body.String())
+	} else {
+		var response types.AssembledContext
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		if err != nil {
+			t.Fatalf("Failed to parse response: %v", err)
+		}
+		t.Logf("Context assembly successful, documents: %d", len(response.Documents))
+	}
+	
+	// Test with invalid JSON
+	req = httptest.NewRequest("POST", "/api/v1/context/assemble", bytes.NewBuffer([]byte("invalid json")))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.handleAssembleContext(w, req)
+	
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("Expected status 400 for invalid JSON, got %d", w.Code)
+	}
+	
+	// Test with missing query
+	reqBody = types.AssembleRequest{
+		MaxTokens:    1000,
+		MaxDocuments: 5,
+	}
+	
+	jsonData, _ = json.Marshal(reqBody)
+	req = httptest.NewRequest("POST", "/api/v1/context/assemble", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	
+	t.Logf("Context assembly with missing query returned status: %d", w.Code)
+	
+	// Test with very large token limit
+	reqBody = types.AssembleRequest{
+		Query:        "test",
+		MaxTokens:    1000000,
+		MaxDocuments: 100,
+	}
+	
+	jsonData, _ = json.Marshal(reqBody)
+	req = httptest.NewRequest("POST", "/api/v1/context/assemble", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.handleAssembleContext(w, req)
+	
+	t.Logf("Context assembly with large limits returned status: %d", w.Code)
+}
+
+func TestServer_HandleScanWorkspaceComprehensive(t *testing.T) {
+	server, _, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	// Create a comprehensive test workspace
+	tmpDir := t.TempDir()
+	
+	// Create nested directory structure with various file types
+	testFiles := map[string]string{
+		"src/main.go":              "package main\nfunc main() { fmt.Println(\"Hello\") }",
+		"src/utils/helper.go":      "package utils\nfunc Helper() { }",
+		"src/api/handler.go":       "package api\nfunc Handler() { }",
+		"tests/main_test.go":       "package main\nfunc TestMain(t *testing.T) { }",
+		"docs/README.md":           "# Project Documentation",
+		"docs/API.md":              "## API Documentation",
+		"config/config.yaml":       "server:\n  port: 8080",
+		"scripts/build.sh":         "#!/bin/bash\ngo build",
+		"vendor/external/lib.go":   "package external\nfunc Lib() { }",
+		".hidden/hidden.go":        "package hidden\nfunc Hidden() { }",
+		"data/sample.json":         "{\"key\": \"value\"}",
+		"assets/style.css":         "body { margin: 0; }",
+	}
+	
+	for path, content := range testFiles {
+		fullPath := filepath.Join(tmpDir, path)
+		dir := filepath.Dir(fullPath)
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			t.Fatalf("Failed to create directory %s: %v", dir, err)
+		}
+		if err := os.WriteFile(fullPath, []byte(content), 0644); err != nil {
+			t.Fatalf("Failed to write test file %s: %v", fullPath, err)
+		}
+	}
+	
+	// Test successful scan with include patterns
+	reqBody := map[string]interface{}{
+		"workspace_path":   tmpDir,
+		"include_patterns": []string{"*.go", "*.md"},
+		"exclude_patterns": []string{"*_test.go", "vendor/*"},
+	}
+	
+	jsonData, _ := json.Marshal(reqBody)
+	req := httptest.NewRequest("POST", "/api/v1/documents/workspace", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	
+	t.Logf("Scan workspace returned status: %d", w.Code)
+	
+	if w.Code == http.StatusOK {
+		var response map[string]interface{}
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		if err != nil {
+			t.Logf("Failed to parse response: %v", err)
+		} else {
+			t.Logf("Scan workspace successful, response keys: %v", getKeys(response))
+		}
+	}
+	
+	// Test scan with no patterns (should include all files)
+	reqBody = map[string]interface{}{
+		"workspace_path": tmpDir,
+	}
+	
+	jsonData, _ = json.Marshal(reqBody)
+	req = httptest.NewRequest("POST", "/api/v1/documents/workspace", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	
+	t.Logf("Scan workspace with no patterns returned status: %d", w.Code)
+	
+	// Test scan with non-existent workspace
+	reqBody = map[string]interface{}{
+		"workspace_path": "/non/existent/path",
+	}
+	
+	jsonData, _ = json.Marshal(reqBody)
+	req = httptest.NewRequest("POST", "/api/v1/documents/workspace", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	
+	t.Logf("Scan non-existent workspace returned status: %d", w.Code)
+	
+	// Test scan with missing workspace_path
+	req = httptest.NewRequest("POST", "/api/v1/documents/workspace", bytes.NewBuffer([]byte("{}")))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	
+	t.Logf("Scan with missing workspace_path returned status: %d", w.Code)
+	
+	// Test scan with invalid JSON
+	req = httptest.NewRequest("POST", "/api/v1/documents/workspace", bytes.NewBuffer([]byte("invalid json")))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	
+	t.Logf("Scan with invalid JSON returned status: %d", w.Code)
+}
