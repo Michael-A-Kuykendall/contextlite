@@ -1,0 +1,10 @@
+[project]
+name = "contextlite-langchain"
+version = "0.1.0"
+description = "LangChain retriever for ContextLite"
+requires-python = ">=3.9"
+dependencies = ["requests>=2", "langchain>=0.2"]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

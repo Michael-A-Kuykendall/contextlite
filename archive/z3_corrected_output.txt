@@ -1,0 +1,14 @@
+sat
+(objectives
+ (obj 2705)
+)
+(
+  (define-fun x0 () Int
+    1)
+  (define-fun y0_1 () Int
+    1)
+  (define-fun x1 () Int
+    1)
+  (define-fun obj () Int
+    2705)
+)

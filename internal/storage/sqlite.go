@@ -213,6 +213,23 @@ func (s *Storage) GetDocument(ctx context.Context, id string) (*types.Document, 
 	return &doc, nil
 }
 
+// GetDocumentByPath retrieves a document by its file path
+func (s *Storage) GetDocumentByPath(ctx context.Context, path string) (*types.Document, error) {
+	var doc types.Document
+	err := s.db.QueryRowContext(ctx, `
+		SELECT id, content, content_hash, path, lang, mtime,
+		       token_count, model_id, quantum_score, entanglement_map,
+		       coherence_history, created_at, updated_at
+		FROM documents WHERE path = ? LIMIT 1`, path).Scan(
+		&doc.ID, &doc.Content, &doc.ContentHash, &doc.Path, &doc.Language,
+		&doc.ModifiedTime, &doc.TokenCount, &doc.ModelID, &doc.QuantumScore,
+		&doc.Entanglement, &doc.Coherence, &doc.CreatedAt, &doc.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &doc, nil
+}
+
 // DeleteDocument removes a document
 func (s *Storage) DeleteDocument(ctx context.Context, id string) error {
 	tx, err := s.db.BeginTx(ctx, nil)
