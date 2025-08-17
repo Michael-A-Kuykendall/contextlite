@@ -1,8 +1,9 @@
 package features
 
 import (
-	"testing"
+	"fmt"
 	"math"
+	"testing"
 	"time"
 
 	"contextlite/pkg/types"
@@ -99,6 +100,100 @@ func TestEntanglementFormula(t *testing.T) {
 	entanglementSingle := fe.computeEntanglement(singleTermDoc, docFreq, 100)
 	if entanglementSingle != 0 {
 		t.Errorf("Expected zero entanglement for single-term doc, got %f", entanglementSingle)
+	}
+}
+
+func TestComputeEntanglementEdgeCases(t *testing.T) {
+	fe := &FeatureExtractor{}
+	
+	// Test empty document terms
+	emptyTerms := map[string]int{}
+	docFreq := map[string]int{"term1": 5, "term2": 3}
+	
+	entanglement := fe.computeEntanglement(emptyTerms, docFreq, 100)
+	if entanglement != 0.0 {
+		t.Errorf("Expected 0.0 entanglement for empty terms, got %f", entanglement)
+	}
+	
+	// Test document with exactly one term (len < 2)
+	oneTermDoc := map[string]int{"single": 1}
+	entanglement = fe.computeEntanglement(oneTermDoc, docFreq, 100)
+	if entanglement != 0.0 {
+		t.Errorf("Expected 0.0 entanglement for single term, got %f", entanglement)
+	}
+	
+	// Test with missing docFreq entries (prob1/prob2 become 0)
+	docTerms := map[string]int{
+		"existing_term": 5,
+		"missing_term":  3, // This term not in docFreq
+	}
+	
+	incompleteDocFreq := map[string]int{
+		"existing_term": 10,
+		// "missing_term" not included - prob2 will be 0
+	}
+	
+	entanglement = fe.computeEntanglement(docTerms, incompleteDocFreq, 100)
+	if entanglement != 0.0 {
+		t.Errorf("Expected 0.0 entanglement when docFreq entries missing, got %f", entanglement)
+	}
+	
+	// Test with zero totalDocs (edge case)
+	entanglement = fe.computeEntanglement(docTerms, docFreq, 0)
+	// Should handle division by zero gracefully
+	if entanglement < 0 {
+		t.Errorf("Expected non-negative entanglement with zero totalDocs, got %f", entanglement)
+	}
+	
+	// Test with terms that have identical frequencies (tests deterministic ordering)
+	equalFreqTerms := map[string]int{
+		"zebra": 5,  // Same frequency, but alphabetically last
+		"alpha": 5,  // Same frequency, but alphabetically first
+		"beta":  5,  // Same frequency, middle
+	}
+	
+	equalFreqDocFreq := map[string]int{
+		"zebra": 10,
+		"alpha": 15,
+		"beta":  12,
+	}
+	
+	entanglement = fe.computeEntanglement(equalFreqTerms, equalFreqDocFreq, 100)
+	if entanglement < 0 {
+		t.Errorf("Expected non-negative entanglement for equal frequency terms, got %f", entanglement)
+	}
+	
+	// Test with very small document (topN edge case)
+	smallDoc := map[string]int{
+		"term1": 1,
+		"term2": 1,
+	}
+	
+	smallDocFreq := map[string]int{
+		"term1": 1,
+		"term2": 1,
+	}
+	
+	// topN = max(2, len(terms)*0.2) = max(2, 2*0.2) = max(2, 0.4) = 2
+	entanglement = fe.computeEntanglement(smallDoc, smallDocFreq, 100)
+	if entanglement < 0 {
+		t.Errorf("Expected non-negative entanglement for small doc, got %f", entanglement)
+	}
+	
+	// Test with large document where topN < len(terms)
+	largeDoc := map[string]int{}
+	largeDocFreq := map[string]int{}
+	
+	// Create 10 terms, topN should be max(2, 10*0.2) = max(2, 2) = 2
+	for i := 0; i < 10; i++ {
+		term := fmt.Sprintf("term%d", i)
+		largeDoc[term] = i + 1 // Different frequencies
+		largeDocFreq[term] = (i + 1) * 2
+	}
+	
+	entanglement = fe.computeEntanglement(largeDoc, largeDocFreq, 100)
+	if entanglement < 0 {
+		t.Errorf("Expected non-negative entanglement for large doc, got %f", entanglement)
 	}
 }
 

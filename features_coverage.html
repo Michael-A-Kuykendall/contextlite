@@ -1,0 +1,1142 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>features: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">contextlite/internal/features/baseline.go (96.6%)</option>
+				
+				<option value="file1">contextlite/internal/features/scoring.go (96.2%)</option>
+				
+				<option value="file2">contextlite/internal/features/similarity.go (92.0%)</option>
+				
+				<option value="file3">contextlite/internal/features/tokenizer.go (87.5%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package features
+
+import (
+        "math"
+        "sort"
+        "strings"
+
+        "contextlite/pkg/types"
+)
+
+// BM25Scorer implements a simple BM25 + MMR baseline for comparison
+type BM25Scorer struct {
+        k1       float64 // Term frequency saturation parameter
+        b        float64 // Length normalization parameter
+        lambda   float64 // MMR diversity parameter (0 = pure relevance, 1 = pure diversity)
+}
+
+// NewBM25Scorer creates a new BM25 scorer with standard parameters
+func NewBM25Scorer() *BM25Scorer <span class="cov8" title="1">{
+        return &amp;BM25Scorer{
+                k1:     1.2,  // Standard BM25 k1
+                b:      0.75, // Standard BM25 b
+                lambda: 0.3,  // 30% diversity, 70% relevance for MMR
+        }
+}</span>
+
+// ScoreDocuments scores documents using BM25 + MMR baseline
+func (bm25 *BM25Scorer) ScoreDocuments(docs []types.Document, query string, maxResults int) []types.ScoredDocument <span class="cov8" title="1">{
+        if len(docs) == 0 </span><span class="cov8" title="1">{
+                return nil
+        }</span>
+
+        // Tokenize query and documents
+        <span class="cov8" title="1">queryTerms := tokenize(query)
+        docTerms := make([]map[string]int, len(docs))
+        docLengths := make([]int, len(docs))
+        avgDocLength := 0.0
+        
+        // Calculate term frequencies and document frequencies
+        termDocFreq := make(map[string]int)
+        
+        for i, doc := range docs </span><span class="cov8" title="1">{
+                terms := tokenize(doc.Content)
+                docTerms[i] = make(map[string]int)
+                for _, term := range terms </span><span class="cov8" title="1">{
+                        docTerms[i][term]++
+                }</span>
+                <span class="cov8" title="1">docLengths[i] = len(terms)
+                avgDocLength += float64(len(terms))
+                
+                // Track which documents contain each term
+                seenTerms := make(map[string]bool)
+                for term := range docTerms[i] </span><span class="cov8" title="1">{
+                        if !seenTerms[term] </span><span class="cov8" title="1">{
+                                termDocFreq[term]++
+                                seenTerms[term] = true
+                        }</span>
+                }
+        }
+        <span class="cov8" title="1">avgDocLength /= float64(len(docs))
+
+        // Calculate BM25 scores
+        scored := make([]types.ScoredDocument, len(docs))
+        for i, doc := range docs </span><span class="cov8" title="1">{
+                score := bm25.calculateBM25(queryTerms, docTerms[i], docLengths[i], avgDocLength, termDocFreq, len(docs))
+                
+                scored[i] = types.ScoredDocument{
+                        Document:     doc,
+                        UtilityScore: score,
+                        Features: types.FeatureVector{
+                                Relevance:   score, // For baseline, relevance = BM25 score
+                                Recency:     0.0,   // Not used in baseline
+                                Entanglement: 0.0,  // Not used in baseline
+                                Prior:       0.0,   // Not used in baseline
+                                Uncertainty: 0.0,   // Not used in baseline
+                                Authority:   0.0,   // Not used in baseline
+                                Specificity: 0.0,   // Not used in baseline
+                        },
+                        PairwiseScores: nil, // Will be calculated in MMR
+                }
+        }</span>
+
+        // Sort by BM25 score (descending)
+        <span class="cov8" title="1">sort.Slice(scored, func(i, j int) bool </span><span class="cov8" title="1">{
+                return scored[i].UtilityScore &gt; scored[j].UtilityScore
+        }</span>)
+
+        // Apply MMR (Maximal Marginal Relevance) for diversity
+        <span class="cov8" title="1">if maxResults &gt; 0 &amp;&amp; maxResults &lt; len(scored) </span><span class="cov8" title="1">{
+                return bm25.applyMMR(scored, maxResults)
+        }</span>
+
+        <span class="cov8" title="1">return scored</span>
+}
+
+// calculateBM25 computes BM25 score for a document given a query
+func (bm25 *BM25Scorer) calculateBM25(queryTerms []string, docTerms map[string]int, docLength int, avgDocLength float64, termDocFreq map[string]int, totalDocs int) float64 <span class="cov8" title="1">{
+        score := 0.0
+        
+        for _, term := range queryTerms </span><span class="cov8" title="1">{
+                tf := float64(docTerms[term]) // Term frequency in document
+                df := float64(termDocFreq[term]) // Document frequency
+                
+                if df == 0 </span><span class="cov8" title="1">{
+                        continue</span> // Term not in any document
+                }
+                
+                // IDF component: log((N - df + 0.5) / (df + 0.5))
+                <span class="cov8" title="1">idf := math.Log((float64(totalDocs) - df + 0.5) / (df + 0.5))
+                
+                // TF component with length normalization
+                normalizedTF := (tf * (bm25.k1 + 1)) / (tf + bm25.k1*(1-bm25.b+bm25.b*(float64(docLength)/avgDocLength)))
+                
+                score += idf * normalizedTF</span>
+        }
+        
+        <span class="cov8" title="1">return score</span>
+}
+
+// applyMMR applies Maximal Marginal Relevance for diversity
+func (bm25 *BM25Scorer) applyMMR(scored []types.ScoredDocument, maxResults int) []types.ScoredDocument <span class="cov8" title="1">{
+        if len(scored) &lt;= maxResults </span><span class="cov0" title="0">{
+                return scored
+        }</span>
+
+        <span class="cov8" title="1">selected := make([]types.ScoredDocument, 0, maxResults)
+        remaining := make([]types.ScoredDocument, len(scored))
+        copy(remaining, scored)
+
+        // Select first document (highest BM25 score)
+        selected = append(selected, remaining[0])
+        remaining = remaining[1:]
+
+        // Iteratively select documents balancing relevance and diversity
+        for len(selected) &lt; maxResults &amp;&amp; len(remaining) &gt; 0 </span><span class="cov8" title="1">{
+                bestIdx := -1
+                bestScore := -1.0
+
+                for i, candidate := range remaining </span><span class="cov8" title="1">{
+                        // Relevance component
+                        relevance := candidate.UtilityScore
+                        if len(scored) &gt; 0 </span><span class="cov8" title="1">{
+                                relevance /= scored[0].UtilityScore // Normalize by top score
+                        }</span>
+
+                        // Diversity component (minimum similarity to selected docs)
+                        <span class="cov8" title="1">minSimilarity := 1.0
+                        for _, selectedDoc := range selected </span><span class="cov8" title="1">{
+                                similarity := bm25.calculateSimilarity(candidate.Document, selectedDoc.Document)
+                                if similarity &lt; minSimilarity </span><span class="cov8" title="1">{
+                                        minSimilarity = similarity
+                                }</span>
+                        }
+                        <span class="cov8" title="1">diversity := 1.0 - minSimilarity
+
+                        // MMR score: λ * relevance + (1-λ) * diversity
+                        mmrScore := bm25.lambda*relevance + (1-bm25.lambda)*diversity
+
+                        if mmrScore &gt; bestScore </span><span class="cov8" title="1">{
+                                bestScore = mmrScore
+                                bestIdx = i
+                        }</span>
+                }
+
+                <span class="cov8" title="1">if bestIdx &gt;= 0 </span><span class="cov8" title="1">{
+                        // Add selected document and remove from remaining
+                        selected = append(selected, remaining[bestIdx])
+                        remaining = append(remaining[:bestIdx], remaining[bestIdx+1:]...)
+                }</span> else<span class="cov0" title="0"> {
+                        break</span>
+                }
+        }
+
+        // Update diversity scores in features
+        <span class="cov8" title="1">for i := range selected </span><span class="cov8" title="1">{
+                diversityScore := bm25.calculateDiversityScore(selected[i].Document, selected)
+                selected[i].Features.Specificity = diversityScore // Use Specificity field for diversity in baseline
+        }</span>
+
+        <span class="cov8" title="1">return selected</span>
+}
+
+// calculateSimilarity computes cosine similarity between two documents
+func (bm25 *BM25Scorer) calculateSimilarity(doc1, doc2 types.Document) float64 <span class="cov8" title="1">{
+        terms1 := tokenize(doc1.Content)
+        terms2 := tokenize(doc2.Content)
+
+        // Create term frequency maps
+        tf1 := make(map[string]int)
+        tf2 := make(map[string]int)
+        
+        for _, term := range terms1 </span><span class="cov8" title="1">{
+                tf1[term]++
+        }</span>
+        <span class="cov8" title="1">for _, term := range terms2 </span><span class="cov8" title="1">{
+                tf2[term]++
+        }</span>
+
+        // Calculate cosine similarity
+        <span class="cov8" title="1">dotProduct := 0.0
+        norm1 := 0.0
+        norm2 := 0.0
+
+        allTerms := make(map[string]bool)
+        for term := range tf1 </span><span class="cov8" title="1">{
+                allTerms[term] = true
+        }</span>
+        <span class="cov8" title="1">for term := range tf2 </span><span class="cov8" title="1">{
+                allTerms[term] = true
+        }</span>
+
+        <span class="cov8" title="1">for term := range allTerms </span><span class="cov8" title="1">{
+                v1 := float64(tf1[term])
+                v2 := float64(tf2[term])
+                dotProduct += v1 * v2
+                norm1 += v1 * v1
+                norm2 += v2 * v2
+        }</span>
+
+        <span class="cov8" title="1">if norm1 == 0 || norm2 == 0 </span><span class="cov0" title="0">{
+                return 0.0
+        }</span>
+
+        <span class="cov8" title="1">return dotProduct / (math.Sqrt(norm1) * math.Sqrt(norm2))</span>
+}
+
+// calculateDiversityScore calculates diversity score for a document within a set
+func (bm25 *BM25Scorer) calculateDiversityScore(doc types.Document, selected []types.ScoredDocument) float64 <span class="cov8" title="1">{
+        if len(selected) &lt;= 1 </span><span class="cov8" title="1">{
+                return 1.0
+        }</span>
+
+        <span class="cov8" title="1">totalSimilarity := 0.0
+        count := 0
+
+        for _, other := range selected </span><span class="cov8" title="1">{
+                if other.Document.ID != doc.ID </span><span class="cov8" title="1">{
+                        similarity := bm25.calculateSimilarity(doc, other.Document)
+                        totalSimilarity += similarity
+                        count++
+                }</span>
+        }
+
+        <span class="cov8" title="1">if count == 0 </span><span class="cov0" title="0">{
+                return 1.0
+        }</span>
+
+        <span class="cov8" title="1">avgSimilarity := totalSimilarity / float64(count)
+        return 1.0 - avgSimilarity</span> // Higher diversity = lower average similarity
+}
+
+// tokenize splits text into terms (simple whitespace tokenization)
+func tokenize(text string) []string <span class="cov8" title="1">{
+        // Simple tokenization - split on whitespace and convert to lowercase
+        text = strings.ToLower(text)
+        fields := strings.Fields(text)
+        
+        // Remove punctuation and short terms
+        var terms []string
+        for _, field := range fields </span><span class="cov8" title="1">{
+                cleaned := strings.Trim(field, ".,!?;:\"'()[]{}=+-*/\\|&lt;&gt;@#$%^&amp;")
+                if len(cleaned) &gt;= 2 </span><span class="cov8" title="1">{ // Only keep terms with 2+ characters
+                        terms = append(terms, cleaned)
+                }</span>
+        }
+        
+        <span class="cov8" title="1">return terms</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package features
+
+import (
+        "context"
+        "math"
+        "sort"
+        "strings"
+        "time"
+
+        "contextlite/pkg/types"
+)
+
+// FeatureExtractor extracts 7D features from documents
+type FeatureExtractor struct {
+        workspacePath string
+        normStats     *types.NormalizationStats
+}
+
+// NewFeatureExtractor creates a new feature extractor
+func NewFeatureExtractor(workspacePath string, normStats *types.NormalizationStats) *FeatureExtractor <span class="cov8" title="1">{
+        return &amp;FeatureExtractor{
+                workspacePath: workspacePath,
+                normStats:     normStats,
+        }
+}</span>
+
+// ExtractFeatures extracts normalized 7D features for all documents
+func (fe *FeatureExtractor) ExtractFeatures(ctx context.Context, docs []types.Document, query string) ([]types.ScoredDocument, error) <span class="cov8" title="1">{
+        var scored []types.ScoredDocument
+
+        // Build term frequency maps for all documents
+        docTerms := make([]map[string]int, len(docs))
+        allTerms := make(map[string]int)
+        docFreq := make(map[string]int) // Document frequency for each term
+        
+        for i, doc := range docs </span><span class="cov8" title="1">{
+                terms := extractTerms(doc.Content)
+                docTerms[i] = terms
+                for term, count := range terms </span><span class="cov8" title="1">{
+                        allTerms[term] += count
+                        if count &gt; 0 </span><span class="cov8" title="1">{
+                                docFreq[term]++
+                        }</span>
+                }
+        }
+
+        <span class="cov8" title="1">queryTerms := extractTerms(query)
+        
+        for i, doc := range docs </span><span class="cov8" title="1">{
+                features := fe.extractRawFeatures(doc, query, queryTerms, docTerms[i], docFreq, len(docs))
+                normalizedFeatures := fe.normalizeFeatures(features)
+                
+                scored = append(scored, types.ScoredDocument{
+                        Document: doc,
+                        Features: normalizedFeatures,
+                        UtilityScore: fe.computeUtilityScore(normalizedFeatures),
+                })
+        }</span>
+
+        <span class="cov8" title="1">return scored, nil</span>
+}
+
+// extractRawFeatures extracts raw feature values (before normalization)
+func (fe *FeatureExtractor) extractRawFeatures(doc types.Document, query string, queryTerms, docTerms map[string]int, docFreq map[string]int, totalDocs int) types.FeatureVector <span class="cov8" title="1">{
+        return types.FeatureVector{
+                Relevance:    fe.computeRelevance(query, queryTerms, docTerms, docFreq, totalDocs),
+                Recency:      fe.computeRecency(doc.ModifiedTime),
+                Entanglement: fe.computeEntanglement(docTerms, docFreq, totalDocs),
+                Prior:        fe.computePrior(doc),
+                Uncertainty:  fe.computeUncertainty(query, docTerms, docFreq, totalDocs),
+                Authority:    fe.computeAuthority(doc),
+                Specificity:  fe.computeSpecificity(query, queryTerms, docTerms),
+        }
+}</span>
+
+// computeRelevance computes BM25 relevance score
+func (fe *FeatureExtractor) computeRelevance(query string, queryTerms, docTerms map[string]int, docFreq map[string]int, totalDocs int) float64 <span class="cov8" title="1">{
+        // BM25 parameters
+        k1 := 1.5
+        b := 0.75
+        
+        // Document length
+        docLen := 0
+        for _, count := range docTerms </span><span class="cov8" title="1">{
+                docLen += count
+        }</span>
+        
+        // Average document length (approximation)
+        <span class="cov8" title="1">avgDocLen := float64(docLen) // For single doc, use its own length
+        if totalDocs &gt; 1 </span><span class="cov8" title="1">{
+                // Better estimation would need all doc lengths, but this is a reasonable approximation
+                avgDocLen = float64(docLen)
+        }</span>
+        
+        <span class="cov8" title="1">score := 0.0
+        for term := range queryTerms </span><span class="cov8" title="1">{
+                if tf, exists := docTerms[term]; exists </span><span class="cov8" title="1">{
+                        df := docFreq[term]
+                        if df == 0 </span><span class="cov0" title="0">{
+                                continue</span> // Skip if term doesn't appear in any documents
+                        }
+                        
+                        // IDF component - handle edge cases
+                        <span class="cov8" title="1">numerator := float64(totalDocs - df) + 0.5
+                        denominator := float64(df) + 0.5
+                        if denominator &lt;= 0 </span><span class="cov0" title="0">{
+                                denominator = 0.5
+                        }</span>
+                        <span class="cov8" title="1">idf := math.Log(numerator / denominator)
+                        
+                        // TF component with normalization
+                        tfNorm := float64(tf) * (k1 + 1) / (float64(tf) + k1*(1-b+b*float64(docLen)/avgDocLen))
+                        
+                        score += idf * tfNorm</span>
+                }
+        }
+        
+        <span class="cov8" title="1">return score</span>
+}
+
+// computeRecency computes exponential decay based on modified time
+func (fe *FeatureExtractor) computeRecency(mtime int64) float64 <span class="cov8" title="1">{
+        if mtime == 0 </span><span class="cov8" title="1">{
+                return 0.5 // Default for unknown time
+        }</span>
+        
+        <span class="cov8" title="1">now := time.Now().Unix()
+        daysSince := float64(now-mtime) / (24 * 3600)
+        
+        // 7-day half-life exponential decay
+        halfLife := 7.0
+        return math.Exp(-math.Ln2 * daysSince / halfLife)</span>
+}
+
+// computeEntanglement computes PMI-based concept density
+func (fe *FeatureExtractor) computeEntanglement(docTerms, docFreq map[string]int, totalDocs int) float64 <span class="cov8" title="1">{
+        if len(docTerms) &lt; 2 </span><span class="cov8" title="1">{
+                return 0.0
+        }</span>
+        
+        // Extract significant terms (top 20% by frequency)
+        <span class="cov8" title="1">type termFreq struct {
+                term string
+                freq int
+        }
+        
+        var terms []termFreq
+        for term, freq := range docTerms </span><span class="cov8" title="1">{
+                terms = append(terms, termFreq{term, freq})
+        }</span>
+        
+        <span class="cov8" title="1">sort.Slice(terms, func(i, j int) bool </span><span class="cov8" title="1">{
+                if terms[i].freq == terms[j].freq </span><span class="cov8" title="1">{
+                        return terms[i].term &lt; terms[j].term // Deterministic ordering for equal frequencies
+                }</span>
+                <span class="cov8" title="1">return terms[i].freq &gt; terms[j].freq</span>
+        })
+        
+        // Take top 20% of terms
+        <span class="cov8" title="1">topN := int(math.Max(2, float64(len(terms))*0.2))
+        if topN &gt; len(terms) </span><span class="cov0" title="0">{
+                topN = len(terms)
+        }</span>
+        
+        <span class="cov8" title="1">entanglement := 0.0
+        pairs := 0
+        
+        // Compute PMI between significant terms
+        for i := 0; i &lt; topN; i++ </span><span class="cov8" title="1">{
+                for j := i + 1; j &lt; topN; j++ </span><span class="cov8" title="1">{
+                        term1, term2 := terms[i].term, terms[j].term
+                        
+                        // Simple co-occurrence approximation (both terms in same doc)
+                        coOccur := 1.0 // Both are in this document
+                        prob1 := float64(docFreq[term1]) / float64(totalDocs)
+                        prob2 := float64(docFreq[term2]) / float64(totalDocs)
+                        jointProb := coOccur / float64(totalDocs)
+                        
+                        if prob1 &gt; 0 &amp;&amp; prob2 &gt; 0 &amp;&amp; jointProb &gt; 0 </span><span class="cov8" title="1">{
+                                pmi := math.Log(jointProb / (prob1 * prob2))
+                                entanglement += math.Max(0, pmi) // Only positive PMI
+                                pairs++
+                        }</span>
+                }
+        }
+        
+        <span class="cov8" title="1">if pairs &gt; 0 </span><span class="cov8" title="1">{
+                return entanglement / float64(pairs)
+        }</span>
+        <span class="cov0" title="0">return 0.0</span>
+}
+
+// computePrior computes historical selection likelihood
+func (fe *FeatureExtractor) computePrior(doc types.Document) float64 <span class="cov8" title="1">{
+        // Simple heuristics based on path and usage patterns
+        score := 0.5 // Base score
+        
+        // Boost for commonly used file types
+        if strings.Contains(doc.Language, "go") ||
+           strings.Contains(doc.Language, "python") ||
+           strings.Contains(doc.Language, "javascript") </span><span class="cov8" title="1">{
+                score += 0.2
+        }</span>
+        
+        // Boost for main/entry files
+        <span class="cov8" title="1">if strings.Contains(strings.ToLower(doc.Path), "main") ||
+           strings.Contains(strings.ToLower(doc.Path), "index") ||
+           strings.Contains(strings.ToLower(doc.Path), "app") </span><span class="cov8" title="1">{
+                score += 0.3
+        }</span>
+        
+        // Boost for recent files (based on modified time)
+        <span class="cov8" title="1">if doc.ModifiedTime &gt; 0 </span><span class="cov8" title="1">{
+                daysSince := float64(time.Now().Unix()-doc.ModifiedTime) / (24 * 3600)
+                if daysSince &lt; 7 </span><span class="cov8" title="1">{
+                        score += 0.2 * (7 - daysSince) / 7
+                }</span>
+        }
+        
+        <span class="cov8" title="1">return math.Min(1.0, score)</span>
+}
+
+// computeUncertainty computes score variance across estimators
+func (fe *FeatureExtractor) computeUncertainty(query string, docTerms, docFreq map[string]int, totalDocs int) float64 <span class="cov8" title="1">{
+        // Compute different scoring methods
+        queryTerms := extractTerms(query)
+        
+        // BM25 score
+        bm25 := fe.computeRelevance(query, queryTerms, docTerms, docFreq, totalDocs)
+        
+        // TF-IDF score (simplified)
+        tfidf := 0.0
+        docLen := 0
+        for _, count := range docTerms </span><span class="cov8" title="1">{
+                docLen += count
+        }</span>
+        
+        <span class="cov8" title="1">for term := range queryTerms </span><span class="cov8" title="1">{
+                if tf, exists := docTerms[term]; exists </span><span class="cov8" title="1">{
+                        df := float64(docFreq[term])
+                        idf := math.Log(float64(totalDocs) / (df + 1))
+                        tfidf += (float64(tf) / float64(docLen)) * idf
+                }</span>
+        }
+        
+        // Simple overlap score
+        <span class="cov8" title="1">overlap := 0.0
+        for term := range queryTerms </span><span class="cov8" title="1">{
+                if _, exists := docTerms[term]; exists </span><span class="cov8" title="1">{
+                        overlap += 1.0
+                }</span>
+        }
+        <span class="cov8" title="1">overlap /= float64(len(queryTerms))
+        
+        // Compute variance
+        scores := []float64{bm25, tfidf, overlap}
+        mean := (bm25 + tfidf + overlap) / 3.0
+        
+        variance := 0.0
+        for _, score := range scores </span><span class="cov8" title="1">{
+                variance += (score - mean) * (score - mean)
+        }</span>
+        <span class="cov8" title="1">variance /= float64(len(scores))
+        
+        // Return normalized uncertainty (higher = more uncertain)
+        return math.Min(1.0, math.Sqrt(variance))</span>
+}
+
+// computeAuthority computes document importance
+func (fe *FeatureExtractor) computeAuthority(doc types.Document) float64 <span class="cov8" title="1">{
+        score := 0.0
+        
+        // File size (longer docs often more important)
+        contentLen := float64(len(doc.Content))
+        if contentLen &gt; 0 </span><span class="cov8" title="1">{
+                // Normalize by log to prevent very long docs from dominating
+                score += math.Min(0.5, math.Log(contentLen)/math.Log(10000))
+        }</span>
+        
+        // Token count (if available)
+        <span class="cov8" title="1">if doc.TokenCount &gt; 0 </span><span class="cov8" title="1">{
+                score += math.Min(0.3, float64(doc.TokenCount)/5000)
+        }</span>
+        
+        // Path-based importance
+        <span class="cov8" title="1">if strings.Contains(strings.ToLower(doc.Path), "readme") ||
+           strings.Contains(strings.ToLower(doc.Path), "doc") </span><span class="cov8" title="1">{
+                score += 0.3
+        }</span>
+        
+        // Language-specific boosts
+        <span class="cov8" title="1">if doc.Language != "" </span><span class="cov8" title="1">{
+                score += 0.2
+        }</span>
+        
+        <span class="cov8" title="1">return math.Min(1.0, score)</span>
+}
+
+// computeSpecificity computes query-document topic alignment
+func (fe *FeatureExtractor) computeSpecificity(query string, queryTerms, docTerms map[string]int) float64 <span class="cov8" title="1">{
+        if len(queryTerms) == 0 || len(docTerms) == 0 </span><span class="cov8" title="1">{
+                return 0.0
+        }</span>
+        
+        // Jaccard similarity of terms
+        <span class="cov8" title="1">intersection := 0
+        union := len(queryTerms)
+        
+        for term := range queryTerms </span><span class="cov8" title="1">{
+                if _, exists := docTerms[term]; exists </span><span class="cov8" title="1">{
+                        intersection++
+                }</span>
+        }
+        
+        // Add doc terms not in query
+        <span class="cov8" title="1">for term := range docTerms </span><span class="cov8" title="1">{
+                if _, exists := queryTerms[term]; !exists </span><span class="cov8" title="1">{
+                        union++
+                }</span>
+        }
+        
+        <span class="cov8" title="1">if union == 0 </span><span class="cov0" title="0">{
+                return 0.0
+        }</span>
+        
+        <span class="cov8" title="1">jaccard := float64(intersection) / float64(union)
+        
+        // Boost for exact phrase matches
+        queryLower := strings.ToLower(query)
+        contentLower := strings.ToLower(extractContent(docTerms))
+        
+        if strings.Contains(contentLower, queryLower) </span><span class="cov8" title="1">{
+                jaccard += 0.3
+        }</span>
+        
+        <span class="cov8" title="1">return math.Min(1.0, jaccard)</span>
+}
+
+// normalizeFeatures applies z-score normalization using workspace stats
+func (fe *FeatureExtractor) normalizeFeatures(features types.FeatureVector) types.FeatureVector <span class="cov8" title="1">{
+        if fe.normStats == nil || fe.normStats.Count == 0 </span><span class="cov0" title="0">{
+                // No normalization stats available, return as-is (clamped to [0,1])
+                return types.FeatureVector{
+                        Relevance:    math.Max(0, math.Min(1, features.Relevance)),
+                        Recency:      math.Max(0, math.Min(1, features.Recency)),
+                        Entanglement: math.Max(0, math.Min(1, features.Entanglement)),
+                        Prior:        math.Max(0, math.Min(1, features.Prior)),
+                        Uncertainty:  math.Max(0, math.Min(1, features.Uncertainty)),
+                        Authority:    math.Max(0, math.Min(1, features.Authority)),
+                        Specificity:  math.Max(0, math.Min(1, features.Specificity)),
+                }
+        }</span>
+        
+        // Apply z-score normalization and clamp to [0,1]
+        <span class="cov8" title="1">normalize := func(value, mean, stdDev float64) float64 </span><span class="cov8" title="1">{
+                if stdDev == 0 </span><span class="cov8" title="1">{
+                        return 0.5 // Default for constant values
+                }</span>
+                <span class="cov8" title="1">zscore := (value - mean) / stdDev
+                // Convert z-score to [0,1] using sigmoid
+                return 1.0 / (1.0 + math.Exp(-zscore))</span>
+        }
+        
+        <span class="cov8" title="1">return types.FeatureVector{
+                Relevance:    normalize(features.Relevance, fe.normStats.Mean["relevance"], fe.normStats.StdDev["relevance"]),
+                Recency:      normalize(features.Recency, fe.normStats.Mean["recency"], fe.normStats.StdDev["recency"]),
+                Entanglement: normalize(features.Entanglement, fe.normStats.Mean["entanglement"], fe.normStats.StdDev["entanglement"]),
+                Prior:        normalize(features.Prior, fe.normStats.Mean["prior"], fe.normStats.StdDev["prior"]),
+                Uncertainty:  normalize(features.Uncertainty, fe.normStats.Mean["uncertainty"], fe.normStats.StdDev["uncertainty"]),
+                Authority:    normalize(features.Authority, fe.normStats.Mean["authority"], fe.normStats.StdDev["authority"]),
+                Specificity:  normalize(features.Specificity, fe.normStats.Mean["specificity"], fe.normStats.StdDev["specificity"]),
+        }</span>
+}
+
+// computeUtilityScore computes per-document utility for SMT optimization
+func (fe *FeatureExtractor) computeUtilityScore(features types.FeatureVector) float64 <span class="cov8" title="1">{
+        // Default weights (will be overridden by workspace-specific weights)
+        weights := map[string]float64{
+                "relevance":    0.30,
+                "recency":      0.20,
+                "entanglement": 0.15,
+                "prior":        0.15,
+                "authority":    0.10,
+                "specificity":  0.05,
+                "uncertainty":  0.05,
+        }
+        
+        return weights["relevance"]*features.Relevance +
+                   weights["recency"]*features.Recency +
+                   weights["entanglement"]*features.Entanglement +
+                   weights["prior"]*features.Prior +
+                   weights["authority"]*features.Authority +
+                   weights["specificity"]*features.Specificity -
+                   weights["uncertainty"]*features.Uncertainty // Subtract uncertainty
+}</span>
+
+// extractTerms extracts and normalizes terms from text
+func extractTerms(text string) map[string]int <span class="cov8" title="1">{
+        terms := make(map[string]int)
+        
+        // Simple tokenization (split on non-alphanumeric)
+        words := strings.FieldsFunc(strings.ToLower(text), func(r rune) bool </span><span class="cov8" title="1">{
+                return !((r &gt;= 'a' &amp;&amp; r &lt;= 'z') || (r &gt;= '0' &amp;&amp; r &lt;= '9'))
+        }</span>)
+        
+        <span class="cov8" title="1">for _, word := range words </span><span class="cov8" title="1">{
+                if len(word) &gt; 2 </span><span class="cov8" title="1">{ // Filter out very short words
+                        terms[word]++
+                }</span>
+        }
+        
+        <span class="cov8" title="1">return terms</span>
+}
+
+// extractContent reconstructs content from term map (for phrase matching)
+func extractContent(terms map[string]int) string <span class="cov8" title="1">{
+        var words []string
+        for term, count := range terms </span><span class="cov8" title="1">{
+                for i := 0; i &lt; count; i++ </span><span class="cov8" title="1">{
+                        words = append(words, term)
+                }</span>
+        }
+        <span class="cov8" title="1">return strings.Join(words, " ")</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package features
+
+import (
+        "fmt"
+        "math"
+        "sort"
+        "strings"
+
+        "contextlite/pkg/types"
+)
+
+// SimilarityComputer computes pairwise similarities between documents
+type SimilarityComputer struct {
+        maxPairsPerDoc int
+}
+
+// NewSimilarityComputer creates a new similarity computer
+func NewSimilarityComputer(maxPairsPerDoc int) *SimilarityComputer <span class="cov8" title="1">{
+        return &amp;SimilarityComputer{
+                maxPairsPerDoc: maxPairsPerDoc,
+        }
+}</span>
+
+// DocumentPair represents a pair of documents with similarity scores
+type DocumentPair struct {
+        DocI          int     `json:"doc_i"`
+        DocJ          int     `json:"doc_j"`
+        Similarity    float64 `json:"similarity"`
+        Coherence     float64 `json:"coherence"`
+        Redundancy    float64 `json:"redundancy"`
+}
+
+// ComputePairwiseScores computes similarity scores for document pairs
+func (sc *SimilarityComputer) ComputePairwiseScores(docs []types.ScoredDocument) []DocumentPair <span class="cov8" title="1">{
+        var pairs []DocumentPair
+        
+        // Compute all pairwise similarities
+        allPairs := make([]DocumentPair, 0, len(docs)*(len(docs)-1)/2)
+        
+        for i := 0; i &lt; len(docs); i++ </span><span class="cov8" title="1">{
+                for j := i + 1; j &lt; len(docs); j++ </span><span class="cov8" title="1">{
+                        similarity := sc.computeDocumentSimilarity(docs[i].Document, docs[j].Document)
+                        coherence := sc.computeCoherence(docs[i].Document, docs[j].Document)
+                        redundancy := similarity // For now, redundancy is just similarity
+                        
+                        allPairs = append(allPairs, DocumentPair{
+                                DocI:       i,
+                                DocJ:       j,
+                                Similarity: similarity,
+                                Coherence:  coherence,
+                                Redundancy: redundancy,
+                        })
+                }</span>
+        }
+        
+        // For each document, keep only top-M most similar pairs
+        <span class="cov8" title="1">docPairs := make(map[int][]DocumentPair)
+        
+        // Group pairs by document
+        for _, pair := range allPairs </span><span class="cov8" title="1">{
+                docPairs[pair.DocI] = append(docPairs[pair.DocI], pair)
+                docPairs[pair.DocJ] = append(docPairs[pair.DocJ], pair)
+        }</span>
+        
+        // Sort and limit pairs per document
+        <span class="cov8" title="1">usedPairs := make(map[string]bool)
+        
+        for _, docPairList := range docPairs </span><span class="cov8" title="1">{
+                // Sort by similarity (descending)
+                sort.Slice(docPairList, func(i, j int) bool </span><span class="cov8" title="1">{
+                        return docPairList[i].Similarity &gt; docPairList[j].Similarity
+                }</span>)
+                
+                // Take top M pairs for this document
+                <span class="cov8" title="1">count := 0
+                for _, pair := range docPairList </span><span class="cov8" title="1">{
+                        if count &gt;= sc.maxPairsPerDoc </span><span class="cov0" title="0">{
+                                break</span>
+                        }
+                        
+                        // Create unique key for this pair
+                        <span class="cov8" title="1">var key string
+                        if pair.DocI &lt; pair.DocJ </span><span class="cov8" title="1">{
+                                key = fmt.Sprintf("%d-%d", pair.DocI, pair.DocJ)
+                        }</span> else<span class="cov0" title="0"> {
+                                key = fmt.Sprintf("%d-%d", pair.DocJ, pair.DocI)
+                        }</span>
+                        
+                        <span class="cov8" title="1">if !usedPairs[key] </span><span class="cov8" title="1">{
+                                pairs = append(pairs, pair)
+                                usedPairs[key] = true
+                                count++
+                        }</span>
+                }
+        }
+        
+        <span class="cov8" title="1">return pairs</span>
+}
+
+// computeDocumentSimilarity computes TF-IDF cosine similarity between documents
+func (sc *SimilarityComputer) computeDocumentSimilarity(doc1, doc2 types.Document) float64 <span class="cov8" title="1">{
+        // Extract terms from both documents
+        terms1 := extractTerms(doc1.Content)
+        terms2 := extractTerms(doc2.Content)
+        
+        // Build union of all terms
+        allTerms := make(map[string]bool)
+        for term := range terms1 </span><span class="cov8" title="1">{
+                allTerms[term] = true
+        }</span>
+        <span class="cov8" title="1">for term := range terms2 </span><span class="cov8" title="1">{
+                allTerms[term] = true
+        }</span>
+        
+        <span class="cov8" title="1">if len(allTerms) == 0 </span><span class="cov8" title="1">{
+                return 0.0
+        }</span>
+        
+        // Compute TF-IDF vectors (simplified - using just TF for now)
+        <span class="cov8" title="1">var vec1, vec2 []float64
+        
+        // Get document lengths for normalization
+        len1 := 0
+        for _, count := range terms1 </span><span class="cov8" title="1">{
+                len1 += count
+        }</span>
+        <span class="cov8" title="1">len2 := 0
+        for _, count := range terms2 </span><span class="cov8" title="1">{
+                len2 += count
+        }</span>
+        
+        <span class="cov8" title="1">if len1 == 0 || len2 == 0 </span><span class="cov8" title="1">{
+                return 0.0
+        }</span>
+        
+        // Build normalized term frequency vectors
+        <span class="cov8" title="1">for term := range allTerms </span><span class="cov8" title="1">{
+                tf1 := float64(terms1[term]) / float64(len1)
+                tf2 := float64(terms2[term]) / float64(len2)
+                vec1 = append(vec1, tf1)
+                vec2 = append(vec2, tf2)
+        }</span>
+        
+        // Compute cosine similarity
+        <span class="cov8" title="1">return cosineSimilarity(vec1, vec2)</span>
+}
+
+// computeCoherence computes concept overlap between documents
+func (sc *SimilarityComputer) computeCoherence(doc1, doc2 types.Document) float64 <span class="cov8" title="1">{
+        // Extract significant terms (top 20% by frequency)
+        terms1 := extractSignificantTerms(doc1.Content, 0.2)
+        terms2 := extractSignificantTerms(doc2.Content, 0.2)
+        
+        if len(terms1) == 0 || len(terms2) == 0 </span><span class="cov0" title="0">{
+                return 0.0
+        }</span>
+        
+        // Compute Jaccard similarity of significant terms
+        <span class="cov8" title="1">intersection := 0
+        union := make(map[string]bool)
+        
+        for term := range terms1 </span><span class="cov8" title="1">{
+                union[term] = true
+        }</span>
+        <span class="cov8" title="1">for term := range terms2 </span><span class="cov8" title="1">{
+                union[term] = true
+                if terms1[term] &gt; 0 </span><span class="cov0" title="0">{
+                        intersection++
+                }</span>
+        }
+        
+        <span class="cov8" title="1">if len(union) == 0 </span><span class="cov0" title="0">{
+                return 0.0
+        }</span>
+        
+        <span class="cov8" title="1">jaccard := float64(intersection) / float64(len(union))
+        
+        // Boost for similar languages/file types
+        if doc1.Language == doc2.Language &amp;&amp; doc1.Language != "" </span><span class="cov0" title="0">{
+                jaccard += 0.1
+        }</span>
+        
+        // Boost for similar paths (same directory, etc.)
+        <span class="cov8" title="1">if sc.pathSimilarity(doc1.Path, doc2.Path) &gt; 0.5 </span><span class="cov0" title="0">{
+                jaccard += 0.1
+        }</span>
+        
+        <span class="cov8" title="1">return math.Min(1.0, jaccard)</span>
+}
+
+// extractSignificantTerms extracts the top percentage of terms by frequency
+func extractSignificantTerms(content string, topPercent float64) map[string]int <span class="cov8" title="1">{
+        allTerms := extractTerms(content)
+        
+        if len(allTerms) == 0 </span><span class="cov8" title="1">{
+                return allTerms
+        }</span>
+        
+        // Sort terms by frequency
+        <span class="cov8" title="1">type termFreq struct {
+                term string
+                freq int
+        }
+        
+        var terms []termFreq
+        for term, freq := range allTerms </span><span class="cov8" title="1">{
+                terms = append(terms, termFreq{term, freq})
+        }</span>
+        
+        <span class="cov8" title="1">sort.Slice(terms, func(i, j int) bool </span><span class="cov8" title="1">{
+                return terms[i].freq &gt; terms[j].freq
+        }</span>)
+        
+        // Take top percentage
+        <span class="cov8" title="1">topN := int(math.Max(1, float64(len(terms))*topPercent))
+        if topN &gt; len(terms) </span><span class="cov0" title="0">{
+                topN = len(terms)
+        }</span>
+        
+        <span class="cov8" title="1">significant := make(map[string]int)
+        for i := 0; i &lt; topN; i++ </span><span class="cov8" title="1">{
+                significant[terms[i].term] = terms[i].freq
+        }</span>
+        
+        <span class="cov8" title="1">return significant</span>
+}
+
+// pathSimilarity computes similarity between file paths
+func (sc *SimilarityComputer) pathSimilarity(path1, path2 string) float64 <span class="cov8" title="1">{
+        if path1 == "" || path2 == "" </span><span class="cov8" title="1">{
+                return 0.0
+        }</span>
+        
+        // Split paths into components
+        <span class="cov8" title="1">parts1 := strings.Split(strings.ToLower(path1), "/")
+        parts2 := strings.Split(strings.ToLower(path2), "/")
+        
+        // Remove empty parts
+        parts1 = filterEmpty(parts1)
+        parts2 = filterEmpty(parts2)
+        
+        if len(parts1) == 0 || len(parts2) == 0 </span><span class="cov0" title="0">{
+                return 0.0
+        }</span>
+        
+        // Compute longest common prefix
+        <span class="cov8" title="1">commonPrefix := 0
+        minLen := len(parts1)
+        if len(parts2) &lt; minLen </span><span class="cov0" title="0">{
+                minLen = len(parts2)
+        }</span>
+        
+        <span class="cov8" title="1">for i := 0; i &lt; minLen; i++ </span><span class="cov8" title="1">{
+                if parts1[i] == parts2[i] </span><span class="cov8" title="1">{
+                        commonPrefix++
+                }</span> else<span class="cov8" title="1"> {
+                        break</span>
+                }
+        }
+        
+        // Similarity based on common prefix ratio
+        <span class="cov8" title="1">maxLen := len(parts1)
+        if len(parts2) &gt; maxLen </span><span class="cov8" title="1">{
+                maxLen = len(parts2)
+        }</span>
+        
+        <span class="cov8" title="1">return float64(commonPrefix) / float64(maxLen)</span>
+}
+
+// cosineSimilarity computes cosine similarity between two vectors
+func cosineSimilarity(vec1, vec2 []float64) float64 <span class="cov8" title="1">{
+        if len(vec1) != len(vec2) </span><span class="cov8" title="1">{
+                return 0.0
+        }</span>
+        
+        <span class="cov8" title="1">var dotProduct, norm1, norm2 float64
+        
+        for i := 0; i &lt; len(vec1); i++ </span><span class="cov8" title="1">{
+                dotProduct += vec1[i] * vec2[i]
+                norm1 += vec1[i] * vec1[i]
+                norm2 += vec2[i] * vec2[i]
+        }</span>
+        
+        <span class="cov8" title="1">if norm1 == 0 || norm2 == 0 </span><span class="cov8" title="1">{
+                return 0.0
+        }</span>
+        
+        <span class="cov8" title="1">return dotProduct / (math.Sqrt(norm1) * math.Sqrt(norm2))</span>
+}
+
+// filterEmpty removes empty strings from slice
+func filterEmpty(strs []string) []string <span class="cov8" title="1">{
+        var result []string
+        for _, s := range strs </span><span class="cov8" title="1">{
+                if s != "" </span><span class="cov8" title="1">{
+                        result = append(result, s)
+                }</span>
+        }
+        <span class="cov8" title="1">return result</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package features
+
+import (
+        "strings"
+)
+
+// TokenCounter provides simple token counting
+type TokenCounter struct {
+        modelID string
+}
+
+// NewTokenCounter creates a new token counter
+func NewTokenCounter(modelID string) *TokenCounter <span class="cov8" title="1">{
+        return &amp;TokenCounter{modelID: modelID}
+}</span>
+
+// CountTokens estimates token count for text (simple word-based approximation)
+func (tc *TokenCounter) CountTokens(text string) int <span class="cov8" title="1">{
+        if text == "" </span><span class="cov8" title="1">{
+                return 0
+        }</span>
+        
+        // Simple approximation: split on whitespace and punctuation
+        <span class="cov8" title="1">words := strings.Fields(text)
+        
+        // Rough estimate: 1.3 tokens per word (accounting for subword tokenization)
+        tokenCount := int(float64(len(words)) * 1.3)
+        
+        // Minimum 1 token for non-empty text
+        if tokenCount == 0 &amp;&amp; len(strings.TrimSpace(text)) &gt; 0 </span><span class="cov0" title="0">{
+                tokenCount = 1
+        }</span>
+        
+        <span class="cov8" title="1">return tokenCount</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

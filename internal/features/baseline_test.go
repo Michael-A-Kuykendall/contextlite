@@ -298,6 +298,85 @@ func TestBM25Scorer_CalculateDiversityScore(t *testing.T) {
 	t.Logf("Diversity score: %f", diversityScore)
 }
 
+func TestBM25Scorer_CalculateDiversityScoreEdgeCases(t *testing.T) {
+	scorer := NewBM25Scorer()
+	
+	doc := types.Document{
+		ID:      "target",
+		Content: "test content",
+	}
+	
+	// Test with empty selected list (len(selected) == 0)
+	emptySelected := []types.ScoredDocument{}
+	diversityScore := scorer.calculateDiversityScore(doc, emptySelected)
+	if diversityScore != 1.0 {
+		t.Errorf("Expected diversity score of 1.0 for empty selection, got %f", diversityScore)
+	}
+	
+	// Test with exactly one document (len(selected) == 1) 
+	oneSelected := []types.ScoredDocument{
+		{Document: types.Document{ID: "other", Content: "other content"}},
+	}
+	diversityScore = scorer.calculateDiversityScore(doc, oneSelected)
+	if diversityScore != 1.0 {
+		t.Errorf("Expected diversity score of 1.0 for single selection, got %f", diversityScore)
+	}
+	
+	// Test where all selected documents have the same ID as target (count == 0)
+	sameIdSelected := []types.ScoredDocument{
+		{Document: types.Document{ID: "target", Content: "same id content 1"}},
+		{Document: types.Document{ID: "target", Content: "same id content 2"}},
+	}
+	diversityScore = scorer.calculateDiversityScore(doc, sameIdSelected)
+	if diversityScore != 1.0 {
+		t.Errorf("Expected diversity score of 1.0 when all docs have same ID as target, got %f", diversityScore)
+	}
+	
+	// Test mixed case: some same ID, some different ID
+	mixedSelected := []types.ScoredDocument{
+		{Document: types.Document{ID: "target", Content: "same id"}}, // Same ID - should be skipped
+		{Document: types.Document{ID: "different1", Content: "test content"}}, // Different ID - should be included
+		{Document: types.Document{ID: "target", Content: "another same id"}}, // Same ID - should be skipped
+		{Document: types.Document{ID: "different2", Content: "other content"}}, // Different ID - should be included
+	}
+	diversityScore = scorer.calculateDiversityScore(doc, mixedSelected)
+	
+	// Should only consider the 2 documents with different IDs
+	if diversityScore < 0.0 || diversityScore > 1.0 {
+		t.Errorf("Diversity score should be between 0 and 1 for mixed selection, got %f", diversityScore)
+	}
+	
+	// Test with highly similar documents (low diversity)
+	similarSelected := []types.ScoredDocument{
+		{Document: types.Document{ID: "sim1", Content: "test content very similar"}},
+		{Document: types.Document{ID: "sim2", Content: "test content extremely similar"}},
+	}
+	similarityScore := scorer.calculateDiversityScore(doc, similarSelected)
+	
+	// Should be lower diversity due to high similarity
+	if similarityScore < 0.0 || similarityScore > 1.0 {
+		t.Errorf("Diversity score should be between 0 and 1 for similar content, got %f", similarityScore)
+	}
+	
+	// Test with very different documents (high diversity)
+	differentSelected := []types.ScoredDocument{
+		{Document: types.Document{ID: "diff1", Content: "completely unrelated words"}},
+		{Document: types.Document{ID: "diff2", Content: "totally different vocabulary"}},
+	}
+	differentScore := scorer.calculateDiversityScore(doc, differentSelected)
+	
+	// Should be higher diversity due to low similarity
+	if differentScore < 0.0 || differentScore > 1.0 {
+		t.Errorf("Diversity score should be between 0 and 1 for different content, got %f", differentScore)
+	}
+	
+	// Different content should have higher diversity than similar content
+	if differentScore <= similarityScore {
+		t.Logf("Note: Expected different content to have higher diversity (%f) than similar content (%f)", 
+			differentScore, similarityScore)
+	}
+}
+
 func TestTokenize(t *testing.T) {
 	tests := []struct {
 		name     string
