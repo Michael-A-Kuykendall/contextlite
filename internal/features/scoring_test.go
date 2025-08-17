@@ -2,6 +2,7 @@ package features
 
 import (
 	"context"
+	"math"
 	"strings"
 	"testing"
 	"time"
@@ -163,6 +164,97 @@ func TestComputeRelevance(t *testing.T) {
 	}
 }
 
+func TestComputeRelevanceEdgeCases(t *testing.T) {
+	normStats := &types.NormalizationStats{
+		Mean:   map[string]float64{},
+		StdDev: map[string]float64{},
+		Count:  100,
+	}
+	
+	extractor := NewFeatureExtractor("/test/workspace", normStats)
+	
+	// Test with zero document frequency (df == 0) - should skip term
+	queryTerms := map[string]int{
+		"term1": 1,
+		"term2": 1,
+	}
+	
+	docTerms := map[string]int{
+		"term1": 1,
+		"term2": 1,
+	}
+	
+	docFreqZero := map[string]int{
+		"term1": 0, // Zero frequency - should be skipped
+		"term2": 1, // Normal frequency
+	}
+	
+	relevance := extractor.computeRelevance("term1 term2", queryTerms, docTerms, docFreqZero, 5)
+	
+	// Should only get contribution from term2, not term1 due to df == 0
+	if relevance <= 0 {
+		t.Errorf("Expected positive relevance from term2 despite term1 having df=0, got %f", relevance)
+	}
+	
+	// Test with missing docFreq entries (should continue loop)
+	incompleteDocFreq := map[string]int{
+		"term2": 1,
+		// "term1" missing - should be treated as 0 and skipped
+	}
+	
+	relevance2 := extractor.computeRelevance("term1 term2", queryTerms, docTerms, incompleteDocFreq, 5)
+	
+	// Should only get contribution from term2
+	if relevance2 <= 0 {
+		t.Errorf("Expected positive relevance from term2 despite term1 missing from docFreq, got %f", relevance2)
+	}
+	
+	// Test with totalDocs > 1 to trigger avgDocLen calculation path
+	relevanceMultiDoc := extractor.computeRelevance("term2", map[string]int{"term2": 1}, docTerms, docFreqZero, 10)
+	
+	// Should be valid (though may be 0 due to df=0 for term2 in this setup)
+	if relevanceMultiDoc < 0 {
+		t.Errorf("Expected non-negative relevance for multiple docs, got %f", relevanceMultiDoc)
+	}
+	
+	// Test with very high document frequency that could cause denominator edge case
+	docFreqHigh := map[string]int{
+		"common_term": 100, // Very high frequency
+	}
+	
+	queryCommon := map[string]int{
+		"common_term": 1,
+	}
+	
+	docCommon := map[string]int{
+		"common_term": 5,
+	}
+	
+	// Test with totalDocs equal to df (edge case for IDF calculation)
+	relevanceEdge := extractor.computeRelevance("common_term", queryCommon, docCommon, docFreqHigh, 100)
+	
+	// BM25 can produce negative values when IDF is negative (common terms)
+	// Just verify the calculation doesn't crash and produces a finite value
+	if !isFinite(relevanceEdge) {
+		t.Errorf("Expected finite relevance for edge case IDF, got %f", relevanceEdge)
+	}
+	
+	// Test with totalDocs == 1 (single document case)
+	relevanceSingle := extractor.computeRelevance("term2", map[string]int{"term2": 1}, 
+		map[string]int{"term2": 3}, map[string]int{"term2": 1}, 1)
+	
+	// Should use document's own length as avgDocLen
+	// BM25 can be negative, just verify it's finite
+	if !isFinite(relevanceSingle) {
+		t.Errorf("Expected finite relevance for single document, got %f", relevanceSingle)
+	}
+}
+
+// Helper function to check if a float is finite
+func isFinite(f float64) bool {
+	return !math.IsNaN(f) && !math.IsInf(f, 0)
+}
+
 func TestNormalizeFeatures(t *testing.T) {
 	normStats := &types.NormalizationStats{
 		Mean: map[string]float64{
@@ -247,6 +339,102 @@ func TestNormalizeFeatures(t *testing.T) {
 	// Should use fallback for missing stats (0.5 for missing mean/stddev)
 	if normalizedPartial.Recency != 0.5 {
 		t.Errorf("Expected 0.5 for missing normalization stats, got %f", normalizedPartial.Recency)
+	}
+}
+
+func TestNormalizeFeaturesNilStats(t *testing.T) {
+	// Test with nil normalization stats
+	extractorNil := NewFeatureExtractor("/test/workspace", nil)
+	
+	raw := types.FeatureVector{
+		Relevance:    1.5,  // Above 1
+		Recency:      -0.3, // Below 0
+		Entanglement: 0.5,  // Normal
+		Prior:        2.0,  // Well above 1
+		Uncertainty:  -1.0, // Well below 0
+		Authority:    0.5,  // Normal
+		Specificity:  0.8,  // Normal
+	}
+	
+	normalized := extractorNil.normalizeFeatures(raw)
+	
+	// Should clamp values to [0,1] range
+	if normalized.Relevance != 1.0 {
+		t.Errorf("Expected relevance clamped to 1.0, got %f", normalized.Relevance)
+	}
+	if normalized.Recency != 0.0 {
+		t.Errorf("Expected recency clamped to 0.0, got %f", normalized.Recency)
+	}
+	if normalized.Prior != 1.0 {
+		t.Errorf("Expected prior clamped to 1.0, got %f", normalized.Prior)
+	}
+	if normalized.Uncertainty != 0.0 {
+		t.Errorf("Expected uncertainty clamped to 0.0, got %f", normalized.Uncertainty)
+	}
+}
+
+func TestNormalizeFeaturesZeroCount(t *testing.T) {
+	// Test with zero count (should also use clamping path)
+	zeroCountStats := &types.NormalizationStats{
+		Mean:   map[string]float64{"relevance": 0.5},
+		StdDev: map[string]float64{"relevance": 0.2},
+		Count:  0, // Zero count should trigger clamping path
+	}
+	
+	extractorZeroCount := NewFeatureExtractor("/test/workspace", zeroCountStats)
+	
+	raw := types.FeatureVector{
+		Relevance:    1.2,  // Above 1
+		Recency:      -0.1, // Below 0
+		Entanglement: 0.7,  // Normal
+	}
+	
+	normalized := extractorZeroCount.normalizeFeatures(raw)
+	
+	// Should clamp values to [0,1] range
+	if normalized.Relevance != 1.0 {
+		t.Errorf("Expected relevance clamped to 1.0 with zero count, got %f", normalized.Relevance)
+	}
+	if normalized.Recency != 0.0 {
+		t.Errorf("Expected recency clamped to 0.0 with zero count, got %f", normalized.Recency)
+	}
+}
+
+func TestNormalizeFeaturesMissingMapKeys(t *testing.T) {
+	// Test with missing keys in mean/stddev maps (should default to 0.5)
+	incompleteStats := &types.NormalizationStats{
+		Mean: map[string]float64{
+			"relevance": 0.5,
+			// Missing other keys
+		},
+		StdDev: map[string]float64{
+			"relevance": 0.2,
+			// Missing other keys
+		},
+		Count: 100,
+	}
+	
+	extractor := NewFeatureExtractor("/test/workspace", incompleteStats)
+	
+	raw := types.FeatureVector{
+		Relevance:    0.7,
+		Recency:      0.3, // No stats for this
+		Entanglement: 0.5, // No stats for this
+	}
+	
+	normalized := extractor.normalizeFeatures(raw)
+	
+	// Relevance should be normalized
+	if normalized.Relevance == raw.Relevance {
+		t.Error("Expected relevance to be normalized, but it remained unchanged")
+	}
+	
+	// Other fields with missing stats should use stdDev=0 path -> return 0.5
+	if normalized.Recency != 0.5 {
+		t.Errorf("Expected recency to default to 0.5 for missing stats, got %f", normalized.Recency)
+	}
+	if normalized.Entanglement != 0.5 {
+		t.Errorf("Expected entanglement to default to 0.5 for missing stats, got %f", normalized.Entanglement)
 	}
 }
 
