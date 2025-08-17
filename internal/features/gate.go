@@ -2,7 +2,7 @@ package features
 
 import (
 	"fmt"
-	"github.com/Michael-A-Kuykendall/contextlite/internal/license"
+	"contextlite/internal/license"
 )
 
 // FeatureGate controls access to premium features
