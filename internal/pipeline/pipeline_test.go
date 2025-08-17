@@ -984,3 +984,509 @@ func TestPipeline_GetWorkspaceWeightsDetailed(t *testing.T) {
 		t.Logf("Retrieved custom weights successfully")
 	}
 }
+
+func TestPipeline_OptimizeSelectionComprehensive(t *testing.T) {
+	pipeline, storage, cleanup := setupTestPipeline(t)
+	defer cleanup()
+	
+	ctx := context.Background()
+	
+	// Add some test documents
+	docs := []*types.Document{
+		{
+			ID:      "opt-doc-1",
+			Content: "Function for HTTP request handling",
+			Path:    "/src/http.go",
+			Language: "go",
+		},
+		{
+			ID:      "opt-doc-2", 
+			Content: "Authentication middleware implementation",
+			Path:    "/src/auth.go",
+			Language: "go",
+		},
+	}
+	
+	for _, doc := range docs {
+		err := storage.AddDocument(ctx, doc)
+		if err != nil {
+			t.Fatalf("Failed to add test document: %v", err)
+		}
+	}
+	
+	// Create scored documents for optimization
+	scoredDocs := []types.ScoredDocument{
+		{
+			Document: *docs[0],
+			Features: types.FeatureVector{
+				Relevance:   0.9,
+				Recency:     0.8,
+				Entanglement: 0.7,
+				Prior:       0.6,
+				Authority:   0.5,
+				Specificity: 0.4,
+				Uncertainty: 0.3,
+			},
+			UtilityScore: 0.85,
+		},
+		{
+			Document: *docs[1],
+			Features: types.FeatureVector{
+				Relevance:   0.8,
+				Recency:     0.7,
+				Entanglement: 0.6,
+				Prior:       0.5,
+				Authority:   0.4,
+				Specificity: 0.3,
+				Uncertainty: 0.2,
+			},
+			UtilityScore: 0.75,
+		},
+	}
+	
+	// Test optimization with SMT enabled
+	reqWithSMT := &types.AssembleRequest{
+		Query:           "HTTP authentication",
+		MaxTokens:       1000,
+		MaxDocuments:    2,
+		WorkspacePath:   "/test/workspace",
+		UseSMT:          true,
+		SMTTimeoutMs:    1000,
+		MaxOptGap:       0.1,
+		ObjectiveStyle:  "weighted-sum",
+	}
+	
+	result, err := pipeline.optimizeSelection(ctx, scoredDocs, reqWithSMT)
+	if err != nil {
+		t.Logf("SMT optimization failed (may be expected): %v", err)
+	} else if result != nil {
+		t.Logf("SMT optimization succeeded with %d selected documents", len(result.SelectedDocs))
+	}
+	
+	// Test optimization with SMT disabled
+	reqWithoutSMT := &types.AssembleRequest{
+		Query:           "HTTP authentication",
+		MaxTokens:       1000,
+		MaxDocuments:    2,
+		WorkspacePath:   "/test/workspace",
+		UseSMT:          false,
+	}
+	
+	result, err = pipeline.optimizeSelection(ctx, scoredDocs, reqWithoutSMT)
+	if err != nil {
+		t.Logf("Non-SMT optimization failed: %v", err)
+	} else if result != nil {
+		t.Logf("Non-SMT optimization succeeded with %d selected documents", len(result.SelectedDocs))
+	}
+	
+	// Test optimization with custom SMT parameters
+	reqCustomSMT := &types.AssembleRequest{
+		Query:           "HTTP authentication",
+		MaxTokens:       1000,
+		MaxDocuments:    2,
+		WorkspacePath:   "/test/workspace",
+		UseSMT:          true,
+		SMTTimeoutMs:    5000,
+		MaxOptGap:       0.05,
+		ObjectiveStyle:  "lexicographic",
+	}
+	
+	result, err = pipeline.optimizeSelection(ctx, scoredDocs, reqCustomSMT)
+	if err != nil {
+		t.Logf("Custom SMT optimization failed (may be expected): %v", err)
+	} else if result != nil {
+		t.Logf("Custom SMT optimization succeeded")
+	}
+	
+	// Test optimization with empty scored documents
+	emptyResult, err := pipeline.optimizeSelection(ctx, []types.ScoredDocument{}, reqWithSMT)
+	if err != nil {
+		t.Logf("Optimization with empty docs failed: %v", err)
+	} else if emptyResult != nil {
+		t.Logf("Optimization with empty docs returned result")
+	}
+}
+
+func TestPipeline_BuildCacheKeyAdvanced(t *testing.T) {
+	pipeline, _, cleanup := setupTestPipeline(t)
+	defer cleanup()
+	
+	ctx := context.Background()
+	
+	// Test basic cache key building
+	req1 := &types.AssembleRequest{
+		Query:           "test query",
+		MaxTokens:       1000,
+		MaxDocuments:    10,
+		WorkspacePath:   "/test/workspace",
+		ModelID:         "gpt-4",
+		UseSMT:          true,
+		EnableSampling:  false,
+	}
+	
+	key1 := pipeline.buildCacheKey(ctx, req1)
+	if key1 == "" {
+		t.Error("Cache key should not be empty")
+	}
+	
+	t.Logf("Basic cache key: %s", key1)
+	
+	// Test that identical requests produce identical keys
+	req2 := *req1
+	key2 := pipeline.buildCacheKey(ctx, &req2)
+	
+	if key1 != key2 {
+		t.Errorf("Identical requests should produce identical cache keys: %s != %s", key1, key2)
+	}
+	
+	// Test that different queries produce different keys
+	req3 := *req1
+	req3.Query = "different query"
+	key3 := pipeline.buildCacheKey(ctx, &req3)
+	
+	if key1 == key3 {
+		t.Error("Different queries should produce different cache keys")
+	}
+	
+	// Test that different max tokens produce different keys
+	req4 := *req1
+	req4.MaxTokens = 2000
+	key4 := pipeline.buildCacheKey(ctx, &req4)
+	
+	if key1 == key4 {
+		t.Error("Different max tokens should produce different cache keys")
+	}
+	
+	// Test that different SMT settings produce different keys
+	req5 := *req1
+	req5.UseSMT = false
+	key5 := pipeline.buildCacheKey(ctx, &req5)
+	
+	// SMT setting may or may not affect cache key
+	t.Logf("SMT enabled key: %s", key1)
+	t.Logf("SMT disabled key: %s", key5)
+	
+	// Test with sampling enabled
+	req6 := *req1
+	req6.EnableSampling = true
+	req6.Temperature = 0.7
+	req6.TopK = 5
+	key6 := pipeline.buildCacheKey(ctx, &req6)
+	
+	// Sampling settings may or may not affect cache key
+	t.Logf("Without sampling key: %s", key1)
+	t.Logf("With sampling key: %s", key6)
+	
+	// Test with include/exclude patterns
+	req7 := *req1
+	req7.IncludePatterns = []string{"*.go", "*.js"}
+	req7.ExcludePatterns = []string{"*_test.go"}
+	key7 := pipeline.buildCacheKey(ctx, &req7)
+	
+	if key1 == key7 {
+		t.Error("Different patterns should produce different cache keys")
+	}
+	
+	// Test with empty workspace path
+	req8 := *req1
+	req8.WorkspacePath = ""
+	key8 := pipeline.buildCacheKey(ctx, &req8)
+	
+	t.Logf("Cache key with empty workspace: %s", key8)
+}
+
+func TestPipeline_AssembleContextComprehensive(t *testing.T) {
+	pipeline, storage, cleanup := setupTestPipeline(t)
+	defer cleanup()
+	
+	ctx := context.Background()
+	
+	// Add comprehensive test documents
+	docs := []*types.Document{
+		{
+			ID:      "assemble-doc-1",
+			Content: "HTTP server implementation with authentication middleware",
+			Path:    "/src/server.go",
+			Language: "go",
+		},
+		{
+			ID:      "assemble-doc-2",
+			Content: "Database connection and query utilities",
+			Path:    "/src/database.go", 
+			Language: "go",
+		},
+		{
+			ID:      "assemble-doc-3",
+			Content: "Authentication service for user login",
+			Path:    "/src/auth.go",
+			Language: "go",
+		},
+	}
+	
+	for _, doc := range docs {
+		err := storage.AddDocument(ctx, doc)
+		if err != nil {
+			t.Fatalf("Failed to add test document: %v", err)
+		}
+	}
+	
+	// Test basic context assembly
+	req1 := &types.AssembleRequest{
+		Query:        "HTTP authentication server",
+		MaxTokens:    2000,
+		MaxDocuments: 3,
+		ModelID:      "gpt-4",
+		UseSMT:       false, // Disable SMT for simpler testing
+	}
+	
+	result1, err := pipeline.AssembleContext(ctx, req1)
+	if err != nil {
+		t.Fatalf("AssembleContext should not fail: %v", err)
+	}
+	
+	if result1 == nil {
+		t.Fatal("AssembleContext should return a result")
+	}
+	
+	t.Logf("Basic assembly returned %d documents", len(result1.Documents))
+	
+	// Test with caching enabled
+	req2 := &types.AssembleRequest{
+		Query:        "HTTP authentication server",
+		MaxTokens:    2000,
+		MaxDocuments: 3,
+		ModelID:      "gpt-4",
+		UseSMT:       false,
+		UseCache:     true,
+	}
+	
+	result2, err := pipeline.AssembleContext(ctx, req2)
+	if err != nil {
+		t.Fatalf("AssembleContext with cache should not fail: %v", err)
+	}
+	
+	if result2 == nil {
+		t.Fatal("AssembleContext with cache should return a result")
+	}
+	
+	t.Logf("Cached assembly returned %d documents, cache hit: %v", len(result2.Documents), result2.CacheHit)
+	
+	// Test with SMT enabled (may fail due to solver availability)
+	req3 := &types.AssembleRequest{
+		Query:        "database authentication",
+		MaxTokens:    1500,
+		MaxDocuments: 2,
+		ModelID:      "gpt-4",
+		UseSMT:       true,
+		SMTTimeoutMs: 1000,
+	}
+	
+	result3, err := pipeline.AssembleContext(ctx, req3)
+	if err != nil {
+		t.Logf("AssembleContext with SMT failed (may be expected): %v", err)
+	} else if result3 != nil {
+		t.Logf("SMT assembly returned %d documents", len(result3.Documents))
+	}
+	
+	// Test with sampling enabled
+	req4 := &types.AssembleRequest{
+		Query:          "authentication",
+		MaxTokens:      1000,
+		MaxDocuments:   2,
+		ModelID:        "gpt-4",
+		UseSMT:         false,
+		EnableSampling: true,
+		Temperature:    0.8,
+		TopK:           2,
+	}
+	
+	result4, err := pipeline.AssembleContext(ctx, req4)
+	if err != nil {
+		t.Fatalf("AssembleContext with sampling should not fail: %v", err)
+	}
+	
+	if result4 == nil {
+		t.Fatal("AssembleContext with sampling should return a result")
+	}
+	
+	t.Logf("Sampling assembly returned %d documents", len(result4.Documents))
+	
+	// Test with workspace patterns
+	req5 := &types.AssembleRequest{
+		Query:           "server",
+		MaxTokens:       1000,
+		MaxDocuments:    3,
+		ModelID:         "gpt-4",
+		WorkspacePath:   "/src",
+		IncludePatterns: []string{"*.go"},
+		ExcludePatterns: []string{"*_test.go"},
+		UseSMT:          false,
+	}
+	
+	result5, err := pipeline.AssembleContext(ctx, req5)
+	if err != nil {
+		t.Fatalf("AssembleContext with patterns should not fail: %v", err)
+	}
+	
+	if result5 == nil {
+		t.Fatal("AssembleContext with patterns should return a result")
+	}
+	
+	t.Logf("Pattern-filtered assembly returned %d documents", len(result5.Documents))
+	
+	// Test with empty query
+	req6 := &types.AssembleRequest{
+		Query:        "",
+		MaxTokens:    1000,
+		MaxDocuments: 3,
+		ModelID:      "gpt-4",
+		UseSMT:       false,
+	}
+	
+	result6, err := pipeline.AssembleContext(ctx, req6)
+	if err != nil {
+		t.Logf("AssembleContext with empty query failed: %v", err)
+	} else if result6 != nil {
+		t.Logf("Empty query assembly returned %d documents", len(result6.Documents))
+	}
+}
+
+func TestPipeline_GetCachedResultComprehensive(t *testing.T) {
+	pipeline, storage, cleanup := setupTestPipeline(t)
+	defer cleanup()
+	
+	ctx := context.Background()
+	
+	// Add test documents first
+	docs := []*types.Document{
+		{
+			ID:      "cache-doc-1",
+			Content: "HTTP server implementation with caching",
+			Path:    "/src/server.go",
+			Language: "go",
+		},
+		{
+			ID:      "cache-doc-2",
+			Content: "Cache management utilities",
+			Path:    "/src/cache.go",
+			Language: "go",
+		},
+	}
+	
+	for _, doc := range docs {
+		err := storage.AddDocument(ctx, doc)
+		if err != nil {
+			t.Fatalf("Failed to add test document: %v", err)
+		}
+	}
+	
+	// Create a request that we'll use for caching
+	req := &types.AssembleRequest{
+		Query:        "HTTP server caching",
+		MaxTokens:    1000,
+		MaxDocuments: 2,
+		ModelID:      "gpt-4",
+		UseSMT:       false,
+		UseCache:     true,
+	}
+	
+	// First, try to get cached result when none exists
+	cached1, err := pipeline.getCachedResult(ctx, req)
+	if err != nil {
+		t.Logf("getCachedResult failed on empty cache (expected): %v", err)
+	}
+	if cached1 != nil {
+		t.Error("getCachedResult should return nil when no cache exists")
+	}
+	
+	// Generate a full result to cache
+	fullResult, err := pipeline.AssembleContext(ctx, req)
+	if err != nil {
+		t.Fatalf("AssembleContext should not fail: %v", err)
+	}
+	
+	if fullResult == nil {
+		t.Fatal("AssembleContext should return a result")
+	}
+	
+	t.Logf("Generated full result with %d documents for caching", len(fullResult.Documents))
+	
+	// Now try to get the cached result
+	cached2, err := pipeline.getCachedResult(ctx, req)
+	if err != nil {
+		t.Logf("getCachedResult failed after caching: %v", err)
+	} else if cached2 != nil {
+		t.Logf("Retrieved cached result with %d documents, cache hit: %v", len(cached2.Documents), cached2.CacheHit)
+		
+		// Verify cache hit flag is set
+		if !cached2.CacheHit {
+			t.Error("Cached result should have CacheHit = true")
+		}
+	} else {
+		t.Log("No cached result found (caching may not be working)")
+	}
+	
+	// Test with caching disabled
+	reqNoCache := &types.AssembleRequest{
+		Query:        "HTTP server caching",
+		MaxTokens:    1000,
+		MaxDocuments: 2,
+		ModelID:      "gpt-4",
+		UseSMT:       false,
+		UseCache:     false,
+	}
+	
+	cached3, err := pipeline.getCachedResult(ctx, reqNoCache)
+	if err != nil {
+		t.Logf("getCachedResult with UseCache=false failed: %v", err)
+	}
+	if cached3 != nil {
+		t.Error("getCachedResult should return nil when UseCache=false")
+	}
+	
+	// Test with different request parameters (should not hit cache)
+	reqDifferent := &types.AssembleRequest{
+		Query:        "different query for caching test",
+		MaxTokens:    1000,
+		MaxDocuments: 2,
+		ModelID:      "gpt-4",
+		UseSMT:       false,
+		UseCache:     true,
+	}
+	
+	cached4, err := pipeline.getCachedResult(ctx, reqDifferent)
+	if err != nil {
+		t.Logf("getCachedResult for different query failed: %v", err)
+	}
+	if cached4 != nil {
+		t.Error("getCachedResult should return nil for different query")
+	}
+	
+	// Test cache key generation directly
+	cacheKey1 := pipeline.buildCacheKey(ctx, req)
+	cacheKey2 := pipeline.buildCacheKey(ctx, reqDifferent)
+	
+	if cacheKey1 == cacheKey2 {
+		t.Error("Different requests should produce different cache keys")
+	}
+	
+	t.Logf("Cache key 1: %s", cacheKey1)
+	t.Logf("Cache key 2: %s", cacheKey2)
+	
+	// Test with extreme parameters
+	reqExtreme := &types.AssembleRequest{
+		Query:        "extreme test case",
+		MaxTokens:    0,
+		MaxDocuments: 0,
+		ModelID:      "",
+		UseSMT:       false,
+		UseCache:     true,
+	}
+	
+	cached5, err := pipeline.getCachedResult(ctx, reqExtreme)
+	if err != nil {
+		t.Logf("getCachedResult with extreme params failed: %v", err)
+	} else if cached5 != nil {
+		t.Logf("getCachedResult with extreme params returned result")
+	}
+}

@@ -757,3 +757,177 @@ func validateConfig(cfg *Config) bool {
 	}
 	return true
 }
+
+func TestConfig_ValidateComprehensive(t *testing.T) {
+	// Test valid configuration
+	validConfig := &Config{
+		Server: ServerConfig{
+			Host: "localhost",
+			Port: 8080,
+		},
+		SMT: SMTConfig{
+			SolverTimeoutMs: 5000,
+			MaxCandidates:   50,
+			ObjectiveStyle:  "weighted-sum",
+			Z3: Z3Config{
+				MaxVerificationDocs: 10,
+			},
+		},
+		Storage: StorageConfig{
+			DatabasePath: "/tmp/test.db",
+		},
+	}
+	
+	err := validate(validConfig)
+	if err != nil {
+		t.Errorf("Valid configuration should not return error: %v", err)
+	}
+	
+	// Test invalid server port - negative
+	invalidPortConfig := *validConfig
+	invalidPortConfig.Server.Port = -1
+	err = validate(&invalidPortConfig)
+	if err == nil {
+		t.Error("Expected error for negative port")
+	}
+	
+	// Test invalid server port - too high
+	invalidPortConfig.Server.Port = 70000
+	err = validate(&invalidPortConfig)
+	if err == nil {
+		t.Error("Expected error for port > 65535")
+	}
+	
+	// Test invalid server port - zero
+	invalidPortConfig.Server.Port = 0
+	err = validate(&invalidPortConfig)
+	if err == nil {
+		t.Error("Expected error for port 0")
+	}
+	
+	// Test invalid SMT timeout
+	invalidTimeoutConfig := *validConfig
+	invalidTimeoutConfig.SMT.SolverTimeoutMs = 0
+	err = validate(&invalidTimeoutConfig)
+	if err == nil {
+		t.Error("Expected error for zero timeout")
+	}
+	
+	invalidTimeoutConfig.SMT.SolverTimeoutMs = -1000
+	err = validate(&invalidTimeoutConfig)
+	if err == nil {
+		t.Error("Expected error for negative timeout")
+	}
+	
+	// Test invalid max candidates
+	invalidCandidatesConfig := *validConfig
+	invalidCandidatesConfig.SMT.MaxCandidates = 0
+	err = validate(&invalidCandidatesConfig)
+	if err == nil {
+		t.Error("Expected error for zero max candidates")
+	}
+	
+	invalidCandidatesConfig.SMT.MaxCandidates = -5
+	err = validate(&invalidCandidatesConfig)
+	if err == nil {
+		t.Error("Expected error for negative max candidates")
+	}
+	
+	// Test invalid objective style
+	invalidObjectiveConfig := *validConfig
+	invalidObjectiveConfig.SMT.ObjectiveStyle = "invalid-style"
+	err = validate(&invalidObjectiveConfig)
+	if err == nil {
+		t.Error("Expected error for invalid objective style")
+	}
+	
+	// Test all valid objective styles
+	validObjectiveStyles := []string{"weighted-sum", "lexicographic", "epsilon-constraint"}
+	for _, style := range validObjectiveStyles {
+		testConfig := *validConfig
+		testConfig.SMT.ObjectiveStyle = style
+		err = validate(&testConfig)
+		if err != nil {
+			t.Errorf("Valid objective style '%s' should not return error: %v", style, err)
+		}
+	}
+	
+	// Test Z3 binary path validation with non-existent file
+	invalidZ3Config := *validConfig
+	invalidZ3Config.SMT.Z3.BinaryPath = "/non/existent/z3/binary"
+	err = validate(&invalidZ3Config)
+	if err == nil {
+		t.Error("Expected error for non-existent Z3 binary path")
+	}
+	
+	// Test Z3 binary path validation with empty path (should be valid)
+	validZ3Config := *validConfig
+	validZ3Config.SMT.Z3.BinaryPath = ""
+	err = validate(&validZ3Config)
+	if err != nil {
+		t.Errorf("Empty Z3 binary path should be valid: %v", err)
+	}
+	
+	// Test negative max verification docs
+	invalidVerificationConfig := *validConfig
+	invalidVerificationConfig.SMT.Z3.MaxVerificationDocs = -1
+	err = validate(&invalidVerificationConfig)
+	if err == nil {
+		t.Error("Expected error for negative max verification docs")
+	}
+}
+
+func TestConfig_ValidateDatabasePath(t *testing.T) {
+	// Create a temporary directory for testing
+	tempDir := t.TempDir()
+	
+	// Test with valid database path in existing directory
+	validConfig := &Config{
+		Server: ServerConfig{
+			Host: "localhost",
+			Port: 8080,
+		},
+		SMT: SMTConfig{
+			SolverTimeoutMs: 5000,
+			MaxCandidates:   50,
+			ObjectiveStyle:  "weighted-sum",
+			Z3: Z3Config{
+				MaxVerificationDocs: 10,
+			},
+		},
+		Storage: StorageConfig{
+			DatabasePath: filepath.Join(tempDir, "test.db"),
+		},
+	}
+	
+	err := validate(validConfig)
+	if err != nil {
+		t.Errorf("Valid database path should not return error: %v", err)
+	}
+	
+	// Test with database path in nested directory that needs creation
+	nestedPath := filepath.Join(tempDir, "nested", "dir", "test.db")
+	validConfig.Storage.DatabasePath = nestedPath
+	err = validate(validConfig)
+	if err != nil {
+		t.Errorf("Database path requiring directory creation should be valid: %v", err)
+	}
+	
+	// Verify the directory was created
+	if _, err := os.Stat(filepath.Dir(nestedPath)); os.IsNotExist(err) {
+		t.Error("Database directory should have been created")
+	}
+	
+	// Test with database path in read-only parent directory (if possible to create)
+	readOnlyDir := filepath.Join(tempDir, "readonly")
+	err = os.MkdirAll(readOnlyDir, 0444) // Read-only permissions
+	if err != nil {
+		t.Logf("Could not create read-only directory: %v", err)
+	} else {
+		readOnlyDbPath := filepath.Join(readOnlyDir, "subdir", "test.db")
+		validConfig.Storage.DatabasePath = readOnlyDbPath
+		err = validate(validConfig)
+		// This may or may not fail depending on system permissions
+		t.Logf("Read-only directory validation result: %v", err)
+	}
+}

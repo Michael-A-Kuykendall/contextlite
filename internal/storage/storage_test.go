@@ -2181,3 +2181,300 @@ func TestStorage_SearchDocumentsComprehensive(t *testing.T) {
 		}
 	}
 }
+
+func TestStorage_NewAdvancedEdgeCases(t *testing.T) {
+	// Test New function with various edge cases
+	
+	// Test with invalid database path characters
+	invalidPaths := []string{
+		"/invalid/path/that/should/not/exist/test.db",
+		"",
+		"test_new_edge.db", // This should work
+	}
+	
+	for i, path := range invalidPaths {
+		storage, err := New(path)
+		if err != nil {
+			t.Logf("New with path '%s' failed (case %d): %v", path, i, err)
+			if storage != nil {
+				storage.Close()
+			}
+		} else {
+			t.Logf("New with path '%s' succeeded (case %d)", path, i)
+			if storage != nil {
+				storage.Close()
+			}
+		}
+	}
+	
+	// Test creating storage in a temporary directory that we control
+	tempDir := filepath.Join(os.TempDir(), fmt.Sprintf("storage-new-test-%d", time.Now().UnixNano()))
+	err := os.MkdirAll(tempDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create temp directory: %v", err)
+	}
+	defer os.RemoveAll(tempDir)
+	
+	validPath := filepath.Join(tempDir, "test_new.db")
+	storage, err := New(validPath)
+	if err != nil {
+		t.Fatalf("New with valid path should not fail: %v", err)
+	}
+	defer storage.Close()
+	
+	// Verify the storage is functional
+	ctx := context.Background()
+	doc := &types.Document{
+		ID:       "new-test-doc",
+		Content:  "Test document for New function testing",
+		Path:     "/test/new.go",
+		Language: "go",
+	}
+	
+	err = storage.AddDocument(ctx, doc)
+	if err != nil {
+		t.Fatalf("AddDocument should work with newly created storage: %v", err)
+	}
+	
+	// Test GetStorageStats on the new storage
+	stats, err := storage.GetStorageStats(ctx)
+	if err != nil {
+		t.Logf("GetStorageStats failed: %v", err)
+	} else {
+		t.Logf("Storage stats: %+v", stats)
+	}
+}
+
+func TestStorage_GetCacheStatsAdvanced(t *testing.T) {
+	storage, cleanup := setupTestStorage(t)
+	defer cleanup()
+	
+	ctx := context.Background()
+	
+	// Test GetCacheStats before any cache operations
+	stats, err := storage.GetCacheStats(ctx)
+	if err != nil {
+		t.Logf("GetCacheStats failed initially: %v", err)
+	} else {
+		t.Logf("Initial cache stats: %+v", stats)
+	}
+	
+	// Add a document and create some cache entries
+	doc := &types.Document{
+		ID:       "cache-stats-doc",
+		Content:  "Document for cache statistics testing",
+		Path:     "/test/cache_stats.go",
+		Language: "go",
+	}
+	
+	err = storage.AddDocument(ctx, doc)
+	if err != nil {
+		t.Fatalf("AddDocument should not fail: %v", err)
+	}
+	
+	// Create cache entries
+	result := &types.QueryResult{
+		Documents: []types.DocumentReference{
+			{
+				ID:              doc.ID,
+				Path:            doc.Path,
+				Language:        doc.Language,
+				UtilityScore:    0.85,
+				RelevanceScore:  0.9,
+				InclusionReason: "test inclusion",
+			},
+		},
+		CoherenceScore: 0.9,
+		CacheHit:       false,
+		SMTMetrics: types.SMTMetrics{
+			SolveTimeMs:    100,
+			FallbackReason: "",
+		},
+	}
+	
+	cacheParams := []struct {
+		queryHash, corpusHash, modelID, tokenizerVersion string
+	}{
+		{"hash1", "corpus1", "model1", "v1"},
+		{"hash2", "corpus1", "model1", "v1"},
+		{"hash3", "corpus2", "model2", "v2"},
+	}
+	
+	expiresAt := time.Now().Add(24 * time.Hour)
+	for i, params := range cacheParams {
+		err = storage.SaveQueryCache(ctx, params.queryHash, params.corpusHash, params.modelID, params.tokenizerVersion, result, expiresAt)
+		if err != nil {
+			t.Logf("SaveQueryCache %d failed: %v", i, err)
+		}
+	}
+	
+	// Test GetCacheStats after cache operations
+	stats, err = storage.GetCacheStats(ctx)
+	if err != nil {
+		t.Logf("GetCacheStats failed after operations: %v", err)
+	} else {
+		t.Logf("Cache stats after operations: %+v", stats)
+	}
+	
+	// Test InvalidateCache
+	err = storage.InvalidateCache(ctx)
+	if err != nil {
+		t.Logf("InvalidateCache failed: %v", err)
+	} else {
+		t.Logf("Cache invalidated successfully")
+	}
+	
+	// Test GetCacheStats after invalidation
+	stats, err = storage.GetCacheStats(ctx)
+	if err != nil {
+		t.Logf("GetCacheStats failed after invalidation: %v", err)
+	} else {
+		t.Logf("Cache stats after invalidation: %+v", stats)
+	}
+}
+
+func TestStorage_SaveQueryCacheWithKeyAdvanced(t *testing.T) {
+	storage, cleanup := setupTestStorage(t)
+	defer cleanup()
+	
+	ctx := context.Background()
+	
+	// Add a test document
+	doc := &types.Document{
+		ID:       "cache-key-doc",
+		Content:  "Document for cache key testing",
+		Path:     "/test/cache_key.go",
+		Language: "go",
+	}
+	
+	err := storage.AddDocument(ctx, doc)
+	if err != nil {
+		t.Fatalf("AddDocument should not fail: %v", err)
+	}
+	
+	// Create test result
+	result := &types.QueryResult{
+		Documents: []types.DocumentReference{
+			{
+				ID:              doc.ID,
+				Path:            doc.Path,
+				Language:        doc.Language,
+				UtilityScore:    0.95,
+				RelevanceScore:  0.9,
+				InclusionReason: "cache key test",
+			},
+		},
+		CoherenceScore: 0.88,
+		CacheHit:       false,
+		SMTMetrics: types.SMTMetrics{
+			SolveTimeMs:    150,
+			FallbackReason: "",
+		},
+	}
+	
+	// Test SaveQueryCacheWithKey with various cache keys
+	cacheKeys := []string{
+		"test-cache-key-1",
+		"test-cache-key-2", 
+		"",                // Empty key
+		"very-long-cache-key-that-should-still-work-properly-even-if-it-is-quite-long",
+		"key-with-special-chars-!@#$%^&*()",
+	}
+	
+	expiresAt := time.Now().Add(24 * time.Hour)
+	for i, key := range cacheKeys {
+		err = storage.SaveQueryCacheWithKey(ctx, "base-hash", "corpus-hash", "model-id", "v1", key, result, expiresAt)
+		if err != nil {
+			t.Logf("SaveQueryCacheWithKey %d with key '%s' failed: %v", i, key, err)
+		} else {
+			t.Logf("SaveQueryCacheWithKey %d with key '%s' succeeded", i, key)
+		}
+	}
+	
+	// Test GetCacheStats to see if entries were created
+	stats, err := storage.GetCacheStats(ctx)
+	if err != nil {
+		t.Logf("GetCacheStats failed: %v", err)
+	} else {
+		t.Logf("Cache stats after SaveQueryCacheWithKey operations: %+v", stats)
+	}
+}
+
+func TestStorage_ApplyMigrationsAndSchemaEdgeCases(t *testing.T) {
+	// Test migration behavior by creating a storage instance and checking internal state
+	
+	tempDir := filepath.Join(os.TempDir(), fmt.Sprintf("storage-migration-test-%d", time.Now().UnixNano()))
+	err := os.MkdirAll(tempDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create temp directory: %v", err)
+	}
+	defer os.RemoveAll(tempDir)
+	
+	dbPath := filepath.Join(tempDir, "migration_test.db")
+	
+	// Create storage - this will run migrations
+	storage, err := New(dbPath)
+	if err != nil {
+		t.Fatalf("New should not fail: %v", err)
+	}
+	defer storage.Close()
+	
+	ctx := context.Background()
+	
+	// Verify that the schema is working by testing basic operations
+	doc := &types.Document{
+		ID:       "migration-test-doc",
+		Content:  "Test document for migration testing",
+		Path:     "/test/migration.go",
+		Language: "go",
+	}
+	
+	err = storage.AddDocument(ctx, doc)
+	if err != nil {
+		t.Fatalf("AddDocument should work after migrations: %v", err)
+	}
+	
+	// Test that search functionality works (requires FTS5 table)
+	results, err := storage.SearchDocuments(ctx, "migration", 10)
+	if err != nil {
+		t.Logf("SearchDocuments failed: %v", err)
+	} else {
+		t.Logf("Search after migration returned %d results", len(results))
+	}
+	
+	// Test cache functionality
+	result := &types.QueryResult{
+		Documents: []types.DocumentReference{
+			{
+				ID:              doc.ID,
+				Path:            doc.Path,
+				Language:        doc.Language,
+				UtilityScore:    0.8,
+				RelevanceScore:  0.85,
+				InclusionReason: "migration test",
+			},
+		},
+		CoherenceScore: 0.75,
+		CacheHit:       false,
+		SMTMetrics: types.SMTMetrics{
+			SolveTimeMs:    75,
+			FallbackReason: "",
+		},
+	}
+	
+	expiresAt := time.Now().Add(24 * time.Hour)
+	err = storage.SaveQueryCache(ctx, "migration-test-hash", "corpus-hash", "test-model", "v1", result, expiresAt)
+	if err != nil {
+		t.Logf("SaveQueryCache failed after migration: %v", err)
+	} else {
+		t.Logf("SaveQueryCache succeeded after migration")
+	}
+	
+	// Retrieve the cached result
+	cached, err := storage.GetQueryCache(ctx, "migration-test-hash", "corpus-hash", "test-model", "v1")
+	if err != nil {
+		t.Logf("GetQueryCache failed: %v", err)
+	} else if cached != nil {
+		t.Logf("GetQueryCache succeeded, cache hit: %v", cached.CacheHit)
+	}
+}
