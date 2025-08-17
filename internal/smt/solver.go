@@ -5,111 +5,174 @@ import (
 	"fmt"
 	"math"
 	"sort"
-	"time"
 
 	"contextlite/internal/features"
+	"contextlite/internal/solve"
+	"contextlite/internal/timing"
+	"contextlite/pkg/config"
 	"contextlite/pkg/types"
 )
 
-// optimizationSolver provides Advanced context selection
+// optimizationSolver provides Advanced context selection using optimizer
 type optimizationSolver struct {
-	config optimizationConfig
-}
-
-// optimizationConfig represents optimization system configuration
-type optimizationConfig struct {
-	TimeoutMs       int
-	MaxOptGap       float64
-	MaxCandidates   int
-	MaxPairsPerDoc  int
-	IntegerScaling  int
-	ObjectiveStyle  string
-	Weights         WeightConfig
-}
-
-// WeightConfig represents the 7D weight configuration
-type WeightConfig struct {
-	Relevance         float64
-	Recency          float64
-	Entanglement     float64
-	Prior            float64
-	Authority        float64
-	Specificity      float64
-	Uncertainty      float64
-	RedundancyPenalty float64
-	CoherenceBonus   float64
+	config      *config.Config
+	z3Optimizer *solve.optimizerOptimizer
+	verifier    *solve.BruteForceVerifier
 }
 
 // optimizationResult represents the result of optimization optimization
 type optimizationResult struct {
 	SelectedDocs    []int               `json:"selected_docs"`
 	ObjectiveValue  float64             `json:"objective_value"`
-	OptimalityGap   float64             `json:"optimality_gap"`
-	SolveTimeMs     int                 `json:"solve_time_ms"`
+	Objective       int                 `json:"objective"`        // Integer objective from optimizer
+	SolveTimeUs     int64               `json:"solve_time_us"`    // Pure solver time in microseconds
+	SolveTimeMs     int                 `json:"solve_time_ms"`    // Legacy compatibility
 	VariableCount   int                 `json:"variable_count"`
 	ConstraintCount int                 `json:"budget_count"`
+	KCandidates     int                 `json:"K_candidates"`
+	PairsCount      int                 `json:"pairs_count"`
+	BudgetTokens    int                 `json:"budget_tokens"`
+	MaxDocs         int                 `json:"max_docs"`
 	SolverUsed      string              `json:"solver_used"`
+	optimizerStatus        string              `json:"z3_status,omitempty"`      // optimizer result: sat/unsat/unknown/timeout
 	FallbackReason  string              `json:"fallback_reason,omitempty"`
+	TimedOut        bool                `json:"timed_out"`
+	Verified        bool                `json:"verified,omitempty"`
 }
 
 // NewoptimizationSolver creates a new optimization system
-func NewoptimizationSolver(config optimizationConfig) *optimizationSolver {
-	return &optimizationSolver{
-		config: config,
+func NewoptimizationSolver(cfg *config.Config) (*optimizationSolver, error) {
+	// Verify optimizer is available if configured
+	if cfg.optimization.optimizer.BinaryPath != "" {
+		if err := solve.CheckoptimizerAvailable(cfg.optimization.optimizer.BinaryPath); err != nil {
+			return nil, fmt.Errorf("optimizer not available: %w", err)
+		}
 	}
+
+	solver := &optimizationSolver{
+		config:      cfg,
+		z3Optimizer: solve.NewoptimizerOptimizer(cfg.optimization.optimizer.BinaryPath, cfg.optimization.SolverTimeoutMs),
+		verifier:    solve.NewBruteForceVerifier(),
+	}
+	
+	return solver, nil
 }
 
-// OptimizeSelection performs Advanced document selection
+// OptimizeSelection performs Advanced document selection using optimizer
 func (s *optimizationSolver) OptimizeSelection(ctx context.Context, 
 	scoredDocs []types.ScoredDocument, 
 	maxTokens int, 
 	maxDocs int) (*optimizationResult, error) {
 	
-	startTime := time.Now()
-	
 	// Limit candidates to keep optimization model manageable
 	candidates := scoredDocs
-	if len(candidates) > s.config.MaxCandidates {
-		candidates = s.selectTopCandidates(scoredDocs, s.config.MaxCandidates)
+	if len(candidates) > s.config.optimization.MaxCandidates {
+		candidates = s.selectTopCandidates(scoredDocs, s.config.optimization.MaxCandidates)
 	}
 	
-	// Compute pairwise similarities
-	simComputer := features.NewSimilarityComputer(s.config.MaxPairsPerDoc)
+	// Compute pairwise similarities for top-M neighbors
+	simComputer := features.NewSimilarityComputer(s.config.optimization.MaxPairsPerDoc)
 	pairs := simComputer.ComputePairwiseScores(candidates)
 	
-	// Try optimization optimization based on objective style
+	// Convert to optimizer format
+	z3Pairs := s.convertPairsForoptimizer(pairs)
+	
+	// Try optimizer optimization first
+	z3Result, err := s.z3Optimizer.OptimizeDocumentSelection(ctx, candidates, z3Pairs, maxTokens, maxDocs)
+	
 	var result *optimizationResult
-	var err error
-	
-	switch s.config.ObjectiveStyle {
-	case "weighted-sum":
-		result, err = s.solveWeightedSum(candidates, pairs, maxTokens, maxDocs)
-	case "lexicographic":
-		result, err = s.solveLexicographic(candidates, pairs, maxTokens, maxDocs)
-	case "epsilon-budget":
-		result, err = s.solveEpsilonConstraint(candidates, pairs, maxTokens, maxDocs)
-	default:
-		result, err = s.solveWeightedSum(candidates, pairs, maxTokens, maxDocs)
+	if err != nil || z3Result.Status != "sat" {
+		// Fallback to appropriate algorithm based on ObjectiveStyle
+		fallbackTimer := timing.Start()
+		fallbackReason := fmt.Sprintf("optimizer failed: %v", err)
+		if z3Result != nil {
+			if z3Result.TimedOut {
+				fallbackReason = "optimizer timeout"
+			} else if z3Result.Status == "unsat" {
+				fallbackReason = "Problem unsatisfiable"
+			}
+		}
+		
+		// Dispatch to appropriate solver based on ObjectiveStyle
+		var solverErr error
+		switch s.config.optimization.ObjectiveStyle {
+		case "weighted-sum":
+			result, solverErr = s.solveWeightedSum(candidates, pairs, maxTokens, maxDocs)
+		case "lexicographic":
+			result, solverErr = s.solveLexicographic(candidates, pairs, maxTokens, maxDocs)
+		case "epsilon-budget":
+			result, solverErr = s.solveEpsilonConstraint(candidates, pairs, maxTokens, maxDocs)
+		case "greedy-weighted":
+			result, solverErr = s.greedyWeightedSelection(candidates, pairs, maxTokens, maxDocs, "greedy-weighted")
+		case "greedy-constrained":
+			result, solverErr = s.greedyConstrainedSelection(candidates, pairs, maxTokens, maxDocs)
+		default:
+			// Default to MMR fallback for unknown styles
+			result = s.fallbackMMR(candidates, pairs, maxTokens, maxDocs)
+			solverErr = nil
+		}
+		
+		// If solver failed, use MMR fallback
+		if solverErr != nil {
+			result = s.fallbackMMR(candidates, pairs, maxTokens, maxDocs)
+		}
+		
+		fallbackUs := fallbackTimer.Us()
+		result.FallbackReason = fallbackReason
+		result.SolveTimeUs = fallbackUs
+		result.SolveTimeMs = int(float64(fallbackUs) / 1_000.0)
+	} else {
+		// optimizer succeeded
+		result = &optimizationResult{
+			SelectedDocs:    z3Result.SelectedDocs,
+			ObjectiveValue:  float64(z3Result.ObjectiveValue) / 10000.0, // Unscaled for compatibility
+			Objective:       z3Result.ObjectiveValue,                    // Integer objective from optimizer
+			SolveTimeUs:     z3Result.SolveTimeUs,
+			SolveTimeMs:     int(float64(z3Result.SolveTimeUs) / 1_000.0),
+			VariableCount:   z3Result.VariableCount,
+			ConstraintCount: z3Result.ConstraintCount,
+			KCandidates:     len(candidates),
+			PairsCount:      len(pairs),
+			BudgetTokens:    maxTokens,
+			MaxDocs:         maxDocs,
+			SolverUsed:      "z3opt",
+			optimizerStatus:        z3Result.Status,
+			TimedOut:        z3Result.TimedOut,
+		}
+		
+		// Optional verification for small problems
+		if s.config.optimization.optimizer.EnableVerification && len(candidates) <= s.config.optimization.optimizer.MaxVerificationDocs {
+			if verification, err := s.verifier.VerifyOptimality(candidates, z3Pairs, maxTokens, maxDocs, z3Result); err == nil {
+				result.Verified = verification.IsOptimal
+			}
+		}
 	}
 	
-	// If optimization fails or times out, fall back to MMR-greedy
-	if err != nil || result == nil {
-		result = s.fallbackMMR(candidates, pairs, maxTokens, maxDocs)
-		result.FallbackReason = fmt.Sprintf("optimization failed: %v", err)
-		result.SolverUsed = "fallback"
-	}
-	
-	result.SolveTimeMs = int(time.Since(startTime).Milliseconds())
 	return result, nil
 }
 
-// solveWeightedSum implements weighted-sum scalarization
+// convertPairsForoptimizer converts feature pairs to optimizer format
+func (s *optimizationSolver) convertPairsForoptimizer(pairs []features.DocumentPair) []solve.DocumentPair {
+	z3Pairs := make([]solve.DocumentPair, len(pairs))
+	for i, pair := range pairs {
+		z3Pairs[i] = solve.DocumentPair{
+			DocI:             pair.DocI,
+			DocJ:             pair.DocJ,
+			Similarity:       pair.Similarity,
+			RedundancyPenalty: s.config.Weights.RedundancyPenalty * pair.Redundancy,
+			CoherenceBonus:   s.config.Weights.CoherenceBonus * pair.Coherence,
+		}
+	}
+	return z3Pairs
+}
+
+// solveWeightedSum implements weighted-sum scalarization (LEGACY FALLBACK)
 func (s *optimizationSolver) solveWeightedSum(docs []types.ScoredDocument, 
 	pairs []features.DocumentPair, 
 	maxTokens, maxDocs int) (*optimizationResult, error) {
 	
-	// For now, implement using greedy approximation
-	// TODO: Replace with actual optimization system (optimizer/CVC5) integration
+	// Legacy greedy implementation for backwards compatibility
+	// Primary optimization now uses optimizer in OptimizeSelection()
 	
 	return s.greedyWeightedSelection(docs, pairs, maxTokens, maxDocs, "weighted-sum")
 }
@@ -226,10 +289,16 @@ func (s *optimizationSolver) greedyWeightedSelection(docs []types.ScoredDocument
 	return &optimizationResult{
 		SelectedDocs:    selected,
 		ObjectiveValue:  s.computeObjectiveValue(docs, selected, pairs),
-		OptimalityGap:   0.0, // Greedy is not guaranteed optimal
-		VariableCount:   len(docs) + len(pairs),
-		ConstraintCount: 3, // Budget, max docs, linking
+		Objective:       0,  // No integer objective for fallback
+		SolveTimeMs:     0,
+		VariableCount:   0,  // No optimization variables for fallback
+		ConstraintCount: 0,  // No optimization budgets for fallback
+		KCandidates:     len(docs),
+		PairsCount:      len(pairs),
+		BudgetTokens:    maxTokens,
+		MaxDocs:         maxDocs,
 		SolverUsed:      method,
+		FallbackReason:  "z3_not_available",
 	}, nil
 }
 
@@ -297,10 +366,16 @@ func (s *optimizationSolver) greedyConstrainedSelection(docs []types.ScoredDocum
 	return &optimizationResult{
 		SelectedDocs:    selected,
 		ObjectiveValue:  s.computeObjectiveValue(docs, selected, pairs),
-		OptimalityGap:   0.0,
-		VariableCount:   len(docs) + len(pairs),
-		ConstraintCount: 5, // Budget, max docs, redundancy, coherence, recency
+		Objective:       0,  // No integer objective for fallback
+		SolveTimeMs:     0,
+		VariableCount:   0,  // No optimization variables for fallback
+		ConstraintCount: 0,  // No optimization budgets for fallback
+		KCandidates:     len(docs),
+		PairsCount:      len(pairs),
+		BudgetTokens:    maxTokens,
+		MaxDocs:         maxDocs,
 		SolverUsed:      "epsilon-budget",
+		FallbackReason:  "z3_not_available",
 	}, nil
 }
 
@@ -364,10 +439,17 @@ func (s *optimizationSolver) fallbackMMR(docs []types.ScoredDocument,
 	return &optimizationResult{
 		SelectedDocs:    selected,
 		ObjectiveValue:  s.computeObjectiveValue(docs, selected, pairs),
-		OptimalityGap:   0.1, // Approximation gap
-		VariableCount:   len(docs),
-		ConstraintCount: 2,
+		Objective:       0,  // No integer objective for fallback
+		SolveTimeUs:     0,  // Will be set by caller
+		SolveTimeMs:     0,  // Will be set by caller
+		VariableCount:   0,  // No optimization variables for fallback
+		ConstraintCount: 0,  // No optimization budgets for fallback
+		KCandidates:     len(docs),
+		PairsCount:      len(pairs),
+		BudgetTokens:    maxTokens,
+		MaxDocs:         maxDocs,
 		SolverUsed:      "mmr-fallback",
+		FallbackReason:  "z3_not_available",
 	}
 }
 

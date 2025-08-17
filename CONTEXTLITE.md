@@ -380,11 +380,16 @@ type DocumentReference struct {
 }
 
 type optimizationMetrics struct {
-    SolverUsed      string  `json:"solver_used"`           // "optimization" or "fallback"
-    OptimalityGap   float64 `json:"optimality_gap"`
+    SolverUsed      string  `json:"solver_used"`           // "z3opt" or "mmr-fallback"
     SolveTimeMs     int     `json:"solve_time_ms"`
     VariableCount   int     `json:"variable_count"`
     ConstraintCount int     `json:"budget_count"`
+    KCandidates     int     `json:"K_candidates"`
+    PairsCount      int     `json:"pairs_count"`
+    BudgetTokens    int     `json:"budget_tokens"`
+    MaxDocs         int     `json:"max_docs"`
+    optimizerStatus        string  `json:"z3_status,omitempty"`   // "sat", "unsat", "timeout"
+    Objective       int     `json:"objective,omitempty"`   // Integer objective from optimizer
     FallbackReason  string  `json:"fallback_reason,omitempty"`
 }
 

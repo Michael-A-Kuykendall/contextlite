@@ -4,9 +4,12 @@
 
 # Variables
 BINARY_NAME=contextlite
+SOTA_EVAL_BINARY=sota-eval
 BUILD_DIR=./build
 CMD_DIR=./cmd/contextlite
+SOTA_CMD_DIR=./cmd/sota-eval
 MAIN_FILE=$(CMD_DIR)/main.go
+SOTA_MAIN_FILE=$(SOTA_CMD_DIR)/main.go
 
 # Default target
 help: ## Show this help message
@@ -22,6 +25,16 @@ build: ## Build the contextlite binary
 	go build -o $(BUILD_DIR)/$(BINARY_NAME) $(MAIN_FILE)
 	@echo "Binary built: $(BUILD_DIR)/$(BINARY_NAME)"
 
+# Build the SOTA evaluation tool
+build-sota: ## Build the sota-eval binary
+	@echo "Building $(SOTA_EVAL_BINARY)..."
+	@mkdir -p $(BUILD_DIR)
+	go build -o $(BUILD_DIR)/$(SOTA_EVAL_BINARY) $(SOTA_MAIN_FILE)
+	@echo "Binary built: $(BUILD_DIR)/$(SOTA_EVAL_BINARY)"
+
+# Build all binaries
+build-all-local: build build-sota ## Build both contextlite and sota-eval binaries
+
 # Build for multiple platforms
 build-all: ## Build for multiple platforms
 	@echo "Building for multiple platforms..."
@@ -29,15 +42,19 @@ build-all: ## Build for multiple platforms
 	
 	# Linux amd64
 	GOOS=linux GOARCH=amd64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-linux-amd64 $(MAIN_FILE)
+	GOOS=linux GOARCH=amd64 go build -o $(BUILD_DIR)/$(SOTA_EVAL_BINARY)-linux-amd64 $(SOTA_MAIN_FILE)
 	
 	# Windows amd64
 	GOOS=windows GOARCH=amd64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-windows-amd64.exe $(MAIN_FILE)
+	GOOS=windows GOARCH=amd64 go build -o $(BUILD_DIR)/$(SOTA_EVAL_BINARY)-windows-amd64.exe $(SOTA_MAIN_FILE)
 	
 	# macOS amd64
 	GOOS=darwin GOARCH=amd64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-amd64 $(MAIN_FILE)
+	GOOS=darwin GOARCH=amd64 go build -o $(BUILD_DIR)/$(SOTA_EVAL_BINARY)-darwin-amd64 $(SOTA_MAIN_FILE)
 	
 	# macOS arm64
 	GOOS=darwin GOARCH=arm64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-darwin-arm64 $(MAIN_FILE)
+	GOOS=darwin GOARCH=arm64 go build -o $(BUILD_DIR)/$(SOTA_EVAL_BINARY)-darwin-arm64 $(SOTA_MAIN_FILE)
 	
 	@echo "Cross-platform binaries built in $(BUILD_DIR)/"
 

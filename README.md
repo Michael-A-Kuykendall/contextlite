@@ -7,12 +7,20 @@ ContextLite is a Go-based context assembly engine that uses **Satisfiability Mod
 ## 🚀 Quick Start
 
 ```bash
-# Build and run
+# Build main contextlite binary
 make build
-./build/contextlite
+
+# Build SOTA evaluation tool
+make build-sota
+
+# Build both binaries
+make build-all-local
 
 # Or with custom config
 ./build/contextlite -config configs/custom.yaml
+
+# Run SOTA evaluation
+./build/sota-eval
 
 # Development mode with hot reload
 make dev
@@ -30,22 +38,30 @@ The server starts on `http://localhost:8080` by default.
 - **Sub-Second Performance**: p50 ≤300ms, p95 ≤600ms uncached; cached ≤30ms
 - **Local Privacy**: All data stays on your machine, no cloud dependencies
 
-## 🏗️ Architecture
+## 🏗️ Repository Structure
 
 ```
 contextlite/
-├── cmd/contextlite/           # HTTP sidecar server
-├── internal/
-│   ├── optimization/                   # optimization system integration
-│   ├── storage/               # SQLite + FTS5 storage
-│   ├── features/              # 7D feature extraction
+├── cmd/                       # Executable applications
+│   ├── contextlite/           # HTTP sidecar server
+│   └── sota-eval/             # SOTA comparison CLI tool
+├── internal/                  # Private implementation
+│   ├── optimization/                   # optimization system integration (optimizer)
+│   ├── storage/               # SQLite + FTS5 storage layer
+│   ├── features/              # 7D feature extraction & scoring
 │   ├── pipeline/              # Main assembly pipeline
-│   ├── cache/                 # Multi-level caching
-│   └── api/                   # HTTP API handlers
-├── pkg/
+│   ├── cache/                 # Multi-level caching system
+│   ├── api/                   # HTTP API handlers
+│   └── evaluation/            # SOTA evaluation framework
+├── pkg/                       # Public API packages
 │   ├── types/                 # Core data structures
-│   └── config/                # Configuration management
-└── configs/                   # Default configuration
+│   ├── config/                # Configuration management
+│   └── tokens/                # Token estimation utilities
+├── docs/                      # Technical documentation
+├── archive/                   # Historical development artifacts
+├── test/                      # Integration tests
+├── configs/                   # Default configuration files
+└── migrations/                # Database schema migrations
 ```
 
 ## 🔧 Configuration
@@ -115,6 +131,27 @@ curl -X POST http://localhost:8080/api/v1/weights/update \
   }'
 ```
 
+## 📈 Development Status
+
+### ✅ Completed Features
+- **Advanced Optimization**: optimization engine integration with multiple optimization strategies
+- **7D Feature System**: Complete implementation of all feature dimensions
+- **SOTA Evaluation Framework**: Comprehensive evaluation harness with Recall@k, nDCG@k, MAP, MRR
+- **Multi-level Caching**: L1 memory, L2 SQLite with intelligent invalidation
+- **HTTP API**: Complete REST API for context assembly and document management
+- **Configuration System**: Flexible YAML-based configuration with workspace-specific weights
+
+### 🔄 In Progress
+- **Evaluation Accuracy**: Investigating timing measurement accuracy in SOTA comparison
+- **Scale Testing**: Validation beyond small datasets (current: 1-4 documents)
+- **Real System Integration**: Moving from simulation-based to actual HTTP API evaluation
+
+### 📋 Technical Documentation
+- [`docs/FEATURE_FORMULAS.md`](docs/FEATURE_FORMULAS.md) - Complete 7D feature implementation
+- [`docs/GOLDEN_RECORD_STEP5.md`](docs/GOLDEN_RECORD_STEP5.md) - SOTA evaluation status & issues
+- [`CONTEXTLITE.md`](CONTEXTLITE.md) - Core technical architecture
+- [`archive/README.md`](archive/README.md) - Historical development artifacts
+
 ## 🧮 optimization Optimization
 
 ContextLite uses three optimization optimization formulations:
@@ -138,6 +175,32 @@ Optimize primary objective with secondary budgets:
 objective_style: "epsilon-budget"
 ```
 
+## 📊 SOTA Evaluation
+
+ContextLite includes a comprehensive evaluation framework comparing against state-of-the-art retrieval systems:
+
+```bash
+# Run full SOTA comparison
+./build/sota-eval
+
+# With custom parameters
+./build/sota-eval -queries 1000 -docs 100 -verbose
+```
+
+**Evaluation Metrics:**
+- **Recall@k**: Fraction of relevant documents retrieved in top-k results
+- **nDCG@k**: Normalized Discounted Cumulative Gain (position-aware relevance)
+- **MAP**: Mean Average Precision across all queries
+- **MRR**: Mean Reciprocal Rank of first relevant document
+
+**Baseline Comparisons:**
+- BM25 (Elasticsearch/Lucene standard)
+- TF-IDF with cosine similarity
+- Hybrid semantic + lexical retrieval
+- Random baseline for statistical significance
+
+See [`docs/GOLDEN_RECORD_STEP5.md`](docs/GOLDEN_RECORD_STEP5.md) for current evaluation status and identified areas for improvement.
+
 ## 🏃‍♂️ Performance
 
 Benchmarked on NVMe SSD, 100k documents, K=200 candidates:
@@ -155,6 +218,18 @@ Benchmarked on NVMe SSD, 100k documents, K=200 candidates:
 # Install dependencies
 make deps
 
+# Build main binary
+make build
+
+# Build SOTA evaluation tool
+make build-sota
+
+# Build both binaries locally
+make build-all-local
+
+# Build for all platforms
+make build-all
+
 # Run tests
 make test
 
@@ -169,6 +244,9 @@ make check
 
 # Development with hot reload
 make dev
+
+# Clean build artifacts
+make clean
 ```
 
 ## 🐳 Docker

@@ -31,7 +31,7 @@ type DocumentReference struct {
 	UtilityScore    float64 `json:"utility_score"`
 	RelevanceScore  float64 `json:"relevance_score"`
 	RecencyScore    float64 `json:"recency_score"`
-	DiversityScore  float64 `json:"diversity_score"`
+	// DiversityScore removed - diversity handled via pairwise terms in optimization objective
 	InclusionReason string  `json:"inclusion_reason"`
 }
 

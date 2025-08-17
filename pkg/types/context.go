@@ -3,19 +3,36 @@ package types
 // optimizationMetrics represents optimization system performance metrics
 type optimizationMetrics struct {
 	SolverUsed      string  `json:"solver_used"`
-	OptimalityGap   float64 `json:"optimality_gap"`
-	SolveTimeMs     int     `json:"solve_time_ms"`
+	optimizerStatus        string  `json:"z3_status,omitempty"`
+	Objective       int64   `json:"objective,omitempty"`
+	SolveTimeUs     int64   `json:"solve_time_us"`      // Pure solver time in microseconds
+	SolveTimeMs     float64 `json:"solve_time_ms"`      // Pure solver time in milliseconds (float)
+	optimizationWallUs       int64   `json:"optimization_wall_us"`        // Total wall-clock time for optimization (includes I/O + parsing)
+	optimizationWallMs       float64 `json:"optimization_wall_ms"`        // Total wall-clock time in milliseconds (float)
 	VariableCount   int     `json:"variable_count"`
 	ConstraintCount int     `json:"budget_count"`
+	KCandidates     int     `json:"K_candidates"`
+	PairsCount      int     `json:"pairs_count"`
+	BudgetTokens    int     `json:"budget_tokens"`
+	MaxDocs         int     `json:"max_docs"`
 	FallbackReason  string  `json:"fallback_reason,omitempty"`
 }
 
 // StageTimings represents timing information for each pipeline stage
 type StageTimings struct {
-	FTSHarvestMs   int `json:"fts_harvest_ms"`
-	FeatureBuildMs int `json:"feature_build_ms"`
-	optimizationSolverMs    int `json:"optimization_solver_ms"`
-	TotalMs        int `json:"total_ms"`
+	// Microsecond precision timings (primary values)
+	FTSHarvestUs   int64   `json:"fts_harvest_us"`
+	FeatureBuildUs int64   `json:"feature_build_us"`
+	optimizationSolverUs    int64   `json:"optimization_solver_us"`    // Pure solver time
+	optimizationWallUs      int64   `json:"optimization_wall_us"`      // Total wall-clock time for optimization (includes I/O + parsing)
+	TotalUs        int64   `json:"total_us"`
+	
+	// Float millisecond convenience fields (derived from microseconds)
+	FTSHarvestMs   float64 `json:"fts_harvest_ms"`
+	FeatureBuildMs float64 `json:"feature_build_ms"`
+	optimizationSolverMs    float64 `json:"optimization_solver_ms"`
+	optimizationWallMs      float64 `json:"optimization_wall_ms"`
+	TotalMs        float64 `json:"total_ms"`
 }
 
 // AssembleRequest represents a context assembly request
@@ -64,4 +81,5 @@ type QueryResult struct {
 	optimizationMetrics     optimizationMetrics          `json:"optimization_metrics"`
 	Timings        StageTimings        `json:"timings"`
 	CacheHit       bool                `json:"cache_hit"`
+	CacheKey       string              `json:"cache_key_fingerprint"`
 }

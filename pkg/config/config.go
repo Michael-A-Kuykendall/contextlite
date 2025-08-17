@@ -40,6 +40,13 @@ type optimizationConfig struct {
 	MaxPairsPerDoc   int     `yaml:"max_pairs_per_doc"`
 	IntegerScaling   int     `yaml:"integer_scaling"`
 	ObjectiveStyle   string  `yaml:"objective_style"`
+	optimizer               optimizerConfig `yaml:"z3"`
+}
+
+type optimizerConfig struct {
+	BinaryPath       string `yaml:"binary_path"`
+	EnableVerification bool `yaml:"enable_verification"`
+	MaxVerificationDocs int `yaml:"max_verification_docs"`
 }
 
 type WeightsConfig struct {
@@ -150,6 +157,17 @@ func validate(config *Config) error {
 	}
 	if !validObjectiveStyles[config.optimization.ObjectiveStyle] {
 		return fmt.Errorf("invalid objective style: %s", config.optimization.ObjectiveStyle)
+	}
+
+	// Validate optimizer configuration
+	if config.optimization.optimizer.BinaryPath != "" {
+		if _, err := os.Stat(config.optimization.optimizer.BinaryPath); err != nil {
+			return fmt.Errorf("optimizer binary not found at path: %s", config.optimization.optimizer.BinaryPath)
+		}
+	}
+
+	if config.optimization.optimizer.MaxVerificationDocs < 0 {
+		return fmt.Errorf("max verification docs must be non-negative")
 	}
 
 	// Ensure database directory exists
