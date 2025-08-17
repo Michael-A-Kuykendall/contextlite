@@ -6,11 +6,13 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"contextlite/internal/features"
 	"contextlite/internal/smt"
 	"contextlite/internal/storage"
+	"contextlite/internal/timing"
 	"contextlite/pkg/config"
 	"contextlite/pkg/types"
 )
@@ -31,53 +33,72 @@ func New(storage *storage.Storage, config *config.Config) *Pipeline {
 
 // AssembleContext performs the complete context assembly pipeline
 func (p *Pipeline) AssembleContext(ctx context.Context, req *types.AssembleRequest) (*types.QueryResult, error) {
-	startTime := time.Now()
+	totTimer := timing.Start()
 	var timings types.StageTimings
+	
+	// Build cache key
+	cacheKey := p.buildCacheKey(ctx, req)
 	
 	// Check cache first if enabled
 	if req.UseCache {
-		if cached, err := p.getCachedResult(ctx, req); err == nil && cached != nil {
+		if cached, err := p.getCachedResultByKey(ctx, cacheKey); err == nil && cached != nil {
 			cached.CacheHit = true
+			cached.CacheKey = cacheKey
 			return cached, nil
 		}
 	}
 	
 	// Stage 1: FTS Harvest - search for candidate documents
-	ftsStart := time.Now()
+	ftsTimer := timing.Start()
 	candidates, err := p.harvestCandidates(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to harvest candidates: %w", err)
 	}
-	timings.FTSHarvestMs = int(time.Since(ftsStart).Milliseconds())
+	ftsUs := ftsTimer.Us()
+	timings.FTSHarvestUs = ftsUs
+	timings.FTSHarvestMs = float64(ftsUs) / 1_000.0
 	
 	if len(candidates) == 0 {
+		totalUs := totTimer.Us()
+		timings.TotalUs = totalUs
+		timings.TotalMs = float64(totalUs) / 1_000.0
 		return &types.QueryResult{
 			Query:      req.Query,
 			Documents:  []types.DocumentReference{},
 			Timings:    timings,
 			CacheHit:   false,
+			CacheKey:   cacheKey,
 		}, nil
 	}
 	
 	// Stage 2: Feature Extraction - compute 7D features
-	featureStart := time.Now()
+	featureTimer := timing.Start()
 	scoredDocs, err := p.extractFeatures(ctx, candidates, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to extract features: %w", err)
 	}
-	timings.FeatureBuildMs = int(time.Since(featureStart).Milliseconds())
+	featUs := featureTimer.Us()
+	timings.FeatureBuildUs = featUs
+	timings.FeatureBuildMs = float64(featUs) / 1_000.0
 	
 	// Stage 3: SMT Optimization - select optimal document set
-	smtStart := time.Now()
+	smtTimer := timing.Start()
 	smtResult, err := p.optimizeSelection(ctx, scoredDocs, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to optimize selection: %w", err)
 	}
-	timings.SMTSolverMs = int(time.Since(smtStart).Milliseconds())
+	smtWallUs := smtTimer.Us()
+	timings.SMTWallUs = smtWallUs
+	timings.SMTWallMs = float64(smtWallUs) / 1_000.0
+	timings.SMTSolverUs = smtResult.SolveTimeUs
+	timings.SMTSolverMs = float64(smtResult.SolveTimeUs) / 1_000.0
 	
 	// Stage 4: Assemble final result
 	result := p.assembleResult(req, scoredDocs, smtResult, timings)
-	result.Timings.TotalMs = int(time.Since(startTime).Milliseconds())
+	totalUs := totTimer.Us()
+	result.Timings.TotalUs = totalUs
+	result.Timings.TotalMs = float64(totalUs) / 1_000.0
+	result.CacheKey = cacheKey
 	
 	// Cache result if enabled and high quality
 	if req.UseCache && result.CoherenceScore > 0.5 {
@@ -143,30 +164,36 @@ func (p *Pipeline) optimizeSelection(ctx context.Context, scoredDocs []types.Sco
 		weights = p.getDefaultWeights()
 	}
 	
-	// Create SMT solver config
-	smtConfig := smt.SMTConfig{
-		TimeoutMs:      req.SMTTimeoutMs,
-		MaxOptGap:      req.MaxOptGap,
-		MaxCandidates:  p.config.SMT.MaxCandidates,
-		MaxPairsPerDoc: p.config.SMT.MaxPairsPerDoc,
-		IntegerScaling: p.config.SMT.IntegerScaling,
-		ObjectiveStyle: req.ObjectiveStyle,
-		Weights:        *weights,
+	// Update configuration with request-specific overrides
+	tempConfig := *p.config // Copy the base config
+	if req.SMTTimeoutMs > 0 {
+		tempConfig.SMT.SolverTimeoutMs = req.SMTTimeoutMs
+	}
+	if req.MaxOptGap > 0 {
+		tempConfig.SMT.MaxOptGap = req.MaxOptGap
+	}
+	if req.ObjectiveStyle != "" {
+		tempConfig.SMT.ObjectiveStyle = req.ObjectiveStyle
 	}
 	
-	// Apply defaults for missing request parameters
-	if smtConfig.TimeoutMs <= 0 {
-		smtConfig.TimeoutMs = p.config.SMT.SolverTimeoutMs
-	}
-	if smtConfig.MaxOptGap <= 0 {
-		smtConfig.MaxOptGap = p.config.SMT.MaxOptGap
-	}
-	if smtConfig.ObjectiveStyle == "" {
-		smtConfig.ObjectiveStyle = p.config.SMT.ObjectiveStyle
+	// Update weights
+	tempConfig.Weights = config.WeightsConfig{
+		Relevance:         weights.Relevance,
+		Recency:          weights.Recency,
+		Entanglement:     weights.Entanglement,
+		Prior:            weights.Prior,
+		Authority:        weights.Authority,
+		Specificity:      weights.Specificity,
+		Uncertainty:      weights.Uncertainty,
+		RedundancyPenalty: weights.RedundancyPenalty,
+		CoherenceBonus:   weights.CoherenceBonus,
 	}
 	
 	// Create solver and optimize
-	solver := smt.NewSMTSolver(smtConfig)
+	solver, err := smt.NewSMTSolver(&tempConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create SMT solver: %w", err)
+	}
 	return solver.OptimizeSelection(ctx, scoredDocs, req.MaxTokens, req.MaxDocuments)
 }
 
@@ -193,7 +220,7 @@ func (p *Pipeline) assembleResult(req *types.AssembleRequest,
 				UtilityScore:    doc.UtilityScore,
 				RelevanceScore:  doc.Features.Relevance,
 				RecencyScore:    doc.Features.Recency,
-				DiversityScore:  1.0 - doc.Features.Uncertainty, // Approximation
+				// DiversityScore removed - diversity handled via pairwise terms in SMT
 				InclusionReason: "smt-optimized",
 			})
 		}
@@ -205,10 +232,18 @@ func (p *Pipeline) assembleResult(req *types.AssembleRequest,
 	// Build SMT metrics
 	smtMetrics := types.SMTMetrics{
 		SolverUsed:      smtResult.SolverUsed,
-		OptimalityGap:   smtResult.OptimalityGap,
-		SolveTimeMs:     smtResult.SolveTimeMs,
+		Z3Status:        smtResult.Z3Status,
+		Objective:       int64(smtResult.Objective),
+		SolveTimeUs:     smtResult.SolveTimeUs,
+		SolveTimeMs:     float64(smtResult.SolveTimeUs) / 1_000.0,
+		SMTWallUs:       timings.SMTWallUs,
+		SMTWallMs:       timings.SMTWallMs,
 		VariableCount:   smtResult.VariableCount,
 		ConstraintCount: smtResult.ConstraintCount,
+		KCandidates:     smtResult.KCandidates,
+		PairsCount:      smtResult.PairsCount,
+		BudgetTokens:    smtResult.BudgetTokens,
+		MaxDocs:         smtResult.MaxDocs,
 		FallbackReason:  smtResult.FallbackReason,
 	}
 	
@@ -238,7 +273,11 @@ func (p *Pipeline) getCachedResult(ctx context.Context, req *types.AssembleReque
 		modelID = p.config.Tokenizer.ModelID
 	}
 	
-	tokenizerVersion := "1.0" // TODO: Get actual tokenizer version
+	// Get tokenizer version from model ID or config
+	tokenizerVersion := "1.0"
+	if modelID != "" {
+		tokenizerVersion = modelID + "-v1.0"
+	}
 	
 	return p.storage.GetQueryCache(ctx, queryHash, corpusHash, modelID, tokenizerVersion)
 }
@@ -265,7 +304,9 @@ func (p *Pipeline) cacheResult(ctx context.Context, req *types.AssembleRequest, 
 	}
 	expiresAt := time.Now().Add(ttl)
 	
-	p.storage.SaveQueryCache(ctx, queryHash, corpusHash, modelID, tokenizerVersion, result, expiresAt)
+	// Use the new method with cache key
+	cacheKey := result.CacheKey
+	p.storage.SaveQueryCacheWithKey(ctx, queryHash, corpusHash, modelID, tokenizerVersion, cacheKey, result, expiresAt)
 }
 
 // hashQuery generates a hash for the query request
@@ -305,9 +346,84 @@ func (p *Pipeline) matchesWorkspace(docPath, workspacePath string) bool {
 }
 
 func (p *Pipeline) applyPatternFilters(docs []types.Document, include, exclude []string) []types.Document {
-	// TODO: Implement glob pattern matching
-	// For now, just return all docs
-	return docs
+	if len(include) == 0 && len(exclude) == 0 {
+		return docs
+	}
+	
+	var filtered []types.Document
+	
+	for _, doc := range docs {
+		// Check include patterns
+		includeMatch := len(include) == 0 // If no include patterns, include by default
+		for _, pattern := range include {
+			if matched, _ := filepath.Match(pattern, doc.Path); matched {
+				includeMatch = true
+				break
+			}
+		}
+		
+		// Check exclude patterns
+		excludeMatch := false
+		for _, pattern := range exclude {
+			if matched, _ := filepath.Match(pattern, doc.Path); matched {
+				excludeMatch = true
+				break
+			}
+		}
+		
+		// Include if matches include pattern and doesn't match exclude pattern
+		if includeMatch && !excludeMatch {
+			filtered = append(filtered, doc)
+		}
+	}
+	
+	return filtered
+}
+
+// buildCacheKey generates a deterministic cache key for the request
+func (p *Pipeline) buildCacheKey(ctx context.Context, req *types.AssembleRequest) string {
+	// Get corpus hash
+	corpusHash, _ := p.storage.GetCorpusHash(ctx)
+	
+	// Build query hash
+	queryHash := p.hashQuery(req)
+	
+	// Get tokenizer version from config
+	tokenizerVersion := "v1.0"
+	if p.config != nil && p.config.Tokenizer.ModelID != "" {
+		tokenizerVersion = p.config.Tokenizer.ModelID + "-v1.0"
+	}
+	
+	// Compute weights hash from workspace weights
+	weightsHash := "default"
+	if req.WorkspacePath != "" {
+		if weights, err := p.storage.GetWorkspaceWeights(ctx, req.WorkspacePath); err == nil {
+			weightsData, _ := json.Marshal(weights)
+			hash := sha256.Sum256(weightsData)
+			weightsHash = hex.EncodeToString(hash[:8]) // First 8 bytes
+		}
+	}
+	
+	// Build cache parts
+	parts := CacheParts{
+		QueryHash:           queryHash,
+		CorpusHash:          corpusHash,
+		ModelID:             req.ModelID,
+		TokenizerVersion:    tokenizerVersion,
+		TokenizerVocabHash:  "vocab-" + tokenizerVersion, // Version-based vocab hash
+		WeightsHash:         weightsHash,
+		ConceptDFVersion:    "concepts-v1.0", // Semantic version for concept features
+		MaxTokens:           req.MaxTokens,
+		MaxDocuments:        req.MaxDocuments,
+		ObjectiveStyle:      req.ObjectiveStyle,
+	}
+	
+	return BuildCacheKey(parts)
+}
+
+// getCachedResultByKey retrieves cached result by cache key
+func (p *Pipeline) getCachedResultByKey(ctx context.Context, cacheKey string) (*types.QueryResult, error) {
+	return p.storage.GetCachedResultByKey(ctx, cacheKey)
 }
 
 func (p *Pipeline) getNormalizationStats(ctx context.Context, workspacePath string) (*types.NormalizationStats, error) {
@@ -325,13 +441,13 @@ func (p *Pipeline) getNormalizationStats(ctx context.Context, workspacePath stri
 	return &stats, err
 }
 
-func (p *Pipeline) getWorkspaceWeights(ctx context.Context, workspacePath string) (*smt.WeightConfig, error) {
+func (p *Pipeline) getWorkspaceWeights(ctx context.Context, workspacePath string) (*config.WeightsConfig, error) {
 	weights, err := p.storage.GetWorkspaceWeights(ctx, workspacePath)
 	if err != nil {
 		return p.getDefaultWeights(), nil // Use defaults if not found
 	}
 	
-	return &smt.WeightConfig{
+	return &config.WeightsConfig{
 		Relevance:         weights.RelevanceWeight,
 		Recency:          weights.RecencyWeight,
 		Entanglement:     weights.EntanglementWeight,
@@ -344,8 +460,8 @@ func (p *Pipeline) getWorkspaceWeights(ctx context.Context, workspacePath string
 	}, nil
 }
 
-func (p *Pipeline) getDefaultWeights() *smt.WeightConfig {
-	return &smt.WeightConfig{
+func (p *Pipeline) getDefaultWeights() *config.WeightsConfig {
+	return &config.WeightsConfig{
 		Relevance:         p.config.Weights.Relevance,
 		Recency:          p.config.Weights.Recency,
 		Entanglement:     p.config.Weights.Entanglement,

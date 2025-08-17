@@ -40,6 +40,13 @@ type SMTConfig struct {
 	MaxPairsPerDoc   int     `yaml:"max_pairs_per_doc"`
 	IntegerScaling   int     `yaml:"integer_scaling"`
 	ObjectiveStyle   string  `yaml:"objective_style"`
+	Z3               Z3Config `yaml:"z3"`
+}
+
+type Z3Config struct {
+	BinaryPath       string `yaml:"binary_path"`
+	EnableVerification bool `yaml:"enable_verification"`
+	MaxVerificationDocs int `yaml:"max_verification_docs"`
 }
 
 type WeightsConfig struct {
@@ -150,6 +157,17 @@ func validate(config *Config) error {
 	}
 	if !validObjectiveStyles[config.SMT.ObjectiveStyle] {
 		return fmt.Errorf("invalid objective style: %s", config.SMT.ObjectiveStyle)
+	}
+
+	// Validate Z3 configuration
+	if config.SMT.Z3.BinaryPath != "" {
+		if _, err := os.Stat(config.SMT.Z3.BinaryPath); err != nil {
+			return fmt.Errorf("Z3 binary not found at path: %s", config.SMT.Z3.BinaryPath)
+		}
+	}
+
+	if config.SMT.Z3.MaxVerificationDocs < 0 {
+		return fmt.Errorf("max verification docs must be non-negative")
 	}
 
 	// Ensure database directory exists

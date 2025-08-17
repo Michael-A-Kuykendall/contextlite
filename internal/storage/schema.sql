@@ -1,4 +1,4 @@
-CREATE TABLE documents (
+CREATE TABLE IF NOT EXISTS documents (
   id TEXT PRIMARY KEY,
   content TEXT NOT NULL,
   content_hash TEXT NOT NULL,
@@ -14,14 +14,14 @@ CREATE TABLE documents (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE VIRTUAL TABLE documents_fts USING fts5(
+CREATE VIRTUAL TABLE IF NOT EXISTS documents_fts USING fts5(
   content,
   content=documents,
   content_rowid=rowid,
   tokenize='porter ascii'
 );
 
-CREATE TABLE query_cache (
+CREATE TABLE IF NOT EXISTS query_cache (
   query_hash TEXT PRIMARY KEY,
   corpus_hash TEXT NOT NULL,
   model_id TEXT NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE query_cache (
   access_count INTEGER DEFAULT 1
 );
 
-CREATE TABLE workspace_weights (
+CREATE TABLE IF NOT EXISTS workspace_weights (
   workspace_path TEXT PRIMARY KEY,
   relevance_weight REAL DEFAULT 0.4,
   recency_weight REAL DEFAULT 0.2,
@@ -50,7 +50,7 @@ CREATE TABLE workspace_weights (
   last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE concepts (
+CREATE TABLE IF NOT EXISTS concepts (
   doc_id TEXT,
   term TEXT,
   tf INTEGER,
@@ -58,13 +58,13 @@ CREATE TABLE concepts (
   PRIMARY KEY(doc_id, term)
 );
 
-CREATE TABLE meta (
+CREATE TABLE IF NOT EXISTS meta (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_documents_token_count ON documents(token_count);
-CREATE INDEX idx_documents_mtime ON documents(mtime);
-CREATE INDEX idx_concepts_term ON concepts(term);
-CREATE INDEX idx_query_cache_composite ON query_cache(corpus_hash, model_id, tokenizer_version);
+CREATE INDEX IF NOT EXISTS idx_documents_token_count ON documents(token_count);
+CREATE INDEX IF NOT EXISTS idx_documents_mtime ON documents(mtime);
+CREATE INDEX IF NOT EXISTS idx_concepts_term ON concepts(term);
+CREATE INDEX IF NOT EXISTS idx_query_cache_composite ON query_cache(corpus_hash, model_id, tokenizer_version);

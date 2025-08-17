@@ -43,3 +43,20 @@ config.local.yaml
 # Temporary files
 tmp/
 temp/
+
+# Archive and temporary development files
+archive/
+*.tmp
+
+# Debug and test output files
+debug_*.go
+test_*.go
+*_demo.go
+*_debug.*
+*_output.*
+z3_*.smt2
+z3_*.txt
+
+# Evaluation outputs
+sota_comparison*.json
+benchmark_results*.json
