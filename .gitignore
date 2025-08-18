@@ -59,3 +59,8 @@ z3_*.txt
 # Evaluation outputs
 sota_comparison*.json
 benchmark_results*.json
+
+# RSA Keys for License System (SECURITY: DO NOT COMMIT)
+private_key.pem
+public_key.pem
+*.pem
