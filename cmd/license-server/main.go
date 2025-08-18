@@ -4,6 +4,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/json"
+        "encoding/base64"
 	"encoding/pem"
 	"fmt"
 	"io"
@@ -368,8 +369,22 @@ func loadConfig() (*Config, error) {
 	}
 	
 	config.StripeSecretKey = os.Getenv("STRIPE_SECRET_KEY")
-	config.StripeWebhookSecret = os.Getenv("STRIPE_WEBHOOK_SECRET")
-	config.PrivateKeyPath = getEnvOrDefault("PRIVATE_KEY_PATH", "./private_key.pem")
+        // Handle RSA private key from environment or file
+        if rsaPrivateKey := os.Getenv("RSA_PRIVATE_KEY"); rsaPrivateKey != "" {
+                // Decode base64 private key and write to temp file
+                privateKeyData, err := base64.StdEncoding.DecodeString(rsaPrivateKey)
+                if err != nil {
+                        return nil, fmt.Errorf("failed to decode RSA_PRIVATE_KEY: %w", err)
+                }
+                
+                tmpFile := "/tmp/private_key.pem"
+                if err := os.WriteFile(tmpFile, privateKeyData, 0600); err != nil {
+                        return nil, fmt.Errorf("failed to write private key to temp file: %w", err)
+                }
+                config.PrivateKeyPath = tmpFile
+        } else {
+                config.PrivateKeyPath = getEnvOrDefault("PRIVATE_KEY_PATH", "./private_key.pem")
+        }
 	config.optimizationPHost = getEnvOrDefault("optimizationP_HOST", "optimizationp.gmail.com")
 	config.optimizationPUser = os.Getenv("optimizationP_USER")
 	config.optimizationPPassword = os.Getenv("optimizationP_PASSWORD")
