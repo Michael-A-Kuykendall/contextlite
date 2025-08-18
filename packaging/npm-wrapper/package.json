@@ -1,0 +1,63 @@
+{
+  "name": "contextlite",
+  "version": "1.0.0",
+  "description": "Lightweight semantic context search engine for Node.js",
+  "main": "index.js",
+  "bin": {
+    "contextlite": "./bin/contextlite.js"
+  },
+  "scripts": {
+    "postinstall": "node scripts/download-binary.js",
+    "test": "jest",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "context",
+    "search",
+    "semantic",
+    "indexing",
+    "retrieval",
+    "information-retrieval"
+  ],
+  "author": "Michael A. Kuykendall <michael@kuykendall.dev>",
+  "license": "MIT",
+  "homepage": "https://github.com/Michael-A-Kuykendall/contextlite",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Michael-A-Kuykendall/contextlite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Michael-A-Kuykendall/contextlite/issues"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7",
+    "tar": "^6.1.11",
+    "yauzl": "^2.10.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^2.8.0",
+    "@types/node": "^18.0.0"
+  },
+  "files": [
+    "index.js",
+    "bin/",
+    "scripts/",
+    "README.md",
+    "LICENSE"
+  ],
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
+}

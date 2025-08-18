@@ -1,0 +1,174 @@
+project_name: contextlite
+
+dist: dist
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - id: contextlite
+    main: ./cmd/contextlite
+    binary: contextlite
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.builtBy=goreleaser
+
+archives:
+  - id: default
+    builds:
+      - contextlite
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE*
+      - README*
+      - CHANGELOG*
+      - docs/**/*
+
+checksum:
+  name_template: 'checksums.txt'
+  algorithm: sha256
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  use: github
+  sort: asc
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: Bug fixes
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: Performance improvements
+      regexp: '^.*?perf(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: Others
+      order: 999
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+
+# Signing with cosign
+signs:
+  - cmd: cosign
+    args:
+      - sign-blob
+      - '--yes'
+      - '--key=env://COSIGN_PRIVATE_KEY'
+      - '--output-signature=${signature}'
+      - '${artifact}'
+    artifacts: all
+
+# Docker images
+dockers:
+  - image_templates:
+      - "ghcr.io/michael-a-kuykendall/contextlite:{{ .Tag }}"
+      - "ghcr.io/michael-a-kuykendall/contextlite:v{{ .Major }}"
+      - "ghcr.io/michael-a-kuykendall/contextlite:v{{ .Major }}.{{ .Minor }}"
+      - "ghcr.io/michael-a-kuykendall/contextlite:latest"
+    dockerfile: Dockerfile
+    goos: linux
+    goarch: amd64
+
+# Homebrew tap
+brews:
+  - name: contextlite
+    repository:
+      owner: Michael-A-Kuykendall
+      name: homebrew-tap
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    homepage: "https://contextlite.com"
+    description: "Single-file, zero-dependency context engine for AI applications"
+    license: "MIT"
+    test: |
+      system "#{bin}/contextlite", "--version"
+    install: |
+      bin.install "contextlite"
+
+# Scoop bucket for Windows
+scoops:
+  - name: contextlite
+    repository:
+      owner: Michael-A-Kuykendall
+      name: scoop-bucket
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    homepage: "https://contextlite.com"
+    description: "Single-file, zero-dependency context engine for AI applications"
+    license: "MIT"
+
+# Generate SBOM
+sboms:
+  - artifacts: archive
+
+# Release notes
+release:
+  github:
+    owner: Michael-A-Kuykendall
+    name: contextlite
+  prerelease: auto
+  name_template: "{{.ProjectName}} v{{.Version}}"
+  header: |
+    ## ContextLite {{.Version}}
+
+    **Single-file, zero-dependency context engine for AI applications**
+
+    ### Installation
+
+    #### Homebrew (macOS/Linux)
+    ```bash
+    brew tap Michael-A-Kuykendall/tap
+    brew install contextlite
+    ```
+
+    #### Scoop (Windows)
+    ```bash
+    scoop bucket add contextlite https://github.com/Michael-A-Kuykendall/scoop-bucket
+    scoop install contextlite
+    ```
+
+    #### Go Install
+    ```bash
+    go install github.com/Michael-A-Kuykendall/contextlite/cmd/contextlite@latest
+    ```
+
+    #### Docker
+    ```bash
+    docker pull ghcr.io/michael-a-kuykendall/contextlite:{{.Tag}}
+    ```
+
+    ### Direct Downloads
+  footer: |
+    **Full Changelog**: https://github.com/Michael-A-Kuykendall/contextlite/compare/{{.PreviousTag}}...{{.Tag}}
+
+    ---
+    
+    **Verification**: All binaries are signed with cosign. Verify with:
+    ```bash
+    cosign verify-blob --key https://github.com/Michael-A-Kuykendall/contextlite/releases/download/{{.Tag}}/contextlite_Linux_x86_64.tar.gz.sig contextlite_Linux_x86_64.tar.gz
+    ```
