@@ -8,7 +8,7 @@ import (
 	"encoding/hex"
 	"os"
 	"path/filepath"
-	"contextlite/internal/features"
+	"contextlite/pkg/types"
 )
 
 // TenantConfig represents a multi-tenant workspace configuration
@@ -38,11 +38,11 @@ type TenantSettings struct {
 // TenantManager handles multi-tenant operations
 type TenantManager struct {
 	db          *sql.DB
-	featureGate *features.FeatureGate
+	featureGate types.FeatureGate
 }
 
 // NewTenantManager creates a new tenant manager
-func NewTenantManager(db *sql.DB, featureGate *features.FeatureGate) *TenantManager {
+func NewTenantManager(db *sql.DB, featureGate types.FeatureGate) *TenantManager {
 	return &TenantManager{
 		db:          db,
 		featureGate: featureGate,
@@ -203,7 +203,7 @@ func (tm *TenantManager) UpdateTenantSettings(tenantID string, settings TenantSe
 // DeleteTenant removes a tenant and its data (careful!)
 func (tm *TenantManager) DeleteTenant(tenantID string) error {
 	// First get tenant info to clean up database file
-	tenant, err := tm.GetTenant(tenantID)
+	_, err := tm.GetTenant(tenantID)
 	if err != nil {
 		return fmt.Errorf("tenant not found: %w", err)
 	}
