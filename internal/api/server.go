@@ -17,9 +17,6 @@ import (
 	"github.com/go-chi/cors"
 	"go.uber.org/zap"
 
-	"contextlite/internal/features"
-	"contextlite/internal/pipeline"
-	"contextlite/internal/storage"
 	"contextlite/pkg/config"
 	"contextlite/pkg/types"
 )
@@ -27,17 +24,17 @@ import (
 // Server provides the HTTP API server
 type Server struct {
 	router      *chi.Mux
-	pipeline    *pipeline.Pipeline
-	storage     *storage.Storage
+	engine      types.ContextEngine
+	storage     types.StorageInterface
 	config      *config.Config
 	logger      *zap.Logger
-	featureGate *features.FeatureGate
+	featureGate types.FeatureGate
 }
 
 // New creates a new API server
-func New(pipeline *pipeline.Pipeline, storage *storage.Storage, config *config.Config, logger *zap.Logger, featureGate *features.FeatureGate) *Server {
+func New(engine types.ContextEngine, storage types.StorageInterface, config *config.Config, logger *zap.Logger, featureGate types.FeatureGate) *Server {
 	s := &Server{
-		pipeline:    pipeline,
+		engine:      engine,
 		storage:     storage,
 		config:      config,
 		logger:      logger,
@@ -156,7 +153,7 @@ func (s *Server) authMiddleware(next http.Handler) http.Handler {
 // requireProfessional ensures the user has Professional or Enterprise license
 func (s *Server) requireProfessional(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if err := s.featureGate.RequireProfessional("API access"); err != nil {
+		if err := s.featureGate.RequireProfessional(); err != nil {
 			s.writeError(w, http.StatusForbidden, "Professional license required: "+err.Error())
 			return
 		}
@@ -167,7 +164,7 @@ func (s *Server) requireProfessional(next http.Handler) http.Handler {
 // requireEnterprise ensures the user has Enterprise license
 func (s *Server) requireEnterprise(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if err := s.featureGate.RequireEnterprise("Enterprise API access"); err != nil {
+			if err := s.featureGate.RequireEnterprise(); err != nil {
 			s.writeError(w, http.StatusForbidden, "Enterprise license required: "+err.Error())
 			return
 		}
@@ -253,7 +250,16 @@ func (s *Server) handleAssembleContext(w http.ResponseWriter, r *http.Request) {
 	
 	// Assemble context
 	ctx := r.Context()
-	result, err := s.pipeline.AssembleContext(ctx, &req)
+	
+	// Convert AssembleRequest to ContextRequest for engine interface
+	contextReq := types.ContextRequest{
+		Query:         req.Query,
+		MaxTokens:     req.MaxTokens,
+		MaxDocuments:  req.MaxDocuments,
+		WorkspacePath: req.WorkspacePath,
+	}
+	
+	result, err := s.engine.AssembleContext(ctx, contextReq)
 	if err != nil {
 		s.logger.Error("Failed to assemble context", zap.Error(err))
 		s.writeError(w, http.StatusInternalServerError, "Failed to assemble context: "+err.Error())
@@ -287,7 +293,15 @@ func (s *Server) handleBaselineComparison(w http.ResponseWriter, r *http.Request
 	// Get SMT-optimized results
 	req.UseSMT = true
 	req.UseCache = false // Force fresh computation for comparison
-	smtResult, err := s.pipeline.AssembleContext(ctx, &req)
+	
+	contextReq := types.ContextRequest{
+		Query:         req.Query,
+		MaxTokens:     req.MaxTokens,
+		MaxDocuments:  req.MaxDocuments,
+		WorkspacePath: req.WorkspacePath,
+	}
+	
+	smtResult, err := s.engine.AssembleContext(ctx, contextReq)
 	if err != nil {
 		s.logger.Error("Failed to get SMT results", zap.Error(err))
 		s.writeError(w, http.StatusInternalServerError, "Failed to get SMT results: "+err.Error())
@@ -302,21 +316,20 @@ func (s *Server) handleBaselineComparison(w http.ResponseWriter, r *http.Request
 		return
 	}
 	
-	// Run baseline (BM25 + MMR)
-	baseline := features.NewBM25Scorer()
-	baselineResults := baseline.ScoreDocuments(allDocs, req.Query, req.MaxDocuments)
+	// Run simple baseline (basic text matching + document length)
+	baselineResults := s.simpleBaseline(allDocs, req.Query, req.MaxDocuments)
 	
 	// Create baseline response format
 	baselineDocRefs := make([]types.DocumentReference, len(baselineResults))
-	for i, scoredDoc := range baselineResults {
+	for i, doc := range baselineResults {
 		baselineDocRefs[i] = types.DocumentReference{
-			ID:              scoredDoc.Document.ID,
-			Path:            scoredDoc.Document.Path,
-			Content:         scoredDoc.Document.Content,
-			Language:        scoredDoc.Document.Language,
-			UtilityScore:    scoredDoc.UtilityScore,
-			RelevanceScore:  scoredDoc.Features.Relevance,
-			RecencyScore:    scoredDoc.Features.Recency,
+			ID:              doc.ID,
+			Path:            doc.Path,
+			Content:         doc.Content,
+			Language:        doc.Language,
+			UtilityScore:    0.5, // Simple baseline score
+			RelevanceScore:  0.5,
+			RecencyScore:    0.5,
 			InclusionReason: "baseline_selected",
 		}
 	}
@@ -342,7 +355,7 @@ func (s *Server) handleBaselineComparison(w http.ResponseWriter, r *http.Request
 			"documents":        smtResult.Documents,
 			"coherence_score":  smtResult.CoherenceScore,
 			"smt_objective":    smtResult.SMTMetrics.Objective,
-			"solve_time_ms":    smtResult.SMTMetrics.SMTWallMs,
+			"solve_time_ms":    float64(smtResult.SMTMetrics.SolveTimeUs) / 1000,
 			"variables":        smtResult.SMTMetrics.VariableCount,
 			"constraints":      smtResult.SMTMetrics.ConstraintCount,
 			"method":           "SMT_optimization",
@@ -564,7 +577,16 @@ func (s *Server) handleUpdateWeights(w http.ResponseWriter, r *http.Request) {
 	weights.LastUpdated = time.Now().Format(time.RFC3339)
 	
 	// Save updated weights
-	if err := s.storage.SaveWorkspaceWeights(ctx, weights); err != nil {
+	featureWeights := types.FeatureWeights{
+		Relevance:    weights.RelevanceWeight,
+		Recency:      weights.RecencyWeight,
+		Entanglement: weights.EntanglementWeight,
+		Prior:        0.0, // Not available in WorkspaceWeights
+		Authority:    0.0, // Not available in WorkspaceWeights
+		Specificity:  weights.DiversityWeight,
+		Uncertainty:  weights.RedundancyPenalty,
+	}
+	if err := s.storage.SaveWorkspaceWeights(feedback.WorkspacePath, featureWeights); err != nil {
 		s.writeError(w, http.StatusInternalServerError, "Failed to save weights: "+err.Error())
 		return
 	}
@@ -601,8 +623,6 @@ func (s *Server) handleResetWeights(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	ctx := r.Context()
-	
 	// Create default weights
 	defaultWeights := &types.WorkspaceWeights{
 		WorkspacePath:      workspacePath,
@@ -616,7 +636,16 @@ func (s *Server) handleResetWeights(w http.ResponseWriter, r *http.Request) {
 	}
 	
 	// Save default weights
-	if err := s.storage.SaveWorkspaceWeights(ctx, defaultWeights); err != nil {
+	defaultFeatureWeights := types.FeatureWeights{
+		Relevance:    defaultWeights.RelevanceWeight,
+		Recency:      defaultWeights.RecencyWeight,
+		Entanglement: defaultWeights.EntanglementWeight,
+		Prior:        0.0,
+		Authority:    0.0,
+		Specificity:  defaultWeights.DiversityWeight,
+		Uncertainty:  defaultWeights.RedundancyPenalty,
+	}
+	if err := s.storage.SaveWorkspaceWeights(workspacePath, defaultFeatureWeights); err != nil {
 		s.writeError(w, http.StatusInternalServerError, "Failed to reset weights: "+err.Error())
 		return
 	}
@@ -630,7 +659,6 @@ func (s *Server) handleResetWeights(w http.ResponseWriter, r *http.Request) {
 // Invalidate cache
 func (s *Server) handleInvalidateCache(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	
 	// Execute cache invalidation by deleting all cache entries
 	err := s.storage.InvalidateCache(ctx)
 	if err != nil {
@@ -888,9 +916,9 @@ func (s *Server) scanWorkspaceFiles(ctx context.Context, workspacePath string, i
 
 // getDatabaseStats returns basic database statistics
 func (s *Server) getDatabaseStats() map[string]interface{} {
-	ctx := context.Background()
 	
 	// Get real storage stats
+	ctx := context.Background()
 	storageStats, err := s.storage.GetStorageStats(ctx)
 	if err != nil {
 		// Fallback to default stats if query fails
@@ -1021,19 +1049,18 @@ func (s *Server) handleRank(w http.ResponseWriter, r *http.Request) {
 		return 
 	}
 
-	// Map to AssembleRequest
-	ar := types.AssembleRequest{
-		Query:        reqBody.Query,
-		MaxTokens:    s.config.Tokenizer.MaxTokensDefault,
-		MaxDocuments: 10,
-		UseSMT:       true,
-		UseCache:     reqBody.UseCache,
+	// Map to ContextRequest
+	cr := types.ContextRequest{
+		Query:         reqBody.Query,
+		MaxTokens:     s.config.Tokenizer.MaxTokensDefault,
+		MaxDocuments:  10,
+		WorkspacePath: "",
 	}
-	if reqBody.K > 0 { ar.MaxDocuments = reqBody.K }
-	if reqBody.MaxTokens > 0 { ar.MaxTokens = reqBody.MaxTokens }
+	if reqBody.K > 0 { cr.MaxDocuments = reqBody.K }
+	if reqBody.MaxTokens > 0 { cr.MaxTokens = reqBody.MaxTokens }
 
 	ctx := r.Context()
-	res, err := s.pipeline.AssembleContext(ctx, &ar)
+	res, err := s.engine.AssembleContext(ctx, cr)
 	if err != nil {
 		s.logger.Error("rank assembly failed", zap.Error(err))
 		s.writeError(w, http.StatusInternalServerError, "assembly failed: "+err.Error())
@@ -1053,7 +1080,7 @@ func (s *Server) handleRank(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	out := rankResponse{ Items: items, P99Ms: int(res.Timings.TotalMs) }
+	out := rankResponse{ Items: items, P99Ms: int(res.ProcessingTime.Milliseconds()) }
 	s.writeJSON(w, http.StatusOK, out)
 }
 
@@ -1086,4 +1113,52 @@ func (s *Server) handleSnippet(w http.ResponseWriter, r *http.Request) {
 
 	snippet := strings.Join(lines[sLine:eLine], "\n")
 	s.writeJSON(w, http.StatusOK, snippetResponse{ Snippet: snippet })
+}
+
+// simpleBaseline provides a basic baseline for comparison without complex features
+func (s *Server) simpleBaseline(docs []types.Document, query string, maxDocs int) []types.Document {
+	if len(docs) <= maxDocs {
+		return docs // Return all if under limit
+	}
+	
+	// Simple scoring: query term frequency + document length preference
+	type scoredDoc struct {
+		doc   types.Document
+		score float64
+	}
+	
+	queryTerms := strings.Fields(strings.ToLower(query))
+	scored := make([]scoredDoc, len(docs))
+	
+	for i, doc := range docs {
+		content := strings.ToLower(doc.Content)
+		score := 0.0
+		
+		// Count query term matches
+		for _, term := range queryTerms {
+			score += float64(strings.Count(content, term))
+		}
+		
+		// Slight preference for longer documents (more authoritative)
+		score += float64(len(doc.Content)) / 10000.0
+		
+		scored[i] = scoredDoc{doc: doc, score: score}
+	}
+	
+	// Sort by score descending
+	for i := 0; i < len(scored)-1; i++ {
+		for j := i + 1; j < len(scored); j++ {
+			if scored[j].score > scored[i].score {
+				scored[i], scored[j] = scored[j], scored[i]
+			}
+		}
+	}
+	
+	// Return top maxDocs
+	result := make([]types.Document, maxDocs)
+	for i := 0; i < maxDocs; i++ {
+		result[i] = scored[i].doc
+	}
+	
+	return result
 }
