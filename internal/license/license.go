@@ -525,3 +525,48 @@ func (fg *LicenseFeatureGate) ValidateCustomMCP() error {
 func (fg *LicenseFeatureGate) ValidateMultiTenant() error {
 	return fg.RequireEnterprise()
 }
+
+// ValidateLicense validates a license string using RSA public key verification
+func ValidateLicense(licenseString string, publicKey *rsa.PublicKey) (bool, error) {
+	// Parse the license JSON
+	var license License
+	if err := json.Unmarshal([]byte(licenseString), &license); err != nil {
+		return false, fmt.Errorf("invalid license JSON: %w", err)
+	}
+	
+	// Create verification payload (excluding signature)
+	licenseData := map[string]interface{}{
+		"key":           license.Key,
+		"email":         license.Email,
+		"tier":          license.Tier,
+		"issued_at":     license.IssuedAt,
+		"expires_at":    license.ExpiresAt,
+		"max_documents": license.MaxDocuments,
+		"max_users":     license.MaxUsers,
+		"hardware_id":   license.HardwareID,
+		"features":      license.Features,
+	}
+	
+	// Create hash of license data
+	dataBytes, _ := json.Marshal(licenseData)
+	hash := sha256.Sum256(dataBytes)
+	
+	// Decode signature
+	signature, err := base64.StdEncoding.DecodeString(license.Signature)
+	if err != nil {
+		return false, fmt.Errorf("invalid signature encoding: %w", err)
+	}
+	
+	// Verify signature
+	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hash[:], signature)
+	if err != nil {
+		return false, fmt.Errorf("signature verification failed: %w", err)
+	}
+	
+	// Check expiration
+	if license.ExpiresAt != nil && time.Now().After(*license.ExpiresAt) {
+		return false, fmt.Errorf("license expired on %v", *license.ExpiresAt)
+	}
+	
+	return true, nil
+}
