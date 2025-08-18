@@ -1,0 +1,98 @@
+<idea-plugin>
+    <id>com.contextlite.intellij</id>
+    <name>ContextLite</name>
+    <vendor email="support@contextlite.com" url="https://contextlite.com">ContextLite Team</vendor>
+
+    <description><![CDATA[
+    <h1>ContextLite IntelliJ Plugin</h1>
+    
+    <p>Integrate ContextLite - an ultra-fast context engine for retrieval and AI applications - directly into your IntelliJ IDE.</p>
+    
+    <h2>Features</h2>
+    <ul>
+        <li><strong>🚀 One-Click Launch:</strong> Start/stop ContextLite server from Tools menu</li>
+        <li><strong>🔍 Auto-Detection:</strong> Automatically finds ContextLite binary in your system</li>
+        <li><strong>📊 Status Integration:</strong> Real-time server status in IDE status bar</li>
+        <li><strong>⚡ Quick Access:</strong> Easy access to ContextLite web interface</li>
+        <li><strong>🛠️ Zero Configuration:</strong> Works out of the box with existing installations</li>
+    </ul>
+    
+    <h2>Quick Start</h2>
+    <ol>
+        <li>Install ContextLite binary: <a href="https://github.com/Michael-A-Kuykendall/contextlite/releases">Download</a></li>
+        <li>Go to <strong>Tools → ContextLite → Start Server</strong></li>
+        <li>Access the web interface via status bar or Tools menu</li>
+    </ol>
+    
+    <p>Visit <a href="https://docs.contextlite.com">docs.contextlite.com</a> for complete documentation.</p>
+    ]]></description>
+
+    <!-- Product and plugin compatibility requirements -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Status bar widget -->
+        <statusBarWidgetFactory implementation="com.contextlite.intellij.ContextLiteStatusBarWidgetFactory" 
+                                id="ContextLiteStatusBar" 
+                                order="before selectionMode"/>
+        
+        <!-- Application service -->
+        <applicationService serviceImplementation="com.contextlite.intellij.ContextLiteService"/>
+        
+        <!-- Settings configurable -->
+        <applicationConfigurable parentId="tools" 
+                               instance="com.contextlite.intellij.ContextLiteConfigurable"
+                               id="ContextLiteConfigurable"
+                               displayName="ContextLite"/>
+    </extensions>
+
+    <actions>
+        <!-- Tools menu group -->
+        <group id="ContextLiteToolsGroup" text="ContextLite" description="ContextLite Actions">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            
+            <action id="ContextLite.StartServer" 
+                    class="com.contextlite.intellij.actions.StartServerAction"
+                    text="Start Server" 
+                    description="Start ContextLite server"/>
+                    
+            <action id="ContextLite.StopServer" 
+                    class="com.contextlite.intellij.actions.StopServerAction"
+                    text="Stop Server" 
+                    description="Stop ContextLite server"/>
+                    
+            <action id="ContextLite.OpenWebInterface" 
+                    class="com.contextlite.intellij.actions.OpenWebInterfaceAction"
+                    text="Open Web Interface" 
+                    description="Open ContextLite web interface"/>
+                    
+            <action id="ContextLite.IndexWorkspace" 
+                    class="com.contextlite.intellij.actions.IndexWorkspaceAction"
+                    text="Index Current Workspace" 
+                    description="Index files from current workspace"/>
+                    
+            <separator/>
+            
+            <action id="ContextLite.ViewLogs" 
+                    class="com.contextlite.intellij.actions.ViewLogsAction"
+                    text="View Logs" 
+                    description="View ContextLite server logs"/>
+        </group>
+        
+        <!-- Context menu actions -->
+        <action id="ContextLite.IndexFile" 
+                class="com.contextlite.intellij.actions.IndexFileAction"
+                text="Index with ContextLite" 
+                description="Index selected file with ContextLite">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+
+    <projectListeners>
+        <listener class="com.contextlite.intellij.ContextLiteProjectListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    </projectListeners>
+
+</idea-plugin>
