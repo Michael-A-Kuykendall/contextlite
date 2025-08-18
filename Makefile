@@ -190,3 +190,46 @@ status: ## Show project status
 	@echo "Source files: $(shell find . -name '*.go' | wc -l) files"
 	@echo "Test files: $(shell find . -name '*_test.go' | wc -l) files"
 	@echo "Build artifacts: $(shell ls -la $(BUILD_DIR) 2>/dev/null | wc -l || echo 0) files"
+
+# Registry-integrated testing
+test-registry: ## Run comprehensive tests with automatic registry updates
+	@echo "Running comprehensive tests with registry integration..."
+	@go run ./cmd/registry-runner/main.go
+
+# Check production readiness
+production-check: ## Check if all critical components are production ready
+	@echo "Checking production readiness..."
+	@go run ./cmd/production-check/main.go
+
+# View registry dashboard
+registry-status: ## Display current system registry status
+	@echo "ContextLite System Registry Status"
+	@echo "=================================="
+	@if [ -f "SYSTEM_REGISTRY.md" ]; then \
+		head -30 SYSTEM_REGISTRY.md | grep -E "(Status|Health|Readiness|Coverage)" || echo "Registry file found but no status data"; \
+	else \
+		echo "❌ SYSTEM_REGISTRY.md not found - run 'make test-registry' to generate"; \
+	fi
+	@echo ""
+	@if [ -f "system_registry.json" ]; then \
+		echo "JSON Registry: ✅ Available"; \
+		echo "Last Updated: $$(jq -r '.last_update' system_registry.json 2>/dev/null || echo 'Unknown')"; \
+	else \
+		echo "JSON Registry: ❌ Missing"; \
+	fi
+
+# Show beautiful dashboard
+dashboard: ## Show comprehensive system dashboard
+	@go run ./cmd/dashboard/main.go
+
+# Initialize registry system
+init-registry: ## Initialize the system registry and testing framework
+	@echo "Initializing ContextLite System Registry..."
+	@go mod tidy
+	@echo "Creating initial registry structure..."
+	@chmod +x ./test_with_registry.sh
+	@./test_with_registry.sh
+	@echo "✅ Registry system initialized!"
+	@echo "   Use 'make test-registry' to run tests with registry updates"
+	@echo "   Use 'make registry-status' to check current status"
+	@echo "   Use 'make production-check' to verify production readiness"

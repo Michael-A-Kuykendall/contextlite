@@ -1,0 +1,22 @@
+{
+    "version": "0.0.1-next",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v0.0.0/contextlite_Windows_x86_64.zip",
+            "bin": [
+                "contextlite.exe"
+            ],
+            "hash": "d501508fe5d8906145802e2c702faac5d44cc44bf2be6832ef80296fe2be514f"
+        },
+        "arm64": {
+            "url": "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v0.0.0/contextlite_Windows_arm64.zip",
+            "bin": [
+                "contextlite.exe"
+            ],
+            "hash": "f64fb11e5ed0c1d525dbe8eb4272a10b310c440cd5a43ffe7a0467fbea62cd40"
+        }
+    },
+    "homepage": "https://contextlite.com",
+    "license": "MIT",
+    "description": "Single-file, zero-dependency context engine for AI applications"
+}
