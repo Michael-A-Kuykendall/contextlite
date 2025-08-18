@@ -1,0 +1,141 @@
+{
+  "name": "contextlite",
+  "displayName": "ContextLite - Intelligent Context Engine",
+  "description": "Lightning-fast context retrieval for AI coding assistants. Zero-dependency local search with quantum-inspired scoring.",
+  "version": "1.0.0",
+  "publisher": "ContextLite",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "AI",
+    "Machine Learning",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "context",
+    "search",
+    "copilot",
+    "assistant",
+    "rag",
+    "retrieval"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "contextlite.start",
+        "title": "Start ContextLite Server",
+        "category": "ContextLite"
+      },
+      {
+        "command": "contextlite.stop",
+        "title": "Stop ContextLite Server",
+        "category": "ContextLite"
+      },
+      {
+        "command": "contextlite.status",
+        "title": "Show ContextLite Status",
+        "category": "ContextLite"
+      },
+      {
+        "command": "contextlite.indexWorkspace",
+        "title": "Index Current Workspace",
+        "category": "ContextLite"
+      },
+      {
+        "command": "contextlite.openUI",
+        "title": "Open ContextLite Dashboard",
+        "category": "ContextLite"
+      }
+    ],
+    "configuration": {
+      "title": "ContextLite",
+      "properties": {
+        "contextlite.autoStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically start ContextLite when VS Code opens"
+        },
+        "contextlite.serverPort": {
+          "type": "number",
+          "default": 8080,
+          "description": "Port for ContextLite server"
+        },
+        "contextlite.binaryPath": {
+          "type": "string",
+          "description": "Custom path to ContextLite binary (optional)"
+        },
+        "contextlite.logLevel": {
+          "type": "string",
+          "enum": [
+            "error",
+            "warn",
+            "info",
+            "debug"
+          ],
+          "default": "info",
+          "description": "ContextLite logging level"
+        }
+      }
+    },
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "contextlite.indexWorkspace",
+          "group": "contextlite"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "contextlite.start"
+        },
+        {
+          "command": "contextlite.stop"
+        },
+        {
+          "command": "contextlite.status"
+        },
+        {
+          "command": "contextlite.indexWorkspace"
+        },
+        {
+          "command": "contextlite.openUI"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^18.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Michael-A-Kuykendall/contextlite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Michael-A-Kuykendall/contextlite/issues"
+  },
+  "homepage": "https://contextlite.com",
+  "license": "MIT",
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
+  "author": "",
+  "type": "commonjs"
+}
