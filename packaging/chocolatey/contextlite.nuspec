@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>contextlite</id>
+    <version>1.0.0</version>
+    <packageSourceUrl>https://github.com/Michael-A-Kuykendall/contextlite</packageSourceUrl>
+    <owners>Michael A. Kuykendall</owners>
+    <title>ContextLite</title>
+    <authors>Michael A. Kuykendall</authors>
+    <projectUrl>https://github.com/Michael-A-Kuykendall/contextlite</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/Michael-A-Kuykendall/contextlite/main/assets/contextlite.png</iconUrl>
+    <copyright>2024 Michael A. Kuykendall</copyright>
+    <licenseUrl>https://github.com/Michael-A-Kuykendall/contextlite/blob/main/LICENSE.md</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/Michael-A-Kuykendall/contextlite</projectSourceUrl>
+    <docsUrl>https://github.com/Michael-A-Kuykendall/contextlite/blob/main/README.md</docsUrl>
+    <bugTrackerUrl>https://github.com/Michael-A-Kuykendall/contextlite/issues</bugTrackerUrl>
+    <tags>context search semantic indexing retrieval information cli</tags>
+    <summary>Lightweight semantic context search engine</summary>
+    <description>ContextLite is a fast, lightweight semantic context search engine that helps you find relevant information from your documents and code. It provides instant context retrieval with advanced scoring algorithms including relevance, recency, and diversity factors.
+
+Features:
+- Instant semantic search across documents
+- Advanced scoring with relevance, recency, and diversity
+- REST API and command-line interface
+- SQLite-based storage with FTS5 indexing
+- Zero external dependencies
+- Cross-platform support
+
+Perfect for developers, researchers, and anyone who needs fast, intelligent context search.</description>
+    <releaseNotes>Initial release of ContextLite for Windows via Chocolatey.</releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
