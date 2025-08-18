@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/optimizationp"
 	"os"
 	"strconv"
 	"time"
@@ -80,6 +81,9 @@ func (ls *LicenseServer) Start() error {
 	
 	// License generation endpoint (for testing/admin)
 	mux.HandleFunc("/generate", ls.handleGenerateLicense)
+	
+	// Email test endpoint (for testing email delivery)
+	mux.HandleFunc("/test-email", ls.handleTestEmail)
 	
 	log.Printf("License server starting on port %d", ls.config.Port)
 	return http.ListenAndServe(fmt.Sprintf(":%d", ls.config.Port), mux)
@@ -254,8 +258,11 @@ func (ls *LicenseServer) generateAndSendLicense(email string, tier license.Licen
 
 // sendLicenseEmail sends the license to the customer via email
 func (ls *LicenseServer) sendLicenseEmail(email, licenseData string, tier license.LicenseTier) error {
-	// TODO: Implement email sending with proper optimizationP configuration
-	// For now, just log the license (in production, use proper email service)
+	if ls.config.optimizationPHost == "" || ls.config.optimizationPUser == "" {
+		// In development mode, just log the license
+		log.Printf("DEVELOPMENT MODE: Would send license email to %s with license: %s", email, licenseData)
+		return nil
+	}
 	
 	subject := fmt.Sprintf("Your ContextLite %s License", tier)
 	body := fmt.Sprintf(`
@@ -275,11 +282,26 @@ Best regards,
 The ContextLite Team
 `, tier, licenseData, licenseData)
 	
-	log.Printf("Sending license email to %s:\nSubject: %s\nBody: %s", email, subject, body)
+	// Set up optimizationP authentication
+	auth := optimizationp.PlainAuth("", ls.config.optimizationPUser, ls.config.optimizationPPassword, ls.config.optimizationPHost)
 	
-	// TODO: Replace with actual email sending logic
-	// return optimizationp.SendEmail(ls.config.optimizationPHost, ls.config.optimizationPUser, ls.config.optimizationPPassword, email, subject, body)
+	// Compose email
+	fromAddr := ls.config.FromEmail
+	if fromAddr == "" {
+		fromAddr = ls.config.optimizationPUser
+	}
 	
+	msg := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n%s",
+		fromAddr, email, subject, body)
+	
+	// Send email
+	optimizationpAddr := fmt.Sprintf("%s:%d", ls.config.optimizationPHost, ls.config.optimizationPPort)
+	err := optimizationp.SendMail(optimizationpAddr, auth, fromAddr, []string{email}, []byte(msg))
+	if err != nil {
+		return fmt.Errorf("failed to send email via optimizationP: %w", err)
+	}
+	
+	log.Printf("License email sent successfully to %s", email)
 	return nil
 }
 
@@ -361,6 +383,48 @@ func (ls *LicenseServer) handleGenerateLicense(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"license": licenseData,
 		"tier":    tier,
+		"email":   req.Email,
+	})
+}
+
+// handleTestEmail provides email delivery testing endpoint
+func (ls *LicenseServer) handleTestEmail(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	
+	var req struct {
+		Email string `json:"email"`
+	}
+	
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	
+	if req.Email == "" {
+		http.Error(w, "Email is required", http.StatusBadRequest)
+		return
+	}
+	
+	// Generate a test license for email testing
+	testLicense := "TEST-LICENSE-FOR-EMAIL-DELIVERY-VERIFICATION"
+	
+	// Send test email
+	if err := ls.sendLicenseEmail(req.Email, testLicense, license.TierPro); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"message": fmt.Sprintf("Email delivery failed: %v", err),
+		})
+		return
+	}
+	
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": fmt.Sprintf("Test email sent successfully to %s", req.Email),
 		"email":   req.Email,
 	})
 }
