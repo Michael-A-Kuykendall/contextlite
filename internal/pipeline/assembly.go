@@ -5,281 +5,210 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
-	"path/filepath"
 	"time"
 
-	"contextlite/internal/features"
-	"contextlite/internal/optimization"
-	"contextlite/internal/storage"
-	"contextlite/internal/timing"
 	"contextlite/pkg/config"
 	"contextlite/pkg/types"
 )
 
+// CacheParts contains all components for building a cache key
+type CacheParts struct {
+	QueryHash           string `json:"query_hash"`
+	CorpusHash          string `json:"corpus_hash"`
+	ModelID             string `json:"model_id"`
+	TokenizerVersion    string `json:"tokenizer_version"`
+	TokenizerVocabHash  string `json:"tokenizer_vocab_hash"`
+	WeightsHash         string `json:"weights_hash"`
+	ConceptDFVersion    string `json:"concept_df_version"`
+	MaxTokens           int    `json:"max_tokens"`
+	MaxDocuments        int    `json:"max_documents"`
+	ObjectiveStyle      string `json:"objective_style"`
+}
+
+// BuildCacheKey creates a deterministic cache key from parts
+func BuildCacheKey(parts CacheParts) string {
+	jsonData, _ := json.Marshal(parts)
+	hash := sha256.Sum256(jsonData)
+	return hex.EncodeToString(hash[:])
+}
+
 // Pipeline provides the main context assembly pipeline
+// This is now a thin wrapper that delegates to the engine
 type Pipeline struct {
-	storage *storage.Storage
+	storage types.StorageInterface
+	engine  types.ContextEngine
 	config  *config.Config
 }
 
 // New creates a new pipeline instance
-func New(storage *storage.Storage, config *config.Config) *Pipeline {
+func New(storage types.StorageInterface, engine types.ContextEngine, config *config.Config) *Pipeline {
 	return &Pipeline{
 		storage: storage,
+		engine:  engine,
 		config:  config,
 	}
 }
 
+// Getter methods for testing
+func (p *Pipeline) Storage() types.StorageInterface {
+	return p.storage
+}
+
+func (p *Pipeline) Config() *config.Config {
+	return p.config
+}
+
 // AssembleContext performs the complete context assembly pipeline
+// This now simply delegates to the engine and handles type conversion
 func (p *Pipeline) AssembleContext(ctx context.Context, req *types.AssembleRequest) (*types.QueryResult, error) {
-	totTimer := timing.Start()
-	var timings types.StageTimings
-	
-	// Build cache key
-	cacheKey := p.buildCacheKey(ctx, req)
-	
 	// Check cache first if enabled
+	var cacheKey string
 	if req.UseCache {
+		cacheKey = p.buildCacheKey(ctx, req)
 		if cached, err := p.getCachedResultByKey(ctx, cacheKey); err == nil && cached != nil {
 			cached.CacheHit = true
 			cached.CacheKey = cacheKey
 			return cached, nil
 		}
 	}
+
+	// Convert AssembleRequest to ContextRequest for the engine
+	contextReq := types.ContextRequest{
+		Query:         req.Query,
+		MaxTokens:     req.MaxTokens,
+		MaxDocuments:  req.MaxDocuments,
+		WorkspacePath: req.WorkspacePath,
+	}
 	
-	// Stage 1: FTS Harvest - search for candidate documents
-	ftsTimer := timing.Start()
-	candidates, err := p.harvestCandidates(ctx, req)
+	// Delegate ALL the work to the engine
+	startTime := time.Now()
+	result, err := p.engine.AssembleContext(ctx, contextReq)
 	if err != nil {
-		return nil, fmt.Errorf("failed to harvest candidates: %w", err)
-	}
-	ftsUs := ftsTimer.Us()
-	timings.FTSHarvestUs = ftsUs
-	timings.FTSHarvestMs = float64(ftsUs) / 1_000.0
-	
-	if len(candidates) == 0 {
-		totalUs := totTimer.Us()
-		timings.TotalUs = totalUs
-		timings.TotalMs = float64(totalUs) / 1_000.0
-		return &types.QueryResult{
-			Query:      req.Query,
-			Documents:  []types.DocumentReference{},
-			Timings:    timings,
-			CacheHit:   false,
-			CacheKey:   cacheKey,
-		}, nil
+		return nil, err
 	}
 	
-	// Stage 2: Feature Extraction - compute 7D features
-	featureTimer := timing.Start()
-	scoredDocs, err := p.extractFeatures(ctx, candidates, req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to extract features: %w", err)
+	// Convert ContextResult to QueryResult for backward compatibility
+	queryResult := &types.QueryResult{
+		Query:          req.Query,
+		Documents:      result.Documents,
+		TotalDocuments: len(result.Documents),
+		TotalTokens:    result.TotalTokens,
+		CoherenceScore: result.CoherenceScore,
+		CacheHit:       result.CacheHit,
+		CacheKey:       cacheKey,
 	}
-	featUs := featureTimer.Us()
-	timings.FeatureBuildUs = featUs
-	timings.FeatureBuildMs = float64(featUs) / 1_000.0
 	
-	// Stage 3: optimization Optimization - select optimal document set
-	optimizationTimer := timing.Start()
-	optimizationResult, err := p.optimizeSelection(ctx, scoredDocs, req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to optimize selection: %w", err)
+	// Convert optimizationResult to optimizationMetrics if present
+	if result.optimizationMetrics != nil {
+		queryResult.optimizationMetrics = types.optimizationMetrics{
+			SolverUsed:      result.optimizationMetrics.SolverUsed,
+			optimizerStatus:        result.optimizationMetrics.optimizerStatus,
+			Objective:       int64(result.optimizationMetrics.Objective),
+			SolveTimeUs:     result.optimizationMetrics.SolveTimeUs,
+			SolveTimeMs:     float64(result.optimizationMetrics.SolveTimeUs) / 1000.0,
+			VariableCount:   result.optimizationMetrics.VariableCount,
+			ConstraintCount: result.optimizationMetrics.ConstraintCount,
+			KCandidates:     result.optimizationMetrics.KCandidates,
+			PairsCount:      result.optimizationMetrics.PairsCount,
+			BudgetTokens:    result.optimizationMetrics.BudgetTokens,
+			MaxDocs:         result.optimizationMetrics.MaxDocs,
+			FallbackReason:  result.optimizationMetrics.FallbackReason,
+		}
 	}
-	optimizationWallUs := optimizationTimer.Us()
-	timings.optimizationWallUs = optimizationWallUs
-	timings.optimizationWallMs = float64(optimizationWallUs) / 1_000.0
-	timings.optimizationSolverUs = optimizationResult.SolveTimeUs
-	timings.optimizationSolverMs = float64(optimizationResult.SolveTimeUs) / 1_000.0
 	
-	// Stage 4: Assemble final result
-	result := p.assembleResult(req, scoredDocs, optimizationResult, timings)
-	totalUs := totTimer.Us()
-	result.Timings.TotalUs = totalUs
-	result.Timings.TotalMs = float64(totalUs) / 1_000.0
-	result.CacheKey = cacheKey
+	// Add timing information
+	totalTime := time.Since(startTime)
+	queryResult.Timings = types.StageTimings{
+		TotalUs: totalTime.Microseconds(),
+		TotalMs: float64(totalTime.Microseconds()) / 1000.0,
+		// Other timing fields come from the engine if it provides them
+	}
 	
 	// Cache result if enabled and high quality
-	if req.UseCache && result.CoherenceScore > 0.5 {
-		p.cacheResult(ctx, req, result)
+	if req.UseCache && queryResult.CoherenceScore > 0.5 {
+		p.cacheResult(ctx, req, queryResult)
 	}
 	
-	return result, nil
+	return queryResult, nil
 }
 
-// harvestCandidates performs FTS search to get candidate documents
-func (p *Pipeline) harvestCandidates(ctx context.Context, req *types.AssembleRequest) ([]types.Document, error) {
-	// Determine search limit (more candidates = better optimization but slower)
-	searchLimit := p.config.optimization.MaxCandidates
-	if searchLimit <= 0 {
-		searchLimit = 200
-	}
-	
-	// Perform FTS search
-	docs, err := p.storage.SearchDocuments(ctx, req.Query, searchLimit)
-	if err != nil {
-		return nil, err
-	}
-	
-	// Filter by workspace path if specified
-	if req.WorkspacePath != "" {
-		filtered := make([]types.Document, 0, len(docs))
-		for _, doc := range docs {
-			if p.matchesWorkspace(doc.Path, req.WorkspacePath) {
-				filtered = append(filtered, doc)
-			}
-		}
-		docs = filtered
-	}
-	
-	// Apply include/exclude patterns
-	docs = p.applyPatternFilters(docs, req.IncludePatterns, req.ExcludePatterns)
-	
-	return docs, nil
+// IndexDocument delegates to the engine
+func (p *Pipeline) IndexDocument(doc types.Document) error {
+	return p.engine.IndexDocument(doc)
 }
 
-// extractFeatures computes 7D features for all candidate documents
-func (p *Pipeline) extractFeatures(ctx context.Context, docs []types.Document, req *types.AssembleRequest) ([]types.ScoredDocument, error) {
-	// Get workspace-specific normalization stats
-	normStats, err := p.getNormalizationStats(ctx, req.WorkspacePath)
-	if err != nil {
-		// Continue without normalization if stats unavailable
-		normStats = nil
-	}
-	
-	// Create feature extractor
-	extractor := features.NewFeatureExtractor(req.WorkspacePath, normStats)
-	
-	// Extract features
-	return extractor.ExtractFeatures(ctx, docs, req.Query)
+// RemoveDocument delegates to the engine
+func (p *Pipeline) RemoveDocument(docID string) error {
+	return p.engine.RemoveDocument(docID)
 }
 
-// optimizeSelection performs optimization-based document selection
-func (p *Pipeline) optimizeSelection(ctx context.Context, scoredDocs []types.ScoredDocument, req *types.AssembleRequest) (*optimization.optimizationResult, error) {
-	// Get workspace-specific weights
-	weights, err := p.getWorkspaceWeights(ctx, req.WorkspacePath)
-	if err != nil {
-		// Use default weights if workspace weights unavailable
-		weights = p.getDefaultWeights()
-	}
-	
-	// Update configuration with request-specific overrides
-	tempConfig := *p.config // Copy the base config
-	if req.optimizationTimeoutMs > 0 {
-		tempConfig.optimization.SolverTimeoutMs = req.optimizationTimeoutMs
-	}
-	if req.MaxOptGap > 0 {
-		tempConfig.optimization.MaxOptGap = req.MaxOptGap
-	}
-	if req.ObjectiveStyle != "" {
-		tempConfig.optimization.ObjectiveStyle = req.ObjectiveStyle
-	}
-	
-	// Update weights
-	tempConfig.Weights = config.WeightsConfig{
-		Relevance:         weights.Relevance,
-		Recency:          weights.Recency,
-		Entanglement:     weights.Entanglement,
-		Prior:            weights.Prior,
-		Authority:        weights.Authority,
-		Specificity:      weights.Specificity,
-		Uncertainty:      weights.Uncertainty,
-		RedundancyPenalty: weights.RedundancyPenalty,
-		CoherenceBonus:   weights.CoherenceBonus,
-	}
-	
-	// Create solver and optimize
-	solver, err := optimization.NewoptimizationSolver(&tempConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create optimization system: %w", err)
-	}
-	return solver.OptimizeSelection(ctx, scoredDocs, req.MaxTokens, req.MaxDocuments)
+// GetEngineStats delegates to the engine
+func (p *Pipeline) GetEngineStats() (*types.EngineStats, error) {
+	return p.engine.GetStats()
 }
 
-// assembleResult creates the final query result
-func (p *Pipeline) assembleResult(req *types.AssembleRequest, 
-	scoredDocs []types.ScoredDocument, 
-	optimizationResult *optimization.optimizationResult, 
-	timings types.StageTimings) *types.QueryResult {
-	
-	// Build document references for selected documents
-	var docRefs []types.DocumentReference
-	totalTokens := 0
-	
-	for _, idx := range optimizationResult.SelectedDocs {
-		if idx >= 0 && idx < len(scoredDocs) {
-			doc := scoredDocs[idx]
-			totalTokens += doc.Document.TokenCount
-			
-			docRefs = append(docRefs, types.DocumentReference{
-				ID:              doc.Document.ID,
-				Path:            doc.Document.Path,
-				Content:         doc.Document.Content,
-				Language:        doc.Document.Language,
-				UtilityScore:    doc.UtilityScore,
-				RelevanceScore:  doc.Features.Relevance,
-				RecencyScore:    doc.Features.Recency,
-				// DiversityScore removed - diversity handled via pairwise terms in optimization
-				InclusionReason: "optimization-optimized",
-			})
-		}
-	}
-	
-	// Compute coherence score
-	coherenceScore := p.computeCoherenceScore(scoredDocs, optimizationResult.SelectedDocs)
-	
-	// Build optimization metrics
-	optimizationMetrics := types.optimizationMetrics{
-		SolverUsed:      optimizationResult.SolverUsed,
-		optimizerStatus:        optimizationResult.optimizerStatus,
-		Objective:       int64(optimizationResult.Objective),
-		SolveTimeUs:     optimizationResult.SolveTimeUs,
-		SolveTimeMs:     float64(optimizationResult.SolveTimeUs) / 1_000.0,
-		optimizationWallUs:       timings.optimizationWallUs,
-		optimizationWallMs:       timings.optimizationWallMs,
-		VariableCount:   optimizationResult.VariableCount,
-		ConstraintCount: optimizationResult.ConstraintCount,
-		KCandidates:     optimizationResult.KCandidates,
-		PairsCount:      optimizationResult.PairsCount,
-		BudgetTokens:    optimizationResult.BudgetTokens,
-		MaxDocs:         optimizationResult.MaxDocs,
-		FallbackReason:  optimizationResult.FallbackReason,
-	}
-	
-	return &types.QueryResult{
-		Query:          req.Query,
-		Documents:      docRefs,
-		TotalDocuments: len(docRefs),
-		TotalTokens:    totalTokens,
-		CoherenceScore: coherenceScore,
-		optimizationMetrics:     optimizationMetrics,
-		Timings:        timings,
-		CacheHit:       false,
-	}
+// UpdateEngineConfig delegates to the engine
+func (p *Pipeline) UpdateEngineConfig(config types.EngineConfig) error {
+	return p.engine.UpdateConfig(config)
 }
 
-// getCachedResult checks for cached query results
-func (p *Pipeline) getCachedResult(ctx context.Context, req *types.AssembleRequest) (*types.QueryResult, error) {
-	// Generate cache key
+// Close performs cleanup
+func (p *Pipeline) Close() error {
+	if err := p.engine.Close(); err != nil {
+		return err
+	}
+	if p.storage != nil {
+		return p.storage.Close()
+	}
+	return nil
+}
+
+// Cache management helpers (these stay in pipeline as they're not core to engine)
+
+// buildCacheKey generates a deterministic cache key for the request
+func (p *Pipeline) buildCacheKey(ctx context.Context, req *types.AssembleRequest) string {
+	// Get corpus hash
+	corpusHash, _ := p.storage.GetCorpusHash(ctx)
+	
+	// Build query hash
 	queryHash := p.hashQuery(req)
-	corpusHash, err := p.storage.GetCorpusHash(ctx)
-	if err != nil {
-		return nil, err
+	
+	// Get tokenizer version from config
+	tokenizerVersion := "v1.0"
+	if p.config != nil && p.config.Tokenizer.ModelID != "" {
+		tokenizerVersion = p.config.Tokenizer.ModelID + "-v1.0"
 	}
 	
-	modelID := req.ModelID
-	if modelID == "" {
-		modelID = p.config.Tokenizer.ModelID
+	// Compute weights hash from workspace weights
+	weightsHash := "default"
+	if req.WorkspacePath != "" {
+		if weights, err := p.storage.GetWorkspaceWeights(ctx, req.WorkspacePath); err == nil {
+			weightsData, _ := json.Marshal(weights)
+			hash := sha256.Sum256(weightsData)
+			weightsHash = hex.EncodeToString(hash[:8]) // First 8 bytes
+		}
 	}
 	
-	// Get tokenizer version from model ID or config
-	tokenizerVersion := "1.0"
-	if modelID != "" {
-		tokenizerVersion = modelID + "-v1.0"
+	// Build cache parts
+	parts := CacheParts{
+		QueryHash:           queryHash,
+		CorpusHash:          corpusHash,
+		ModelID:             req.ModelID,
+		TokenizerVersion:    tokenizerVersion,
+		TokenizerVocabHash:  "vocab-" + tokenizerVersion,
+		WeightsHash:         weightsHash,
+		ConceptDFVersion:    "concepts-v1.0",
+		MaxTokens:           req.MaxTokens,
+		MaxDocuments:        req.MaxDocuments,
+		ObjectiveStyle:      req.ObjectiveStyle,
 	}
 	
-	return p.storage.GetQueryCache(ctx, queryHash, corpusHash, modelID, tokenizerVersion)
+	return BuildCacheKey(parts)
+}
+
+// getCachedResultByKey retrieves cached result by cache key
+func (p *Pipeline) getCachedResultByKey(ctx context.Context, cacheKey string) (*types.QueryResult, error) {
+	return p.storage.GetCachedResultByKey(ctx, cacheKey)
 }
 
 // cacheResult saves query result to cache
@@ -291,7 +220,7 @@ func (p *Pipeline) cacheResult(ctx context.Context, req *types.AssembleRequest, 
 	}
 	
 	modelID := req.ModelID
-	if modelID == "" {
+	if modelID == "" && p.config != nil {
 		modelID = p.config.Tokenizer.ModelID
 	}
 	
@@ -299,8 +228,11 @@ func (p *Pipeline) cacheResult(ctx context.Context, req *types.AssembleRequest, 
 	
 	// Cache for configured TTL
 	ttl := time.Duration(req.CacheTTL) * time.Minute
-	if ttl <= 0 {
+	if ttl <= 0 && p.config != nil {
 		ttl = time.Duration(p.config.Cache.L2TTLMinutes) * time.Minute
+	}
+	if ttl <= 0 {
+		ttl = 24 * time.Hour // Default 24 hours
 	}
 	expiresAt := time.Now().Add(ttl)
 	
@@ -333,194 +265,4 @@ func (p *Pipeline) hashQuery(req *types.AssembleRequest) string {
 	jsonData, _ := json.Marshal(data)
 	hash := sha256.Sum256(jsonData)
 	return hex.EncodeToString(hash[:])
-}
-
-// Helper functions
-
-func (p *Pipeline) matchesWorkspace(docPath, workspacePath string) bool {
-	if workspacePath == "" {
-		return true
-	}
-	// Simple prefix matching - could be enhanced
-	return len(docPath) >= len(workspacePath) && docPath[:len(workspacePath)] == workspacePath
-}
-
-func (p *Pipeline) applyPatternFilters(docs []types.Document, include, exclude []string) []types.Document {
-	if len(include) == 0 && len(exclude) == 0 {
-		return docs
-	}
-	
-	var filtered []types.Document
-	
-	for _, doc := range docs {
-		// Check include patterns
-		includeMatch := len(include) == 0 // If no include patterns, include by default
-		for _, pattern := range include {
-			if matched, _ := filepath.Match(pattern, doc.Path); matched {
-				includeMatch = true
-				break
-			}
-		}
-		
-		// Check exclude patterns
-		excludeMatch := false
-		for _, pattern := range exclude {
-			if matched, _ := filepath.Match(pattern, doc.Path); matched {
-				excludeMatch = true
-				break
-			}
-		}
-		
-		// Include if matches include pattern and doesn't match exclude pattern
-		if includeMatch && !excludeMatch {
-			filtered = append(filtered, doc)
-		}
-	}
-	
-	return filtered
-}
-
-// buildCacheKey generates a deterministic cache key for the request
-func (p *Pipeline) buildCacheKey(ctx context.Context, req *types.AssembleRequest) string {
-	// Get corpus hash
-	corpusHash, _ := p.storage.GetCorpusHash(ctx)
-	
-	// Build query hash
-	queryHash := p.hashQuery(req)
-	
-	// Get tokenizer version from config
-	tokenizerVersion := "v1.0"
-	if p.config != nil && p.config.Tokenizer.ModelID != "" {
-		tokenizerVersion = p.config.Tokenizer.ModelID + "-v1.0"
-	}
-	
-	// Compute weights hash from workspace weights
-	weightsHash := "default"
-	if req.WorkspacePath != "" {
-		if weights, err := p.storage.GetWorkspaceWeights(ctx, req.WorkspacePath); err == nil {
-			weightsData, _ := json.Marshal(weights)
-			hash := sha256.Sum256(weightsData)
-			weightsHash = hex.EncodeToString(hash[:8]) // First 8 bytes
-		}
-	}
-	
-	// Build cache parts
-	parts := CacheParts{
-		QueryHash:           queryHash,
-		CorpusHash:          corpusHash,
-		ModelID:             req.ModelID,
-		TokenizerVersion:    tokenizerVersion,
-		TokenizerVocabHash:  "vocab-" + tokenizerVersion, // Version-based vocab hash
-		WeightsHash:         weightsHash,
-		ConceptDFVersion:    "concepts-v1.0", // Semantic version for concept features
-		MaxTokens:           req.MaxTokens,
-		MaxDocuments:        req.MaxDocuments,
-		ObjectiveStyle:      req.ObjectiveStyle,
-	}
-	
-	return BuildCacheKey(parts)
-}
-
-// getCachedResultByKey retrieves cached result by cache key
-func (p *Pipeline) getCachedResultByKey(ctx context.Context, cacheKey string) (*types.QueryResult, error) {
-	return p.storage.GetCachedResultByKey(ctx, cacheKey)
-}
-
-func (p *Pipeline) getNormalizationStats(ctx context.Context, workspacePath string) (*types.NormalizationStats, error) {
-	weights, err := p.storage.GetWorkspaceWeights(ctx, workspacePath)
-	if err != nil {
-		return nil, err
-	}
-	
-	if weights.NormalizationStats == "" {
-		return nil, fmt.Errorf("no normalization stats available")
-	}
-	
-	var stats types.NormalizationStats
-	err = json.Unmarshal([]byte(weights.NormalizationStats), &stats)
-	return &stats, err
-}
-
-func (p *Pipeline) getWorkspaceWeights(ctx context.Context, workspacePath string) (*config.WeightsConfig, error) {
-	weights, err := p.storage.GetWorkspaceWeights(ctx, workspacePath)
-	if err != nil {
-		return p.getDefaultWeights(), nil // Use defaults if not found
-	}
-	
-	return &config.WeightsConfig{
-		Relevance:         weights.RelevanceWeight,
-		Recency:          weights.RecencyWeight,
-		Entanglement:     weights.EntanglementWeight,
-		Prior:            0.15, // Not stored separately yet
-		Authority:        0.10, // Not stored separately yet
-		Specificity:      0.05, // Not stored separately yet
-		Uncertainty:      0.05, // Not stored separately yet
-		RedundancyPenalty: weights.RedundancyPenalty,
-		CoherenceBonus:   0.2,  // Default
-	}, nil
-}
-
-func (p *Pipeline) getDefaultWeights() *config.WeightsConfig {
-	return &config.WeightsConfig{
-		Relevance:         p.config.Weights.Relevance,
-		Recency:          p.config.Weights.Recency,
-		Entanglement:     p.config.Weights.Entanglement,
-		Prior:            p.config.Weights.Prior,
-		Authority:        p.config.Weights.Authority,
-		Specificity:      p.config.Weights.Specificity,
-		Uncertainty:      p.config.Weights.Uncertainty,
-		RedundancyPenalty: p.config.Weights.RedundancyPenalty,
-		CoherenceBonus:   p.config.Weights.CoherenceBonus,
-	}
-}
-
-func (p *Pipeline) computeCoherenceScore(scoredDocs []types.ScoredDocument, selected []int) float64 {
-	if len(selected) <= 1 {
-		return 1.0
-	}
-	
-	// Simple coherence approximation based on feature similarity
-	totalCoherence := 0.0
-	pairs := 0
-	
-	for i := 0; i < len(selected); i++ {
-		for j := i + 1; j < len(selected); j++ {
-			if selected[i] < len(scoredDocs) && selected[j] < len(scoredDocs) {
-				doc1 := scoredDocs[selected[i]]
-				doc2 := scoredDocs[selected[j]]
-				
-				// Compute feature vector similarity
-				similarity := p.featureSimilarity(doc1.Features, doc2.Features)
-				totalCoherence += similarity
-				pairs++
-			}
-		}
-	}
-	
-	if pairs > 0 {
-		return totalCoherence / float64(pairs)
-	}
-	return 0.5
-}
-
-func (p *Pipeline) featureSimilarity(f1, f2 types.FeatureVector) float64 {
-	// Compute cosine similarity of feature vectors
-	vec1 := []float64{f1.Relevance, f1.Recency, f1.Entanglement, f1.Prior, f1.Authority, f1.Specificity, f1.Uncertainty}
-	vec2 := []float64{f2.Relevance, f2.Recency, f2.Entanglement, f2.Prior, f2.Authority, f2.Specificity, f2.Uncertainty}
-	
-	dotProduct := 0.0
-	norm1 := 0.0
-	norm2 := 0.0
-	
-	for i := 0; i < len(vec1); i++ {
-		dotProduct += vec1[i] * vec2[i]
-		norm1 += vec1[i] * vec1[i]
-		norm2 += vec2[i] * vec2[i]
-	}
-	
-	if norm1 == 0 || norm2 == 0 {
-		return 0.0
-	}
-	
-	return dotProduct / (norm1 * norm2)
 }

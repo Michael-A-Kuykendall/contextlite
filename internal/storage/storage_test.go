@@ -12,6 +12,32 @@ import (
 	"contextlite/pkg/types"
 )
 
+// Helper functions to convert between WorkspaceWeights and FeatureWeights
+func workspaceWeightsToFeatureWeights(w *types.WorkspaceWeights) types.FeatureWeights {
+	return types.FeatureWeights{
+		Relevance:    w.RelevanceWeight,
+		Recency:      w.RecencyWeight,
+		Entanglement: w.EntanglementWeight,
+		Prior:        0.0, // Not available in WorkspaceWeights
+		Authority:    0.0, // Not available in WorkspaceWeights  
+		Specificity:  w.DiversityWeight, // Map diversity to specificity
+		Uncertainty:  w.RedundancyPenalty, // Map redundancy penalty to uncertainty
+	}
+}
+
+func featureWeightsToWorkspaceWeights(f types.FeatureWeights, workspacePath string) *types.WorkspaceWeights {
+	return &types.WorkspaceWeights{
+		WorkspacePath:      workspacePath,
+		RelevanceWeight:    f.Relevance,
+		RecencyWeight:      f.Recency,
+		EntanglementWeight: f.Entanglement,
+		DiversityWeight:    f.Specificity,
+		RedundancyPenalty:  f.Uncertainty,
+		UpdateCount:        0,
+		LastUpdated:        time.Now().Format(time.RFC3339),
+	}
+}
+
 func TestMain(m *testing.M) {
 	// Setup
 	code := m.Run()
@@ -306,7 +332,9 @@ func TestStorage_WorkspaceWeights(t *testing.T) {
 		LastUpdated:        time.Now().Format(time.RFC3339),
 	}
 	
-	err = storage.SaveWorkspaceWeights(ctx, weights)
+	// Convert to FeatureWeights for the interface
+	featureWeights := workspaceWeightsToFeatureWeights(weights)
+	err = storage.SaveWorkspaceWeights(workspacePath, featureWeights)
 	if err != nil {
 		t.Fatalf("Failed to save workspace weights: %v", err)
 	}
@@ -637,7 +665,9 @@ func TestStorage_SaveWorkspaceWeights_Extended(t *testing.T) {
 		NormalizationStats: `{"mean": 0.5, "std": 0.2}`,
 	}
 	
-	err := storage.SaveWorkspaceWeights(ctx, weights)
+	// Convert to FeatureWeights for the interface
+	featureWeights := workspaceWeightsToFeatureWeights(weights)
+	err := storage.SaveWorkspaceWeights("/test/workspace", featureWeights)
 	if err != nil {
 		t.Fatalf("Failed to save workspace weights: %v", err)
 	}
@@ -919,7 +949,9 @@ func TestStorage_WorkspaceWeightsEdgeCases(t *testing.T) {
 		NormalizationStats: `{"extreme": true}`,
 	}
 	
-	err := storage.SaveWorkspaceWeights(ctx, weights)
+	// Convert to FeatureWeights for the interface
+	featureWeights := workspaceWeightsToFeatureWeights(weights)
+	err := storage.SaveWorkspaceWeights("/test/extreme", featureWeights)
 	if err != nil {
 		t.Fatalf("Failed to save extreme weights: %v", err)
 	}
@@ -939,7 +971,7 @@ func TestStorage_WorkspaceWeightsEdgeCases(t *testing.T) {
 		NormalizationStats: `{invalid json`,
 	}
 	
-	err = storage.SaveWorkspaceWeights(ctx, malformed)
+	err = storage.SaveWorkspaceWeights("/test/malformed", workspaceWeightsToFeatureWeights(malformed))
 	if err != nil {
 		t.Logf("Malformed JSON weights save returned error: %v", err)
 	}

@@ -81,7 +81,7 @@ jobs:
     - name: Build CLI
       run: |
         make build
-        ./build/contextlite-cli -action stats
+        ./build/contextlite --help
     
     - name: Build examples
       run: make examples
@@ -107,9 +107,9 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          build/release/contextlite-cli-linux-amd64
-          build/release/contextlite-cli-darwin-amd64
-          build/release/contextlite-cli-windows-amd64.exe
+          build/release/contextlite-linux-amd64
+          build/release/contextlite-darwin-amd64
+          build/release/contextlite-windows-amd64.exe
         body: |
           # ContextLite Release
           

@@ -462,3 +462,57 @@ func getDefaultFeatures(tier LicenseTier) []string {
 		return getDeveloperFeatures()
 	}
 }
+
+// LicenseFeatureGate implements the FeatureGate interface
+type LicenseFeatureGate struct {
+	tier LicenseTier
+}
+
+// NewFeatureGate creates a new feature gate based on current license
+func NewFeatureGate() *LicenseFeatureGate {
+	// For now, default to developer tier
+	// TODO: Implement actual license detection
+	return &LicenseFeatureGate{
+		tier: TierDeveloper,
+	}
+}
+
+// IsEnabled checks if a feature is enabled for current license
+func (fg *LicenseFeatureGate) IsEnabled(feature string) bool {
+	features := getDefaultFeatures(fg.tier)
+	for _, f := range features {
+		if f == feature {
+			return true
+		}
+	}
+	return false
+}
+
+// RequireFeature returns error if feature not available
+func (fg *LicenseFeatureGate) RequireFeature(feature string) error {
+	if !fg.IsEnabled(feature) {
+		return fmt.Errorf("feature '%s' requires %s license or higher", feature, TierPro)
+	}
+	return nil
+}
+
+// RequireProfessional ensures Professional+ license
+func (fg *LicenseFeatureGate) RequireProfessional() error {
+	if fg.tier == TierDeveloper {
+		return fmt.Errorf("this feature requires Professional license or higher")
+	}
+	return nil
+}
+
+// RequireEnterprise ensures Enterprise license
+func (fg *LicenseFeatureGate) RequireEnterprise() error {
+	if fg.tier != TierEnterprise {
+		return fmt.Errorf("this feature requires Enterprise license")
+	}
+	return nil
+}
+
+// GetTier returns current license tier
+func (fg *LicenseFeatureGate) GetTier() string {
+	return string(fg.tier)
+}

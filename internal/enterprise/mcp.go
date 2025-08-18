@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 	"net/http"
-	"contextlite/internal/features"
+	"contextlite/pkg/types"
 )
 
 // MCPServerConfig represents an MCP server configuration (different from MCPServer for API compatibility)
@@ -67,11 +67,11 @@ type MCPResource struct {
 // MCPManager handles custom MCP server operations
 type MCPManager struct {
 	db          *sql.DB
-	featureGate *features.FeatureGate
+	featureGate types.FeatureGate
 }
 
 // NewMCPManager creates a new MCP manager
-func NewMCPManager(db *sql.DB, featureGate *features.FeatureGate) *MCPManager {
+func NewMCPManager(db *sql.DB, featureGate types.FeatureGate) *MCPManager {
 	return &MCPManager{
 		db:          db,
 		featureGate: featureGate,
