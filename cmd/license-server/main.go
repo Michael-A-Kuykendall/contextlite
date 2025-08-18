@@ -299,12 +299,22 @@ func (ls *LicenseServer) handleValidateLicense(w http.ResponseWriter, r *http.Re
 		return
 	}
 	
-	// Validate license (would need public key for this)
-	// For now, just respond with basic validation
+	// Validate license using RSA public key
+	publicKey := &ls.privateKey.PublicKey
+	isValid, err := license.ValidateLicense(req.License, publicKey)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"valid":   false,
+			"message": fmt.Sprintf("License validation failed: %v", err),
+		})
+		return
+	}
+	
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"valid":   true,
-		"message": "License validation endpoint - implement with public key",
+		"valid":   isValid,
+		"message": "License validation complete",
 	})
 }
 
