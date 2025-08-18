@@ -348,16 +348,21 @@ func (s *Server) handleBaselineComparison(w http.ResponseWriter, r *http.Request
 		CacheKey: "", // No cache for baseline
 	}
 	
-	// Compare results
+	// Compare results  
+	optimizationMetrics := types.optimizationResult{}
+	if optimizationResult.optimizationMetrics != nil {
+		optimizationMetrics = *optimizationResult.optimizationMetrics
+	}
+	
 	comparison := map[string]interface{}{
 		"query": req.Query,
 		"optimization_optimized": map[string]interface{}{
 			"documents":        optimizationResult.Documents,
 			"coherence_score":  optimizationResult.CoherenceScore,
-			"optimization_objective":    optimizationResult.optimizationMetrics.Objective,
-			"solve_time_ms":    float64(optimizationResult.optimizationMetrics.SolveTimeUs) / 1000,
-			"variables":        optimizationResult.optimizationMetrics.VariableCount,
-			"budgets":      optimizationResult.optimizationMetrics.ConstraintCount,
+			"optimization_objective":    optimizationMetrics.Objective,
+			"solve_time_ms":    float64(optimizationMetrics.SolveTimeUs) / 1000,
+			"variables":        optimizationMetrics.VariableCount,
+			"budgets":      optimizationMetrics.ConstraintCount,
 			"method":           "optimization_optimization",
 		},
 		"baseline": map[string]interface{}{

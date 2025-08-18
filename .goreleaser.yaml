@@ -74,16 +74,16 @@ changelog:
       - '^test:'
       - '^ci:'
 
-# Signing with cosign
-signs:
-  - cmd: cosign
-    args:
-      - sign-blob
-      - '--yes'
-      - '--key=env://COSIGN_PRIVATE_KEY'
-      - '--output-signature=${signature}'
-      - '${artifact}'
-    artifacts: all
+# Signing with cosign (disabled - requires cosign installation and keys)
+# signs:
+#   - cmd: cosign
+#     args:
+#       - sign-blob
+#       - '--yes'
+#       - '--key=env://COSIGN_PRIVATE_KEY'
+#       - '--output-signature=${signature}'
+#       - '${artifact}'
+#     artifacts: all
 
 # Docker images
 dockers:
@@ -122,9 +122,9 @@ scoops:
     description: "Single-file, zero-dependency context engine for AI applications"
     license: "MIT"
 
-# Generate SBOM
-sboms:
-  - artifacts: archive
+# Generate SBOM (disabled - requires syft installation)
+# sboms:
+#   - artifacts: archive
 
 # Release notes
 release:

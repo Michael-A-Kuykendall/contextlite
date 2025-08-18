@@ -1,0 +1,616 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>license-server: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">contextlite/cmd/license-server/main.go (58.4%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "crypto/rsa"
+        "crypto/x509"
+        "encoding/json"
+        "encoding/base64"
+        "encoding/pem"
+        "fmt"
+        "io"
+        "log"
+        "net/http"
+        "net/optimizationp"
+        "os"
+        "strconv"
+        "time"
+
+        "github.com/stripe/stripe-go/v74"
+        "github.com/stripe/stripe-go/v74/webhook"
+        "contextlite/internal/license"
+)
+
+// Configuration
+type Config struct {
+        Port                int    `json:"port"`
+        StripeSecretKey     string `json:"stripe_secret_key"`
+        StripeWebhookSecret string `json:"stripe_webhook_secret"`
+        PrivateKeyPath      string `json:"private_key_path"`
+        optimizationPHost            string `json:"optimizationp_host"`
+        optimizationPPort            int    `json:"optimizationp_port"`
+        optimizationPUser            string `json:"optimizationp_user"`
+        optimizationPPassword        string `json:"optimizationp_password"`
+        FromEmail           string `json:"from_email"`
+}
+
+// LicenseServer handles license generation and distribution
+type LicenseServer struct {
+        config     *Config
+        privateKey *rsa.PrivateKey
+}
+
+// NewLicenseServer creates a new license server
+func NewLicenseServer(config *Config) (*LicenseServer, error) <span class="cov8" title="1">{
+        // Load RSA private key
+        privateKeyData, err := os.ReadFile(config.PrivateKeyPath)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("failed to read private key: %w", err)
+        }</span>
+        
+        <span class="cov8" title="1">block, _ := pem.Decode(privateKeyData)
+        if block == nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to decode PEM block")
+        }</span>
+        
+        <span class="cov8" title="1">privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to parse private key: %w", err)
+        }</span>
+        
+        <span class="cov8" title="1">return &amp;LicenseServer{
+                config:     config,
+                privateKey: privateKey,
+        }, nil</span>
+}
+
+// Start starts the license server
+func (ls *LicenseServer) Start() error <span class="cov0" title="0">{
+        // Initialize Stripe
+        stripe.Key = ls.config.StripeSecretKey
+        
+        mux := http.NewServeMux()
+        
+        // Health check
+        mux.HandleFunc("/health", ls.handleHealth)
+        
+        // Stripe webhook handler
+        mux.HandleFunc("/webhook/stripe", ls.handleStripeWebhook)
+        
+        // License validation endpoint (for testing)
+        mux.HandleFunc("/validate", ls.handleValidateLicense)
+        
+        // License generation endpoint (for testing/admin)
+        mux.HandleFunc("/generate", ls.handleGenerateLicense)
+        
+        // Email test endpoint (for testing email delivery)
+        mux.HandleFunc("/test-email", ls.handleTestEmail)
+        
+        log.Printf("License server starting on port %d", ls.config.Port)
+        return http.ListenAndServe(fmt.Sprintf(":%d", ls.config.Port), mux)
+}</span>
+
+// handleHealth provides a health check endpoint
+func (ls *LicenseServer) handleHealth(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(map[string]string{
+                "status":    "healthy",
+                "service":   "contextlite-license-server",
+                "timestamp": time.Now().Format(time.RFC3339),
+        })
+}</span>
+
+// handleStripeWebhook handles Stripe webhook events
+func (ls *LicenseServer) handleStripeWebhook(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        if r.Method != "POST" </span><span class="cov8" title="1">{
+                http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+                return
+        }</span>
+        
+        <span class="cov8" title="1">payload, err := io.ReadAll(r.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error reading request body: %v", err)
+                http.Error(w, "Error reading request body", http.StatusBadRequest)
+                return
+        }</span>
+        
+        // Verify webhook signature
+        <span class="cov8" title="1">event, err := webhook.ConstructEvent(payload, r.Header.Get("Stripe-Signature"), ls.config.StripeWebhookSecret)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Printf("Error verifying webhook signature: %v", err)
+                http.Error(w, "Invalid signature", http.StatusBadRequest)
+                return
+        }</span>
+        
+        // Handle the event
+        <span class="cov0" title="0">switch event.Type </span>{
+        case "checkout.session.completed":<span class="cov0" title="0">
+                ls.handleCheckoutCompleted(event)</span>
+        case "customer.subscription.created":<span class="cov0" title="0">
+                ls.handleSubscriptionCreated(event)</span>
+        case "customer.subscription.updated":<span class="cov0" title="0">
+                ls.handleSubscriptionUpdated(event)</span>
+        case "customer.subscription.deleted":<span class="cov0" title="0">
+                ls.handleSubscriptionDeleted(event)</span>
+        case "invoice.payment_succeeded":<span class="cov0" title="0">
+                ls.handlePaymentSucceeded(event)</span>
+        case "invoice.payment_failed":<span class="cov0" title="0">
+                ls.handlePaymentFailed(event)</span>
+        default:<span class="cov0" title="0">
+                log.Printf("Unhandled event type: %s", event.Type)</span>
+        }
+        
+        <span class="cov0" title="0">w.WriteHeader(http.StatusOK)</span>
+}
+
+// handleCheckoutCompleted processes successful checkout sessions
+func (ls *LicenseServer) handleCheckoutCompleted(event stripe.Event) <span class="cov8" title="1">{
+        var session stripe.CheckoutSession
+        if err := json.Unmarshal(event.Data.Raw, &amp;session); err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error parsing checkout session: %v", err)
+                return
+        }</span>
+        
+        <span class="cov8" title="1">log.Printf("Checkout completed for customer: %s", session.Customer.ID)
+        
+        // Determine license tier based on amount
+        tier := ls.determineLicenseTier(session.AmountTotal)
+        
+        // Generate and send license
+        if err := ls.generateAndSendLicense(session.CustomerEmail, tier, session.Customer.ID, ""); err != nil </span><span class="cov0" title="0">{
+                log.Printf("Failed to generate license for %s: %v", session.CustomerEmail, err)
+                return
+        }</span>
+        
+        <span class="cov8" title="1">log.Printf("License generated and sent to %s (tier: %s)", session.CustomerEmail, tier)</span>
+}
+
+// handleSubscriptionCreated processes new subscription creation
+func (ls *LicenseServer) handleSubscriptionCreated(event stripe.Event) <span class="cov8" title="1">{
+        var subscription stripe.Subscription
+        if err := json.Unmarshal(event.Data.Raw, &amp;subscription); err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error parsing subscription: %v", err)
+                return
+        }</span>
+        
+        <span class="cov8" title="1">log.Printf("Subscription created: %s", subscription.ID)</span>
+        // Handle subscription-based licensing here
+}
+
+// handleSubscriptionUpdated processes subscription changes
+func (ls *LicenseServer) handleSubscriptionUpdated(event stripe.Event) <span class="cov0" title="0">{
+        var subscription stripe.Subscription
+        if err := json.Unmarshal(event.Data.Raw, &amp;subscription); err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error parsing subscription: %v", err)
+                return
+        }</span>
+        
+        <span class="cov0" title="0">log.Printf("Subscription updated: %s", subscription.ID)</span>
+        // Handle license updates for subscription changes
+}
+
+// handleSubscriptionDeleted processes subscription cancellations
+func (ls *LicenseServer) handleSubscriptionDeleted(event stripe.Event) <span class="cov0" title="0">{
+        var subscription stripe.Subscription
+        if err := json.Unmarshal(event.Data.Raw, &amp;subscription); err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error parsing subscription: %v", err)
+                return
+        }</span>
+        
+        <span class="cov0" title="0">log.Printf("Subscription deleted: %s", subscription.ID)</span>
+        // Handle license revocation for cancelled subscriptions
+}
+
+// handlePaymentSucceeded processes successful payments
+func (ls *LicenseServer) handlePaymentSucceeded(event stripe.Event) <span class="cov8" title="1">{
+        var invoice stripe.Invoice
+        if err := json.Unmarshal(event.Data.Raw, &amp;invoice); err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error parsing invoice: %v", err)
+                return
+        }</span>
+        
+        <span class="cov8" title="1">log.Printf("Payment succeeded for invoice: %s", invoice.ID)</span>
+        // Handle license renewal or extension
+}
+
+// handlePaymentFailed processes failed payments
+func (ls *LicenseServer) handlePaymentFailed(event stripe.Event) <span class="cov8" title="1">{
+        var invoice stripe.Invoice
+        if err := json.Unmarshal(event.Data.Raw, &amp;invoice); err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error parsing invoice: %v", err)
+                return
+        }</span>
+        
+        <span class="cov8" title="1">log.Printf("Payment failed for invoice: %s", invoice.ID)</span>
+        // Handle license suspension or grace period
+}
+
+// determineLicenseTier determines the license tier based on payment amount
+func (ls *LicenseServer) determineLicenseTier(amountTotal int64) license.LicenseTier <span class="cov8" title="1">{
+        switch amountTotal </span>{
+        case 9900:<span class="cov8" title="1"> // $99.00
+                return license.TierPro</span>
+        case 299900:<span class="cov8" title="1"> // $2,999.00
+                return license.TierEnterprise</span>
+        default:<span class="cov8" title="1">
+                // Default to developer for any other amount
+                return license.TierDeveloper</span>
+        }
+}
+
+// generateAndSendLicense generates a license and sends it via email
+func (ls *LicenseServer) generateAndSendLicense(email string, tier license.LicenseTier, customerID, hardwareID string) error <span class="cov8" title="1">{
+        // Generate license
+        licenseData, err := license.GenerateLicense(email, tier, hardwareID, ls.privateKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to generate license: %w", err)
+        }</span>
+        
+        // Send license via email
+        <span class="cov8" title="1">if err := ls.sendLicenseEmail(email, licenseData, tier); err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to send license email: %w", err)
+        }</span>
+        
+        // Log license generation for audit trail
+        <span class="cov8" title="1">log.Printf("License generated - Email: %s, Tier: %s, Customer: %s", email, tier, customerID)
+        
+        return nil</span>
+}
+
+// sendLicenseEmail sends the license to the customer via email
+func (ls *LicenseServer) sendLicenseEmail(email, licenseData string, tier license.LicenseTier) error <span class="cov8" title="1">{
+        if ls.config.optimizationPHost == "" || ls.config.optimizationPUser == "" </span><span class="cov8" title="1">{
+                // In development mode, just log the license
+                log.Printf("DEVELOPMENT MODE: Would send license email to %s with license: %s", email, licenseData)
+                return nil
+        }</span>
+        
+        <span class="cov0" title="0">subject := fmt.Sprintf("Your ContextLite %s License", tier)
+        body := fmt.Sprintf(`
+Thank you for purchasing ContextLite %s!
+
+Your license key is:
+%s
+
+Installation Instructions:
+1. Download ContextLite from https://contextlite.com/download
+2. Run: contextlite license install --key="%s"
+3. Verify with: contextlite license verify
+
+For support, visit: https://contextlite.com/support
+
+Best regards,
+The ContextLite Team
+`, tier, licenseData, licenseData)
+        
+        // Set up optimizationP authentication
+        auth := optimizationp.PlainAuth("", ls.config.optimizationPUser, ls.config.optimizationPPassword, ls.config.optimizationPHost)
+        
+        // Compose email
+        fromAddr := ls.config.FromEmail
+        if fromAddr == "" </span><span class="cov0" title="0">{
+                fromAddr = ls.config.optimizationPUser
+        }</span>
+        
+        <span class="cov0" title="0">msg := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n%s",
+                fromAddr, email, subject, body)
+        
+        // Send email
+        optimizationpAddr := fmt.Sprintf("%s:%d", ls.config.optimizationPHost, ls.config.optimizationPPort)
+        err := optimizationp.SendMail(optimizationpAddr, auth, fromAddr, []string{email}, []byte(msg))
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to send email via optimizationP: %w", err)
+        }</span>
+        
+        <span class="cov0" title="0">log.Printf("License email sent successfully to %s", email)
+        return nil</span>
+}
+
+// handleValidateLicense provides license validation endpoint for testing
+func (ls *LicenseServer) handleValidateLicense(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        if r.Method != "POST" </span><span class="cov8" title="1">{
+                http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+                return
+        }</span>
+        
+        <span class="cov8" title="1">var req struct {
+                License string `json:"license"`
+        }
+        
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov8" title="1">{
+                http.Error(w, "Invalid request body", http.StatusBadRequest)
+                return
+        }</span>
+        
+        // Validate license using RSA public key
+        <span class="cov8" title="1">publicKey := &amp;ls.privateKey.PublicKey
+        isValid, err := license.ValidateLicense(req.License, publicKey)
+        if err != nil </span><span class="cov8" title="1">{
+                w.Header().Set("Content-Type", "application/json")
+                json.NewEncoder(w).Encode(map[string]interface{}{
+                        "valid":   false,
+                        "message": fmt.Sprintf("License validation failed: %v", err),
+                })
+                return
+        }</span>
+        
+        <span class="cov0" title="0">w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(map[string]interface{}{
+                "valid":   isValid,
+                "message": "License validation complete",
+        })</span>
+}
+
+// handleGenerateLicense provides manual license generation for testing/admin
+func (ls *LicenseServer) handleGenerateLicense(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        if r.Method != "POST" </span><span class="cov8" title="1">{
+                http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+                return
+        }</span>
+        
+        <span class="cov8" title="1">var req struct {
+                Email      string `json:"email"`
+                Tier       string `json:"tier"`
+                HardwareID string `json:"hardware_id,omitempty"`
+        }
+        
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov8" title="1">{
+                http.Error(w, "Invalid request body", http.StatusBadRequest)
+                return
+        }</span>
+        
+        // Parse tier
+        <span class="cov8" title="1">var tier license.LicenseTier
+        switch req.Tier </span>{
+        case "developer":<span class="cov8" title="1">
+                tier = license.TierDeveloper</span>
+        case "professional":<span class="cov8" title="1">
+                tier = license.TierPro</span>
+        case "enterprise":<span class="cov8" title="1">
+                tier = license.TierEnterprise</span>
+        default:<span class="cov8" title="1">
+                http.Error(w, "Invalid tier", http.StatusBadRequest)
+                return</span>
+        }
+        
+        // Generate license
+        <span class="cov8" title="1">licenseData, err := license.GenerateLicense(req.Email, tier, req.HardwareID, ls.privateKey)
+        if err != nil </span><span class="cov0" title="0">{
+                http.Error(w, fmt.Sprintf("Failed to generate license: %v", err), http.StatusInternalServerError)
+                return
+        }</span>
+        
+        <span class="cov8" title="1">w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(map[string]interface{}{
+                "license": licenseData,
+                "tier":    tier,
+                "email":   req.Email,
+        })</span>
+}
+
+// handleTestEmail provides email delivery testing endpoint
+func (ls *LicenseServer) handleTestEmail(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        if r.Method != "POST" </span><span class="cov8" title="1">{
+                http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+                return
+        }</span>
+        
+        <span class="cov8" title="1">var req struct {
+                Email string `json:"email"`
+        }
+        
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov8" title="1">{
+                http.Error(w, "Invalid request body", http.StatusBadRequest)
+                return
+        }</span>
+        
+        <span class="cov8" title="1">if req.Email == "" </span><span class="cov8" title="1">{
+                http.Error(w, "Email is required", http.StatusBadRequest)
+                return
+        }</span>
+        
+        // Generate a test license for email testing
+        <span class="cov8" title="1">testLicense := "TEST-LICENSE-FOR-EMAIL-DELIVERY-VERIFICATION"
+        
+        // Send test email
+        if err := ls.sendLicenseEmail(req.Email, testLicense, license.TierPro); err != nil </span><span class="cov0" title="0">{
+                w.Header().Set("Content-Type", "application/json")
+                json.NewEncoder(w).Encode(map[string]interface{}{
+                        "success": false,
+                        "message": fmt.Sprintf("Email delivery failed: %v", err),
+                })
+                return
+        }</span>
+        
+        <span class="cov8" title="1">w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(map[string]interface{}{
+                "success": true,
+                "message": fmt.Sprintf("Test email sent successfully to %s", req.Email),
+                "email":   req.Email,
+        })</span>
+}
+
+// loadConfig loads configuration from environment variables or config file
+func loadConfig() (*Config, error) <span class="cov8" title="1">{
+        config := &amp;Config{
+                Port: 8080, // Default port
+        }
+        
+        // Load from environment variables
+        if port := os.Getenv("PORT"); port != "" </span><span class="cov8" title="1">{
+                if p, err := strconv.Atoi(port); err == nil </span><span class="cov8" title="1">{
+                        config.Port = p
+                }</span>
+        }
+        
+        <span class="cov8" title="1">config.StripeSecretKey = os.Getenv("STRIPE_SECRET_KEY")
+        config.StripeWebhookSecret = os.Getenv("STRIPE_WEBHOOK_SECRET")
+        // Handle RSA private key from environment or file
+        if rsaPrivateKey := os.Getenv("RSA_PRIVATE_KEY"); rsaPrivateKey != "" </span><span class="cov0" title="0">{
+                // Decode base64 private key and write to temp file
+                privateKeyData, err := base64.StdEncoding.DecodeString(rsaPrivateKey)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("failed to decode RSA_PRIVATE_KEY: %w", err)
+                }</span>
+                
+                <span class="cov0" title="0">tmpFile := "/tmp/private_key.pem"
+                if err := os.WriteFile(tmpFile, privateKeyData, 0600); err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("failed to write private key to temp file: %w", err)
+                }</span>
+                <span class="cov0" title="0">config.PrivateKeyPath = tmpFile</span>
+        } else<span class="cov8" title="1"> {
+                config.PrivateKeyPath = getEnvOrDefault("PRIVATE_KEY_PATH", "./private_key.pem")
+        }</span>
+        <span class="cov8" title="1">config.optimizationPHost = getEnvOrDefault("optimizationP_HOST", "optimizationp.gmail.com")
+        config.optimizationPUser = os.Getenv("optimizationP_USER")
+        config.optimizationPPassword = os.Getenv("optimizationP_PASSWORD")
+        config.FromEmail = getEnvOrDefault("FROM_EMAIL", "licenses@contextlite.com")
+        
+        if optimizationpPort := os.Getenv("optimizationP_PORT"); optimizationpPort != "" </span><span class="cov8" title="1">{
+                if p, err := strconv.Atoi(optimizationpPort); err == nil </span><span class="cov8" title="1">{
+                        config.optimizationPPort = p
+                }</span>
+        } else<span class="cov8" title="1"> {
+                config.optimizationPPort = 587
+        }</span>
+        
+        // Validate required configuration
+        <span class="cov8" title="1">if config.StripeSecretKey == "" </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("STRIPE_SECRET_KEY is required")
+        }</span>
+        <span class="cov8" title="1">if config.StripeWebhookSecret == "" </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("STRIPE_WEBHOOK_SECRET is required")
+        }</span>
+        
+        <span class="cov8" title="1">return config, nil</span>
+}
+
+// getEnvOrDefault gets environment variable or returns default value
+func getEnvOrDefault(key, defaultValue string) string <span class="cov8" title="1">{
+        if value := os.Getenv(key); value != "" </span><span class="cov8" title="1">{
+                return value
+        }</span>
+        <span class="cov8" title="1">return defaultValue</span>
+}
+
+func main() <span class="cov0" title="0">{
+        // Load configuration
+        config, err := loadConfig()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Failed to load configuration: %v", err)
+        }</span>
+        
+        // Create license server
+        <span class="cov0" title="0">server, err := NewLicenseServer(config)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Failed to create license server: %v", err)
+        }</span>
+        
+        // Start server
+        <span class="cov0" title="0">log.Printf("Starting ContextLite License Server...")
+        if err := server.Start(); err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("License server failed: %v", err)
+        }</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

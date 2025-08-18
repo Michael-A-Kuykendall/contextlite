@@ -1,0 +1,228 @@
+project_name: contextlite
+release:
+  github:
+    owner: Michael-A-Kuykendall
+    name: contextlite
+  prerelease: auto
+  name_template: '{{.ProjectName}} v{{.Version}}'
+  header: |
+    ## ContextLite {{.Version}}
+
+    **Single-file, zero-dependency context engine for AI applications**
+
+    ### Installation
+
+    #### Homebrew (macOS/Linux)
+    ```bash
+    brew tap Michael-A-Kuykendall/tap
+    brew install contextlite
+    ```
+
+    #### Scoop (Windows)
+    ```bash
+    scoop bucket add contextlite https://github.com/Michael-A-Kuykendall/scoop-bucket
+    scoop install contextlite
+    ```
+
+    #### Go Install
+    ```bash
+    go install github.com/Michael-A-Kuykendall/contextlite/cmd/contextlite@latest
+    ```
+
+    #### Docker
+    ```bash
+    docker pull ghcr.io/michael-a-kuykendall/contextlite:{{.Tag}}
+    ```
+
+    ### Direct Downloads
+  footer: |
+    **Full Changelog**: https://github.com/Michael-A-Kuykendall/contextlite/compare/{{.PreviousTag}}...{{.Tag}}
+
+    ---
+
+    **Verification**: All binaries are signed with cosign. Verify with:
+    ```bash
+    cosign verify-blob --key https://github.com/Michael-A-Kuykendall/contextlite/releases/download/{{.Tag}}/contextlite_Linux_x86_64.tar.gz.sig contextlite_Linux_x86_64.tar.gz
+    ```
+brews:
+  - name: contextlite
+    repository:
+      owner: Michael-A-Kuykendall
+      name: homebrew-tap
+      token: '{{ .Env.GITHUB_TOKEN }}'
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    commit_msg_template: Brew formula update for {{ .ProjectName }} version {{ .Tag }}
+    install: |
+      bin.install "contextlite"
+    test: |
+      system "#{bin}/contextlite", "--version"
+    description: Single-file, zero-dependency context engine for AI applications
+    homepage: https://contextlite.com
+    license: MIT
+    goarm: "6"
+    goamd64: v1
+scoops:
+  - name: contextlite
+    repository:
+      owner: Michael-A-Kuykendall
+      name: scoop-bucket
+      token: '{{ .Env.GITHUB_TOKEN }}'
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    commit_msg_template: Scoop update for {{ .ProjectName }} version {{ .Tag }}
+    homepage: https://contextlite.com
+    description: Single-file, zero-dependency context engine for AI applications
+    license: MIT
+    goamd64: v1
+builds:
+  - id: contextlite
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - "6"
+    gomips:
+      - hardfloat
+    goamd64:
+      - v1
+    targets:
+      - linux_amd64_v1
+      - linux_arm64
+      - darwin_amd64_v1
+      - darwin_arm64
+      - windows_amd64_v1
+      - windows_arm64
+    dir: .
+    main: ./cmd/contextlite
+    binary: contextlite
+    builder: go
+    gobinary: go
+    command: build
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.builtBy=goreleaser
+    env:
+      - CGO_ENABLED=0
+archives:
+  - id: default
+    builds:
+      - contextlite
+    name_template: '{{ .ProjectName }}_ {{- title .Os }}_ {{- if eq .Arch "amd64" }}x86_64 {{- else if eq .Arch "386" }}i386 {{- else }}{{ .Arch }}{{ end }}'
+    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - src: LICENSE*
+      - src: README*
+      - src: CHANGELOG*
+      - src: docs/**/*
+snapshot:
+  name_template: '{{ incpatch .Version }}-next'
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+dockers:
+  - goos: linux
+    goarch: amd64
+    goarm: "6"
+    goamd64: v1
+    dockerfile: Dockerfile
+    image_templates:
+      - ghcr.io/michael-a-kuykendall/contextlite:{{ .Tag }}
+      - ghcr.io/michael-a-kuykendall/contextlite:v{{ .Major }}
+      - ghcr.io/michael-a-kuykendall/contextlite:v{{ .Major }}.{{ .Minor }}
+      - ghcr.io/michael-a-kuykendall/contextlite:latest
+    use: docker
+changelog:
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+  sort: asc
+  use: github
+  format: '{{ .SHA }}: {{ .Message }} ({{ with .AuthorUsername }}@{{ . }}{{ else }}{{ .AuthorName }} <{{ .AuthorEmail }}>{{ end }})'
+  groups:
+    - title: Features
+      regexp: ^.*?feat(\([[:word:]]+\))??!?:.+$
+    - title: Bug fixes
+      regexp: ^.*?fix(\([[:word:]]+\))??!?:.+$
+      order: 1
+    - title: Performance improvements
+      regexp: ^.*?perf(\([[:word:]]+\))??!?:.+$
+      order: 2
+    - title: Others
+      order: 999
+dist: dist
+env_files:
+  github_token: ~/.config/goreleaser/github_token
+  gitlab_token: ~/.config/goreleaser/gitlab_token
+  gitea_token: ~/.config/goreleaser/gitea_token
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+source:
+  name_template: '{{ .ProjectName }}-{{ .Version }}'
+  format: tar.gz
+gomod:
+  gobinary: go
+announce:
+  twitter:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+  mastodon:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    server: ""
+  reddit:
+    title_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    url_template: '{{ .ReleaseURL }}'
+  slack:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    username: GoReleaser
+  discord:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    author: GoReleaser
+    color: "3888754"
+    icon_url: https://goreleaser.com/static/avatar.png
+  teams:
+    title_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    color: '#2D313E'
+    icon_url: https://goreleaser.com/static/avatar.png
+  optimizationp:
+    subject_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    body_template: 'You can view details from: {{ .ReleaseURL }}'
+  mattermost:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+    title_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    username: GoReleaser
+  linkedin:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+  telegram:
+    message_template: '{{ mdv2escape .ProjectName }} {{ mdv2escape .Tag }} is out{{ mdv2escape "!" }} Check it out at {{ mdv2escape .ReleaseURL }}'
+    parse_mode: MarkdownV2
+  webhook:
+    message_template: '{ "message": "{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}"}'
+    content_type: application/json; charset=utf-8
+  opencollective:
+    title_template: '{{ .Tag }}'
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out!<br/>Check it out at <a href="{{ .ReleaseURL }}">{{ .ReleaseURL }}</a>'
+  bluesky:
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
+git:
+  tag_sort: -version:refname
+github_urls:
+  download: https://github.com
+gitlab_urls:
+  download: https://gitlab.com
