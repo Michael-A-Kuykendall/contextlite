@@ -1,0 +1,79 @@
+name: contextlite
+version: '1.0.0'
+summary: Ultra-fast context engine for retrieval and AI applications
+description: |
+  ContextLite is an ultra-fast context engine designed for retrieval and AI 
+  applications. Built with Go for maximum performance, it provides lightning-fast 
+  document indexing and semantic search capabilities.
+
+  Features:
+  - Ultra-fast microsecond-level query responses
+  - Zero dependencies - single binary with no external services
+  - Smart scoring with quantum-inspired relevance algorithms
+  - REST API for easy integration
+  - Built-in analytics and performance monitoring
+  - Enterprise features: multi-tenancy, licensing, advanced analytics
+
+grade: stable
+confinement: strict
+base: core22
+
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+
+apps:
+  contextlite:
+    command: bin/contextlite
+    daemon: simple
+    restart-condition: always
+    plugs:
+      - network
+      - network-bind
+      - home
+    environment:
+      PATH: $SNAP/bin:$PATH
+
+  contextlite-cli:
+    command: bin/contextlite
+    plugs:
+      - network
+      - network-bind
+      - home
+    environment:
+      PATH: $SNAP/bin:$PATH
+
+parts:
+  contextlite:
+    plugin: go
+    source: .
+    source-type: git
+    build-snaps: [go/1.21/stable]
+    override-build: |
+      # Build the binary
+      cd $SNAPCRAFT_PART_SRC
+      CGO_ENABLED=0 go build -ldflags="-s -w" -o $SNAPCRAFT_PART_INSTALL/bin/contextlite ./cmd/contextlite
+      
+      # Copy any additional files
+      if [ -f configs/default.yaml ]; then
+        mkdir -p $SNAPCRAFT_PART_INSTALL/etc/contextlite
+        cp configs/default.yaml $SNAPCRAFT_PART_INSTALL/etc/contextlite/
+      fi
+    
+    stage-packages:
+      - ca-certificates
+
+plugs:
+  home:
+    interface: home
+  network:
+    interface: network
+  network-bind:
+    interface: network-bind
+
+slots:
+  contextlite-api:
+    interface: content
+    content: contextlite-api
+    read:
+      - $SNAP_DATA
