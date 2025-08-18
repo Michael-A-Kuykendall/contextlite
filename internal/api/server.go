@@ -348,16 +348,21 @@ func (s *Server) handleBaselineComparison(w http.ResponseWriter, r *http.Request
 		CacheKey: "", // No cache for baseline
 	}
 	
-	// Compare results
+	// Compare results  
+	smtMetrics := types.SMTResult{}
+	if smtResult.SMTMetrics != nil {
+		smtMetrics = *smtResult.SMTMetrics
+	}
+	
 	comparison := map[string]interface{}{
 		"query": req.Query,
 		"smt_optimized": map[string]interface{}{
 			"documents":        smtResult.Documents,
 			"coherence_score":  smtResult.CoherenceScore,
-			"smt_objective":    smtResult.SMTMetrics.Objective,
-			"solve_time_ms":    float64(smtResult.SMTMetrics.SolveTimeUs) / 1000,
-			"variables":        smtResult.SMTMetrics.VariableCount,
-			"constraints":      smtResult.SMTMetrics.ConstraintCount,
+			"smt_objective":    smtMetrics.Objective,
+			"solve_time_ms":    float64(smtMetrics.SolveTimeUs) / 1000,
+			"variables":        smtMetrics.VariableCount,
+			"constraints":      smtMetrics.ConstraintCount,
 			"method":           "SMT_optimization",
 		},
 		"baseline": map[string]interface{}{
