@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"contextlite/internal/features"
+	"contextlite/pkg/tokens"
 	"contextlite/pkg/types"
 
 	"crypto/sha256"
@@ -29,13 +29,14 @@ type Storage struct {
 }
 
 // CacheStats represents cache performance metrics
-type CacheStats struct {
-	Hits     int64   `json:"hits"`
-	Misses   int64   `json:"misses"`
-	HitRate  float64 `json:"hit_rate"`
-	L1Size   int     `json:"l1_size"`
-	L2Size   int     `json:"l2_size"`
-}
+// Remove the local CacheStats type since we'll use the one from types
+// type CacheStats struct {
+// 	Hits     int64   `json:"hits"`
+// 	Misses   int64   `json:"misses"`
+// 	HitRate  float64 `json:"hit_rate"`
+// 	L1Size   int     `json:"l1_size"`
+// 	L2Size   int     `json:"l2_size"`
+// }
 
 // New creates a new Storage instance
 func New(dbPath string) (*Storage, error) {
@@ -132,8 +133,73 @@ func (s *Storage) GetStorageStats(ctx context.Context) (map[string]interface{}, 
 	return stats, nil
 }
 
+// GetWorkspaceStats returns workspace-specific statistics
+func (s *Storage) GetWorkspaceStats(workspacePath string) (*types.WorkspaceStats, error) {
+	ctx := context.Background()
+	
+	// Count documents in this workspace
+	var docCount int
+	err := s.db.QueryRowContext(ctx, `
+		SELECT COUNT(*) FROM documents WHERE path LIKE ?
+	`, workspacePath+"%").Scan(&docCount)
+	if err != nil {
+		return nil, fmt.Errorf("failed to count workspace documents: %w", err)
+	}
+	
+	// Get total tokens in workspace
+	var totalTokens sql.NullInt64
+	err = s.db.QueryRowContext(ctx, `
+		SELECT SUM(token_count) FROM documents WHERE path LIKE ?
+	`, workspacePath+"%").Scan(&totalTokens)
+	if err != nil {
+		totalTokens.Int64 = 0 // Default if query fails
+	}
+	
+	// Get average file size
+	var avgFileSize sql.NullFloat64
+	err = s.db.QueryRowContext(ctx, `
+		SELECT AVG(LENGTH(content)) FROM documents WHERE path LIKE ?
+	`, workspacePath+"%").Scan(&avgFileSize)
+	if err != nil {
+		avgFileSize.Float64 = 0 // Default if query fails
+	}
+	
+	// Get languages (simplified - just take first few)
+	rows, err := s.db.QueryContext(ctx, `
+		SELECT DISTINCT lang FROM documents WHERE path LIKE ? AND lang != '' LIMIT 10
+	`, workspacePath+"%")
+	languages := []string{}
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var lang string
+			if err := rows.Scan(&lang); err == nil {
+				languages = append(languages, lang)
+			}
+		}
+	}
+	
+	// Get last indexed time (most recent document)
+	var lastIndexed time.Time
+	err = s.db.QueryRowContext(ctx, `
+		SELECT MAX(updated_at) FROM documents WHERE path LIKE ?
+	`, workspacePath+"%").Scan(&lastIndexed)
+	if err != nil {
+		lastIndexed = time.Now() // Default if query fails
+	}
+	
+	return &types.WorkspaceStats{
+		Path:            workspacePath,
+		DocumentCount:   docCount,
+		TotalTokens:     totalTokens.Int64,
+		LastIndexed:     lastIndexed,
+		Languages:       languages,
+		AverageFileSize: int64(avgFileSize.Float64),
+	}, nil
+}
+
 // GetCacheStats returns cache performance statistics
-func (s *Storage) GetCacheStats(ctx context.Context) (*CacheStats, error) {
+func (s *Storage) GetCacheStats(ctx context.Context) (*types.CacheStats, error) {
 	// Get L2 cache size (number of cached results)
 	var l2Size int
 	err := s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM query_cache").Scan(&l2Size)
@@ -147,7 +213,7 @@ func (s *Storage) GetCacheStats(ctx context.Context) (*CacheStats, error) {
 		hitRate = float64(s.cacheHits) / float64(total)
 	}
 	
-	return &CacheStats{
+	return &types.CacheStats{
 		Hits:    s.cacheHits,
 		Misses:  s.cacheMisses,
 		HitRate: hitRate,
@@ -208,8 +274,8 @@ func (s *Storage) AddDocument(ctx context.Context, doc *types.Document) error {
 
 	// Estimate token count if not provided
 	if doc.TokenCount == 0 {
-		tokenCounter := features.NewTokenCounter("gpt-4") // Default model
-		doc.TokenCount = tokenCounter.CountTokens(doc.Content)
+		tokenEstimator := tokens.NewTokenEstimator("gpt-4") // Default model
+		doc.TokenCount = tokenEstimator.EstimateTokens(doc.Content)
 	}
 
 	// Set timestamps
@@ -245,6 +311,16 @@ func (s *Storage) AddDocument(ctx context.Context, doc *types.Document) error {
 	}
 
 	return tx.Commit()
+}
+
+// InsertDocument inserts a new document (wrapper around AddDocument for interface compliance)
+func (s *Storage) InsertDocument(doc types.Document) error {
+	return s.AddDocument(context.Background(), &doc)
+}
+
+// UpdateDocument updates an existing document (wrapper around AddDocument for interface compliance)
+func (s *Storage) UpdateDocument(doc types.Document) error {
+	return s.AddDocument(context.Background(), &doc)
 }
 
 // SearchDocuments performs FTS search
@@ -387,8 +463,28 @@ func (s *Storage) GetWorkspaceWeights(ctx context.Context, workspacePath string)
 	return &weights, nil
 }
 
-// SaveWorkspaceWeights saves workspace weights
-func (s *Storage) SaveWorkspaceWeights(ctx context.Context, weights *types.WorkspaceWeights) error {
+// SaveWorkspaceWeights saves workspace weights (interface-compatible version)
+func (s *Storage) SaveWorkspaceWeights(workspacePath string, weights types.FeatureWeights) error {
+	ctx := context.Background()
+	
+	// Convert FeatureWeights to WorkspaceWeights format for storage
+	workspaceWeights := &types.WorkspaceWeights{
+		WorkspacePath:      workspacePath,
+		RelevanceWeight:    weights.Relevance,
+		RecencyWeight:      weights.Recency,
+		EntanglementWeight: weights.Entanglement,
+		DiversityWeight:    weights.Specificity, // Map Specificity to DiversityWeight
+		RedundancyPenalty:  weights.Uncertainty, // Map Uncertainty to RedundancyPenalty
+		UpdateCount:        1,
+		LastUpdated:        time.Now().Format(time.RFC3339),
+		NormalizationStats: "", // Default empty
+	}
+	
+	return s.saveWorkspaceWeightsInternal(ctx, workspaceWeights)
+}
+
+// saveWorkspaceWeightsInternal saves workspace weights (internal implementation)
+func (s *Storage) saveWorkspaceWeightsInternal(ctx context.Context, weights *types.WorkspaceWeights) error {
 	_, err := s.db.ExecContext(ctx, `
 		INSERT OR REPLACE INTO workspace_weights 
 		(workspace_path, relevance_weight, recency_weight, diversity_weight,
