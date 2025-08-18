@@ -321,6 +321,12 @@ func (ls *LicenseServer) handleValidateLicense(w http.ResponseWriter, r *http.Re
 		return
 	}
 	
+	// Check if license field is provided
+	if req.License == "" {
+		http.Error(w, "License field is required", http.StatusBadRequest)
+		return
+	}
+	
 	// Validate license using RSA public key
 	publicKey := &ls.privateKey.PublicKey
 	isValid, err := license.ValidateLicense(req.License, publicKey)
