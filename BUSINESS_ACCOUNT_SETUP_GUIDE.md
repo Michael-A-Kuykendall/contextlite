@@ -190,14 +190,17 @@ jobs:
 1. **GitHub repo** → Settings → Secrets and variables → Actions
 2. **New repository secret**:
    - Name: `CARGO_REGISTRY_TOKEN`
-   - Value: [paste the crates.io token]
+   - Value: [paste your crates.io token]
 
-#### Step 4: Reserve Package Name
+#### Step 4: Configure Cargo for Publishing
 
-1. **Go to**: https://crates.io/crates/new
-2. **Package name**: `contextlite`
-3. **Check availability** (if taken, try `contextlite-cli` or `contextlite-rs`)
-4. **Reserve it** by uploading a minimal package first
+1. **Login to cargo** (run locally first):
+   ```bash
+   cargo login [your-token]
+   ```
+2. **Package name**: `contextlite` ✅ **AVAILABLE**
+3. **Note**: No reservation needed - names are first-come-first-served on publish
+4. **Publishing happens** via GitHub Actions using the stored token
 
 ---
 
@@ -241,41 +244,69 @@ jobs:
 
 ---
 
-### 5. 🛍️ VS Code Marketplace - DETAILED WALKTHROUGH
+### 5. 🛍️ VS Code Marketplace - OFFICIAL WALKTHROUGH
 **URL**: https://marketplace.visualstudio.com/manage  
 **Priority**: HIGH - 1B+ installs, direct developer reach
+**Source**: https://code.visualstudio.com/api/working-with-extensions/publishing-extension
 
-#### Step 1: Create Publisher Account
+#### Current Status: ✅ PUBLISHERS CREATED
+- **"Targeted Web Results LLC"** (business) ✅ RECOMMENDED
+- **"contextlite"** (product) ✅ BACKUP
+- **Next Steps**: Generate Personal Access Token, set up automated publishing
 
-1. **Go to**: https://marketplace.visualstudio.com/manage
-2. **Sign in** with Microsoft account (create one if needed)
-3. **Create publisher**:
-   ```
-   Publisher name: contextlite
-   Display name: ContextLite
-   Description: AI-powered context management tools
-   ```
+#### Step 1: Create Azure DevOps Organization
+**REQUIRED**: VS Code publishing requires Azure DevOps Personal Access Token
 
-#### Step 2: Generate Personal Access Token
+1. **Go to**: https://dev.azure.com
+2. **Sign in** with same Microsoft account used for VS Code Marketplace
+3. **Create organization** (if you don't have one):
+   - Click "New organization"
+   - Organization name: choose any name (doesn't have to match publisher)
+   - Region: Choose your region
+   - Click "Continue"
 
-1. **Go to**: https://dev.azure.com/
-2. **User settings** → Personal access tokens
-3. **New Token**:
-   ```
-   Name: VS Code Marketplace
-   Organization: All accessible organizations
-   Expiration: 1 year
-   Scopes: Custom defined → Marketplace → Manage
-   ```
-4. **Copy token**
+#### Step 2: Create Personal Access Token
+
+1. **From your organization home page** (e.g., `https://dev.azure.com/YOUR_ORG`):
+   - Open user settings dropdown (next to profile image)
+   - Select "Personal access tokens"
+
+2. **Create new token**:
+   - Click "New Token"
+   - **Name**: "VS Code Marketplace Publishing"
+   - **Organization**: "All accessible organizations"
+   - **Expiration**: Set desired expiration (recommend 90 days for security)
+   - **Scopes**: "Custom defined"
+   - **CRITICAL**: Click "Show all scopes"
+   - Scroll to "Marketplace" section
+   - Select **"Manage"** scope ONLY
+
+3. **Click "Create"**
+4. **Copy token immediately** - it won't be shown again
+5. **Store securely** (password manager recommended)
 
 #### Step 3: Install vsce CLI Tool
 
 ```bash
-npm install -g vsce
-vsce login contextlite
-# Enter the PAT when prompted
+npm install -g @vscode/vsce
 ```
+
+#### Step 4: Login with vsce
+
+```bash
+vsce login YOUR_PUBLISHER_ID
+```
+- Use "targetedwebresultsllc" or whatever your actual publisher ID is
+- Enter your Personal Access Token when prompted
+- Should see: "The Personal Access Token verification succeeded"
+
+#### Step 5: Verify Setup
+
+```bash
+vsce ls-publishers
+```
+
+Should show your authenticated publisher ready for extension publishing.
 
 ---
 
