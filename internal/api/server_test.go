@@ -15,7 +15,8 @@ import (
 	"testing"
 	"time"
 
-	"contextlite/internal/pipeline"
+	"contextlite/internal/engine"
+	"contextlite/internal/license"
 	"contextlite/internal/storage"
 	"contextlite/pkg/config"
 	"contextlite/pkg/types"
@@ -55,14 +56,17 @@ func setupTestServer(t *testing.T) (*Server, *storage.Storage, func()) {
 		},
 	}
 	
-	// Initialize pipeline
-	pipe := pipeline.New(store, cfg)
+	// Initialize engine
+	engine := engine.LoadEngine(cfg, store)
 	
 	// Create logger
 	logger := zap.NewNop()
 	
+	// Create feature gate
+	featureGate := license.NewFeatureGate()
+	
 	// Create server
-	server := New(pipe, store, cfg, logger)
+	server := New(engine, store, cfg, logger, featureGate)
 	
 	cleanup := func() {
 		store.Close()
@@ -705,7 +709,7 @@ func TestServer_AuthMiddleware_Coverage(t *testing.T) {
 	
 	// Test with auth required
 	serverWithAuth := &Server{
-		pipeline: server.pipeline,
+		engine: server.engine,
 		config:   &config.Config{
 			Server: config.ServerConfig{AuthToken: "test-key"},
 		},
@@ -1166,8 +1170,6 @@ func TestServer_HandleGetWeightsComprehensive(t *testing.T) {
 	server, store, cleanup := setupTestServer(t)
 	defer cleanup()
 	
-	ctx := context.Background()
-	
 	// First, save some weights
 	weights := &types.WorkspaceWeights{
 		WorkspacePath:     "/test/workspace",
@@ -1181,7 +1183,18 @@ func TestServer_HandleGetWeightsComprehensive(t *testing.T) {
 		LastUpdated:       time.Now().Format(time.RFC3339),
 	}
 	
-	err := store.SaveWorkspaceWeights(ctx, weights)
+	// Convert to FeatureWeights for the API
+	featureWeights := types.FeatureWeights{
+		Relevance:    weights.RelevanceWeight,
+		Recency:      weights.RecencyWeight,
+		Entanglement: weights.EntanglementWeight,
+		Prior:        0.1, // default
+		Authority:    0.1, // default
+		Specificity:  0.1, // default
+		Uncertainty:  0.05, // default
+	}
+	
+	err := store.SaveWorkspaceWeights(weights.WorkspacePath, featureWeights)
 	if err != nil {
 		t.Fatalf("Failed to save weights: %v", err)
 	}
