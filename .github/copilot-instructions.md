@@ -2,7 +2,20 @@
 
 Purpose: Enable an AI agent to be productive immediately in this repo. Follow these repo-specific conventions. Keep changes minimal, fast, and aligned with the existing architecture.
 
-## 1. Big Picture Architecture
+## 🎯 CURRENT MISSION: DISTRIBUTION READY ACTION PLAN
+**Status: Architecture Complete → Distribution Prep Phase**
+**Active Document**: `DISTRIBUTION_READY_ACTION_PLAN.md` - Check off tasks as completed
+**Next Priority**: Fix immediate test failures, then proceed to package manifest creation
+**Architecture Achievement**: Clean delegation pattern, private binary integration, 58K+ lines cleaned up
+
+## 1. Big Picture Architecture ✅ RECENTLY COMPLETED
+**MAJOR ACHIEVEMENT**: Clean architectural refactoring completed (Aug 17, 2025)
+- **CoreEngine**: Production-ready foundational engine (was "StubEngine" - now professional)
+- **Engine Loading System**: Automatic detection of private binaries with graceful fallback  
+- **Clean Delegation**: Pipeline reduced from 591→250 lines of pure delegation logic
+- **Integration Success**: Private repository integration verified and working
+
+**Current Architecture**:
 - Core Go library (pkg + internal) providing an embedded context engine atop SQLite (modernc.org/sqlite) – no external services.
 - Layers:
   1. `pkg/types` – data contracts (Document, QueryResult, Config, QueryOptions, Stats, ScoredDocument).
