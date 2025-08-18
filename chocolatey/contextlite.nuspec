@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>contextlite</id>
+    <version>1.0.0</version>
+    <packageSourceUrl>https://github.com/Michael-A-Kuykendall/contextlite/tree/main/chocolatey</packageSourceUrl>
+    <owners>ContextLite Team</owners>
+    <title>ContextLite</title>
+    <authors>ContextLite Team</authors>
+    <projectUrl>https://contextlite.com</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/Michael-A-Kuykendall/contextlite/main/assets/contextlite-logo.png</iconUrl>
+    <copyright>2024 ContextLite Team</copyright>
+    <licenseUrl>https://github.com/Michael-A-Kuykendall/contextlite/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/Michael-A-Kuykendall/contextlite</projectSourceUrl>
+    <docsUrl>https://docs.contextlite.com</docsUrl>
+    <bugTrackerUrl>https://github.com/Michael-A-Kuykendall/contextlite/issues</bugTrackerUrl>
+    <tags>contextlite context ai retrieval search database sqlite cli</tags>
+    <summary>Ultra-fast context engine for retrieval and AI applications</summary>
+    <description><![CDATA[
+# ContextLite
+
+ContextLite is an ultra-fast context engine designed for retrieval and AI applications. Built with Go for maximum performance, it provides lightning-fast document indexing and semantic search capabilities.
+
+## Features
+
+- **🔥 Ultra-Fast**: Microsecond-level query responses with SQLite FTS5
+- **🚀 Zero Dependencies**: Single binary with no external services required
+- **🔍 Smart Scoring**: Quantum-inspired relevance algorithms with recency weighting
+- **⚡ REST API**: Easy integration with any language or framework
+- **📊 Built-in Analytics**: Query statistics and performance monitoring
+- **🛡️ Enterprise Ready**: Multi-tenancy, licensing, and advanced features
+
+## Installation
+
+After installation, ContextLite will be available as the `contextlite` command:
+
+```
+contextlite --help
+contextlite --port 8080
+```
+
+## Quick Start
+
+1. Start the server: `contextlite --port 8080`
+2. Add documents via REST API
+3. Query for relevant content
+4. Get lightning-fast results
+
+Visit https://docs.contextlite.com for complete documentation.
+
+## Package Notes
+
+This Chocolatey package installs the ContextLite binary and makes it available system-wide via PATH.
+    ]]></description>
+    <releaseNotes>https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/v1.0.0</releaseNotes>
+    <dependencies>
+      <!-- No dependencies - single binary -->
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
