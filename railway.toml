@@ -1,0 +1,14 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "railway.dockerfile"
+
+[deploy]
+startCommand = "./license-server"
+restartPolicyType = "always"
+
+[[ports]]
+port = 8080
+protocol = "http"
+
+[variables]
+PORT = "8080"
