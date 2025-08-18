@@ -369,6 +369,7 @@ func loadConfig() (*Config, error) {
 	}
 	
 	config.StripeSecretKey = os.Getenv("STRIPE_SECRET_KEY")
+        config.StripeWebhookSecret = os.Getenv("STRIPE_WEBHOOK_SECRET")
         // Handle RSA private key from environment or file
         if rsaPrivateKey := os.Getenv("RSA_PRIVATE_KEY"); rsaPrivateKey != "" {
                 // Decode base64 private key and write to temp file
