@@ -39,13 +39,13 @@ func LoadEngine(cfg *config.Config, storage types.StorageInterface) types.Contex
 
 // findPrivateBinary searches for the private JSON CLI binary
 func findPrivateBinary() string {
-	// Determine binary filename based on OS
-	var binaryName string
+	// Try both with and without .exe extension for Windows compatibility
+	var binaryNames []string
 	switch runtime.GOOS {
 	case "windows":
-		binaryName = "contextlite-library.exe"
+		binaryNames = []string{"contextlite-library.exe", "contextlite-library"}
 	default:
-		binaryName = "contextlite-library"
+		binaryNames = []string{"contextlite-library"}
 	}
 	
 	// Try multiple locations for the private binary
@@ -58,11 +58,13 @@ func findPrivateBinary() string {
 	}
 	
 	for _, basePath := range searchPaths {
-		binaryPath := filepath.Join(basePath, binaryName)
-		
-		// Check if binary exists and is executable
-		if fileExists(binaryPath) && isExecutable(binaryPath) {
-			return binaryPath
+		for _, binaryName := range binaryNames {
+			binaryPath := filepath.Join(basePath, binaryName)
+			
+			// Check if binary exists and is executable
+			if fileExists(binaryPath) && isExecutable(binaryPath) {
+				return binaryPath
+			}
 		}
 	}
 	
@@ -101,9 +103,10 @@ func isExecutable(filename string) bool {
 		return false
 	}
 	
-	// On Windows, check file extension
+	// On Windows, check file extension OR assume binary is executable if it exists
 	if runtime.GOOS == "windows" {
-		return filepath.Ext(filename) == ".exe"
+		ext := filepath.Ext(filename)
+		return ext == ".exe" || ext == "" // Allow binaries without .exe extension
 	}
 	
 	// On Unix-like systems, check execute permission
