@@ -254,6 +254,12 @@ type FeatureGate interface {
 	
 	// GetTier returns current license tier
 	GetTier() string
+	
+	// ValidateCustomMCP validates custom MCP feature access
+	ValidateCustomMCP() error
+	
+	// ValidateMultiTenant validates multi-tenant feature access
+	ValidateMultiTenant() error
 }
 
 // ContextRequest represents a request for context assembly
