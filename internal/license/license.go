@@ -112,7 +112,7 @@ func (lm *LicenseManager) validateLicense(license *License) error {
 // verifySignature verifies the license signature
 func (lm *LicenseManager) verifySignature(license *License) error {
 	// Create verification payload (excluding signature)
-	payload := fmt.Sprintf("%s:%s:%s:%d:%d:%s:%s",
+	payload := fmt.Sprintf("%s:%s:%s:%d:%d:%d:%s",
 		license.Key, license.Email, license.Tier,
 		license.IssuedAt.Unix(), license.MaxDocuments,
 		license.MaxUsers, license.HardwareID)
@@ -515,4 +515,14 @@ func (fg *LicenseFeatureGate) RequireEnterprise() error {
 // GetTier returns current license tier
 func (fg *LicenseFeatureGate) GetTier() string {
 	return string(fg.tier)
+}
+
+// ValidateCustomMCP validates custom MCP feature access
+func (fg *LicenseFeatureGate) ValidateCustomMCP() error {
+	return fg.RequireEnterprise()
+}
+
+// ValidateMultiTenant validates multi-tenant feature access  
+func (fg *LicenseFeatureGate) ValidateMultiTenant() error {
+	return fg.RequireEnterprise()
 }
