@@ -1,0 +1,70 @@
+{
+  "name": "contextlite-launcher",
+  "displayName": "ContextLite Launcher",
+  "description": "Launch ContextLite context engine directly from VS Code",
+  "version": "1.0.0",
+  "publisher": "contextlite",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Machine Learning",
+    "Data Science"
+  ],
+  "keywords": [
+    "context",
+    "ai",
+    "rag",
+    "vector",
+    "search",
+    "embeddings",
+    "llm"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "contextlite.start",
+        "title": "Start ContextLite Server",
+        "category": "ContextLite"
+      },
+      {
+        "command": "contextlite.index",
+        "title": "Index Current Workspace",
+        "category": "ContextLite"
+      },
+      {
+        "command": "contextlite.stop",
+        "title": "Stop ContextLite Server",
+        "category": "ContextLite"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "contextlite.index",
+          "group": "contextlite",
+          "when": "explorerResourceIsFolder"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^2.24.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Michael-A-Kuykendall/contextlite"
+  },
+  "bugs": {
+    "url": "https://github.com/Michael-A-Kuykendall/contextlite/issues"
+  },
+  "homepage": "https://contextlite.com",
+  "license": "MIT",
+  "icon": "icon.png"
+}
