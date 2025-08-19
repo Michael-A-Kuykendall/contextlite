@@ -287,13 +287,11 @@ curl http://localhost:8080/api/v1/cache/stats
 
 ## 📝 License
 
-Dual-licensed:
-- **MIT License** for open source use
-- **Commercial License** available for proprietary applications
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🔬 Technical Details
 
-For complete implementation details, algorithms, and architecture decisions, see [CONTEXTLITE.md](CONTEXTLITE.md).
+For complete implementation details, algorithms, and architecture decisions, see the documentation in the `docs/` directory.
 
 ## 🤝 Contributing
 
@@ -305,9 +303,13 @@ For complete implementation details, algorithms, and architecture decisions, see
 
 ## 📞 Support
 
-- **Documentation**: See [CONTEXTLITE.md](CONTEXTLITE.md) for technical details
+- **Documentation**: See the `docs/` directory for technical details
 - **Issues**: Report bugs and feature requests via GitHub Issues
-- **Discussions**: Join the community discussions
+- **Community**: Join the discussions for help and feature requests
+
+---
+
+**ContextLite** - Making AI context assembly fast, local, and intelligent.
 
 ---
 
