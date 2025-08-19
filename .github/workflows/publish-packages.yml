@@ -14,8 +14,99 @@ on:
         type: string
 
 jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build multi-platform binaries
+        run: |
+          mkdir -p release
+          
+          # Build for multiple platforms
+          GOOS=linux GOARCH=amd64 go build -o release/contextlite-linux-amd64 ./cmd/contextlite/main.go
+          GOOS=linux GOARCH=arm64 go build -o release/contextlite-linux-arm64 ./cmd/contextlite/main.go
+          GOOS=darwin GOARCH=amd64 go build -o release/contextlite-darwin-amd64 ./cmd/contextlite/main.go
+          GOOS=darwin GOARCH=arm64 go build -o release/contextlite-darwin-arm64 ./cmd/contextlite/main.go
+          GOOS=windows GOARCH=amd64 go build -o release/contextlite-windows-amd64.exe ./cmd/contextlite/main.go
+          GOOS=windows GOARCH=arm64 go build -o release/contextlite-windows-arm64.exe ./cmd/contextlite/main.go
+
+      - name: Create release archives
+        run: |
+          cd release
+          
+          # Create tar.gz for Unix platforms
+          tar -czf contextlite-${{ steps.version.outputs.version }}-linux-amd64.tar.gz contextlite-linux-amd64
+          tar -czf contextlite-${{ steps.version.outputs.version }}-linux-arm64.tar.gz contextlite-linux-arm64
+          tar -czf contextlite-${{ steps.version.outputs.version }}-darwin-amd64.tar.gz contextlite-darwin-amd64
+          tar -czf contextlite-${{ steps.version.outputs.version }}-darwin-arm64.tar.gz contextlite-darwin-arm64
+          
+          # Create zip for Windows
+          zip contextlite-${{ steps.version.outputs.version }}-windows-amd64.zip contextlite-windows-amd64.exe
+          zip contextlite-${{ steps.version.outputs.version }}-windows-arm64.zip contextlite-windows-arm64.exe
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ContextLite ${{ steps.version.outputs.version }}
+          body: |
+            🧪 **Alpha Testing Release**
+            
+            Complete marketplace automation with version compliance for ContextLite ${{ steps.version.outputs.version }}.
+            
+            ✅ **Features:**
+            - 14-day trial system with full optimization optimization
+            - Multi-platform support (Linux, macOS, Windows)
+            - Hardware-bound licensing with graceful expiration
+            - Real-time statistics and performance metrics
+            
+            ⚠️ **Pre-production release for integration testing only**
+            
+            **Installation:**
+            - Download the appropriate binary for your platform
+            - Extract and run `./contextlite --version` to verify
+            - Run `./contextlite` to start 14-day trial
+            
+            **Package Managers:** Available on npm, PyPI, Docker Hub, and more.
+          draft: false
+          prerelease: true
+
+      - name: Upload Release Assets
+        run: |
+          upload_url=$(echo '${{ steps.create_release.outputs.upload_url }}' | sed 's/{?name,label}//')
+          
+          for file in release/*.tar.gz release/*.zip; do
+            filename=$(basename "$file")
+            curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                 -H "Content-Type: application/octet-stream" \
+                 --data-binary @"$file" \
+                 "${upload_url}?name=${filename}"
+          done
+
   publish-npm:
     runs-on: ubuntu-latest
+    needs: build-and-release
     steps:
       - name: Checkout
         uses: actions/checkout@v4
