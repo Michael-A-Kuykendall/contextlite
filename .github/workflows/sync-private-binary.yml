@@ -1,0 +1,88 @@
+name: Sync Private Binary from Private Repo
+
+on:
+  repository_dispatch:
+    types: [private-binary-updated]
+  workflow_dispatch:
+    inputs:
+      binary_version:
+        description: 'Private binary version to sync'
+        required: false
+        default: 'latest'
+
+jobs:
+  sync-binary:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    
+    steps:
+    - name: Checkout Public Repo
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Create build directory
+      run: mkdir -p build
+      
+    - name: Download Private Binary (Linux)
+      run: |
+        # This will be triggered by the private repo's workflow
+        # For now, create a placeholder that shows the system is working
+        echo "#!/bin/bash" > build/contextlite-library
+        echo "# Advanced private binary placeholder" >> build/contextlite-library
+        echo "# This will be replaced by actual private binary" >> build/contextlite-library
+        echo 'echo "Private optimization engine not available - using core engine"' >> build/contextlite-library
+        chmod +x build/contextlite-library
+        
+    - name: Download Private Binary (Windows)  
+      run: |
+        echo "REM Advanced private binary placeholder" > build/contextlite-library.exe
+        echo "REM This will be replaced by actual private binary" >> build/contextlite-library.exe
+        echo "echo Private optimization engine not available - using core engine" >> build/contextlite-library.exe
+        
+    - name: Update Binary Version Info
+      run: |
+        echo "PRIVATE_BINARY_VERSION=${{ github.event.client_payload.version || 'placeholder' }}" > .private-version
+        echo "BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> .private-version
+        echo "SYNC_COMMIT=${{ github.event.client_payload.commit || 'none' }}" >> .private-version
+        
+    - name: Commit and Push Binary Updates
+      run: |
+        git config user.name "ContextLite Binary Sync"
+        git config user.email "sync@contextlite.com"
+        git add build/contextlite-library*
+        git add .private-version
+        
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "chore: sync private binary v${{ github.event.client_payload.version || 'placeholder' }}"
+          git push
+        fi
+        
+    - name: Create Release if Tagged
+      if: github.event.client_payload.tag
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.event.client_payload.tag }}
+        release_name: ContextLite ${{ github.event.client_payload.tag }}
+        body: |
+          ## ContextLite Release ${{ github.event.client_payload.tag }}
+          
+          ### Private Binary Updates
+          - Private binary version: ${{ github.event.client_payload.version }}
+          - Build date: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+          
+          ### Features
+          - 14-day full-featured trial
+          - Complete optimization optimization (with private binary)
+          - BM25 fallback engine (always available)
+          - Cross-platform support
+          
+          Download the appropriate binary for your platform from the assets below.
+        draft: false
+        prerelease: false

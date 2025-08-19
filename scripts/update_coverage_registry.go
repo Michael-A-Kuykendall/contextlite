@@ -52,6 +52,12 @@ func main() {
 			priority:      "CRITICAL",
 			revenueImpact: "CRITICAL",
 		},
+		"license": {
+			name:          "License System",
+			package_path:  "./internal/license",
+			priority:      "CRITICAL",
+			revenueImpact: "CRITICAL",
+		},
 		"engine": {
 			name:          "Context Engine",
 			package_path:  "./internal/engine",

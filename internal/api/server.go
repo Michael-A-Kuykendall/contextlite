@@ -17,6 +17,7 @@ import (
 	"github.com/go-chi/cors"
 	"go.uber.org/zap"
 
+	apimiddleware "contextlite/internal/api/middleware"
 	"contextlite/pkg/config"
 	"contextlite/pkg/types"
 )
@@ -56,6 +57,16 @@ func (s *Server) setupRoutes() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
 	
+	// Rate limiting middleware
+	rateLimiterConfig := apimiddleware.RateLimiterConfig{
+		Enabled:           s.config.Server.RateLimiting.Enabled,
+		RequestsPerMinute: s.config.Server.RateLimiting.RequestsPerMinute,
+		Burst:             s.config.Server.RateLimiting.Burst,
+		EndpointSpecific:  s.config.Server.RateLimiting.EndpointSpecific,
+	}
+	rateLimiter := apimiddleware.NewRateLimiter(rateLimiterConfig)
+	r.Use(rateLimiter.Middleware())
+	
 	// CORS if enabled
 	if s.config.Server.CORSEnabled {
 		r.Use(cors.Handler(cors.Options{
@@ -71,10 +82,17 @@ func (s *Server) setupRoutes() {
 	// Health check (no auth required)
 	r.Get("/health", s.handleHealth)
 	
+	// License status (no auth required)
+	r.Get("/license/status", s.handleLicenseStatus)
+	
 	// API routes with authentication
 	r.Route("/api/v1", func(r chi.Router) {
 		// Bearer token authentication for all API routes
 		r.Use(s.authMiddleware)
+		
+		// License and trial information
+		r.Get("/license/status", s.handleLicenseStatus)
+		r.Get("/trial/info", s.handleTrialInfo)
 		
 		// Context assembly (requires Professional+)
 		r.With(s.requireProfessional).Post("/context/assemble", s.handleAssembleContext)
@@ -1166,4 +1184,63 @@ func (s *Server) simpleBaseline(docs []types.Document, query string, maxDocs int
 	}
 	
 	return result
+}
+
+// handleLicenseStatus returns current license and trial status
+func (s *Server) handleLicenseStatus(w http.ResponseWriter, r *http.Request) {
+	// Check if we have enhanced feature gate with trial support
+	if enhancedGate, ok := s.featureGate.(interface {
+		GetStatus() map[string]interface{}
+		TrialDaysRemaining() int
+	}); ok {
+		status := enhancedGate.GetStatus()
+		status["purchase_url"] = "https://contextlite.com/purchase"
+		status["trial_days_remaining"] = enhancedGate.TrialDaysRemaining()
+		
+		s.writeJSON(w, http.StatusOK, status)
+		return
+	}
+	
+	// Fallback for basic feature gate
+	status := map[string]interface{}{
+		"tier":                s.featureGate.GetTier(),
+		"status":              "basic",
+		"message":             "Basic license system active",
+		"purchase_url":        "https://contextlite.com/purchase",
+		"trial_days_remaining": 0,
+	}
+	
+	s.writeJSON(w, http.StatusOK, status)
+}
+
+// handleTrialInfo returns detailed trial information
+func (s *Server) handleTrialInfo(w http.ResponseWriter, r *http.Request) {
+	// Check if we have enhanced feature gate with trial support
+	if enhancedGate, ok := s.featureGate.(interface {
+		GetStatus() map[string]interface{}
+	}); ok {
+		status := enhancedGate.GetStatus()
+		
+		if trialInfo, ok := status["trial"].(map[string]interface{}); ok {
+			trialInfo["purchase_url"] = "https://contextlite.com/purchase"
+			trialInfo["features_available"] = []string{
+				"unlimited_workspaces",
+				"advanced_optimization", 
+				"7d_scoring",
+				"caching",
+				"rest_api",
+			}
+			
+			s.writeJSON(w, http.StatusOK, trialInfo)
+			return
+		}
+	}
+	
+	// No trial information available
+	s.writeJSON(w, http.StatusOK, map[string]interface{}{
+		"status":           "no_trial",
+		"message":          "Trial system not available",
+		"purchase_url":     "https://contextlite.com/purchase",
+		"days_remaining":   0,
+	})
 }

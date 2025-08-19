@@ -22,10 +22,18 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Port        int    `yaml:"port"`
-	Host        string `yaml:"host"`
-	CORSEnabled bool   `yaml:"cors_enabled"`
-	AuthToken   string `yaml:"auth_token"`
+	Port         int                    `yaml:"port"`
+	Host         string                 `yaml:"host"`
+	CORSEnabled  bool                   `yaml:"cors_enabled"`
+	AuthToken    string                 `yaml:"auth_token"`
+	RateLimiting RateLimitingConfig     `yaml:"rate_limiting"`
+}
+
+type RateLimitingConfig struct {
+	Enabled           bool           `yaml:"enabled"`
+	RequestsPerMinute int            `yaml:"requests_per_minute"`
+	Burst             int            `yaml:"burst"`
+	EndpointSpecific  map[string]int `yaml:"endpoint_specific"`
 }
 
 type StorageConfig struct {
