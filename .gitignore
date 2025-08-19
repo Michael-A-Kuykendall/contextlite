@@ -64,3 +64,40 @@ benchmark_results*.json
 private_key.pem
 public_key.pem
 *.pem
+
+# License Files (SECURITY: DO NOT COMMIT)
+*_license.json
+production_license.json
+test_license.json
+validation_test.json
+
+# Business Planning Documents (INTERNAL USE ONLY)
+MASTER_DISTRIBUTION_PLAN.md
+PRODUCTION_READINESS_ACTION_PLAN.md
+PRODUCTION_SECURITY_VICTORY.md
+BUSINESS_ACCOUNT_SETUP_GUIDE.md
+PRODUCTION_VICTORY.md
+PATENT_PROTECTION_PLAN.md
+MASTER_STATUS_TRACKER.md
+COMPLETE_AUDIT_REPORT.md
+CRITICAL_QA_GAPS.md
+CURRENT_STATUS_ASSESSMENT.md
+DISTRIBUTION_FOUNDATION_STATUS.md
+DISTRIBUTION_PACKAGES_COMPLETE.md
+DISTRIBUTION_READY_ACTION_PLAN.md
+EXECUTION_STATUS_REPORT.md
+IMPLEMENTATION_PLAN.md
+SECURITY_IMPLEMENTATION_STATUS.md
+VSCODE_EXTENSION_IMPLEMENTATION_PLAN.md
+CONTEXTLITE-CLOUD.md
+CONTEXTLITE_WIKI.md
+private-docs/
+
+# License Server and Private Repository Files
+cmd/license-server/
+build/license-server*
+contextlite-license-server*
+contextlite_private.h
+go_mod_private.txt
+railway.*
+*.railway.*
