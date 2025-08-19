@@ -11,6 +11,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	github.com/stripe/stripe-go/v74 v74.30.0
 	go.uber.org/zap v1.25.0
+	golang.org/x/time v0.12.0
 	gopkg.in/yaml.v3 v3.0.1
 	modernc.org/sqlite v1.27.0
 )
@@ -26,7 +27,6 @@ require (
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/mod v0.3.0 // indirect
 	golang.org/x/sys v0.9.0 // indirect
-	golang.org/x/time v0.12.0 // indirect
 	golang.org/x/tools v0.0.0-20201124115921-2c860bdd6e78 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect

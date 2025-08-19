@@ -426,13 +426,21 @@ func GenerateLicense(email string, tier LicenseTier, hardwareID string, privateK
 		license.MaxUsers = 0     // unlimited
 	}
 	
-	// Generate signature
-	payload := fmt.Sprintf("%s:%s:%s:%d:%d:%d:%s",
-		license.Key, license.Email, license.Tier,
-		license.IssuedAt.Unix(), license.MaxDocuments,
-		license.MaxUsers, license.HardwareID)
+	// Generate signature using same format as validation
+	licenseData := map[string]interface{}{
+		"key":           license.Key,
+		"email":         license.Email,
+		"tier":          license.Tier,
+		"issued_at":     license.IssuedAt,
+		"expires_at":    license.ExpiresAt,
+		"max_documents": license.MaxDocuments,
+		"max_users":     license.MaxUsers,
+		"hardware_id":   license.HardwareID,
+		"features":      license.Features,
+	}
 
-	hash := sha256.Sum256([]byte(payload))
+	dataBytes, _ := json.Marshal(licenseData)
+	hash := sha256.Sum256(dataBytes)
 	signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, hash[:])
 	if err != nil {
 		return "", fmt.Errorf("failed to sign license: %w", err)

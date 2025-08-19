@@ -9,7 +9,7 @@ import (
 "time"
 )
 
-const TestServerURL = "http://127.0.0.1:8083"
+const TestServerURL = "http://127.0.0.1:8082"
 
 type TestDocument struct {
 ID      string `json:"id"`
