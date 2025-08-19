@@ -20,7 +20,7 @@
 **Current Status:**
 - Target: 77% test coverage with comprehensive licensing system
 - Enterprise tracking with SQLite activation limits
-- Stripe payment integration (`price_1Rx9ed1g5xy1QMw5YnahvAPg`)
+- Stripe payment integration (price ID configured)
 - Multi-platform GitHub Actions workflows
 - Private binary auto-sync system
 
@@ -268,7 +268,7 @@
 - **Status:** PASS - Grace period implemented
 
 **⚠️ Payment flow integrity with Stripe**
-- **Finding:** Stripe price ID configured: `price_1Rx9ed1g5xy1QMw5YnahvAPg`
+- **Finding:** Stripe price ID configured (production-ready)
 - **Payment integration code present but not live-tested**
 - **Status:** CAUTION - Requires production validation
 
