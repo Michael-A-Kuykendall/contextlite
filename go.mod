@@ -1,10 +1,12 @@
 module contextlite
 
-go 1.21
+go 1.23.0
+
+toolchain go1.24.5
 
 require (
 	github.com/denisbrodbeck/machineid v1.0.1
-	github.com/go-chi/chi/v5 v5.0.8
+	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-chi/cors v1.2.1
 	github.com/stretchr/testify v1.8.1
 	github.com/stripe/stripe-go/v74 v74.30.0
@@ -24,6 +26,7 @@ require (
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/mod v0.3.0 // indirect
 	golang.org/x/sys v0.9.0 // indirect
+	golang.org/x/time v0.12.0 // indirect
 	golang.org/x/tools v0.0.0-20201124115921-2c860bdd6e78 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect

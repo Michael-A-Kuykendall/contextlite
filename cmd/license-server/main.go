@@ -37,6 +37,7 @@ type Config struct {
 type LicenseServer struct {
 	config     *Config
 	privateKey *rsa.PrivateKey
+	tracker    *license.LicenseTracker
 }
 
 // NewLicenseServer creates a new license server
@@ -57,9 +58,16 @@ func NewLicenseServer(config *Config) (*LicenseServer, error) {
 		return nil, fmt.Errorf("failed to parse private key: %w", err)
 	}
 	
+	// Initialize license tracker
+	tracker, err := license.NewLicenseTracker("./license_tracking.db")
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize license tracker: %w", err)
+	}
+	
 	return &LicenseServer{
 		config:     config,
 		privateKey: privateKey,
+		tracker:    tracker,
 	}, nil
 }
 
@@ -84,6 +92,13 @@ func (ls *LicenseServer) Start() error {
 	
 	// Email test endpoint (for testing email delivery)
 	mux.HandleFunc("/test-email", ls.handleTestEmail)
+	
+	// License tracking and analytics endpoints
+	mux.HandleFunc("/activate", ls.handleActivateLicense)
+	mux.HandleFunc("/deactivate", ls.handleDeactivateLicense)
+	mux.HandleFunc("/usage", ls.handleRecordUsage)
+	mux.HandleFunc("/analytics", ls.handleGetAnalytics)
+	mux.HandleFunc("/security", ls.handleSecurityEvents)
 	
 	log.Printf("License server starting on port %d", ls.config.Port)
 	return http.ListenAndServe(fmt.Sprintf(":%d", ls.config.Port), mux)
@@ -248,6 +263,16 @@ func (ls *LicenseServer) generateAndSendLicense(email string, tier license.Licen
 	// Send license via email
 	if err := ls.sendLicenseEmail(email, licenseData, tier); err != nil {
 		return fmt.Errorf("failed to send license email: %w", err)
+	}
+	
+	// Record license generation in tracking system
+	if ls.tracker != nil {
+		metadata := map[string]interface{}{
+			"customer_id": customerID,
+			"tier":        string(tier),
+			"generated_at": time.Now().Format(time.RFC3339),
+		}
+		ls.tracker.RecordUsage(licenseData[:16], "system", "license_generated", metadata, "")
 	}
 	
 	// Log license generation for audit trail
@@ -432,6 +457,211 @@ func (ls *LicenseServer) handleTestEmail(w http.ResponseWriter, r *http.Request)
 		"success": true,
 		"message": fmt.Sprintf("Test email sent successfully to %s", req.Email),
 		"email":   req.Email,
+	})
+}
+
+// handleActivateLicense handles license activation requests
+func (ls *LicenseServer) handleActivateLicense(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	
+	var req struct {
+		LicenseKey string `json:"license_key"`
+		Email      string `json:"email"`
+		HardwareID string `json:"hardware_id"`
+		Tier       string `json:"tier"`
+	}
+	
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	
+	// Parse tier
+	var tier license.LicenseTier
+	switch req.Tier {
+	case "developer":
+		tier = license.TierDeveloper
+	case "professional":
+		tier = license.TierPro
+	case "enterprise":
+		tier = license.TierEnterprise
+	default:
+		tier = license.TierDeveloper
+	}
+	
+	// Get client IP and user agent
+	ipAddress := r.Header.Get("X-Forwarded-For")
+	if ipAddress == "" {
+		ipAddress = r.RemoteAddr
+	}
+	userAgent := r.Header.Get("User-Agent")
+	
+	// Activate license
+	activation, err := ls.tracker.ActivateLicense(req.LicenseKey, req.Email, req.HardwareID, ipAddress, userAgent, tier)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+	
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success":     true,
+		"activation":  activation,
+		"message":     "License activated successfully",
+	})
+}
+
+// handleDeactivateLicense handles license deactivation requests
+func (ls *LicenseServer) handleDeactivateLicense(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	
+	var req struct {
+		LicenseKey string `json:"license_key"`
+		HardwareID string `json:"hardware_id"`
+	}
+	
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	
+	err := ls.tracker.DeactivateLicense(req.LicenseKey, req.HardwareID)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+	
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": "License deactivated successfully",
+	})
+}
+
+// handleRecordUsage handles usage event recording
+func (ls *LicenseServer) handleRecordUsage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	
+	var req struct {
+		LicenseKey   string                 `json:"license_key"`
+		ActivationID string                 `json:"activation_id"`
+		EventType    string                 `json:"event_type"`
+		Metadata     map[string]interface{} `json:"metadata,omitempty"`
+	}
+	
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	
+	// Get client IP
+	ipAddress := r.Header.Get("X-Forwarded-For")
+	if ipAddress == "" {
+		ipAddress = r.RemoteAddr
+	}
+	
+	err := ls.tracker.RecordUsage(req.LicenseKey, req.ActivationID, req.EventType, req.Metadata, ipAddress)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+	
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": "Usage recorded successfully",
+	})
+}
+
+// handleGetAnalytics provides business analytics dashboard
+func (ls *LicenseServer) handleGetAnalytics(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	
+	// Get days parameter (default 30)
+	days := 30
+	if daysStr := r.URL.Query().Get("days"); daysStr != "" {
+		if d, err := strconv.Atoi(daysStr); err == nil && d > 0 {
+			days = d
+		}
+	}
+	
+	analytics, err := ls.tracker.GetAnalytics(days)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+	
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success":   true,
+		"analytics": analytics,
+		"period":    fmt.Sprintf("Last %d days", days),
+	})
+}
+
+// handleSecurityEvents provides security monitoring dashboard
+func (ls *LicenseServer) handleSecurityEvents(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	
+	// Get hours parameter (default 24)
+	hours := 24
+	if hoursStr := r.URL.Query().Get("hours"); hoursStr != "" {
+		if h, err := strconv.Atoi(hoursStr); err == nil && h > 0 {
+			hours = h
+		}
+	}
+	
+	events, err := ls.tracker.GetSecurityEvents(hours)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+	
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"events":  events,
+		"period":  fmt.Sprintf("Last %d hours", hours),
 	})
 }
 

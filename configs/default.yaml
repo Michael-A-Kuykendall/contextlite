@@ -4,6 +4,13 @@ server:
   host: "127.0.0.1"
   cors_enabled: false
   auth_token: "contextlite-dev-token-2025"  # Default token for development
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 60
+    burst: 10
+    endpoint_specific:
+      "/api/v1/query": 30
+      "/api/v1/enterprise": 100
   
 storage:
   database_path: "./contextlite_fresh.db"

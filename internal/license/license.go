@@ -13,6 +13,7 @@ import (
 	mathrand "math/rand"
 	"net"
 	"os"
+	"path/filepath"
 	"runtime"
 	"time"
 
@@ -469,8 +470,24 @@ type LicenseFeatureGate struct {
 
 // NewFeatureGate creates a new feature gate based on current license
 func NewFeatureGate() *LicenseFeatureGate {
-	// For now, default to developer tier
-	// TODO: Implement actual license detection
+	// Try to load license from common locations
+	licenseLocations := []string{
+		"license.json",
+		"contextlite-license.json",
+		filepath.Join(os.Getenv("HOME"), ".contextlite", "license.json"),
+		filepath.Join(os.Getenv("USERPROFILE"), ".contextlite", "license.json"),
+	}
+	
+	lm := NewLicenseManager()
+	for _, location := range licenseLocations {
+		if err := lm.LoadLicense(location); err == nil {
+			return &LicenseFeatureGate{
+				tier: lm.GetTier(),
+			}
+		}
+	}
+	
+	// No license found - default to developer tier
 	return &LicenseFeatureGate{
 		tier: TierDeveloper,
 	}

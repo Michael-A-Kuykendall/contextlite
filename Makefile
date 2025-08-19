@@ -227,6 +227,17 @@ production-check: ## Check if all critical components are production ready
 	@echo "Checking production readiness..."
 	@go run ./cmd/production-check/main.go
 
+# Security scanning
+security-scan: ## Run comprehensive security vulnerability scanning
+	@echo "🔍 Running security vulnerability scanning..."
+	@if ! command -v govulncheck > /dev/null; then \
+		echo "Installing govulncheck..."; \
+		go install golang.org/x/vuln/cmd/govulncheck@latest; \
+	fi
+	@echo "Running govulncheck..."
+	@govulncheck ./...
+	@echo "✅ Security scan completed"
+
 # View registry dashboard
 registry-status: ## Display current system registry status
 	@echo "ContextLite System Registry Status"

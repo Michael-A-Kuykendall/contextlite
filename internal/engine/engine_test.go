@@ -177,8 +177,8 @@ func TestCoreEngineBasicFunctionality(t *testing.T) {
 		t.Errorf("GetStats failed: %v", err)
 	}
 	
-	if stats.LicenseTier != "open-source" {
-		t.Errorf("Expected open-source license tier, got %s", stats.LicenseTier)
+	if stats.LicenseTier != "core-engine" {
+		t.Errorf("Expected core-engine license tier, got %s", stats.LicenseTier)
 	}
 	
 	// Test Close doesn't fail
