@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ContextLite — Lightning-Fast AI Context Engine</title>
+  <meta name="description" content="Get perfect AI context in 0.3ms. 100x faster than vector databases. Local binary, zero dependencies.">
+  <link rel="icon" href="contextlite-logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html,body{height:100%} .route{display:none} .route.active{display:block}
+    .hero-bg{background:radial-gradient(1200px 600px at 50% -10%, rgba(59,130,246,.25), transparent 60%), linear-gradient(#fff,#fff)}
+    pre{white-space:pre; overflow:auto}
+    .btn{border-radius:14px; padding:.8rem 1.2rem; font-weight:600}
+    .btn-primary{background:#2563eb;color:#fff}
+    .btn-outline{border:1px solid #cbd5e1;color:#0f172a}
+    .stripe{background-image:radial-gradient(closest-side, rgba(59,130,246,.06), transparent); background-size:22px 22px}
+    .hl:after{content:"";display:block;width:72px;height:4px;margin:.5rem auto 0;border-radius:9999px;background:linear-gradient(90deg,#1d4ed8,#60a5fa)}
+    
+    /* Keep your animations - they're good! */
+    .killing-animation{
+      animation: dramatic-kill 2s ease-in-out infinite;
+      transform-origin: center;
+      display: inline-block;
+    }
+    
+    @keyframes dramatic-kill {
+      0% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.1) rotate(-2deg); color: #dc2626; }
+      50% { transform: scale(0.95) rotate(1deg); color: #b91c1c; }
+      75% { transform: scale(1.05) rotate(-1deg); color: #dc2626; }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    
+    .failed-animation {
+      animation: epic-failure 3s ease-in-out infinite;
+      transform-origin: center;
+      display: inline-block;
+      font-weight: 700;
+    }
+    
+    @keyframes epic-failure {
+      0% { transform: scale(1) translateY(0px); color: inherit; }
+      20% { transform: scale(1.2) translateY(-3px); color: #dc2626; }
+      40% { transform: scale(0.9) translateY(2px); color: #b91c1c; }
+      60% { transform: scale(1.1) translateY(-2px); color: #ef4444; }
+      80% { transform: scale(0.95) translateY(1px); color: #dc2626; }
+      100% { transform: scale(1) translateY(0px); color: inherit; }
+    }
+    
+    .mistake-pulse {
+      animation: slow-mistake-pulse 4s ease-in-out infinite;
+      display: inline-block;
+    }
+    
+    @keyframes slow-mistake-pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.08); opacity: 0.85; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    /* Professional hover effects */
+    .feature-card{transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1)}
+    .feature-card:hover{transform:translateY(-8px); box-shadow:0 20px 40px rgba(0,0,0,0.15)}
+  </style>
+</head>
+<body class="min-h-screen bg-white text-gray-900">
+  <header class="sticky top-0 z-50 border-b bg-white/80 backdrop-blur">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+      <a href="/" class="flex items-center gap-3 font-bold text-xl">
+        <img src="contextlite-logo.png" alt="ContextLite Logo" class="h-10 w-auto shadow-lg">
+        <span>ContextLite</span>
+      </a>
+      <nav class="hidden lg:flex items-center gap-6 text-sm">
+        <a href="#problem" class="hover:text-blue-600">Problem</a>
+        <a href="#solution" class="hover:text-blue-600">Solution</a>
+        <a href="#performance" class="hover:text-blue-600">Performance</a>
+        <a href="#pricing" class="hover:text-blue-600">Pricing</a>
+        <a href="#enterprise" class="hover:text-blue-600 font-semibold">Enterprise</a>
+      </nav>
+      <a href="https://github.com/Michael-A-Kuykendall/contextlite" target="_blank" class="btn btn-primary">
+        Get Started Free
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero - Keep your animations! -->
+    <section class="hero-bg py-16">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-12">
+          <img src="contextlite.png" alt="ContextLite" class="h-32 w-auto mx-auto mb-6 shadow-xl">
+          <h1 class="text-4xl md:text-6xl font-bold mb-6">
+            The RAG Revolution 
+            <br><span class="text-blue-600">Was a <span class="mistake-pulse">Mistake</span></span>
+          </h1>
+          <p class="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
+            While everyone rushed to build vector databases and embedding pipelines, 
+            they missed the fundamental flaw that's <span class="killing-animation">killing</span> AI applications worldwide.
+          </p>
+        </div>
+
+        <!-- Single consolidated problem statement -->
+        <div class="

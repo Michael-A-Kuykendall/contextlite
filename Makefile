@@ -65,21 +65,47 @@ deps: ## Install Go dependencies
 	go mod tidy
 
 # Run tests
-test: ## Run all tests
+test: ## Run all tests with automatic registry update
 	@echo "Running tests..."
 	go test -v ./...
+	@echo "📊 Updating registry with latest test results..."
+	@go run scripts/update_coverage_registry.go
 
 # Run tests with coverage
-coverage: ## Run tests with coverage report
+coverage: ## Run tests with coverage report and registry update
 	@echo "Running tests with coverage..."
 	go test -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out -o coverage.html
+	@echo "📊 Updating registry with latest coverage data..."
+	@go run scripts/update_coverage_registry.go
 	@echo "Coverage report generated: coverage.html"
+	@echo "Registry updated with current coverage data"
 
 # Run benchmarks
 bench: ## Run benchmarks
 	@echo "Running benchmarks..."
 	go test -bench=. -benchmem ./...
+
+# Update registry only (without running tests)
+update-registry: ## Update the system registry with current coverage data
+	@echo "📊 Updating system registry..."
+	@go run scripts/update_coverage_registry.go
+
+# Test specific package with registry update
+test-package: ## Test specific package and update registry (usage: make test-package PKG=./internal/engine)
+	@if [ -z "$(PKG)" ]; then echo "Usage: make test-package PKG=./path/to/package"; exit 1; fi
+	@echo "Testing package: $(PKG)"
+	@go test -v -coverprofile=temp_coverage.out $(PKG)
+	@echo "📊 Updating registry..."
+	@go run scripts/update_coverage_registry.go
+	@rm -f temp_coverage.out
+
+# Quick test with registry update for critical components  
+test-critical: ## Run tests for critical components only with registry update
+	@echo "Testing critical components..."
+	@go test -v ./cmd/license-server ./internal/engine ./internal/api
+	@echo "📊 Updating registry with critical component data..."
+	@go run scripts/update_coverage_registry.go
 
 # Run the application
 run: build ## Build and run the application
@@ -219,7 +245,10 @@ registry-status: ## Display current system registry status
 	fi
 
 # Show beautiful dashboard
-dashboard: ## Show comprehensive system dashboard
+dashboard: ## Show comprehensive system dashboard with latest data
+	@echo "📊 Refreshing registry data..."
+	@go run scripts/update_coverage_registry.go
+	@echo "🎯 Displaying system dashboard..."
 	@go run ./cmd/dashboard/main.go
 
 # Initialize registry system

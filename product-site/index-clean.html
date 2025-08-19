@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ContextLite — Fast AI Context Engine</title>
+  <meta name="description" content="High-performance context optimization engine. 100x faster than vector databases. Local, secure, no dependencies.">
+  <link rel="icon" href="contextlite-logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html,body{height:100%} 
+    .route{display:none} 
+    .route.active{display:block}
+    
+    /* Clean, professional animations */
+    .fade-in{opacity:0; animation:fadeIn 0.5s ease forwards}
+    @keyframes fadeIn{to{opacity:1}}
+    
+    /* Simple hover effects */
+    .card-hover{transition:transform 0.2s ease, box-shadow 0.2s ease}
+    .card-hover:hover{transform:translateY(-4px); box-shadow:0 8px 24px rgba(0,0,0,0.12)}
+    
+    /* Clean navigation */
+    .nav-link{transition:color 0.2s ease}
+    .nav-link:hover{color:#2563eb}
+    .nav-link.active{color:#2563eb; font-weight:600}
+    
+    /* Professional styling */
+    .gradient-text{background:linear-gradient(90deg,#2563eb,#7c3aed); -webkit-background-clip:text; -webkit-text-fill-color:transparent}
+    .section-divider{width:60px; height:3px; background:linear-gradient(90deg,#2563eb,#7c3aed); margin:0 auto; border-radius:2px}
+    
+    /* Clean code blocks */
+    pre{background:#1e293b; color:#e2e8f0; padding:1.5rem; border-radius:0.5rem; overflow-x:auto}
+    .code-comment{color:#64748b}
+    .code-keyword{color:#60a5fa}
+    .code-string{color:#86efac}
+  </style>
+</head>
+<body class="min-h-screen bg-white text-gray-900">
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white border-b">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img src="contextlite-logo.png" alt="ContextLite" class="h-10 w-auto">
+          <span class="text-xl font-bold">ContextLite</span>
+        </div>
+        <nav class="hidden md:flex items-center gap-8">
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#performance" class="nav-link">Performance</a>
+          <a href="#pricing" class="nav-link">Pricing</a>
+          <a href="#docs" class="nav-link">Documentation</a>
+        </nav>
+        <a href="#get-started" class="hidden md:inline-flex bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
+          Get Started
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="py-20 px-6">
+      <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-5xl font-bold mb-6">
+          AI Context That's <span class="gradient-text">100x Faster</span>
+        </h1>
+        <p class="text-xl text-gray-600 mb-8">
+          Replace slow vector databases with a high-performance context engine. 
+          Sub-millisecond queries, perfect relevance, zero cloud dependencies.
+        </p>
+        <div class="flex gap-4 justify-center">
+          <a href="#get-started" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition">
+            Start Free Trial
+          </a>
+          <a href="#performance" class="border border-gray-300 px-8 py-3 rounded-lg font-medium hover:bg-gray-50 transition">
+            View Benchmarks
+          </a>
+        </div>
+        
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto">
+          <div class="text-center">
+            <div class="text-3xl font-bold text-blue-600">0.3ms</div>
+            <div class="text-sm text-gray-600 mt-1">Query Speed</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-green-600">100x</div>
+            <div class="text-sm text-gray-600 mt-1">Faster Than RAG</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-purple-600">$0</div>
+            <div class="text-sm text-gray-600 mt-1">Cloud Costs</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="py-16 px-6 bg-gray-50">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-4">The Vector Database Problem</h2>
+        <div class="section-divider mb-8"></div>
+        
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="bg-white p-6 rounded-lg border">
+            <h3 class="font-semibold text-red-600 mb-3">Current Approach</h3>
+            <ul class="space-y-2 text-gray-600">
+              <li>• 30-50ms query latency</li>
+              <li>• $300-500/month cloud costs</li>
+              <li>• Complex embedding pipelines</li>
+              <li>• Approximate results only</li>
+              <li>• Privacy concerns with cloud APIs</li>
+            </ul>
+          </div>
+          <div class="bg-white p-6 rounded-lg border">
+            <h3 class="font-semibold text-green-600 mb-3">ContextLite Solution</h3>
+            <ul class="space-y-2 text-gray-600">
+              <li>• 0.3ms query latency</li>
+              <li>• $0 operational costs</li>
+              <li>• Single binary, zero config</li>
+              <li>• Mathematically optimal results</li>
+              <li>• 100% local processing</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 px-6">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-4">Core Features</h2>
+        <div class="section-divider mb-12"></div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="text-center card-hover p-6">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="
