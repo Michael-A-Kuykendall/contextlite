@@ -1,0 +1,537 @@
+name: Publish Packages
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create npm package structure
+        run: |
+          # Use existing npm-wrapper
+          cp -r npm-wrapper npm-package
+
+      - name: Update npm package version
+        run: |
+          cd npm-package
+          npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+
+      - name: Install npm dependencies
+        run: |
+          cd npm-package
+          npm install
+
+      - name: Publish to npm
+        run: |
+          cd npm-package
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-pypi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine wheel
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Use existing Python package structure
+        run: |
+          # Use existing python-wrapper
+          cp -r python-wrapper python-package
+
+      - name: Update Python package version
+        run: |
+          cd python-package
+          # Update version in pyproject.toml
+          sed -i 's/version = ".*"/version = "${{ steps.version.outputs.version }}"/' pyproject.toml
+
+      - name: Build Python package
+        run: |
+          cd python-package
+          python -m build
+
+      - name: Publish to PyPI
+        run: |
+          cd python-package
+          python -m twine upload dist/* --verbose
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+  publish-chocolatey:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install Chocolatey
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+          iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+      - name: Use existing Chocolatey package
+        shell: bash
+        run: |
+          # Use existing chocolatey package structure
+          cp -r chocolatey chocolatey-package
+          
+          # Update version in nuspec file
+          cd chocolatey-package
+          sed -i "s/<version>.*<\/version>/<version>${{ steps.version.outputs.version }}<\/version>/" contextlite.nuspec
+
+      - name: Build Chocolatey package
+        shell: powershell
+        run: |
+          cd chocolatey-package
+          choco pack
+
+      - name: Publish to Chocolatey
+        shell: powershell
+        run: |
+          cd chocolatey-package
+          choco push contextlite.${{ steps.version.outputs.version }}.nupkg --key $env:CHOCOLATEY_API_KEY
+        env:
+          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+
+  publish-vscode:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+
+      - name: Update extension version
+        run: |
+          cd vscode-extension
+          npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+
+      - name: Install extension dependencies
+        run: |
+          cd vscode-extension
+          npm install
+
+      - name: Compile extension
+        run: |
+          cd vscode-extension
+          npm run compile
+
+      - name: Package extension
+        run: |
+          cd vscode-extension
+          vsce package
+
+      - name: Publish to VS Code Marketplace
+        run: |
+          cd vscode-extension
+          vsce publish --pat ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+
+  publish-snap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install snapcraft
+        run: sudo snap install snapcraft --classic
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create snapcraft.yaml
+        run: |
+          mkdir -p snap
+          cat > snap/snapcraft.yaml << 'EOF'
+          name: contextlite
+          base: core22
+          version: '${{ steps.version.outputs.version }}'
+          summary: AI-powered context management for developers
+          description: |
+            ContextLite is an AI-powered tool that intelligently manages context for developers,
+            providing smart code completion, documentation, and analysis capabilities.
+          grade: stable
+          confinement: classic
+
+          parts:
+            contextlite:
+              plugin: dump
+              source: .
+              stage:
+                - contextlite
+              prime:
+                - contextlite
+
+          apps:
+            contextlite:
+              command: contextlite
+          EOF
+
+      - name: Build snap
+        run: snapcraft --destructive-mode
+
+      - name: Login to Snap Store
+        run: |
+          echo "$SNAPCRAFT_STORE_CREDENTIALS" | base64 -d > /tmp/snapcraft-login
+          snapcraft login --with /tmp/snapcraft-login
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+
+      - name: Upload and release snap
+        run: |
+          snapcraft upload *.snap --release=stable
+
+  publish-homebrew:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Clone homebrew-core
+        run: |
+          git clone https://github.com/Homebrew/homebrew-core.git
+          cd homebrew-core
+
+      - name: Calculate checksums
+        run: |
+          # Download release assets and calculate SHA256
+          wget "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ steps.version.outputs.version }}/contextlite_${{ steps.version.outputs.version }}_darwin_amd64.tar.gz"
+          AMD64_SHA=$(sha256sum contextlite_${{ steps.version.outputs.version }}_darwin_amd64.tar.gz | cut -d' ' -f1)
+          echo "AMD64_SHA=$AMD64_SHA" >> $GITHUB_ENV
+
+      - name: Create/update formula in homebrew-core
+        run: |
+          cd homebrew-core
+          cp ../homebrew/contextlite.rb Formula/contextlite.rb
+          
+          # Update version and checksums
+          sed -i '' 's/v[0-9]\+\.[0-9]\+\.[0-9]\+/v${{ steps.version.outputs.version }}/g' Formula/contextlite.rb
+          sed -i '' 's/_[0-9]\+\.[0-9]\+\.[0-9]\+_/_${{ steps.version.outputs.version }}_/g' Formula/contextlite.rb
+          sed -i '' "s/YOUR_SHA256_CHECKSUM_HERE/$AMD64_SHA/" Formula/contextlite.rb
+
+      - name: Create PR to homebrew-core
+        run: |
+          cd homebrew-core
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          
+          git checkout -b contextlite-${{ steps.version.outputs.version }}
+          git add Formula/contextlite.rb
+          git commit -m "contextlite ${{ steps.version.outputs.version }} (new formula)"
+          
+          # Push to your fork and create PR
+          git remote add fork https://github.com/${{ github.actor }}/homebrew-core.git
+          git push fork contextlite-${{ steps.version.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-scoop:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update Scoop manifest
+        shell: bash
+        run: |
+          cp dist/scoop/contextlite.json scoop-manifest.json
+          sed -i "s/0\.0\.1-next/${{ steps.version.outputs.version }}/" scoop-manifest.json
+          sed -i "s/v0\.0\.0/v${{ steps.version.outputs.version }}/" scoop-manifest.json
+
+      - name: Submit to Scoop bucket
+        shell: bash
+        run: |
+          git clone https://github.com/ScoopInstaller/Main.git scoop-main
+          cp scoop-manifest.json scoop-main/bucket/contextlite.json
+          cd scoop-main
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git checkout -b contextlite-${{ steps.version.outputs.version }}
+          git add bucket/contextlite.json
+          git commit -m "contextlite: Update to ${{ steps.version.outputs.version }}"
+          git remote add fork https://github.com/${{ github.actor }}/Main.git
+          git push fork contextlite-${{ steps.version.outputs.version }}
+
+  publish-winget:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Submit to winget
+        uses: vedantmgoyal2009/winget-releaser@v2
+        with:
+          identifier: Michael-A-Kuykendall.ContextLite
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-aur:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create AUR package
+        run: |
+          mkdir aur-package
+          cat > aur-package/PKGBUILD << 'EOF'
+          pkgname=contextlite
+          pkgver=${{ steps.version.outputs.version }}
+          pkgrel=1
+          pkgdesc="AI-powered context management for developers"
+          arch=('x86_64')
+          url="https://contextlite.com"
+          license=('MIT')
+          depends=()
+          source=("https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${pkgver}/contextlite_${pkgver}_linux_amd64.tar.gz")
+          sha256sums=('SKIP')
+
+          package() {
+              install -Dm755 "${srcdir}/contextlite" "${pkgdir}/usr/bin/contextlite"
+          }
+          EOF
+
+      - name: Publish to AUR
+        uses: KSXGitHub/github-actions-deploy-aur@v2.7.2
+        with:
+          pkgname: contextlite
+          pkgbuild: aur-package/PKGBUILD
+          commit_username: ${{ github.actor }}
+          commit_email: ${{ github.actor }}@users.noreply.github.com
+          ssh_private_key: ${{ secrets.AUR_SSH_KEY }}
+
+  publish-flathub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Flatpak manifest
+        run: |
+          mkdir -p flathub
+          cat > flathub/com.contextlite.ContextLite.yml << 'EOF'
+          app-id: com.contextlite.ContextLite
+          runtime: org.freedesktop.Platform
+          runtime-version: '23.08'
+          sdk: org.freedesktop.Sdk
+          command: contextlite
+          finish-args:
+            - --share=network
+            - --filesystem=home
+          modules:
+            - name: contextlite
+              buildsystem: simple
+              build-commands:
+                - install -D contextlite /app/bin/contextlite
+              sources:
+                - type: archive
+                  url: https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ steps.version.outputs.version }}/contextlite_${{ steps.version.outputs.version }}_linux_amd64.tar.gz
+          EOF
+
+      - name: Submit to Flathub
+        run: |
+          git clone https://github.com/flathub/flathub.git
+          cp flathub/com.contextlite.ContextLite.yml flathub/
+          cd flathub
+          git checkout -b contextlite-${{ steps.version.outputs.version }}
+          git add com.contextlite.ContextLite.yml
+          git commit -m "Add ContextLite ${{ steps.version.outputs.version }}"
+
+  publish-github-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Publish to GitHub Packages
+        run: |
+          cp -r npm-wrapper github-package
+          cd github-package
+          sed -i 's/"name": "contextlite"/"name": "@michael-a-kuykendall\/contextlite"/' package.json
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-nix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Nix package
+        run: |
+          mkdir nix-package
+          cat > nix-package/default.nix << 'EOF'
+          { lib, stdenv, fetchurl }:
+
+          stdenv.mkDerivation rec {
+            pname = "contextlite";
+            version = "${{ steps.version.outputs.version }}";
+
+            src = fetchurl {
+              url = "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${version}/contextlite_${version}_linux_amd64.tar.gz";
+              sha256 = "SKIP";
+            };
+
+            installPhase = ''
+              mkdir -p $out/bin
+              cp contextlite $out/bin/
+            '';
+
+            meta = with lib; {
+              description = "AI-powered context management for developers";
+              homepage = "https://contextlite.com";
+              license = licenses.mit;
+              platforms = platforms.linux;
+            };
+          }
+          EOF
+
+      - name: Submit to nixpkgs
+        run: |
+          git clone https://github.com/NixOS/nixpkgs.git
+          mkdir -p nixpkgs/pkgs/applications/misc/contextlite
+          cp nix-package/default.nix nixpkgs/pkgs/applications/misc/contextlite/
+          cd nixpkgs
+          git checkout -b contextlite-${{ steps.version.outputs.version }}
+          git add pkgs/applications/misc/contextlite/
+          git commit -m "contextlite: init at ${{ steps.version.outputs.version }}"

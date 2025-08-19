@@ -219,7 +219,7 @@ func TestValidateLicense(t *testing.T) {
 	}{
 		{
 			name:      "valid license",
-			license:   string(licenseJSON),
+			license:   string(licenseJSON), // Use the decoded JSON
 			wantValid: true,
 			wantErr:   false,
 		},
