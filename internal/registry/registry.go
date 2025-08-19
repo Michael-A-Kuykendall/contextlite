@@ -276,7 +276,7 @@ func (sr *SystemRegistry) calculateOverallMetrics() {
 func (sr *SystemRegistry) updateCriticalAlerts() {
 	sr.CriticalAlerts = []string{}
 
-	for name, component := range sr.Components {
+	for _, component := range sr.Components {
 		if component.RevenueImpact == "CRITICAL" && !component.ProductionReady {
 			sr.CriticalAlerts = append(sr.CriticalAlerts, 
 				fmt.Sprintf("CRITICAL: %s not production ready (%.1f%% coverage)", 
