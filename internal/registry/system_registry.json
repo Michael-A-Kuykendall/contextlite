@@ -1,0 +1,119 @@
+{
+  "components": {
+    "api": {
+      "name": "API Layer",
+      "package": "./internal/api",
+      "coverage": 0.629,
+      "tests_passing": 0,
+      "tests_total": 0,
+      "production_ready": false,
+      "priority": "HIGH",
+      "revenue_impact": "HIGH",
+      "last_updated": "2025-08-18T19:11:14.3872641-05:00"
+    },
+    "config": {
+      "name": "Configuration",
+      "package": "./pkg/config",
+      "coverage": 0.919,
+      "tests_passing": 0,
+      "tests_total": 0,
+      "production_ready": true,
+      "priority": "MEDIUM",
+      "revenue_impact": "LOW",
+      "last_updated": "2025-08-18T19:11:21.9685807-05:00"
+    },
+    "contextlite": {
+      "name": "Main Server",
+      "package": "./cmd/contextlite",
+      "coverage": 0.745,
+      "tests_passing": 0,
+      "tests_total": 0,
+      "production_ready": false,
+      "priority": "HIGH",
+      "revenue_impact": "HIGH",
+      "last_updated": "2025-08-18T19:11:19.2044314-05:00"
+    },
+    "engine": {
+      "name": "Context Engine",
+      "package": "./internal/engine",
+      "coverage": 0.502,
+      "tests_passing": 0,
+      "tests_total": 0,
+      "production_ready": false,
+      "priority": "CRITICAL",
+      "revenue_impact": "HIGH",
+      "last_updated": "2025-08-18T19:11:12.2604393-05:00"
+    },
+    "evaluation": {
+      "name": "Evaluation System",
+      "package": "./internal/evaluation",
+      "coverage": 0.9470000000000001,
+      "tests_passing": 0,
+      "tests_total": 0,
+      "production_ready": true,
+      "priority": "LOW",
+      "revenue_impact": "LOW",
+      "last_updated": "2025-08-18T19:11:23.9735749-05:00"
+    },
+    "license-server": {
+      "name": "License Server",
+      "package": "./cmd/license-server",
+      "coverage": 0.775,
+      "tests_passing": 0,
+      "tests_total": 0,
+      "production_ready": true,
+      "priority": "CRITICAL",
+      "revenue_impact": "CRITICAL",
+      "last_updated": "2025-08-18T19:11:50.9160415-05:00"
+    },
+    "pipeline": {
+      "name": "Processing Pipeline",
+      "package": "./internal/pipeline",
+      "coverage": 0.63,
+      "tests_passing": 0,
+      "tests_total": 0,
+      "production_ready": false,
+      "priority": "MEDIUM",
+      "revenue_impact": "MEDIUM",
+      "last_updated": "2025-08-18T19:11:20.8770781-05:00"
+    },
+    "storage": {
+      "name": "Storage Layer",
+      "package": "./internal/storage",
+      "coverage": 0.7509999999999999,
+      "tests_passing": 0,
+      "tests_total": 0,
+      "production_ready": true,
+      "priority": "HIGH",
+      "revenue_impact": "MEDIUM",
+      "last_updated": "2025-08-18T19:11:16.6991128-05:00"
+    },
+    "timing": {
+      "name": "Timing Utils",
+      "package": "./internal/timing",
+      "coverage": 1,
+      "tests_passing": 0,
+      "tests_total": 0,
+      "production_ready": true,
+      "priority": "LOW",
+      "revenue_impact": "LOW",
+      "last_updated": "2025-08-18T19:11:17.731064-05:00"
+    },
+    "tokens": {
+      "name": "Token Processing",
+      "package": "./pkg/tokens",
+      "coverage": 1,
+      "tests_passing": 0,
+      "tests_total": 0,
+      "production_ready": true,
+      "priority": "MEDIUM",
+      "revenue_impact": "LOW",
+      "last_updated": "2025-08-18T19:11:22.9504612-05:00"
+    }
+  },
+  "critical_alerts": [
+    "LOW_COVERAGE: License Server below 80% coverage (77.5%)",
+    "LOW_COVERAGE: Context Engine below 80% coverage (50.2%)"
+  ],
+  "last_updated": "2025-08-18T19:11:11.0741072-05:00"
+}
