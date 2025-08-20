@@ -1,12 +1,12 @@
 {
   "name": "contextlite",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "Ultra-fast context engine for retrieval and AI applications",
   "keywords": [
     "context",
     "ai",
     "retrieval",
-    "search", 
+    "search",
     "embedding",
     "database",
     "sqlite",
@@ -43,7 +43,6 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "postinstall": "node scripts/fetch-binary.js",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts"
