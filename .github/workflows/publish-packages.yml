@@ -76,17 +76,17 @@ jobs:
           tag_name: v${{ steps.version.outputs.version }}
           name: ContextLite ${{ steps.version.outputs.version }}
           body: |
-            🧪 **Alpha Testing Release**
+            **Alpha Testing Release**
             
             Complete marketplace automation with version compliance for ContextLite ${{ steps.version.outputs.version }}.
             
-            ✅ **Features:**
+            **Features:**
             - 14-day trial system with full optimization optimization
             - Multi-platform support (Linux, macOS, Windows)
             - Hardware-bound licensing with graceful expiration
             - Real-time statistics and performance metrics
             
-            ⚠️ **Pre-production release for integration testing only**
+            **WARNING: Pre-production release for integration testing only**
             
             **Installation:**
             - Download the appropriate binary for your platform
@@ -103,7 +103,7 @@ jobs:
       - name: Trigger website update
         if: success()
         run: |
-          echo "🚀 Release ${{ steps.version.outputs.version }} published successfully!"
+          echo "Release ${{ steps.version.outputs.version }} published successfully!"
           echo "The download page will automatically update with new release assets."
           echo "Release URL: https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/v${{ steps.version.outputs.version }}"
           
