@@ -270,6 +270,7 @@ jobs:
 
   publish-chocolatey:
     runs-on: windows-latest
+    needs: build-and-release
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -547,6 +548,9 @@ jobs:
           git checkout -b contextlite-${{ steps.version.outputs.version }}
           git add Formula/contextlite.rb
           git commit -m "contextlite ${{ steps.version.outputs.version }} (new formula)"
+          
+          # Configure git to use token for authentication
+          git config --global url."https://${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}@github.com/".insteadOf "https://github.com/"
           
           # Push to your fork and create PR
           git remote add fork https://github.com/${{ github.actor }}/homebrew-core.git
