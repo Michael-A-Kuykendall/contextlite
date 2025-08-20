@@ -263,8 +263,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            michaelakuykendall/contextlite:latest
-            michaelakuykendall/contextlite:${{ steps.version.outputs.version }}
+            makuykendall/contextlite:latest
+            makuykendall/contextlite:${{ steps.version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
