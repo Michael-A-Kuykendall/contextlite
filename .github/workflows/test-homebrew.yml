@@ -1,0 +1,179 @@
+name: Test Homebrew Publishing
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 1.0.30)'
+        required: true
+        default: '1.0.30'
+        type: string
+
+jobs:
+  test-homebrew:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Debug GitHub Token Permissions
+        run: |
+          echo "🔍 Testing GitHub Token Permissions"
+          echo "Actor: ${{ github.actor }}"
+          echo "Repository: ${{ github.repository }}"
+          
+          # Test if we can access GitHub API
+          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/user
+               
+          echo ""
+          echo "🔍 Testing Token Scopes"
+          curl -I -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                  https://api.github.com/user 2>&1 | grep -i "x-oauth-scopes" || echo "No scopes header found"
+
+      - name: Check if homebrew-core fork exists
+        id: check_fork
+        run: |
+          echo "🔍 Checking if ${{ github.actor }}/homebrew-core fork exists"
+          if curl -s -f -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                  "https://api.github.com/repos/${{ github.actor }}/homebrew-core" > /dev/null; then
+            echo "fork_exists=true" >> $GITHUB_OUTPUT
+            echo "✅ Fork exists"
+          else
+            echo "fork_exists=false" >> $GITHUB_OUTPUT
+            echo "❌ Fork does not exist"
+          fi
+
+      - name: Create homebrew-core fork if needed
+        if: steps.check_fork.outputs.fork_exists == 'false'
+        run: |
+          echo "🍺 Creating fork of homebrew-core"
+          curl -X POST \
+               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/repos/Homebrew/homebrew-core/forks
+          
+          echo "⏳ Waiting for fork to be ready..."
+          sleep 10
+
+      - name: Clone homebrew-core fork
+        run: |
+          echo "🍺 Cloning your fork of homebrew-core"
+          git clone --depth=1 https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.actor }}/homebrew-core.git
+          cd homebrew-core
+          
+          # Set up git config
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          
+          # Add upstream remote
+          git remote add upstream https://github.com/Homebrew/homebrew-core.git
+          
+          # Make sure we're up to date
+          git fetch upstream
+          git checkout master
+          git reset --hard upstream/master
+
+      - name: Download release assets and calculate checksums
+        run: |
+          echo "📦 Downloading release assets for v${{ github.event.inputs.version }}"
+          
+          # Download the macOS binaries
+          wget "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ github.event.inputs.version }}/contextlite-${{ github.event.inputs.version }}-darwin-amd64.tar.gz"
+          wget "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ github.event.inputs.version }}/contextlite-${{ github.event.inputs.version }}-darwin-arm64.tar.gz"
+          
+          # Calculate checksums
+          AMD64_SHA=$(shasum -a 256 contextlite-${{ github.event.inputs.version }}-darwin-amd64.tar.gz | cut -d' ' -f1)
+          ARM64_SHA=$(shasum -a 256 contextlite-${{ github.event.inputs.version }}-darwin-arm64.tar.gz | cut -d' ' -f1)
+          
+          echo "✅ AMD64 SHA256: $AMD64_SHA"
+          echo "✅ ARM64 SHA256: $ARM64_SHA"
+          
+          # Save to environment
+          echo "AMD64_SHA=$AMD64_SHA" >> $GITHUB_ENV
+          echo "ARM64_SHA=$ARM64_SHA" >> $GITHUB_ENV
+
+      - name: Create updated Homebrew formula
+        run: |
+          echo "🍺 Creating updated Homebrew formula"
+          cd homebrew-core
+          
+          # Copy our template formula
+          cp ../homebrew/contextlite.rb Formula/contextlite.rb
+          
+          # Update version and checksums using sed
+          sed -i '' "s/v[0-9]\+\.[0-9]\+\.[0-9]\+/v${{ github.event.inputs.version }}/g" Formula/contextlite.rb
+          sed -i '' "s/[0-9]\+\.[0-9]\+\.[0-9]\+/${{ github.event.inputs.version }}/g" Formula/contextlite.rb
+          sed -i '' "s/YOUR_SHA256_CHECKSUM_HERE/$AMD64_SHA/" Formula/contextlite.rb
+          sed -i '' "s/YOUR_SHA256_AMD64_HERE/$AMD64_SHA/" Formula/contextlite.rb
+          sed -i '' "s/YOUR_SHA256_ARM64_HERE/$ARM64_SHA/" Formula/contextlite.rb
+          
+          echo "📄 Updated formula contents:"
+          cat Formula/contextlite.rb
+
+      - name: Test formula locally
+        run: |
+          echo "🧪 Testing formula locally"
+          cd homebrew-core
+          
+          # Install Homebrew if not present (should be on macOS runner)
+          if ! command -v brew &> /dev/null; then
+            echo "Installing Homebrew..."
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          fi
+          
+          # Test formula syntax
+          brew audit --new-formula Formula/contextlite.rb
+          
+          # Test installation (this will actually install the package)
+          echo "🚀 Testing installation..."
+          brew install --formula ./Formula/contextlite.rb
+          
+          # Test the installed binary
+          contextlite --version
+          
+          echo "✅ Homebrew formula works!"
+
+      - name: Create PR branch and push
+        run: |
+          echo "🚀 Creating PR branch and pushing to fork"
+          cd homebrew-core
+          
+          # Create new branch
+          BRANCH_NAME="contextlite-${{ github.event.inputs.version }}"
+          git checkout -b $BRANCH_NAME
+          
+          # Add the formula
+          git add Formula/contextlite.rb
+          git commit -m "contextlite ${{ github.event.inputs.version }}"
+          
+          # Push to fork
+          git push origin $BRANCH_NAME
+          
+          echo "✅ Pushed branch $BRANCH_NAME to your fork"
+
+      - name: Create Pull Request
+        run: |
+          echo "📝 Creating Pull Request to homebrew-core"
+          
+          # Create PR using GitHub API
+          curl -X POST \
+               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               -d "{
+                 \"title\": \"contextlite ${{ github.event.inputs.version }}\",
+                 \"body\": \"Add contextlite ${{ github.event.inputs.version }}\\n\\nContextLite is an ultra-fast context engine for retrieval and AI applications.\",
+                 \"head\": \"${{ github.actor }}:contextlite-${{ github.event.inputs.version }}\",
+                 \"base\": \"master\"
+               }" \
+               https://api.github.com/repos/Homebrew/homebrew-core/pulls
+               
+          echo "✅ Pull Request created!"
+
+      - name: Cleanup test installation
+        if: always()
+        run: |
+          echo "🧹 Cleaning up test installation"
+          brew uninstall contextlite || true
