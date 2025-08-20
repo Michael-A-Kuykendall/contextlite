@@ -2,7 +2,7 @@ module contextlite
 
 go 1.23.0
 
-toolchain go1.24.5
+toolchain go1.24.6
 
 require (
 	github.com/denisbrodbeck/machineid v1.0.1
