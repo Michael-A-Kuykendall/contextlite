@@ -148,6 +148,11 @@ jobs:
           cd npm-package
           npm install
 
+      - name: Build npm package
+        run: |
+          cd npm-package
+          npm run build
+
       - name: Publish to npm
         run: |
           cd npm-package
