@@ -57,15 +57,15 @@ jobs:
         run: |
           cd release
           
-          # Create tar.gz for Unix platforms
-          tar -czf contextlite-${{ steps.version.outputs.version }}-linux-amd64.tar.gz contextlite-linux-amd64
-          tar -czf contextlite-${{ steps.version.outputs.version }}-linux-arm64.tar.gz contextlite-linux-arm64
-          tar -czf contextlite-${{ steps.version.outputs.version }}-darwin-amd64.tar.gz contextlite-darwin-amd64
-          tar -czf contextlite-${{ steps.version.outputs.version }}-darwin-arm64.tar.gz contextlite-darwin-arm64
+          # Create tar.gz for Unix platforms with clean binary names
+          cp contextlite-linux-amd64 contextlite && tar -czf contextlite-${{ steps.version.outputs.version }}-linux-amd64.tar.gz contextlite && rm contextlite
+          cp contextlite-linux-arm64 contextlite && tar -czf contextlite-${{ steps.version.outputs.version }}-linux-arm64.tar.gz contextlite && rm contextlite
+          cp contextlite-darwin-amd64 contextlite && tar -czf contextlite-${{ steps.version.outputs.version }}-darwin-amd64.tar.gz contextlite && rm contextlite
+          cp contextlite-darwin-arm64 contextlite && tar -czf contextlite-${{ steps.version.outputs.version }}-darwin-arm64.tar.gz contextlite && rm contextlite
           
-          # Create zip for Windows
-          zip contextlite-${{ steps.version.outputs.version }}-windows-amd64.zip contextlite-windows-amd64.exe
-          zip contextlite-${{ steps.version.outputs.version }}-windows-arm64.zip contextlite-windows-arm64.exe
+          # Create zip for Windows with clean binary names
+          cp contextlite-windows-amd64.exe contextlite.exe && zip contextlite-${{ steps.version.outputs.version }}-windows-amd64.zip contextlite.exe && rm contextlite.exe
+          cp contextlite-windows-arm64.exe contextlite.exe && zip contextlite-${{ steps.version.outputs.version }}-windows-arm64.zip contextlite.exe && rm contextlite.exe
 
       - name: Create GitHub Release
         id: create_release
@@ -595,14 +595,6 @@ jobs:
             echo "🚀 Homebrew formula not found or different version, proceeding"
           fi
 
-      - name: Clone homebrew-core (shallow)
-        if: steps.check_homebrew.outputs.skip == 'false'
-        run: |
-          # Shallow clone with only Formula directory to minimize download
-          git clone --depth=1 --filter=blob:none --sparse https://github.com/Homebrew/homebrew-core.git
-          cd homebrew-core
-          git sparse-checkout set Formula
-
       - name: Get checksums from GitHub API
         if: steps.check_homebrew.outputs.skip == 'false'
         run: |
@@ -615,33 +607,35 @@ jobs:
           echo "✅ AMD64 SHA: $AMD64_SHA"
           echo "✅ ARM64 SHA: $ARM64_SHA"
 
-      - name: Create/update formula in homebrew-core
+      - name: Create/update formula in repository
         if: steps.check_homebrew.outputs.skip == 'false'
         run: |
-          cd homebrew-core
-          cp ../homebrew/contextlite.rb Formula/contextlite.rb
+          # Update the formula in our repository with current version and checksums
+          cp homebrew/contextlite.rb homebrew/contextlite.rb.tmp
           
-          # Update version and checksums
-          sed -i '' 's/v[0-9]\+\.[0-9]\+\.[0-9]\+/v${{ steps.version.outputs.version }}/g' Formula/contextlite.rb
-          sed -i '' 's/1\.[0-9]\+\.[0-9]\+/${{ steps.version.outputs.version }}/g' Formula/contextlite.rb
-          sed -i '' "s/YOUR_SHA256_CHECKSUM_HERE/$AMD64_SHA/" Formula/contextlite.rb
-          sed -i '' "s/YOUR_SHA256_AMD64_HERE/$AMD64_SHA/" Formula/contextlite.rb
-          sed -i '' "s/YOUR_SHA256_ARM64_HERE/$ARM64_SHA/" Formula/contextlite.rb
+          # Update version and checksums in our repository formula
+          sed -i '' 's/v[0-9]\+\.[0-9]\+\.[0-9]\+/v${{ steps.version.outputs.version }}/g' homebrew/contextlite.rb.tmp
+          sed -i '' 's/1\.[0-9]\+\.[0-9]\+/${{ steps.version.outputs.version }}/g' homebrew/contextlite.rb.tmp
+          sed -i '' "s/YOUR_SHA256_CHECKSUM_HERE/$AMD64_SHA/" homebrew/contextlite.rb.tmp
+          sed -i '' "s/YOUR_SHA256_AMD64_HERE/$AMD64_SHA/" homebrew/contextlite.rb.tmp
+          sed -i '' "s/YOUR_SHA256_ARM64_HERE/$ARM64_SHA/" homebrew/contextlite.rb.tmp
+          
+          # Replace the original with updated version
+          mv homebrew/contextlite.rb.tmp homebrew/contextlite.rb
 
-      - name: Create PR to homebrew-core
+      - name: Commit updated formula to repository
         if: steps.check_homebrew.outputs.skip == 'false'
         run: |
-          cd homebrew-core
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
           
-          git checkout -b contextlite-${{ steps.version.outputs.version }}
-          git add Formula/contextlite.rb
-          git commit -m "contextlite ${{ steps.version.outputs.version }} (new formula)"
-          
-          # Push to your fork using the default GitHub token
-          git remote add fork https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.actor }}/homebrew-core.git
-          git push fork contextlite-${{ steps.version.outputs.version }}
+          git add homebrew/contextlite.rb
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update Homebrew formula for v${{ steps.version.outputs.version }}"
+            git push origin HEAD:main
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -752,7 +746,7 @@ jobs:
           sha256sums=('SKIP')
 
           package() {
-              install -Dm755 "${srcdir}/contextlite-linux-amd64" "${pkgdir}/usr/bin/contextlite"
+              install -Dm755 "${srcdir}/contextlite" "${pkgdir}/usr/bin/contextlite"
           }
           EOF
 
@@ -798,7 +792,7 @@ jobs:
             - name: contextlite
               buildsystem: simple
               build-commands:
-                - install -D contextlite-linux-amd64 /app/bin/contextlite
+                - install -D contextlite /app/bin/contextlite
               sources:
                 - type: archive
                   url: https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ steps.version.outputs.version }}/contextlite-${{ steps.version.outputs.version }}-linux-amd64.tar.gz
@@ -883,7 +877,7 @@ jobs:
 
             installPhase = ''
               mkdir -p $out/bin
-              cp contextlite-linux-amd64 $out/bin/contextlite
+              cp contextlite $out/bin/contextlite
             '';
 
             meta = with lib; {
