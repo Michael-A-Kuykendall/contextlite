@@ -93,7 +93,7 @@ mod integration_tests {
     async fn test_client_creation_and_basic_operations() {
         // This test requires a running ContextLite server
         // Skip if server is not available
-        let client = match ContextLiteClient::new() {
+        let client = match ContextLiteClient::new("http://127.0.0.1:8082") {
             Ok(client) => client,
             Err(_) => return, // Skip test if client creation fails
         };
@@ -104,8 +104,10 @@ mod integration_tests {
         }
         
         // Test document operations
+        let mut metadata = std::collections::HashMap::new();
+        metadata.insert("test".to_string(), "true".to_string());
         let document = Document::new("test.txt", "This is a test document")
-            .with_metadata(serde_json::json!({"test": true}));
+            .with_metadata(metadata);
         
         let doc_id = client.add_document(&document).await.unwrap();
         assert!(!doc_id.is_empty());
@@ -120,7 +122,7 @@ mod integration_tests {
             .with_budget(1000)
             .with_max_results(3);
         let context = client.assemble_context(&context_request).await.unwrap();
-        assert!(!context.context.is_empty());
+        assert!(context.total_documents > 0);
         
         // Clean up
         let _ = client.delete_document(&doc_id).await;

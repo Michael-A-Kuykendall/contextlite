@@ -9,7 +9,7 @@
       "production_ready": false,
       "priority": "HIGH",
       "revenue_impact": "HIGH",
-      "last_updated": "2025-08-19T20:08:41.0881269-05:00"
+      "last_updated": "2025-08-20T02:48:12.5564301-05:00"
     },
     "config": {
       "name": "Configuration",
@@ -20,7 +20,7 @@
       "production_ready": true,
       "priority": "MEDIUM",
       "revenue_impact": "LOW",
-      "last_updated": "2025-08-19T20:08:04.724066-05:00"
+      "last_updated": "2025-08-20T02:48:23.229515-05:00"
     },
     "contextlite": {
       "name": "Main Server",
@@ -31,7 +31,7 @@
       "production_ready": false,
       "priority": "HIGH",
       "revenue_impact": "HIGH",
-      "last_updated": "2025-08-19T20:08:08.4781071-05:00"
+      "last_updated": "2025-08-20T02:48:15.0074104-05:00"
     },
     "engine": {
       "name": "Context Engine",
@@ -42,7 +42,7 @@
       "production_ready": false,
       "priority": "CRITICAL",
       "revenue_impact": "HIGH",
-      "last_updated": "2025-08-19T20:08:39.3138851-05:00"
+      "last_updated": "2025-08-20T02:48:10.9829398-05:00"
     },
     "evaluation": {
       "name": "Evaluation System",
@@ -53,18 +53,18 @@
       "production_ready": true,
       "priority": "LOW",
       "revenue_impact": "LOW",
-      "last_updated": "2025-08-19T20:08:05.8949299-05:00"
+      "last_updated": "2025-08-20T02:48:13.561034-05:00"
     },
     "license": {
       "name": "License System",
       "package": "./internal/license",
-      "coverage": 0.7759999999999999,
+      "coverage": 0.772,
       "tests_passing": 0,
       "tests_total": 0,
       "production_ready": true,
       "priority": "CRITICAL",
       "revenue_impact": "CRITICAL",
-      "last_updated": "2025-08-19T20:08:01.0580457-05:00"
+      "last_updated": "2025-08-20T02:48:17.975845-05:00"
     },
     "license-server": {
       "name": "License Server",
@@ -75,7 +75,7 @@
       "production_ready": true,
       "priority": "CRITICAL",
       "revenue_impact": "CRITICAL",
-      "last_updated": "2025-08-19T20:08:38.1958427-05:00"
+      "last_updated": "2025-08-20T02:48:09.9869784-05:00"
     },
     "pipeline": {
       "name": "Processing Pipeline",
@@ -86,7 +86,7 @@
       "production_ready": false,
       "priority": "MEDIUM",
       "revenue_impact": "MEDIUM",
-      "last_updated": "2025-08-19T20:08:42.8113673-05:00"
+      "last_updated": "2025-08-20T02:48:22.0497045-05:00"
     },
     "storage": {
       "name": "Storage Layer",
@@ -97,7 +97,7 @@
       "production_ready": true,
       "priority": "HIGH",
       "revenue_impact": "MEDIUM",
-      "last_updated": "2025-08-19T20:08:03.5958032-05:00"
+      "last_updated": "2025-08-20T02:48:20.3175489-05:00"
     },
     "timing": {
       "name": "Timing Utils",
@@ -108,7 +108,7 @@
       "production_ready": true,
       "priority": "LOW",
       "revenue_impact": "LOW",
-      "last_updated": "2025-08-19T20:08:06.924947-05:00"
+      "last_updated": "2025-08-20T02:47:39.6554402-05:00"
     },
     "tokens": {
       "name": "Token Processing",
@@ -119,13 +119,13 @@
       "production_ready": true,
       "priority": "MEDIUM",
       "revenue_impact": "LOW",
-      "last_updated": "2025-08-19T20:08:43.856752-05:00"
+      "last_updated": "2025-08-20T02:48:24.2523986-05:00"
     }
   },
   "critical_alerts": [
-    "LOW_COVERAGE: License Server below 80% coverage (75.9%)",
     "LOW_COVERAGE: Context Engine below 80% coverage (50.0%)",
-    "LOW_COVERAGE: License System below 80% coverage (77.6%)"
+    "LOW_COVERAGE: License System below 80% coverage (77.2%)",
+    "LOW_COVERAGE: License Server below 80% coverage (75.9%)"
   ],
-  "last_updated": "2025-08-19T20:07:57.9795363-05:00"
+  "last_updated": "2025-08-20T02:47:38.6349745-05:00"
 }

@@ -7,6 +7,7 @@
 //! - Basic error handling
 
 use contextlite_client::{ContextLiteClient, Document, SearchQuery, ContextRequest};
+use std::collections::HashMap;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -14,16 +15,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("===========================================");
     
     // Create client with default configuration (http://127.0.0.1:8082)
-    let client = ContextLiteClient::new()?;
+    let client = ContextLiteClient::new("http://127.0.0.1:8082")?;
     
     // Check server health
     println!("\n1. Checking server health...");
     match client.health().await {
         Ok(health) => {
             println!("✓ Server is healthy: {}", health.status);
-            if let Some(version) = health.version {
-                println!("  Version: {}", version);
-            }
+            println!("  Version: {}", health.version);
         }
         Err(e) => {
             eprintln!("✗ Health check failed: {}", e);
@@ -37,9 +36,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match client.storage_info().await {
         Ok(info) => {
             println!("✓ Storage info:");
-            println!("  Total documents: {}", info.total_documents);
-            println!("  Database size: {}", info.database_size);
-            println!("  Index size: {}", info.index_size);
+            println!("  Total documents: {}", info.document_count);
+            println!("  Database size: {} bytes", info.size_bytes);
+            println!("  Database path: {}", info.database_path);
         }
         Err(e) => {
             eprintln!("✗ Failed to get storage info: {}", e);
@@ -52,27 +51,33 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let documents = vec![
         Document::new("rust_tutorial.md", 
             "Rust is a systems programming language that runs blazingly fast, prevents segfaults, and guarantees thread safety.")
-            .with_metadata(serde_json::json!({
-                "type": "tutorial",
-                "language": "rust",
-                "difficulty": "beginner"
-            })),
+            .with_metadata({
+                let mut map = HashMap::new();
+                map.insert("type".to_string(), "tutorial".to_string());
+                map.insert("language".to_string(), "rust".to_string());
+                map.insert("difficulty".to_string(), "beginner".to_string());
+                map
+            }),
         
         Document::new("async_programming.md",
             "Async programming in Rust uses futures and the async/await syntax for non-blocking operations.")
-            .with_metadata(serde_json::json!({
-                "type": "guide", 
-                "language": "rust",
-                "difficulty": "intermediate"
-            })),
+            .with_metadata({
+                let mut map = HashMap::new();
+                map.insert("type".to_string(), "guide".to_string());
+                map.insert("language".to_string(), "rust".to_string());
+                map.insert("difficulty".to_string(), "intermediate".to_string());
+                map
+            }),
         
         Document::new("web_development.md",
             "Building web applications with Rust frameworks like Actix-web, Warp, and Rocket.")
-            .with_metadata(serde_json::json!({
-                "type": "tutorial",
-                "language": "rust", 
-                "difficulty": "advanced"
-            })),
+            .with_metadata({
+                let mut map = HashMap::new();
+                map.insert("type".to_string(), "tutorial".to_string());
+                map.insert("language".to_string(), "rust".to_string());
+                map.insert("difficulty".to_string(), "advanced".to_string());
+                map
+            }),
     ];
     
     let mut doc_ids = Vec::new();
@@ -114,9 +119,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         doc_ref.score.unwrap_or(0.0)
                     );
                     
-                    if let Some(snippet) = &doc_ref.snippet {
-                        println!("       \"{}\"", snippet);
-                    }
+                    // Show content preview (first 100 chars)
+                    let preview = if doc_ref.content.len() > 100 {
+                        format!("{}...", &doc_ref.content[..100])
+                    } else {
+                        doc_ref.content.clone()
+                    };
+                    println!("       \"{}\"", preview);
                 }
             }
             Err(e) => {
@@ -135,18 +144,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     match client.assemble_context(&context_request).await {
         Ok(context) => {
-            println!("✓ Assembled context ({} chars):", context.context.len());
-            println!("  Documents used: {}", context.documents.len());
+            // Assemble context text from documents
+            let assembled_text = if let Some(docs) = &context.documents {
+                docs.iter().map(|doc| doc.content.as_str()).collect::<Vec<_>>().join("\n\n")
+            } else {
+                String::new()
+            };
             
-            if let Some(token_count) = context.token_count {
-                println!("  Token count: {}", token_count);
-            }
+            println!("✓ Assembled context ({} chars):", assembled_text.len());
+            println!("  Documents used: {}", context.total_documents);
+            println!("  Token count: {}", context.total_tokens);
             
             // Show first 200 characters of context
-            let preview = if context.context.len() > 200 {
-                format!("{}...", &context.context[..200])
+            let preview = if assembled_text.len() > 200 {
+                format!("{}...", &assembled_text[..200])
             } else {
-                context.context.clone()
+                assembled_text.clone()
             };
             
             println!("  Context preview: \"{}\"", preview);
