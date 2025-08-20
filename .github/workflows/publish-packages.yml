@@ -291,14 +291,29 @@ jobs:
           iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
       - name: Use existing Chocolatey package
-        shell: bash
+        shell: powershell
         run: |
           # Use existing chocolatey package structure
-          cp -r chocolatey chocolatey-package
+          Copy-Item -Path "chocolatey" -Destination "chocolatey-package" -Recurse
           
           # Update version in nuspec file
           cd chocolatey-package
-          sed -i "s/<version>.*<\/version>/<version>${{ steps.version.outputs.version }}<\/version>/" contextlite.nuspec
+          $content = Get-Content "contextlite.nuspec" -Raw
+          $content = $content -replace '<version>.*</version>', '<version>${{ steps.version.outputs.version }}</version>'
+          Set-Content "contextlite.nuspec" -Value $content
+          
+          # Download the Windows binary to get checksum
+          $downloadUrl = "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ steps.version.outputs.version }}/contextlite-${{ steps.version.outputs.version }}-windows-amd64.zip"
+          Invoke-WebRequest -Uri $downloadUrl -OutFile "contextlite-windows.zip"
+          $checksum = (Get-FileHash "contextlite-windows.zip" -Algorithm SHA256).Hash
+          
+          # Update install script with new URL and checksum
+          $installScript = Get-Content "tools\chocolateyinstall.ps1" -Raw
+          $installScript = $installScript -replace 'https://github\.com/[^/]+/[^/]+/releases/download/v[^/]+/[^'']+', $downloadUrl
+          $installScript = $installScript -replace 'YOUR_CHECKSUM_HERE', $checksum
+          $installScript = $installScript -replace 'v\d+\.\d+\.\d+', "v${{ steps.version.outputs.version }}"
+          $installScript = $installScript -replace '\d+\.\d+\.\d+', "${{ steps.version.outputs.version }}"
+          Set-Content "tools\chocolateyinstall.ps1" -Value $installScript
 
       - name: Build Chocolatey package
         shell: powershell
@@ -320,7 +335,6 @@ jobs:
 
   publish-crates:
     runs-on: ubuntu-latest
-    if: false  # Disabled - API mismatches in Rust client need fixing
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -475,7 +489,7 @@ jobs:
   publish-homebrew:
     runs-on: macos-latest
     needs: build-and-release
-    if: false  # Disabled - git clone hangs indefinitely
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -489,10 +503,12 @@ jobs:
             echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Clone homebrew-core
+      - name: Clone homebrew-core (shallow)
         run: |
-          git clone https://github.com/Homebrew/homebrew-core.git
+          # Shallow clone with only Formula directory to minimize download
+          git clone --depth=1 --filter=blob:none --sparse https://github.com/Homebrew/homebrew-core.git
           cd homebrew-core
+          git sparse-checkout set Formula
 
       - name: Calculate checksums
         run: |

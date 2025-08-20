@@ -7,6 +7,7 @@ use contextlite_client::{
     ContextLiteClient, ClientConfig, Document, SearchQuery, ContextRequest, ContextLiteError
 };
 use serde_json::json;
+use std::collections::HashMap;
 use tokio::time::Duration;
 
 /// Test configuration - matches the integration test suite setup
@@ -73,11 +74,13 @@ async fn test_document_operations() {
     // Create a test document
     let document = Document::new("test_rust.rs", 
         "fn main() { println!(\"Hello from Rust!\"); }")
-        .with_metadata(json!({
-            "language": "rust",
-            "test": true,
-            "timestamp": chrono::Utc::now().timestamp()
-        }));
+        .with_metadata({
+            let mut map = HashMap::new();
+            map.insert("language".to_string(), "rust".to_string());
+            map.insert("test".to_string(), "true".to_string());
+            map.insert("timestamp".to_string(), chrono::Utc::now().timestamp().to_string());
+            map
+        });
     
     // Add document
     let doc_id = client.add_document(&document).await
@@ -95,7 +98,11 @@ async fn test_document_operations() {
     // Update document
     let updated_doc = Document::new("test_rust_updated.rs",
         "fn main() { println!(\"Hello from updated Rust!\"); }")
-        .with_metadata(json!({"updated": true}));
+        .with_metadata({
+            let mut map = HashMap::new();
+            map.insert("updated".to_string(), "true".to_string());
+            map
+        });
     
     client.update_document(&doc_id, &updated_doc).await
         .expect("Failed to update document");
@@ -129,15 +136,27 @@ async fn test_batch_operations() {
     let documents = vec![
         Document::new("rust_basics.md", 
             "Rust programming basics: variables, functions, and ownership")
-            .with_metadata(json!({"topic": "basics"})),
+            .with_metadata({
+                let mut map = HashMap::new();
+                map.insert("topic".to_string(), "basics".to_string());
+                map
+            }),
         
         Document::new("rust_advanced.md",
             "Advanced Rust concepts: lifetimes, traits, and async programming")
-            .with_metadata(json!({"topic": "advanced"})),
+            .with_metadata({
+                let mut map = HashMap::new();
+                map.insert("topic".to_string(), "advanced".to_string());
+                map
+            }),
         
         Document::new("rust_web.md",
             "Web development with Rust using Actix-web and Tokio")
-            .with_metadata(json!({"topic": "web"})),
+            .with_metadata({
+                let mut map = HashMap::new();
+                map.insert("topic".to_string(), "web".to_string());
+                map
+            }),
     ];
     
     // Add documents in batch
@@ -238,9 +257,11 @@ async fn test_context_assembly() {
     let context = client.assemble_context(&context_request).await
         .expect("Context assembly failed");
     
-    assert!(!context.context.is_empty());
-    assert!(!context.documents.is_empty());
-    assert!(context.documents.len() <= 3);
+    assert!(context.total_documents > 0);
+    assert!(context.documents.is_some());
+    if let Some(docs) = &context.documents {
+        assert!(docs.len() <= 3);
+    }
     
     // Clean up
     for doc_id in doc_ids {
