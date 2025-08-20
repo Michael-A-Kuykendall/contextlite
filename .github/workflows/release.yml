@@ -1,0 +1,237 @@
+name: Multi-Platform Release (DISABLED)
+
+on:
+  # Disabled to prevent conflicts with publish-packages.yml
+  # push:
+  #   tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  id-token: write
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Run tests
+        run: |
+          go test ./internal/engine -v
+          go test ./internal/pipeline -v  
+          go test ./internal/storage -v
+          go test ./pkg/config -v
+          go test ./pkg/tokens -v
+          go test ./cmd/contextlite -v
+
+  build-and-release:
+    needs: test
+    strategy:
+      matrix:
+        include:
+        - os: ubuntu-latest
+          goos: linux
+          goarch: amd64
+          suffix: ""
+          name: "linux-amd64"
+        - os: ubuntu-latest  
+          goos: linux
+          goarch: arm64
+          suffix: ""
+          name: "linux-arm64"
+        - os: windows-latest
+          goos: windows
+          goarch: amd64
+          suffix: ".exe"
+          name: "windows-amd64"
+        - os: macos-latest
+          goos: darwin
+          goarch: amd64
+          suffix: ""
+          name: "darwin-amd64"
+        - os: macos-latest
+          goos: darwin
+          goarch: arm64
+          suffix: ""
+          name: "darwin-arm64"
+          
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22.x'
+        
+    - name: Get Version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+        
+    - name: Check Private Binary Status
+      run: |
+        if [ -f "build/contextlite-library${{ matrix.suffix }}" ]; then
+          echo "✅ Private binary found - SMT optimization available"
+          echo "PRIVATE_BINARY=true" >> $GITHUB_ENV
+        else
+          echo "⚠️  Private binary not found - using core engine only"
+          echo "PRIVATE_BINARY=false" >> $GITHUB_ENV
+        fi
+      shell: bash
+        
+    - name: Build Release Binary
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
+        CGO_ENABLED: 0
+      run: |
+        echo "Building ContextLite for ${{ matrix.goos }}/${{ matrix.goarch }}"
+        mkdir -p build
+        go build -ldflags="-X main.version=${{ steps.version.outputs.version }}" \
+          -o build/contextlite${{ matrix.suffix }} ./cmd/contextlite/main.go
+        
+    - name: Create Package Directory
+      run: |
+        mkdir -p dist/contextlite-${{ steps.version.outputs.version }}-${{ matrix.name }}
+        cp build/contextlite${{ matrix.suffix }} dist/contextlite-${{ steps.version.outputs.version }}-${{ matrix.name }}/
+        
+        # Copy private binary if available
+        if [ "${{ env.PRIVATE_BINARY }}" = "true" ]; then
+          cp build/contextlite-library${{ matrix.suffix }} dist/contextlite-${{ steps.version.outputs.version }}-${{ matrix.name }}/
+        fi
+        
+        # Copy documentation
+        cp README.md LICENSE dist/contextlite-${{ steps.version.outputs.version }}-${{ matrix.name }}/
+        
+        # Create installation instructions
+        cat > dist/contextlite-${{ steps.version.outputs.version }}-${{ matrix.name }}/INSTALL.md << EOF
+        # ContextLite Installation
+        
+        ## Quick Start
+        1. Add contextlite to your PATH
+        2. Run: \`contextlite --help\`
+        3. Start server: \`contextlite\`
+        4. Visit: http://localhost:8082/health
+        
+        ## 14-Day Trial
+        - Full SMT optimization available for 14 days
+        - No credit card required
+        - All features unlocked
+        
+        ## Purchase License
+        After trial: https://contextlite.com/purchase
+        
+        ## Features in This Build
+        - Core Engine: ✅ Always available (BM25 + heuristics)
+        - SMT Engine: $([ "${{ env.PRIVATE_BINARY }}" = "true" ] && echo "✅ Available" || echo "❌ Requires license")
+        - Trial System: ✅ 14-day full access
+        EOF
+      shell: bash
+        
+    - name: Create Archive
+      run: |
+        cd dist
+        if [ "${{ matrix.goos }}" = "windows" ]; then
+          zip -r ../contextlite-${{ steps.version.outputs.version }}-${{ matrix.name }}.zip contextlite-${{ steps.version.outputs.version }}-${{ matrix.name }}
+        else
+          tar -czf ../contextlite-${{ steps.version.outputs.version }}-${{ matrix.name }}.tar.gz contextlite-${{ steps.version.outputs.version }}-${{ matrix.name }}
+        fi
+      shell: bash
+        
+    - name: Upload Release Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: contextlite-${{ steps.version.outputs.version }}-${{ matrix.name }}
+        path: |
+          contextlite-${{ steps.version.outputs.version }}-${{ matrix.name }}.*
+          
+  create-release:
+    needs: build-and-release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: Download All Artifacts
+      uses: actions/download-artifact@v4
+      
+    - name: Get Version
+      id: version
+      run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        name: ContextLite ${{ steps.version.outputs.version }}
+        body: |
+          ## 🚀 ContextLite ${{ steps.version.outputs.version }}
+          
+          ### ✨ What's New
+          - 14-day full-featured trial (no credit card required)
+          - Complete SMT optimization with private binary integration
+          - Robust BM25 fallback engine always available
+          - Cross-platform support (Linux, Windows, macOS)
+          
+          ### 📦 Installation
+          1. Download the appropriate binary for your platform
+          2. Extract the archive
+          3. Add to your PATH or run directly
+          4. Start with: `./contextlite`
+          
+          ### 🔗 Links
+          - 📖 Documentation: https://docs.contextlite.com
+          - 💬 Discord: https://discord.gg/contextlite
+          - 🛒 Purchase License: https://contextlite.com/purchase
+          
+          ### 🎯 Trial Information
+          - **Duration**: 14 days from first run
+          - **Features**: Complete SMT optimization included
+          - **Requirement**: None (no registration needed)
+          - **After Trial**: Purchase $99 license to continue
+          
+          Download the binary for your platform below ⬇️
+        draft: false
+        prerelease: false
+        files: |
+          contextlite-*/contextlite-*.*
