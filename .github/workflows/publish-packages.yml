@@ -552,7 +552,7 @@ jobs:
           git remote add fork https://github.com/${{ github.actor }}/homebrew-core.git
           git push fork contextlite-${{ steps.version.outputs.version }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}
 
   publish-scoop:
     runs-on: windows-latest

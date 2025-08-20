@@ -96,7 +96,7 @@ class GitHubActionsMonitor:
             elif 'aur' in job.lower():
                 fixes[job] = "🏛️ AUR publish error - SSH key or PKGBUILD issue"
             elif 'homebrew' in job.lower():
-                fixes[job] = "🍺 Homebrew PR failed - API rate limit or formula issue"
+                fixes[job] = "🍺 HOMEBREW_GITHUB_API_TOKEN missing or invalid - check GitHub API token for Homebrew"
             else:
                 fixes[job] = "❓ Unknown failure - check logs manually"
                 
