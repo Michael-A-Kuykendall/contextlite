@@ -548,11 +548,11 @@ jobs:
           git add Formula/contextlite.rb
           git commit -m "contextlite ${{ steps.version.outputs.version }} (new formula)"
           
-          # Push to your fork using token authentication directly in URL
-          git remote add fork https://${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}@github.com/${{ github.actor }}/homebrew-core.git
+          # Push to your fork using the default GitHub token
+          git remote add fork https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.actor }}/homebrew-core.git
           git push fork contextlite-${{ steps.version.outputs.version }}
         env:
-          GITHUB_TOKEN: ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-scoop:
     runs-on: windows-latest
