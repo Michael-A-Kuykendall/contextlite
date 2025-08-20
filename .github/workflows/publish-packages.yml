@@ -307,11 +307,14 @@ jobs:
           choco pack
 
       - name: Publish to Chocolatey
-        if: ${{ env.CHOCOLATEY_API_KEY != '' }}
         shell: powershell
         run: |
-          cd chocolatey-package
-          choco push contextlite.${{ steps.version.outputs.version }}.nupkg --source="https://push.chocolatey.org/" --key $env:CHOCOLATEY_API_KEY
+          if ($env:CHOCOLATEY_API_KEY) {
+            cd chocolatey-package
+            choco push contextlite.${{ steps.version.outputs.version }}.nupkg --source="https://push.chocolatey.org/" --key $env:CHOCOLATEY_API_KEY
+          } else {
+            Write-Host "CHOCOLATEY_API_KEY not set, skipping Chocolatey publish"
+          }
         env:
           CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
 
@@ -348,10 +351,15 @@ jobs:
           cargo test
 
       - name: Publish to crates.io
-        if: ${{ secrets.CARGO_REGISTRY_TOKEN != '' }}
         run: |
-          cd adapters/rust/contextlite-client
-          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          if [ -n "$CARGO_REGISTRY_TOKEN" ]; then
+            cd adapters/rust/contextlite-client
+            cargo publish --token $CARGO_REGISTRY_TOKEN
+          else
+            echo "CARGO_REGISTRY_TOKEN not set, skipping crates.io publish"
+          fi
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
   publish-vscode:
     runs-on: ubuntu-latest
