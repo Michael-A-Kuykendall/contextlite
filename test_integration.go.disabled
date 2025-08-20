@@ -1,0 +1,18 @@
+package main
+
+import (
+"fmt"
+"contextlite/internal/engine"
+"contextlite/pkg/config"
+)
+
+func main() {
+fmt.Println("Private engine available:", engine.PrivateEngineAvailable())
+
+cfg := &config.Config{}
+eng := engine.LoadEngine(cfg, nil)
+info := engine.GetEngineInfo(eng)
+
+fmt.Printf("Engine type: %v\n", info["type"])
+fmt.Printf("Communication: %v\n", info["communication"])
+}
