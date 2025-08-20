@@ -386,6 +386,7 @@ jobs:
 
   publish-crates:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -405,12 +406,25 @@ jobs:
             echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check if Crates version exists
+        id: check_crates
+        run: |
+          if curl -f "https://crates.io/api/v1/crates/contextlite-client" | grep -q "\"${{ steps.version.outputs.version }}\"" 2>/dev/null; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "✅ Crates.io already has this version, skipping"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "🚀 Crates.io version not found, proceeding"
+          fi
+
       - name: Update Cargo.toml version
+        if: steps.check_crates.outputs.skip == 'false'
         run: |
           cd adapters/rust/contextlite-client
           sed -i 's/^version = ".*"/version = "${{ steps.version.outputs.version }}"/' Cargo.toml
 
       - name: Build for publishing
+        if: steps.check_crates.outputs.skip == 'false'
         run: |
           cd adapters/rust/contextlite-client
           cargo build --release
@@ -418,6 +432,7 @@ jobs:
           echo "Build successful, skipping tests for publishing"
 
       - name: Publish to crates.io
+        if: steps.check_crates.outputs.skip == 'false'
         run: |
           if [ -n "$CARGO_REGISTRY_TOKEN" ]; then
             cd adapters/rust/contextlite-client
@@ -496,7 +511,19 @@ jobs:
             echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check if Snap version exists
+        id: check_snap
+        run: |
+          if snap info contextlite | grep -q "${{ steps.version.outputs.version }}" 2>/dev/null; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "✅ Snap Store already has this version, skipping"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "🚀 Snap Store version not found, proceeding"
+          fi
+
       - name: Create snapcraft.yaml
+        if: steps.check_snap.outputs.skip == 'false'
         run: |
           mkdir -p snap
           cat > snap/snapcraft.yaml << 'EOF'
@@ -515,19 +542,21 @@ jobs:
               plugin: dump
               source: https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ steps.version.outputs.version }}/contextlite-${{ steps.version.outputs.version }}-linux-amd64.tar.gz
               stage:
-                - contextlite-linux-amd64
+                - contextlite
               prime:
-                - contextlite-linux-amd64
+                - contextlite
 
           apps:
             contextlite:
-              command: contextlite-linux-amd64
+              command: contextlite
           EOF
 
       - name: Build snap
+        if: steps.check_snap.outputs.skip == 'false'
         run: snapcraft --destructive-mode
 
       - name: Login to Snap Store
+        if: steps.check_snap.outputs.skip == 'false'
         run: |
           echo "$SNAPCRAFT_STORE_CREDENTIALS" | base64 -d > /tmp/snapcraft-login
           snapcraft login --with /tmp/snapcraft-login
@@ -535,6 +564,7 @@ jobs:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
       - name: Upload and release snap
+        if: steps.check_snap.outputs.skip == 'false'
         run: |
           snapcraft upload *.snap --release=stable
 
@@ -573,16 +603,17 @@ jobs:
           cd homebrew-core
           git sparse-checkout set Formula
 
-      - name: Calculate checksums
+      - name: Get checksums from GitHub API
         if: steps.check_homebrew.outputs.skip == 'false'
         run: |
-          # Download release assets and calculate SHA256
-          wget "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ steps.version.outputs.version }}/contextlite-${{ steps.version.outputs.version }}-darwin-amd64.tar.gz"
-          wget "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ steps.version.outputs.version }}/contextlite-${{ steps.version.outputs.version }}-darwin-arm64.tar.gz"
-          AMD64_SHA=$(shasum -a 256 contextlite-${{ steps.version.outputs.version }}-darwin-amd64.tar.gz | cut -d' ' -f1)
-          ARM64_SHA=$(shasum -a 256 contextlite-${{ steps.version.outputs.version }}-darwin-arm64.tar.gz | cut -d' ' -f1)
+          # Get checksums directly from GitHub API (pre-computed)
+          RELEASE_DATA=$(curl -s "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/releases/tags/v${{ steps.version.outputs.version }}")
+          AMD64_SHA=$(echo "$RELEASE_DATA" | grep -A2 "darwin-amd64.tar.gz" | grep '"digest"' | sed 's/.*sha256:\([^"]*\)".*/\1/')
+          ARM64_SHA=$(echo "$RELEASE_DATA" | grep -A2 "darwin-arm64.tar.gz" | grep '"digest"' | sed 's/.*sha256:\([^"]*\)".*/\1/')
           echo "AMD64_SHA=$AMD64_SHA" >> $GITHUB_ENV
           echo "ARM64_SHA=$ARM64_SHA" >> $GITHUB_ENV
+          echo "✅ AMD64 SHA: $AMD64_SHA"
+          echo "✅ ARM64 SHA: $ARM64_SHA"
 
       - name: Create/update formula in homebrew-core
         if: steps.check_homebrew.outputs.skip == 'false'
@@ -679,6 +710,7 @@ jobs:
 
   publish-aur:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -692,7 +724,19 @@ jobs:
             echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check if AUR package exists
+        id: check_aur
+        run: |
+          if curl -f "https://aur.archlinux.org/rpc/?v=5&type=info&arg=contextlite" | grep -q "${{ steps.version.outputs.version }}" 2>/dev/null; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "✅ AUR package already has this version, skipping"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "🚀 AUR package not found or different version, proceeding"
+          fi
+
       - name: Create AUR package
+        if: steps.check_aur.outputs.skip == 'false'
         run: |
           mkdir aur-package
           cat > aur-package/PKGBUILD << 'EOF'
@@ -713,6 +757,7 @@ jobs:
           EOF
 
       - name: Publish to AUR
+        if: steps.check_aur.outputs.skip == 'false'
         uses: KSXGitHub/github-actions-deploy-aur@v2.7.2
         with:
           pkgname: contextlite
