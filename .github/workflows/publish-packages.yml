@@ -350,6 +350,7 @@ jobs:
 
   publish-homebrew:
     runs-on: macos-latest
+    if: false  # Disabled - missing HOMEBREW_GITHUB_API_TOKEN
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -404,6 +405,7 @@ jobs:
 
   publish-scoop:
     runs-on: windows-latest
+    if: false  # Disabled - missing SCOOP_GITHUB_TOKEN
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -443,6 +445,7 @@ jobs:
 
   publish-winget:
     runs-on: windows-latest
+    if: false  # Disabled - missing WINGET_GITHUB_TOKEN
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -509,6 +512,7 @@ jobs:
 
   publish-flathub:
     runs-on: ubuntu-latest
+    if: false  # Disabled - missing FLATHUB_TOKEN
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -555,6 +559,7 @@ jobs:
 
   publish-github-packages:
     runs-on: ubuntu-latest
+    if: false  # Disabled - configuration issues with npm registry
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -576,6 +581,7 @@ jobs:
 
   publish-nix:
     runs-on: ubuntu-latest
+    if: false  # Disabled - missing NIXPKGS_GITHUB_TOKEN
     steps:
       - name: Checkout
         uses: actions/checkout@v4
