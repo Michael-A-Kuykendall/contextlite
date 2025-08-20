@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download ContextLite - Lightning Fast Context Retrieval</title>
+    <meta name="description" content="Download ContextLite - 100x faster than vector databases with 0.3ms response time. Free 14-day trial.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .title {
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .version-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .version-badge {
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+        
+        .downloads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .download-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .download-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+        }
+        
+        .download-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .platform-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .platform-icon {
+            font-size: 3rem;
+            margin-right: 15px;
+        }
+        
+        .platform-name {
+            font-size: 1.8rem;
+            color: #1f2937;
+            font-weight: 700;
+        }
+        
+        .file-size {
+            color: #6b7280;
+            font-size: 1rem;
+        }
+        
+        .download-btn {
+            display: block;
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            color: white;
+            text-decoration: none;
+            padding: 15px 25px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+        
+        .filename {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+        
+        .quickstart {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .quickstart-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #1f2937;
+            margin-bottom: 30px;
+        }
+        
+        .install-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .install-steps {
+            text-align: center;
+        }
+        
+        .install-steps h3 {
+            color: #2563eb;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .install-steps ol {
+            text-align: left;
+            color: #555;
+            padding-left: 20px;
+        }
+        
+        .install-steps li {
+            margin-bottom: 8px;
+        }
+        
+        .install-steps code {
+            background: #f3f4f6;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            color: #1f2937;
+        }
+        
+        .package-managers {
+            background: #1f2937;
+            color: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .package-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+        
+        .package-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .package-card {
+            background: #374151;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .package-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .package-card code {
+            background: #111827;
+            padding: 15px;
+            border-radius: 8px;
+            display: block;
+            color: #f9fafb;
+            font-family: 'Monaco', 'Consolas', monospace;
+            word-break: break-all;
+        }
+        
+        .actions {
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            background: #374151;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+        
+        .action-btn.primary {
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+        }
+        
+        .performance {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(45deg, #f0f9ff, #e0f2fe);
+            border-radius: 20px;
+            border-left: 6px solid #2563eb;
+        }
+        
+        .performance h3 {
+            color: #1e40af;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        
+        .performance-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            color: #1e40af;
+            font-size: 2rem;
+            font-weight: 800;
+            display: block;
+        }
+        
+        .stat-label {
+            color: #1e40af;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .downloads-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .performance-stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Download ContextLite</h1>
+            <p class="subtitle">Lightning-fast context retrieval for AI applications</p>
+            <div id="version-info" class="version-info">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading latest release...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="downloads" class="downloads-grid">
+            <!-- Downloads will be populated by JavaScript -->
+        </div>
+        
+        <div class="quickstart">
+            <h2 class="quickstart-title">🚀 Quick Start Guide</h2>
+            <div class="install-grid">
+                <div class="install-steps">
+                    <h3>🖥️ Windows</h3>
+                    <ol>
+                        <li>Download the Windows executable</li>
+                        <li>Extract the archive</li>
+                        <li>Run <code>contextlite.exe</code></li>
+                        <li>Start your 14-day trial!</li>
+                    </ol>
+                </div>
+                
+                <div class="install-steps">
+                    <h3>🍎 macOS</h3>
+                    <ol>
+                        <li>Download the macOS archive</li>
+                        <li><code>tar -xzf contextlite-*.tar.gz</code></li>
+                        <li><code>chmod +x contextlite</code></li>
+                        <li><code>./contextlite</code></li>
+                    </ol>
+                </div>
+                
+                <div class="install-steps">
+                    <h3>🐧 Linux</h3>
+                    <ol>
+                        <li>Download the Linux archive</li>
+                        <li><code>tar -xzf contextlite-*.tar.gz</code></li>
+                        <li><code>chmod +x contextlite</code></li>
+                        <li><code>./contextlite</code></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <div class="package-managers">
+            <h2 class="package-title">📦 Package Managers</h2>
+            <div class="package-grid">
+                <div class="package-card">
+                    <h3 style="color: #ef4444;">📕 npm</h3>
+                    <code>npm install -g contextlite</code>
+                </div>
+                
+                <div class="package-card">
+                    <h3 style="color: #3b82f6;">🐍 PyPI</h3>
+                    <code>pip install contextlite</code>
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <div class="action-buttons">
+                <a href="https://github.com/Michael-A-Kuykendall/contextlite/wiki" class="action-btn">
+                    📚 Documentation
+                </a>
+                <a href="https://github.com/Michael-A-Kuykendall/contextlite" class="action-btn">
+                    ⚡ GitHub
+                </a>
+                <a href="https://contextlite.com" class="action-btn primary">
+                    🏠 Homepage
+                </a>
+            </div>
+        </div>
+        
+        <div class="performance">
+            <h3>⚡ Performance Highlights</h3>
+            <div class="performance-stats">
+                <div class="stat">
+                    <span class="stat-value">0.3ms</span>
+                    <div class="stat-label">Average Response Time</div>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">100x</span>
+                    <div class="stat-label">Faster Than Vector DBs</div>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">optimization</span>
+                    <div class="stat-label">Smart Multi-Token Tech</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadLatestRelease() {
+            try {
+                const response = await fetch('https://api.github.com/repos/Michael-A-Kuykendall/contextlite/releases/latest');
+                const release = await response.json();
+                
+                // Update version info
+                const versionInfo = document.getElementById('version-info');
+                const releaseDate = new Date(release.published_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                versionInfo.innerHTML = `
+                    <div class="version-badge">Latest Version: ${release.tag_name}</div>
+                    <div style="color: #888; margin-top: 10px;">Released: ${releaseDate}</div>
+                `;
+                
+                // Create download cards
+                const downloadsContainer = document.getElementById('downloads');
+                downloadsContainer.innerHTML = '';
+                
+                release.assets.forEach(asset => {
+                    let platform, icon;
+                    
+                    if (asset.name.toLowerCase().includes('windows') || asset.name.toLowerCase().includes('win')) {
+                        platform = 'Windows';
+                        icon = '🖥️';
+                    } else if (asset.name.toLowerCase().includes('darwin') || asset.name.toLowerCase().includes('macos')) {
+                        platform = 'macOS';
+                        icon = '🍎';
+                    } else if (asset.name.toLowerCase().includes('linux')) {
+                        platform = 'Linux';
+                        icon = '🐧';
+                    } else {
+                        platform = 'Other';
+                        icon = '📦';
+                    }
+                    
+                    const fileSize = (asset.size / 1024 / 1024).toFixed(1);
+                    
+                    const downloadCard = document.createElement('div');
+                    downloadCard.className = 'download-card';
+                    downloadCard.innerHTML = `
+                        <div class="platform-header">
+                            <span class="platform-icon">${icon}</span>
+                            <div>
+                                <div class="platform-name">${platform}</div>
+                                <div class="file-size">${fileSize} MB</div>
+                            </div>
+                        </div>
+                        <a href="${asset.browser_download_url}" class="download-btn">
+                            📥 Download for ${platform}
+                        </a>
+                        <div class="filename">${asset.name}</div>
+                    `;
+                    
+                    downloadsContainer.appendChild(downloadCard);
+                });
+                
+            } catch (error) {
+                console.error('Error loading release data:', error);
+                document.getElementById('version-info').innerHTML = `
+                    <div style="color: #ef4444;">Unable to load latest release. Please visit 
+                    <a href="https://github.com/Michael-A-Kuykendall/contextlite/releases" style="color: #2563eb;">GitHub Releases</a></div>
+                `;
+            }
+        }
+        
+        // Load release data when page loads
+        loadLatestRelease();
+        
+        // Refresh every 5 minutes
+        setInterval(loadLatestRelease, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
