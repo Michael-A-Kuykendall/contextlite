@@ -376,7 +376,7 @@ jobs:
         run: |
           if [ -n "$CARGO_REGISTRY_TOKEN" ]; then
             cd adapters/rust/contextlite-client
-            cargo publish --token $CARGO_REGISTRY_TOKEN
+            cargo publish --token $CARGO_REGISTRY_TOKEN --allow-dirty
           else
             echo "CARGO_REGISTRY_TOKEN not set, skipping crates.io publish"
           fi
