@@ -361,55 +361,55 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
-  publish-vscode:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Get version
-        id: version
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Install vsce
-        run: npm install -g @vscode/vsce
-
-      - name: Update extension version
-        run: |
-          cd vscode-extension
-          npm version ${{ steps.version.outputs.version }} --no-git-tag-version
-
-      - name: Install extension dependencies
-        run: |
-          cd vscode-extension
-          npm install
-
-      - name: Compile extension
-        run: |
-          cd vscode-extension
-          npm run compile
-
-      - name: Package extension
-        run: |
-          cd vscode-extension
-          vsce package
-
-      - name: Publish to VS Code Marketplace
-        run: |
-          cd vscode-extension
-          vsce publish --pat ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
-        env:
-          VSCE_PAT: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+  # publish-vscode:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '18'
+  #
+  #     - name: Get version
+  #       id: version
+  #       run: |
+  #         if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+  #           echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+  #         else
+  #           echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+  #         fi
+  #
+  #     - name: Install vsce
+  #       run: npm install -g @vscode/vsce
+  #
+  #     - name: Update extension version
+  #       run: |
+  #         cd vscode-extension
+  #         npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+  #
+  #     - name: Install extension dependencies
+  #       run: |
+  #         cd vscode-extension
+  #         npm install
+  #
+  #     - name: Compile extension
+  #       run: |
+  #         cd vscode-extension
+  #         npm run compile
+  #
+  #     - name: Package extension
+  #       run: |
+  #         cd vscode-extension
+  #         vsce package
+  #
+  #     - name: Publish to VS Code Marketplace
+  #       run: |
+  #         cd vscode-extension
+  #         vsce publish --pat ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+  #       env:
+  #         VSCE_PAT: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
 
   publish-snap:
     runs-on: ubuntu-latest
@@ -686,7 +686,6 @@ jobs:
 
   publish-github-packages:
     runs-on: ubuntu-latest
-    if: false  # Disabled - configuration issues with npm registry
     steps:
       - name: Checkout
         uses: actions/checkout@v4
