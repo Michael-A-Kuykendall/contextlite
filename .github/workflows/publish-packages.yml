@@ -133,27 +133,43 @@ jobs:
             echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check if npm package exists
+        id: check_npm
+        run: |
+          if npm view contextlite@${{ steps.version.outputs.version }} >/dev/null 2>&1; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "✅ npm package already exists, skipping"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "🚀 npm package not found, proceeding"
+          fi
+
       - name: Create npm package structure
+        if: steps.check_npm.outputs.skip == 'false'
         run: |
           # Use existing npm-wrapper
           cp -r npm-wrapper npm-package
 
       - name: Update npm package version
+        if: steps.check_npm.outputs.skip == 'false'
         run: |
           cd npm-package
           npm version ${{ steps.version.outputs.version }} --no-git-tag-version
 
       - name: Install npm dependencies
+        if: steps.check_npm.outputs.skip == 'false'
         run: |
           cd npm-package
           npm install
 
       - name: Build npm package
+        if: steps.check_npm.outputs.skip == 'false'
         run: |
           cd npm-package
           npm run build
 
       - name: Publish to npm
+        if: steps.check_npm.outputs.skip == 'false'
         run: |
           cd npm-package
           npm publish
@@ -185,23 +201,38 @@ jobs:
             echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check if PyPI package exists
+        id: check_pypi
+        run: |
+          if curl -f "https://pypi.org/pypi/contextlite/${{ steps.version.outputs.version }}/json" >/dev/null 2>&1; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "✅ PyPI package already exists, skipping"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "🚀 PyPI package not found, proceeding"
+          fi
+
       - name: Use existing Python package structure
+        if: steps.check_pypi.outputs.skip == 'false'
         run: |
           # Use existing python-wrapper
           cp -r python-wrapper python-package
 
       - name: Update Python package version
+        if: steps.check_pypi.outputs.skip == 'false'
         run: |
           cd python-package
           # Update version in pyproject.toml
           sed -i 's/version = ".*"/version = "${{ steps.version.outputs.version }}"/' pyproject.toml
 
       - name: Build Python package
+        if: steps.check_pypi.outputs.skip == 'false'
         run: |
           cd python-package
           python -m build
 
       - name: Publish to PyPI
+        if: steps.check_pypi.outputs.skip == 'false'
         run: |
           cd python-package
           python -m twine upload dist/* --verbose
@@ -284,13 +315,27 @@ jobs:
             echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check if Chocolatey package exists
+        id: check_chocolatey
+        shell: bash
+        run: |
+          if curl -f "https://community.chocolatey.org/api/v2/Packages?%24filter=Id%20eq%20%27contextlite%27%20and%20Version%20eq%20%27${{ steps.version.outputs.version }}%27" >/dev/null 2>&1; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "✅ Chocolatey package already exists, skipping"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "🚀 Chocolatey package not found, proceeding"
+          fi
+
       - name: Install Chocolatey
+        if: steps.check_chocolatey.outputs.skip == 'false'
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force
           [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
           iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
       - name: Use existing Chocolatey package
+        if: steps.check_chocolatey.outputs.skip == 'false'
         shell: powershell
         run: |
           # Use existing chocolatey package structure
@@ -320,12 +365,14 @@ jobs:
           Write-Host "Updated Chocolatey package files for version $version"
 
       - name: Build Chocolatey package
+        if: steps.check_chocolatey.outputs.skip == 'false'
         shell: powershell
         run: |
           cd chocolatey-package
           choco pack
 
       - name: Publish to Chocolatey
+        if: steps.check_chocolatey.outputs.skip == 'false'
         shell: powershell
         run: |
           if ($env:CHOCOLATEY_API_KEY) {
@@ -507,7 +554,19 @@ jobs:
             echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check if Homebrew formula exists
+        id: check_homebrew
+        run: |
+          if curl -f "https://formulae.brew.sh/api/formula/contextlite.json" | grep -q "${{ steps.version.outputs.version }}" 2>/dev/null; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "✅ Homebrew formula already has this version, skipping"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "🚀 Homebrew formula not found or different version, proceeding"
+          fi
+
       - name: Clone homebrew-core (shallow)
+        if: steps.check_homebrew.outputs.skip == 'false'
         run: |
           # Shallow clone with only Formula directory to minimize download
           git clone --depth=1 --filter=blob:none --sparse https://github.com/Homebrew/homebrew-core.git
@@ -515,6 +574,7 @@ jobs:
           git sparse-checkout set Formula
 
       - name: Calculate checksums
+        if: steps.check_homebrew.outputs.skip == 'false'
         run: |
           # Download release assets and calculate SHA256
           wget "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ steps.version.outputs.version }}/contextlite-${{ steps.version.outputs.version }}-darwin-amd64.tar.gz"
@@ -525,6 +585,7 @@ jobs:
           echo "ARM64_SHA=$ARM64_SHA" >> $GITHUB_ENV
 
       - name: Create/update formula in homebrew-core
+        if: steps.check_homebrew.outputs.skip == 'false'
         run: |
           cd homebrew-core
           cp ../homebrew/contextlite.rb Formula/contextlite.rb
@@ -537,6 +598,7 @@ jobs:
           sed -i '' "s/YOUR_SHA256_ARM64_HERE/$ARM64_SHA/" Formula/contextlite.rb
 
       - name: Create PR to homebrew-core
+        if: steps.check_homebrew.outputs.skip == 'false'
         run: |
           cd homebrew-core
           git config --global user.name "${{ github.actor }}"
