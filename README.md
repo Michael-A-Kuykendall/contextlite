@@ -147,9 +147,11 @@ curl -X POST http://localhost:8080/api/v1/weights/update \
 - **Real System Integration**: Moving from simulation-based to actual HTTP API evaluation
 
 ### 📋 Technical Documentation
+- [`docs/DEPLOYMENT_MANAGEMENT.md`](docs/DEPLOYMENT_MANAGEMENT.md) - Platform deployment & Hugging Face management
+- [`docs/MARKETING_BLAST_STRATEGY.md`](docs/MARKETING_BLAST_STRATEGY.md) - Cross-platform marketing exploitation guide
 - [`docs/FEATURE_FORMULAS.md`](docs/FEATURE_FORMULAS.md) - Complete 7D feature implementation
 - [`docs/GOLDEN_RECORD_STEP5.md`](docs/GOLDEN_RECORD_STEP5.md) - SOTA evaluation status & issues
-- [`CONTEXTLITE.md`](CONTEXTLITE.md) - Core technical architecture
+- [`HUGGING_FACE_MANAGEMENT.md`](HUGGING_FACE_MANAGEMENT.md) - Detailed Hugging Face administration guide
 - [`archive/README.md`](archive/README.md) - Historical development artifacts
 
 ## 🧮 SMT Optimization

@@ -217,3 +217,66 @@ git tag v1.0.0 && git push --tags
 ---
 
 **CURRENT STATUS**: Production ready with automated distribution system complete. Repository marriage implemented. 14-day trial system fully functional. Ready for public launch after workflow testing.
+
+## 12. Hugging Face Page Management 🎯
+
+### **Professional Download Experience**
+- **URL**: https://huggingface.co/spaces/MikeKuykendall/contextlite-download
+- **Repository**: Located in `contextlite-download/` subdirectory
+- **Technology**: Gradio app with GitHub API integration
+- **Design**: Beautiful glassmorphism UI matching contextlite.com
+
+### **Key Features**
+- **Auto-updating**: Fetches latest releases from GitHub API every 5 minutes
+- **Multi-platform**: Detects user platform and shows appropriate download
+- **Professional Styling**: Dark theme with gradients and animations
+- **Performance Stats**: Live metrics display (0.3ms, 2,406 files/sec, etc.)
+- **Comparison Section**: ContextLite vs Vector DBs with visual indicators
+- **Package Managers**: npm, PyPI, VS Code extension links
+
+### **Management Commands**
+```bash
+# Navigate to Hugging Face directory
+cd contextlite-download
+
+# Edit the page
+nano app.py  # or code app.py
+
+# Test locally (optional)
+python app.py
+
+# Deploy changes
+git add app.py
+git commit -m "Update: [description]"
+git push
+
+# Hugging Face auto-deploys from main branch
+```
+
+### **File Structure**
+```
+contextlite-download/
+├── app.py              # Main Gradio application
+├── requirements.txt    # Python dependencies
+├── README.md          # Hugging Face page description
+└── .git/              # Connected to HF Spaces repo
+```
+
+### **Common Updates**
+1. **Version Numbers**: Auto-fetched from GitHub API
+2. **Performance Stats**: Update in app.py performance section
+3. **Design Changes**: Modify CSS in HTML strings
+4. **New Features**: Add to feature list sections
+5. **Download Links**: Auto-generated from latest GitHub release
+
+### **Troubleshooting**
+- **Syntax Errors**: Check with `python -m py_compile app.py`
+- **API Issues**: GitHub API has 60 req/hour limit (usually not hit)
+- **Deployment**: Hugging Face redeploys automatically on push
+- **Local Testing**: Run `python app.py` to test Gradio interface
+
+### **Integration Points**
+- **GitHub Releases**: Auto-syncs with repository releases
+- **Main Website**: Consistent branding with contextlite.com
+- **Package Managers**: Links to npm, PyPI, VS Code marketplace
+- **Documentation**: Links to GitHub wiki and repository
