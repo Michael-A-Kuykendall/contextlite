@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -65,13 +66,17 @@ func TestLoadConfig_FromFile(t *testing.T) {
 	tmpDir := t.TempDir()
 	configPath := filepath.Join(tmpDir, "test_config.yaml")
 	
-	configContent := `
+	// Create a valid temp database path using forward slashes for YAML compatibility
+	tempDbDir := filepath.Join(tmpDir, "db")
+	tempDbPath := filepath.ToSlash(filepath.Join(tempDbDir, "test.db"))
+	
+	configContent := fmt.Sprintf(`
 server:
   host: "test-host"
   port: 9999
 
 storage:
-  database_path: "/test/db/path"
+  database_path: "%s"
 
 optimization:
   solver_timeout_ms: 10000
@@ -79,7 +84,7 @@ optimization:
   max_pairs_per_doc: 8000
   objective_style: "weighted-sum"
   z3:
-    binary_path: ""  # Empty path to avoid validation issues
+    binary_path: ""
     enable_verification: true
 
 weights:
@@ -111,7 +116,7 @@ cache:
   l1_size: 1000
   l2_ttl_minutes: 60
   l3_enabled: true
-`
+`, tempDbPath)
 	
 	err := os.WriteFile(configPath, []byte(configContent), 0644)
 	if err != nil {
@@ -133,8 +138,8 @@ cache:
 		t.Errorf("Expected server port 9999, got %d", cfg.Server.Port)
 	}
 	
-	if cfg.Storage.DatabasePath != "/test/db/path" {
-		t.Errorf("Expected database path '/test/db/path', got '%s'", cfg.Storage.DatabasePath)
+	if cfg.Storage.DatabasePath != tempDbPath {
+		t.Errorf("Expected database path '%s', got '%s'", tempDbPath, cfg.Storage.DatabasePath)
 	}
 	
 	if cfg.optimization.SolverTimeoutMs != 10000 {
@@ -540,7 +545,11 @@ func TestConfig_DatabasePathOverride(t *testing.T) {
 		}
 	}()
 	
-	os.Setenv("CONTEXTLITE_DB_PATH", "/custom/db/path")
+	// Create a valid temp database path using forward slashes for YAML compatibility
+	tmpDir := t.TempDir()
+	customDbPath := filepath.ToSlash(filepath.Join(tmpDir, "custom", "db", "path", "test.db"))
+	
+	os.Setenv("CONTEXTLITE_DB_PATH", customDbPath)
 	
 	tempConfig := `
 server:
@@ -567,8 +576,8 @@ optimization:
 		t.Fatalf("Failed to load config: %v", err)
 	}
 	
-	if cfg.Storage.DatabasePath != "/custom/db/path" {
-		t.Errorf("Expected database path '/custom/db/path', got '%s'", cfg.Storage.DatabasePath)
+	if cfg.Storage.DatabasePath != customDbPath {
+		t.Errorf("Expected database path '%s', got '%s'", customDbPath, cfg.Storage.DatabasePath)
 	}
 }
 
