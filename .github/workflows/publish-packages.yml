@@ -320,6 +320,7 @@ jobs:
 
   publish-crates:
     runs-on: ubuntu-latest
+    if: false  # Disabled - API mismatches in Rust client need fixing
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -474,6 +475,7 @@ jobs:
   publish-homebrew:
     runs-on: macos-latest
     needs: build-and-release
+    if: false  # Disabled - git clone hangs indefinitely
     steps:
       - name: Checkout
         uses: actions/checkout@v4
