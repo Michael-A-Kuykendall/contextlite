@@ -1,0 +1,22 @@
+{
+  "attempts": [
+    {
+      "tag": "v1.0.20",
+      "timestamp": "2025-08-20T03:30:04.535187",
+      "successful": [
+        "publish-npm",
+        "publish-pypi",
+        "publish-docker",
+        "publish-github-packages"
+      ],
+      "failed": [
+        "publish-crates",
+        "publish-chocolatey",
+        "publish-aur",
+        "publish-snap"
+      ],
+      "total": 9,
+      "success_rate": 44.4
+    }
+  ]
+}
