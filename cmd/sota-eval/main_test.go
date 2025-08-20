@@ -25,7 +25,9 @@ func TestFlagDefaults(t *testing.T) {
 	systemsFlag := flag.String("systems", "contextlite_smt,bm25_baseline,embedding_retrieval,llm_reranking", "Comma-separated list of systems to test")
 	
 	// Parse with no arguments (should use defaults)
-	flag.CommandLine.Parse([]string{})
+	if err := flag.CommandLine.Parse([]string{}); err != nil {
+		t.Fatalf("Failed to parse command line arguments: %v", err)
+	}
 	
 	// Test default values
 	if *outputPath != "sota_comparison.json" {
@@ -76,7 +78,9 @@ func TestFlagParsing(t *testing.T) {
 		"-systems", "contextlite_smt,bm25_baseline",
 	}
 	
-	flag.CommandLine.Parse(args)
+	if err := flag.CommandLine.Parse(args); err != nil {
+		t.Fatalf("Failed to parse command line arguments: %v", err)
+	}
 	
 	// Test parsed values
 	if *outputPath != "custom_output.json" {

@@ -10,14 +10,6 @@ import (
 	"contextlite/pkg/types"
 )
 
-// min function helper
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 // mockStorage provides a complete storage implementation for testing
 type mockStorage struct {
 	documents map[string]types.Document
