@@ -270,6 +270,7 @@ jobs:
 
   publish-chocolatey:
     runs-on: windows-latest
+    if: ${{ secrets.CHOCOLATEY_API_KEY != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -310,9 +311,47 @@ jobs:
         shell: powershell
         run: |
           cd chocolatey-package
-          choco push contextlite.${{ steps.version.outputs.version }}.nupkg --key $env:CHOCOLATEY_API_KEY
+          choco push contextlite.${{ steps.version.outputs.version }}.nupkg --source="https://push.chocolatey.org/" --key $env:CHOCOLATEY_API_KEY
         env:
           CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+
+  publish-crates:
+    runs-on: ubuntu-latest
+    if: ${{ secrets.CARGO_REGISTRY_TOKEN != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update Cargo.toml version
+        run: |
+          cd adapters/rust/contextlite-client
+          sed -i 's/^version = ".*"/version = "${{ steps.version.outputs.version }}"/' Cargo.toml
+
+      - name: Build and test
+        run: |
+          cd adapters/rust/contextlite-client
+          cargo build --release
+          cargo test
+
+      - name: Publish to crates.io
+        run: |
+          cd adapters/rust/contextlite-client
+          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
   publish-vscode:
     runs-on: ubuntu-latest
@@ -426,7 +465,8 @@ jobs:
 
   publish-homebrew:
     runs-on: macos-latest
-    if: false  # Disabled - missing HOMEBREW_GITHUB_API_TOKEN
+    needs: build-and-release
+    if: ${{ secrets.HOMEBREW_GITHUB_API_TOKEN != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -449,8 +489,11 @@ jobs:
         run: |
           # Download release assets and calculate SHA256
           wget "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ steps.version.outputs.version }}/contextlite-${{ steps.version.outputs.version }}-darwin-amd64.tar.gz"
-          AMD64_SHA=$(sha256sum contextlite-${{ steps.version.outputs.version }}-darwin-amd64.tar.gz | cut -d' ' -f1)
+          wget "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ steps.version.outputs.version }}/contextlite-${{ steps.version.outputs.version }}-darwin-arm64.tar.gz"
+          AMD64_SHA=$(shasum -a 256 contextlite-${{ steps.version.outputs.version }}-darwin-amd64.tar.gz | cut -d' ' -f1)
+          ARM64_SHA=$(shasum -a 256 contextlite-${{ steps.version.outputs.version }}-darwin-arm64.tar.gz | cut -d' ' -f1)
           echo "AMD64_SHA=$AMD64_SHA" >> $GITHUB_ENV
+          echo "ARM64_SHA=$ARM64_SHA" >> $GITHUB_ENV
 
       - name: Create/update formula in homebrew-core
         run: |
@@ -459,9 +502,10 @@ jobs:
           
           # Update version and checksums
           sed -i '' 's/v[0-9]\+\.[0-9]\+\.[0-9]\+/v${{ steps.version.outputs.version }}/g' Formula/contextlite.rb
-          sed -i '' 's/contextlite_[0-9]\+\.[0-9]\+\.[0-9]\+_/contextlite-${{ steps.version.outputs.version }}-/g' Formula/contextlite.rb
+          sed -i '' 's/1\.[0-9]\+\.[0-9]\+/${{ steps.version.outputs.version }}/g' Formula/contextlite.rb
           sed -i '' "s/YOUR_SHA256_CHECKSUM_HERE/$AMD64_SHA/" Formula/contextlite.rb
           sed -i '' "s/YOUR_SHA256_AMD64_HERE/$AMD64_SHA/" Formula/contextlite.rb
+          sed -i '' "s/YOUR_SHA256_ARM64_HERE/$ARM64_SHA/" Formula/contextlite.rb
 
       - name: Create PR to homebrew-core
         run: |
