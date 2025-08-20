@@ -43,6 +43,7 @@ optimization:
 	
 	if cfg == nil {
 		t.Errorf("Config should not be nil")
+		return // Avoid nil pointer dereference
 	}
 	
 	// Check default values

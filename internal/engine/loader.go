@@ -83,11 +83,6 @@ func getExecutableDir() string {
 	return "."
 }
 
-// getExecutablePath returns the path to the current executable
-func getExecutablePath() (string, error) {
-	return os.Executable()
-}
-
 // PrivateEngineAvailable checks if private JSON CLI binary is available
 func PrivateEngineAvailable() bool {
 	return findPrivateBinary() != ""

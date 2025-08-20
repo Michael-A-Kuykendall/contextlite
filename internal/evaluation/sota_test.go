@@ -111,6 +111,7 @@ func TestExecuteSystemQuery(t *testing.T) {
 	
 	// Test embedding retrieval
 	docs, latency, memory, err = sota.executeSystemQuery(ctx, "embedding_retrieval", query, queryType)
+	_, _, _ = docs, latency, memory // Suppress unused variable warnings
 	if err != nil {
 		t.Fatalf("executeSystemQuery failed for embedding: %v", err)
 	}
@@ -121,6 +122,7 @@ func TestExecuteSystemQuery(t *testing.T) {
 	
 	// Test LLM reranking
 	docs, latency, memory, err = sota.executeSystemQuery(ctx, "llm_reranking", query, queryType)
+	_, _, _ = latency, memory, docs // Suppress unused variable warnings
 	if err != nil {
 		t.Fatalf("executeSystemQuery failed for llm: %v", err)
 	}

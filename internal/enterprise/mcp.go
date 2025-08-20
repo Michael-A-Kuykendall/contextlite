@@ -532,7 +532,7 @@ func (mm *MCPManager) deployGithubServer(server *MCPServerConfig, config map[str
 
 // deployCustomServer deploys a custom MCP server
 func (mm *MCPManager) deployCustomServer(server *MCPServerConfig, config map[string]interface{}) error {
-	return fmt.Errorf("Custom MCP server deployment not yet implemented")
+	return fmt.Errorf("custom MCP server deployment not yet implemented")
 }
 
 // healthCheckWithRetry performs health check with exponential backoff

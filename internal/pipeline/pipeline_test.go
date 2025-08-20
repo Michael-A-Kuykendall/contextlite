@@ -241,6 +241,7 @@ func TestPipeline_GetEngineStats(t *testing.T) {
 	
 	if stats == nil {
 		t.Errorf("Stats should not be nil")
+		return // Avoid nil pointer dereference
 	}
 	
 	// Stub engine should return basic stats

@@ -133,7 +133,7 @@ func TestTrackedFeatureGate_ErrorCases(t *testing.T) {
 	
 	// Advanced features might be denied or allowed depending on trial state
 	err = featureGate.RequireFeature("advanced_optimization")
-	// Don't assert error since trial might allow advanced features
+	_ = err // Suppress unused variable warning - Don't assert error since trial might allow advanced features
 }
 
 // TestConcurrentOperations tests concurrent operations on license tracker

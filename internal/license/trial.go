@@ -118,7 +118,7 @@ func (tm *TrialManager) DaysRemaining() int {
 		return 14 // New installation
 	}
 	
-	remaining := trial.ExpiresAt.Sub(time.Now()).Hours() / 24
+	remaining := time.Until(trial.ExpiresAt).Hours() / 24
 	if remaining < 0 {
 		return 0
 	}

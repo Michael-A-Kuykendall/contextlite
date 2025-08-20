@@ -1,0 +1,1968 @@
+🔍 ContextLite Local Validation Suite
+=====================================
+Running the same checks as GitHub Actions...
+
+[0;34m🔍 Running: Go Build[0m
+[0;32m✅ PASSED: Go Build[0m
+
+[0;34m🔍 Running: Go Tests[0m
+=== RUN   TestSetupLogger
+=== RUN   TestSetupLogger/debug_level
+=== RUN   TestSetupLogger/info_level
+=== RUN   TestSetupLogger/production_level
+=== RUN   TestSetupLogger/default_level
+--- PASS: TestSetupLogger (0.00s)
+    --- PASS: TestSetupLogger/debug_level (0.00s)
+    --- PASS: TestSetupLogger/info_level (0.00s)
+    --- PASS: TestSetupLogger/production_level (0.00s)
+    --- PASS: TestSetupLogger/default_level (0.00s)
+=== RUN   TestServerComponentsIntegration
+    main_test.go:99: License loading failed as expected in test environment
+    main_test.go:127: All server components initialized successfully
+--- PASS: TestServerComponentsIntegration (0.01s)
+=== RUN   TestServerConfiguration
+--- PASS: TestServerConfiguration (0.00s)
+=== RUN   TestGracefulShutdown
+    main_test.go:206: Shutdown completed within timeout
+--- PASS: TestGracefulShutdown (0.10s)
+=== RUN   TestLicenseIntegration
+    main_test.go:220: Default license tier: developer
+--- PASS: TestLicenseIntegration (0.00s)
+=== RUN   TestConfigurationLoading
+=== RUN   TestConfigurationLoading/valid_minimal_config
+=== RUN   TestConfigurationLoading/config_with_all_sections
+--- PASS: TestConfigurationLoading (0.00s)
+    --- PASS: TestConfigurationLoading/valid_minimal_config (0.00s)
+    --- PASS: TestConfigurationLoading/config_with_all_sections (0.00s)
+=== RUN   TestMainServerInitialization
+    main_test.go:377: License loading failed as expected in test environment: failed to read license file: open : The system cannot find the file specified.
+    main_test.go:440: Main server initialization test passed
+--- PASS: TestMainServerInitialization (0.00s)
+=== RUN   TestServerStartupAndShutdown
+    main_test.go:488: License loading failed as expected: failed to read license file: open : The system cannot find the file specified.
+    main_test.go:536: Server shutdown completed successfully
+--- PASS: TestServerStartupAndShutdown (0.10s)
+=== RUN   TestSignalHandling
+--- PASS: TestSignalHandling (0.00s)
+=== RUN   TestConfigPathHandling
+=== RUN   TestConfigPathHandling/valid_config_file
+=== RUN   TestConfigPathHandling/nonexistent_config_file
+=== RUN   TestConfigPathHandling/invalid_config_content
+--- PASS: TestConfigPathHandling (0.01s)
+    --- PASS: TestConfigPathHandling/valid_config_file (0.00s)
+    --- PASS: TestConfigPathHandling/nonexistent_config_file (0.00s)
+    --- PASS: TestConfigPathHandling/invalid_config_content (0.00s)
+=== RUN   TestComponentIntegration
+    main_test.go:735: Component integration test passed successfully
+--- PASS: TestComponentIntegration (0.00s)
+=== RUN   TestErrorHandling
+=== RUN   TestErrorHandling/invalid_logger_level
+=== RUN   TestErrorHandling/config_validation
+    main_test.go:777: Config validation correctly failed: invalid configuration: invalid server port: -1
+=== RUN   TestErrorHandling/component_initialization
+    main_test.go:835: All components initialized successfully
+--- PASS: TestErrorHandling (0.01s)
+    --- PASS: TestErrorHandling/invalid_logger_level (0.00s)
+    --- PASS: TestErrorHandling/config_validation (0.00s)
+    --- PASS: TestErrorHandling/component_initialization (0.01s)
+=== RUN   TestRunServer
+{"level":"info","ts":1755651429.7318885,"caller":"contextlite/main.go:63","msg":"Starting ContextLite","config":"C:\\Users\\micha\\AppData\\Local\\Temp\\TestRunServer4016679030\\001\\run_server_config.yaml"}
+{"level":"info","ts":1755651429.7382147,"caller":"contextlite/main.go:70","msg":"License/Trial Status","tier":"professional","status":"trial_active","message":"Trial active: 13 days remaining"}
+{"level":"info","ts":1755651429.7382147,"caller":"contextlite/main.go:79","msg":"Trial Information","days_remaining":13,"first_run":true}
+{"level":"info","ts":1755651429.7397494,"caller":"contextlite/main.go:93","msg":"Storage initialized","database":":memory:"}
+{"level":"info","ts":1755651429.7407515,"caller":"contextlite/main.go:125","msg":"Server started successfully. Press Ctrl+C to stop."}
+{"level":"info","ts":1755651429.7407515,"caller":"contextlite/main.go:118","msg":"Starting HTTP server","address":"127.0.0.1:8085"}
+{"level":"info","ts":1755651429.9313822,"caller":"contextlite/main.go:132","msg":"Test requested shutdown..."}
+{"level":"info","ts":1755651429.9313822,"caller":"contextlite/main.go:146","msg":"Server exited gracefully"}
+    main_test.go:883: runServer completed successfully
+--- PASS: TestRunServer (0.20s)
+=== RUN   TestRunServerConfigError
+    main_test.go:897: runServer correctly failed with config error: failed to load config: failed to read config file /nonexistent/config/path.yaml: open /nonexistent/config/path.yaml: The system cannot find the path specified.
+--- PASS: TestRunServerConfigError (0.00s)
+PASS
+ok  	contextlite/cmd/contextlite	(cached)
+?   	contextlite/cmd/dashboard	[no test files]
+=== RUN   TestNewLicenseServer
+=== RUN   TestNewLicenseServer/valid_config
+=== RUN   TestNewLicenseServer/invalid_private_key_path
+--- PASS: TestNewLicenseServer (0.02s)
+    --- PASS: TestNewLicenseServer/valid_config (0.01s)
+    --- PASS: TestNewLicenseServer/invalid_private_key_path (0.00s)
+=== RUN   TestLicenseServer_HandleHealth
+--- PASS: TestLicenseServer_HandleHealth (0.10s)
+=== RUN   TestLicenseServer_HandleGenerateLicense
+=== RUN   TestLicenseServer_HandleGenerateLicense/valid_developer_license
+=== RUN   TestLicenseServer_HandleGenerateLicense/valid_professional_license
+=== RUN   TestLicenseServer_HandleGenerateLicense/valid_enterprise_license
+=== RUN   TestLicenseServer_HandleGenerateLicense/invalid_method
+=== RUN   TestLicenseServer_HandleGenerateLicense/invalid_tier
+=== RUN   TestLicenseServer_HandleGenerateLicense/invalid_json
+--- PASS: TestLicenseServer_HandleGenerateLicense (0.06s)
+    --- PASS: TestLicenseServer_HandleGenerateLicense/valid_developer_license (0.00s)
+    --- PASS: TestLicenseServer_HandleGenerateLicense/valid_professional_license (0.00s)
+    --- PASS: TestLicenseServer_HandleGenerateLicense/valid_enterprise_license (0.00s)
+    --- PASS: TestLicenseServer_HandleGenerateLicense/invalid_method (0.00s)
+    --- PASS: TestLicenseServer_HandleGenerateLicense/invalid_tier (0.00s)
+    --- PASS: TestLicenseServer_HandleGenerateLicense/invalid_json (0.00s)
+=== RUN   TestLicenseServer_HandleValidateLicense
+=== RUN   TestLicenseServer_HandleValidateLicense/valid_license
+=== RUN   TestLicenseServer_HandleValidateLicense/invalid_license
+=== RUN   TestLicenseServer_HandleValidateLicense/invalid_method
+=== RUN   TestLicenseServer_HandleValidateLicense/invalid_json
+--- PASS: TestLicenseServer_HandleValidateLicense (0.14s)
+    --- PASS: TestLicenseServer_HandleValidateLicense/valid_license (0.00s)
+    --- PASS: TestLicenseServer_HandleValidateLicense/invalid_license (0.00s)
+    --- PASS: TestLicenseServer_HandleValidateLicense/invalid_method (0.00s)
+    --- PASS: TestLicenseServer_HandleValidateLicense/invalid_json (0.00s)
+=== RUN   TestLicenseServer_DetermineLicenseTier
+=== RUN   TestLicenseServer_DetermineLicenseTier/developer_tier_amount
+=== RUN   TestLicenseServer_DetermineLicenseTier/enterprise_tier_amount
+=== RUN   TestLicenseServer_DetermineLicenseTier/unknown_amount_defaults_to_developer
+=== RUN   TestLicenseServer_DetermineLicenseTier/zero_amount_defaults_to_developer
+--- PASS: TestLicenseServer_DetermineLicenseTier (0.09s)
+    --- PASS: TestLicenseServer_DetermineLicenseTier/developer_tier_amount (0.00s)
+    --- PASS: TestLicenseServer_DetermineLicenseTier/enterprise_tier_amount (0.00s)
+    --- PASS: TestLicenseServer_DetermineLicenseTier/unknown_amount_defaults_to_developer (0.00s)
+    --- PASS: TestLicenseServer_DetermineLicenseTier/zero_amount_defaults_to_developer (0.00s)
+=== RUN   TestLicenseServer_SendLicenseEmail
+=== RUN   TestLicenseServer_SendLicenseEmail/valid_email_developer
+2025/08/19 19:51:03 DEVELOPMENT MODE: Would send license email to test@example.com with license: TEST-LICENSE-KEY
+=== RUN   TestLicenseServer_SendLicenseEmail/valid_email_professional
+2025/08/19 19:51:03 DEVELOPMENT MODE: Would send license email to pro@example.com with license: PRO-LICENSE-KEY
+=== RUN   TestLicenseServer_SendLicenseEmail/valid_email_enterprise
+2025/08/19 19:51:03 DEVELOPMENT MODE: Would send license email to enterprise@example.com with license: ENTERPRISE-LICENSE-KEY
+--- PASS: TestLicenseServer_SendLicenseEmail (0.12s)
+    --- PASS: TestLicenseServer_SendLicenseEmail/valid_email_developer (0.00s)
+    --- PASS: TestLicenseServer_SendLicenseEmail/valid_email_professional (0.00s)
+    --- PASS: TestLicenseServer_SendLicenseEmail/valid_email_enterprise (0.00s)
+=== RUN   TestLicenseServer_GenerateAndSendLicense
+=== RUN   TestLicenseServer_GenerateAndSendLicense/successful_developer_license
+2025/08/19 19:51:03 DEVELOPMENT MODE: Would send license email to dev@example.com with license: eyJrZXkiOiIzNkxaLVc0QjktWkdJTS1HUTVQIiwiZW1haWwiOiJkZXZAZXhhbXBsZS5jb20iLCJ0aWVyIjoiZGV2ZWxvcGVyIiwiaXNzdWVkX2F0IjoiMjAyNS0wOC0xOVQxOTo1MTowMy41NTE2MDUzLTA1OjAwIiwiZXhwaXJlc19hdCI6IjIwMjYtMDgtMTlUMTk6NTE6MDMuNTUxNjA1My0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAsIm1heF91c2VycyI6MSwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiXSwiaGFyZHdhcmVfaWQiOiJod190ZXN0MTIzIiwic2lnbmF0dXJlIjoiaCtiV3RHSTNncytTbDdJcUczMEUrd3lwR2RnSjVXcHBaQWl5b0YweWhwQTc4SXROSkowZTNxWG81OFJpTHJhMkdNaldrZTNOK2dBWjFqVlUzL1lvRVBYakY4Wmo5c1hiZm10ckF4azZNQnlRckVIQ3ZsdzVYQ1BhV3hHbWdmUFlqTTl0Y1ByYll3YzdsNUIvRGZVbitjZHVhNTlGZmlhd2JnSnNyalBhTzMrVk4va2svMFhob1J1Y1hURDJienczQ2JvS0pEc2g4VUVMQm1na2pNMGYvUTJDT1lmVFo2OTk0L1ZxZEZha0dVSG93dWtPbVNneEtGSmVDTWdhZURhY2FoYWZiWU1ZWlgzU3ZUVmlxakZFeFhDUXcvKzdGZlcxbWtRL2ZQTVE3aGNlVm1yRjZTTXZCTy93bVd2MWtJUVVqSzNoVHVPaXNxZkZJRFoptimizerR1RqQjVBPT0ifQ==
+2025/08/19 19:51:03 License generated - Email: dev@example.com, Tier: developer, Customer: cust_test123
+=== RUN   TestLicenseServer_GenerateAndSendLicense/successful_professional_license
+2025/08/19 19:51:03 DEVELOPMENT MODE: Would send license email to pro@example.com with license: eyJrZXkiOiJQMzJQLU5NU1AtVElJVi1SSjg1IiwiZW1haWwiOiJwcm9AZXhhbXBsZS5jb20iLCJ0aWVyIjoicHJvZmVzc2lvbmFsIiwiaXNzdWVkX2F0IjoiMjAyNS0wOC0xOVQxOTo1MTowMy41NTY0MzI3LTA1OjAwIiwiZXhwaXJlc19hdCI6IjIwMjYtMDgtMTlUMTk6NTE6MDMuNTU2NDMyNy0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAwMCwibWF4X3VzZXJzIjoxMCwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiLCJ1bmxpbWl0ZWRfd29ya3NwYWNlcyIsImFkdmFuY2VkX3NtdCIsIjdkX3Njb3JpbmciLCJjYWNoaW5nIiwicHJpb3JpdHlfc3VwcG9ydCJdLCJoYXJkd2FyZV9pZCI6Imh3X3BybzEyMyIsInNpZ25hdHVyZSI6ImJhNkhQdEp4WEx6bUUxV2l5a0VSSFE2SUNHazNJUFFkZkFRNmQvMytpbWE5VlpCMUxTNGxOWWRuUmVETUZqMHFFSWgzZnUxZHhVZHRZZGJMZU5LOGduei9qN2g4Q0JoYUtxeFgxakQ4MENvVnZMZ2FSbUtidnhCc3AwbGpicHl1bVpDYzhIQllGa1JSQmVQZXlYTnBTRmlTemVoVWliVTNKdXdhQ1BpdlI1VjJ3bktPTE1idEdVd28xbnBFSjNNQnpoS1ZLTGNOSDRjZUFUWk9ROGJFL0JLTWduUC9ocFo0aVlodGVuSm1LNFVuTEdlUDdON3VucHNMZTdVVlFyVHQxdXZKU2x6b1duKzdYeU9adExXRXY4eTlvM2s0cGZKWDZkOExFQzArbVFpOEl5V282ajVmbVM2MFRKeUhEZHcrK0Q4Ukw4OGxnWjVvbnFpUnMzUmtzQT09In0=
+2025/08/19 19:51:03 License generated - Email: pro@example.com, Tier: professional, Customer: cust_pro123
+=== RUN   TestLicenseServer_GenerateAndSendLicense/successful_enterprise_license
+2025/08/19 19:51:03 DEVELOPMENT MODE: Would send license email to ent@example.com with license: eyJrZXkiOiJYUTMyLTFaRE0tQVo1Sy01V1dWIiwiZW1haWwiOiJlbnRAZXhhbXBsZS5jb20iLCJ0aWVyIjoiZW50ZXJwcmlzZSIsImlzc3VlZF9hdCI6IjIwMjUtMDgtMTlUMTk6NTE6MDMuNTYwMDY2Mi0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjAzLjU2MDA2NjItMDU6MDAiLCJtYXhfZG9jdW1lbnRzIjowLCJtYXhfdXNlcnMiOjAsImZlYXR1cmVzIjpbImJhc2ljX3NlYXJjaCIsInJlc3RfYXBpIiwic3FsaXRlX3N0b3JhZ2UiLCJzaW5nbGVfd29ya3NwYWNlIiwidW5saW1pdGVkX3dvcmtzcGFjZXMiLCJhZHZhbmNlZF9zbXQiLCI3ZF9zY29yaW5nIiwiY2FjaGluZyIsInByaW9yaXR5X3N1cHBvcnQiLCJtdWx0aV90ZW5hbnQiLCJzc29fbGRhcCIsImN1c3RvbV9tY3AiLCJ3aGl0ZV9sYWJlbCIsInNvdXJjZV9hY2Nlc3MiLCJzbGFfc3VwcG9ydCIsImN1c3RvbV9pbnRloptimizerJhdGlvbnMiLCJ0ZWFtX2RlcGxveW1lbnQiLCJvbl9wcmVtaXNlIiwiYW5hbHl0aWNzIiwiYXVkaXRfdHJhaWxzIiwiY29tcGxpYW5jZV9yZXBvcnRpbmciXSwiaGFyZHdhcmVfaWQiOiJod19lbnQxMjMiLCJzaWduYXR1cmUiOiJOckp2NVp1cTI3Y0hFMlBraS92elMwQjYvNW1LTjV5a3JwY241M1dydzRoMWlxclZ2akhJNkYvUEdpU3A4b2d6dCthaU1MZVNLWGFia1lKTVN0VTF3b1JkclN5TkZtb1E0b1lyd3l3RnFncGhhWWNKYm43QnRsMW9EQ3BTZDdqc1NCajBVcWhrZzU2U21KTlBlK0Vmd25jcXdvK0JlalJxb3NJdStQaDY3UDhKZ05BeUVLeDV1WFlZKzJFVENRcHd6c1hEdktnTDlTT3BOcGlUdjZ1ZFZyOVRkbVkxbjNJcWxRMHp1V3dZV2JHYmlsd01nR3ZicytBeGFPMjdTUU1xWHdudERyV1FPa2REVTc5eUdpSVlSZCtIM243M3hmMkFxTWUzcWZEY3lGME1QSUQvY3ZCYUxtQ1o4MDlBSjRHaXJqWTlwa2FlUWFOTCtZZEVjSFZLaFE9PSJ9
+2025/08/19 19:51:03 License generated - Email: ent@example.com, Tier: enterprise, Customer: cust_ent123
+--- PASS: TestLicenseServer_GenerateAndSendLicense (0.11s)
+    --- PASS: TestLicenseServer_GenerateAndSendLicense/successful_developer_license (0.00s)
+    --- PASS: TestLicenseServer_GenerateAndSendLicense/successful_professional_license (0.00s)
+    --- PASS: TestLicenseServer_GenerateAndSendLicense/successful_enterprise_license (0.00s)
+=== RUN   TestLicenseServer_HandleStripeWebhook
+=== RUN   TestLicenseServer_HandleStripeWebhook/invalid_method
+=== RUN   TestLicenseServer_HandleStripeWebhook/invalid_signature
+2025/08/19 19:51:03 Error verifying webhook signature: webhook has invalid Stripe-Signature header
+--- PASS: TestLicenseServer_HandleStripeWebhook (0.03s)
+    --- PASS: TestLicenseServer_HandleStripeWebhook/invalid_method (0.00s)
+    --- PASS: TestLicenseServer_HandleStripeWebhook/invalid_signature (0.00s)
+=== RUN   TestLicenseServer_HandleStripeWebhook_ErrorConditions
+=== RUN   TestLicenseServer_HandleStripeWebhook_ErrorConditions/empty_body_read_error
+2025/08/19 19:51:03 Error reading request body: simulated read error
+=== RUN   TestLicenseServer_HandleStripeWebhook_ErrorConditions/missing_stripe_signature_header
+2025/08/19 19:51:03 Error verifying webhook signature: webhook has no Stripe-Signature header
+=== RUN   TestLicenseServer_HandleStripeWebhook_ErrorConditions/malformed_json_payload
+2025/08/19 19:51:03 Error verifying webhook signature: webhook has invalid Stripe-Signature header
+--- PASS: TestLicenseServer_HandleStripeWebhook_ErrorConditions (0.12s)
+    --- PASS: TestLicenseServer_HandleStripeWebhook_ErrorConditions/empty_body_read_error (0.00s)
+    --- PASS: TestLicenseServer_HandleStripeWebhook_ErrorConditions/missing_stripe_signature_header (0.00s)
+    --- PASS: TestLicenseServer_HandleStripeWebhook_ErrorConditions/malformed_json_payload (0.00s)
+=== RUN   TestLicenseServer_HandleTestEmail
+=== RUN   TestLicenseServer_HandleTestEmail/valid_test_email
+2025/08/19 19:51:03 DEVELOPMENT MODE: Would send license email to test@example.com with license: TEST-LICENSE-FOR-EMAIL-DELIVERY-VERIFICATION
+=== RUN   TestLicenseServer_HandleTestEmail/missing_email
+=== RUN   TestLicenseServer_HandleTestEmail/invalid_method
+=== RUN   TestLicenseServer_HandleTestEmail/invalid_json
+--- PASS: TestLicenseServer_HandleTestEmail (0.12s)
+    --- PASS: TestLicenseServer_HandleTestEmail/valid_test_email (0.00s)
+    --- PASS: TestLicenseServer_HandleTestEmail/missing_email (0.00s)
+    --- PASS: TestLicenseServer_HandleTestEmail/invalid_method (0.00s)
+    --- PASS: TestLicenseServer_HandleTestEmail/invalid_json (0.00s)
+=== RUN   TestLoadConfig
+=== RUN   TestLoadConfig/missing_required_env_vars
+=== RUN   TestLoadConfig/valid_configuration
+--- PASS: TestLoadConfig (0.00s)
+    --- PASS: TestLoadConfig/missing_required_env_vars (0.00s)
+    --- PASS: TestLoadConfig/valid_configuration (0.00s)
+=== RUN   TestLicenseServer_StripeEventHandlers
+=== RUN   TestLicenseServer_StripeEventHandlers/handleCheckoutCompleted
+2025/08/19 19:51:03 Checkout completed for customer: cust_test_123
+2025/08/19 19:51:03 DEVELOPMENT MODE: Would send license email to test@example.com with license: eyJrZXkiOiJVUUk5LUFQTEUtUzFTRi1ST1ZOIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwidGllciI6InByb2Zlc3Npb25hbCIsImlzc3VlZF9hdCI6IjIwMjUtMDgtMTlUMTk6NTE6MDMuOTIxODExOC0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjAzLjkyMTgxMTgtMDU6MDAiLCJtYXhfZG9jdW1lbnRzIjoxMDAwMDAsIm1heF91c2VycyI6MTAsImZlYXR1cmVzIjpbImJhc2ljX3NlYXJjaCIsInJlc3RfYXBpIiwic3FsaXRlX3N0b3JhZ2UiLCJzaW5nbGVfd29ya3NwYWNlIiwidW5saW1pdGVkX3dvcmtzcGFjZXMiLCJhZHZhbmNlZF9zbXQiLCI3ZF9zY29yaW5nIiwiY2FjaGluZyIsInByaW9yaXR5X3N1cHBvcnQiXSwiaGFyZHdhcmVfaWQiOiIiLCJzaWduYXR1cmUiOiJpeUZlcW40UkRTY3o0czBCTkk0NW5rNU9uZDVaOGJGdERicDl4R2FCYzN6Y0tsNUpOdmNzUWEvVnZnV1BBTVFHSkZRQThuK2xMdDdKU2R3MWc4WDBEYk5sQlRReU5UVEs5eERHR2M3UGJ2MkNQcG0wTENudmppQkptTUE1U1k4SVVaNklWckRFK3NaSytTMHVVSi9WRno5dTNNVnY0VWhkQWJxaVZSMEJ0dENYdUNqd2hFSjhBUDgxY1RyOTFySkh6NDZPRUhYVmE0OFVYOHRyaFN5U2pIUlh0RHNHTGIwQ2tkZVpuRUJlVDFvNUZpQ2VyQUdEdDlzelNnb1hUOXFtTzRUcG9KcWEwWUtGbjZzSUtMQnpRRWs1cjhKMWFMY0FqcllWZTJlWmJLT3h1d3JQUllBNkNQZ0JLoptimizerBLNmhMd1JkL2pjN05QSlI3Vms3aXNyUHZWS0E9PSJ9
+2025/08/19 19:51:03 License generated - Email: test@example.com, Tier: professional, Customer: cust_test_123
+2025/08/19 19:51:03 License generated and sent to test@example.com (tier: professional)
+=== RUN   TestLicenseServer_StripeEventHandlers/handleSubscriptionCreated
+2025/08/19 19:51:03 Subscription created: sub_test_123
+=== RUN   TestLicenseServer_StripeEventHandlers/handlePaymentSucceeded
+2025/08/19 19:51:03 Payment succeeded for invoice: in_test_123
+=== RUN   TestLicenseServer_StripeEventHandlers/handlePaymentFailed
+2025/08/19 19:51:03 Payment failed for invoice: in_test_123
+--- PASS: TestLicenseServer_StripeEventHandlers (0.10s)
+    --- PASS: TestLicenseServer_StripeEventHandlers/handleCheckoutCompleted (0.01s)
+    --- PASS: TestLicenseServer_StripeEventHandlers/handleSubscriptionCreated (0.00s)
+    --- PASS: TestLicenseServer_StripeEventHandlers/handlePaymentSucceeded (0.00s)
+    --- PASS: TestLicenseServer_StripeEventHandlers/handlePaymentFailed (0.00s)
+=== RUN   TestLicenseServer_StripeEventHandlers_ErrorScenarios
+=== RUN   TestLicenseServer_StripeEventHandlers_ErrorScenarios/handleCheckoutCompleted_InvalidJSON
+2025/08/19 19:51:04 Error parsing checkout session: invalid character 'i' looking for beginning of object key string
+=== RUN   TestLicenseServer_StripeEventHandlers_ErrorScenarios/handleCheckoutCompleted_MissingFields
+=== RUN   TestLicenseServer_StripeEventHandlers_ErrorScenarios/handleSubscriptionCreated_InvalidJSON
+2025/08/19 19:51:04 Error parsing subscription: invalid character 'm' looking for beginning of object key string
+=== RUN   TestLicenseServer_StripeEventHandlers_ErrorScenarios/handlePaymentSucceeded_InvalidJSON
+2025/08/19 19:51:04 Error parsing invoice: invalid character 'i' looking for beginning of object key string
+=== RUN   TestLicenseServer_StripeEventHandlers_ErrorScenarios/handlePaymentFailed_InvalidJSON
+2025/08/19 19:51:04 Error parsing invoice: invalid character 'b' looking for beginning of object key string
+=== RUN   TestLicenseServer_StripeEventHandlers_ErrorScenarios/handlePaymentFailed_MissingCustomer
+2025/08/19 19:51:04 Payment failed for invoice: in_test_123
+--- PASS: TestLicenseServer_StripeEventHandlers_ErrorScenarios (0.37s)
+    --- PASS: TestLicenseServer_StripeEventHandlers_ErrorScenarios/handleCheckoutCompleted_InvalidJSON (0.00s)
+    --- PASS: TestLicenseServer_StripeEventHandlers_ErrorScenarios/handleCheckoutCompleted_MissingFields (0.00s)
+    --- PASS: TestLicenseServer_StripeEventHandlers_ErrorScenarios/handleSubscriptionCreated_InvalidJSON (0.00s)
+    --- PASS: TestLicenseServer_StripeEventHandlers_ErrorScenarios/handlePaymentSucceeded_InvalidJSON (0.00s)
+    --- PASS: TestLicenseServer_StripeEventHandlers_ErrorScenarios/handlePaymentFailed_InvalidJSON (0.00s)
+    --- PASS: TestLicenseServer_StripeEventHandlers_ErrorScenarios/handlePaymentFailed_MissingCustomer (0.00s)
+=== RUN   TestLicenseServer_Start_InvalidPort
+2025/08/19 19:51:04 License server starting on port -1
+--- PASS: TestLicenseServer_Start_InvalidPort (0.32s)
+=== RUN   TestLicenseServer_SendLicenseEmail_optimizationPDisabled
+=== RUN   TestLicenseServer_SendLicenseEmail_optimizationPDisabled/valid_email_no_optimizationp
+2025/08/19 19:51:04 DEVELOPMENT MODE: Would send license email to test@example.com with license: test-license-key
+=== RUN   TestLicenseServer_SendLicenseEmail_optimizationPDisabled/empty_email
+2025/08/19 19:51:04 DEVELOPMENT MODE: Would send license email to  with license: test-license-key
+--- PASS: TestLicenseServer_SendLicenseEmail_optimizationPDisabled (0.05s)
+    --- PASS: TestLicenseServer_SendLicenseEmail_optimizationPDisabled/valid_email_no_optimizationp (0.00s)
+    --- PASS: TestLicenseServer_SendLicenseEmail_optimizationPDisabled/empty_email (0.00s)
+=== RUN   TestLicenseServer_StripeWebhookHandlers_Subscriptions
+=== RUN   TestLicenseServer_StripeWebhookHandlers_Subscriptions/handleSubscriptionUpdated
+2025/08/19 19:51:04 Subscription updated: sub_test_123
+=== RUN   TestLicenseServer_StripeWebhookHandlers_Subscriptions/handleSubscriptionDeleted
+2025/08/19 19:51:04 Subscription deleted: sub_test_123
+--- PASS: TestLicenseServer_StripeWebhookHandlers_Subscriptions (0.08s)
+    --- PASS: TestLicenseServer_StripeWebhookHandlers_Subscriptions/handleSubscriptionUpdated (0.00s)
+    --- PASS: TestLicenseServer_StripeWebhookHandlers_Subscriptions/handleSubscriptionDeleted (0.00s)
+=== RUN   TestLicenseServer_SendLicenseEmail_WithoptimizationP
+--- PASS: TestLicenseServer_SendLicenseEmail_WithoptimizationP (21.20s)
+=== RUN   TestLoadConfig_EnvironmentVariables
+--- PASS: TestLoadConfig_EnvironmentVariables (0.00s)
+=== RUN   TestLicenseServer_GenerateAndSendLicense_EdgeCases
+=== RUN   TestLicenseServer_GenerateAndSendLicense_EdgeCases/empty_customer_id
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to test@example.com with license: eyJrZXkiOiJBUkFVLVlON0UtMUZJWS0wVjBGIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwidGllciI6ImRldmVsb3BlciIsImlzc3VlZF9hdCI6IjIwMjUtMDgtMTlUMTk6NTE6MjYuMTY2NDgxNy0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI2LjE2NjQ4MTctMDU6MDAiLCJtYXhfZG9jdW1lbnRzIjoxMDAwLCJtYXhfdXNlcnMiOjEsImZlYXR1cmVzIjpbImJhc2ljX3NlYXJjaCIsInJlc3RfYXBpIiwic3FsaXRlX3N0b3JhZ2UiLCJzaW5nbGVfd29ya3NwYWNlIl0sImhhcmR3YXJlX2lkIjoiaHdfdGVzdF8xMjMiLCJzaWduYXR1cmUiOiJsMStET2lLZmljWEpnVGlHSHNRdmhhMnBmU2Iya3JJWmkyWGw0eVFDaXlxUFk3THFxSXd1bVh4R0IrSVRxMnIwVXVIaENBcC8wM3FwZE4vdHNUc2FIOGREeG9LZzM2bkV2cGxFTjBtTGdCSHdGZzJiRlBuaVNZSGlSTHBCbjRwdWNYbXFNOG11TjlKOEszZ1V4U3VtQ1ZjWnpuOENSL1ozNWFjTnJsc0V3UHo5dVNiYWlhZWhYMzEvRHVRc05rYU9DSkhuRWc0dE9SckpyMHozQWZMWWlOVzEyVWNQeXdpTDNvRk9Kc3JiQUN1d3UyM1Q2QmJ1TVQrbld5WHcwb0hRTDZKb1FQVUVzWUlYaFF0RlVXcXgzQmNqSURhTWRRNGk3cXVXbURNcHk2K1B6WkFFU0RMNUxnL1JYT09VQWtoclMzYWVNMkFXU0VsTXZMbFNST28xbEE9PSJ9
+2025/08/19 19:51:26 License generated - Email: test@example.com, Tier: developer, Customer: 
+=== RUN   TestLicenseServer_GenerateAndSendLicense_EdgeCases/invalid_tier
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to test@example.com with license: eyJrZXkiOiJGS0FCLU43NUUtRk9EMS1NVlVIIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwidGllciI6ImludmFsaWRfdGllciIsImlzc3VlZF9hdCI6IjIwMjUtMDgtMTlUMTk6NTE6MjYuMTcxNDczNi0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI2LjE3MTQ3MzYtMDU6MDAiLCJtYXhfZG9jdW1lbnRzIjowLCJtYXhfdXNlcnMiOjAsImZlYXR1cmVzIjpbImJhc2ljX3NlYXJjaCIsInJlc3RfYXBpIiwic3FsaXRlX3N0b3JhZ2UiLCJzaW5nbGVfd29ya3NwYWNlIl0sImhhcmR3YXJlX2lkIjoiaHdfdGVzdF8xMjMiLCJzaWduYXR1cmUiOiJWN2NtV3RIdFJiejlDUHRlbG02Q3ZUSWoyN3NJNHp2VmdSQ3hqSU10OWdlU0FhVzlQN0t1ZnFPVHJxSmpLdGExdlJVYkRyUTB1RzVVdWdhV3V6emNKVWxDTzMyTTdMQ2tpcVVRakpZS3E4SEQyQ0lIZ1gxOVpWQ0lmNnJRNW1mZ1pjTE43VDZZbDVyTG8zNllPRnZ4dmx0TjVDa2p6V21JMUVPMlRsL0d0dlg3QVR2aURrM1dIbzF4bG1aakU5ZUNmVFk2Z2MxbHZZcGMrYTVVSFN5UlNmTFZMQWl6dmxGL3ZVRkY0ZEhsUVQrSklRbiswUkNGc0NaeFpydDdZQ0YwcmQwZEYrVXVCclBwZ2NDNXIyaXljaXczOGcwQW1uNTFXY2h3UGQya0t6djRxdE5wK2VlbG50V1YveUtvZElQS2IzSGYrekhGbWZmR1pZMjFFcHFWRmc9PSJ9
+2025/08/19 19:51:26 License generated - Email: test@example.com, Tier: invalid_tier, Customer: cust_123
+=== RUN   TestLicenseServer_GenerateAndSendLicense_EdgeCases/long_email
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to very.long.email.address.that.might.cause.issues@example.com with license: eyJrZXkiOiJWMEVNLVNNUkgtSkZMUC1JOVhFIiwiZW1haWwiOiJ2ZXJ5LmxvbmcuZW1haWwuYWRkcmVzcy50aGF0Lm1pZ2h0LmNhdXNlLmlzc3Vlc0BleGFtcGxlLmNvbSIsInRpZXIiOiJlbnRlcnByaXNlIiwiaXNzdWVkX2F0IjoiMjAyNS0wOC0xOVQxOTo1MToyNi4xNzQwMjIxLTA1OjAwIiwiZXhwaXJlc19hdCI6IjIwMjYtMDgtMTlUMTk6NTE6MjYuMTc0MDIyMS0wNTowMCIsIm1heF9kb2N1bWVudHMiOjAsIm1heF91c2VycyI6MCwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiLCJ1bmxpbWl0ZWRfd29ya3NwYWNlcyIsImFkdmFuY2VkX3NtdCIsIjdkX3Njb3JpbmciLCJjYWNoaW5nIiwicHJpb3JpdHlfc3VwcG9ydCIsIm11bHRpX3RlbmFudCIsInNzb19sZGFwIiwiY3VzdG9tX21jcCIsIndoaXRlX2xhYmVsIiwic291cmNlX2FjY2VzcyIsInNsYV9zdXBwb3J0IiwiY3VzdG9tX2ludGVncmF0aW9ucyIsInRlYW1fZGVwbG95bWVudCIsIm9uX3ByZW1pc2UiLCJhbmFseXRpY3MiLCJhdWRpdF90cmFpbHMiLCJjb21wbGlhbmNlX3JlcG9ydGluZyJdLCJoYXJkd2FyZV9pZCI6Imh3X3Rlc3RfMTIzIiwic2lnbmF0dXJlIjoiWHJPR0VkbzRrdGY4RDFpaUloRTdHRXRwV0xlbVpsT0hwK3ZTY2RtNExhYTZ1TEVId3dFQlhSUHUycExPK2VBZmt1MkJWTXZLZm9vSVhnZmpqTWJRYXp0RUFtS2NDd2J5T2w4M1pWRGZYN2M0d0pmbXBZbEt5MEdFME5DRFA0SEJoWDFPSERlWFhQRldUelBKRGgwZlVscklacmFlZDNPSlZIaU40SncxQUV3ZHVxV1JFa256UUtNcmgvcmJGeWJFSVJQUHVxdlhmV2NtTVJTTTBOY3Zsb1lHNHpGdGRZRkZVWmJZamdMOTlCcUpQN0VGYWlHem5oTHlMTGNNRVg4eXNvLzFWbjBmMkpjMklaNFN6bjFSK2lBd1pXNzkzTGkyMHFaRy9CNW5KUGlnUm1nUzY2V2F6T0wzek41UndUQXMrWWhIeXFJVEtKV0w5VWsyZy9JMG9nPT0ifQ==
+2025/08/19 19:51:26 License generated - Email: very.long.email.address.that.might.cause.issues@example.com, Tier: enterprise, Customer: cust_123
+--- PASS: TestLicenseServer_GenerateAndSendLicense_EdgeCases (0.22s)
+    --- PASS: TestLicenseServer_GenerateAndSendLicense_EdgeCases/empty_customer_id (0.00s)
+    --- PASS: TestLicenseServer_GenerateAndSendLicense_EdgeCases/invalid_tier (0.00s)
+    --- PASS: TestLicenseServer_GenerateAndSendLicense_EdgeCases/long_email (0.00s)
+=== RUN   TestLicenseServer_HandleValidateLicense_EdgeCases
+=== RUN   TestLicenseServer_HandleValidateLicense_EdgeCases/empty_body
+=== RUN   TestLicenseServer_HandleValidateLicense_EdgeCases/malformed_json
+=== RUN   TestLicenseServer_HandleValidateLicense_EdgeCases/missing_license_field
+--- PASS: TestLicenseServer_HandleValidateLicense_EdgeCases (0.30s)
+    --- PASS: TestLicenseServer_HandleValidateLicense_EdgeCases/empty_body (0.00s)
+    --- PASS: TestLicenseServer_HandleValidateLicense_EdgeCases/malformed_json (0.00s)
+    --- PASS: TestLicenseServer_HandleValidateLicense_EdgeCases/missing_license_field (0.00s)
+=== RUN   TestLicenseServer_StartupSimulation
+--- PASS: TestLicenseServer_StartupSimulation (0.24s)
+=== RUN   TestLicenseServer_ConcurrentGeneration
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to test9@example.com with license: eyJrZXkiOiJXU1FHLVNXWUctMU9XMi1YNkNBIiwiZW1haWwiOiJ0ZXN0OUBleGFtcGxlLmNvbSIsInRpZXIiOiJkZXZlbG9wZXIiLCJpc3N1ZWRfYXQiOiIyMDI1LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAsIm1heF91c2VycyI6MSwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiXSwiaGFyZHdhcmVfaWQiOiJod190ZXN0Iiwic2lnbmF0dXJlIjoiWWY1VTJlOUxzMGt6SkNydVVQMUZsN3J4YkxudkhNbVF2VENpbHM1Y3RJQkZncmg1ZWxTSk1CODdrekIzb0x3Z0F2TnhwZ1FGK2lzNHFFNWZaT0RMbVluN2xBYTRsOUlGUFRLWXVxZWQwMDd0bXRSNEFFcCtVTDZJS0N1bHZ0ZGJscC94eFcwMXlKTHlhZXYyUFBKSmhrS0dZTkxtcTF5U3hHdUhoMFNUZXhaVXFTcS9nL1pMVFEweklDRU5aTTVaQk9nSmttVjgrdEVOUllqYk5IY3hmRnZJc3ZBQVFHcjh3YmRMZHNPYVhXa3M5SWVhaVo4dnlkT1B1Wm00UXZFc0VILy9Kd1hNOFhDRlNyYXQwd2dQL1EvOGovSDYyamErQkJlb0JaQXI1VUlpZ2p6T0ZHN0kvWUtmRWE0MW5ZZURFanliRmhsN0lhVnNhc1MrNjNvWXh3PT0ifQ==
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to test1@example.com with license: eyJrZXkiOiJTTTBLLThTNlYtM1ZCMS1EVjg2IiwiZW1haWwiOiJ0ZXN0MUBleGFtcGxlLmNvbSIsInRpZXIiOiJkZXZlbG9wZXIiLCJpc3N1ZWRfYXQiOiIyMDI1LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAsIm1heF91c2VycyI6MSwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiXSwiaGFyZHdhcmVfaWQiOiJod190ZXN0Iiwic2lnbmF0dXJlIjoiTk9LdkVITlpVMlEzVk82d3dUajhyTVlZbEJScXdBSjVEblpKbmxZbVAyNVRnTnB4eENtQzJrdVJ2SUxwa1JiM1hlcTBaaWFKOGNsTXZoZ0NTRW5mSDdMZjh6bGdNSkdJSkVTREt4OHB4Yk15emUvVnF5NEVVa0lCdCtNMzhDTDZlOG5GTmFmRk1lWk1VdEl5VDdHVW5vSTVJcU1jUWVGYklVbXdNZUtkay9NMjJaMkoptimizerUnJRWjdMNkZtdGgwQjhwMm5WeDNNdmkvNFd1QitvMTdINzZHbCtUdVVWZENnNERPYjJnSS9XZk5SbHBPSXlCU2h1WkxyTkRZcVppeTVGcnNJVGh6OGRyWUpOUW1jcEVnbXlNUi9yZnd0aC9qbHVsL0RmZk5rRFR1S01FM0NWOHROVkFWVUNUNGJWSFZQYzJWRHNnSHpIelRqS0hnTkhMMlZ1SUxnPT0ifQ==
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to test6@example.com with license: eyJrZXkiOiJCMEk2LUdKUjktTE1BVC1UVzJSIiwiZW1haWwiOiJ0ZXN0NkBleGFtcGxlLmNvbSIsInRpZXIiOiJkZXZlbG9wZXIiLCJpc3N1ZWRfYXQiOiIyMDI1LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAsIm1heF91c2VycyI6MSwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiXSwiaGFyZHdhcmVfaWQiOiJod190ZXN0Iiwic2lnbmF0dXJlIjoiRkJkT2g0THJZR3Y0MmhQbElod1I1My9OQ09IRlBYTTY4MmdYOFNCTW00TDR0cGJGSEN0TVJKbittVkxGS1MzU1FTSHRiU3JGanpiMFAvTVFHb3hpZDhhQUxublhTNGlxWVBuWjUzcWNZQVF1TUNIbmRqNXFtc2l2bCtiOTY4YUhYVlVlbTNSenI2dm4zREZWdFpGMGMvYmdlY2NTWWtxQVI2L2dhMTlRUDRNb1VkRG8ySkVnUFVROWJlR3gzODk2cWdGTWxmM2ZTNmM3MnRlejEzM3ZpSTQwaS84RjZvb1o3RVZEMVI0MTFFUm1jY0FQcXQwd3BJWEUrYjdHOFY3aStlZDA4WVdyR085emVFZXZ2dzlKOXB2TnRBQnBmSzd1cDJ0MWd2VWRrTTdxVnVpbkV0optimizerdsaUMwQzYwaEY3THF2MHZ4cmVaV3pFaldSM2FoZDN6bDRnPT0ifQ==
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to test0@example.com with license: eyJrZXkiOiJSV1AxLTkxTVEtUzZMRi1IMkk1IiwiZW1haWwiOiJ0ZXN0MEBleGFtcGxlLmNvbSIsInRpZXIiOiJkZXZlbG9wZXIiLCJpc3N1ZWRfYXQiOiIyMDI1LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAsIm1heF91c2VycyI6MSwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiXSwiaGFyZHdhcmVfaWQiOiJod190ZXN0Iiwic2lnbmF0dXJlIjoiRmdTUGxjeTRTa2RUWDA2UlhmeEJHb0JCMkNoSG82NWJOc25oTDRyMVBXUEtURTNUWFpwTVZVV0d1WnlYa0xVeU5vZzE4c1dSU2dmOFMyR0tnNUVQUEdsNFRqejJIRUkrUldabjFLQzlhYnhCbnZWeFJBVDQrbkRhb29tNVFFbUpsbUVnbWRDZGE0L0JuVHRaYVRoRy9ubVE2dTVzamZTblhMTDBDQ2k1czFrMEUvMzJyRzhEaFNzU0JyeU9WcUd2NjEzb2lHVC9YVEZ6eHZHNFRzdHcrRVlPMlk4SFdMUDRhWGJVWUZDTUhzNEVjK0ZkMmp5VUJyTVdmNm13WkJBVzN5TVp5RzdicEN1MXYyZWFYWjA1dlBvdGIrMUZMVzlKK1lKQlJXWEdNQ1htRmhLdXkzoptimizerVVVHJYOWRMZXVuMG1iMUtkT2x0TWUxYXRTcitPb0lkNU13PT0ifQ==
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to test5@example.com with license: eyJrZXkiOiI2Rk1JLVM3STktR1BTNy0wMUNZIiwiZW1haWwiOiJ0ZXN0NUBleGFtcGxlLmNvbSIsInRpZXIiOiJkZXZlbG9wZXIiLCJpc3N1ZWRfYXQiOiIyMDI1LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAsIm1heF91c2VycyI6MSwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiXSwiaGFyZHdhcmVfaWQiOiJod190ZXN0Iiwic2lnbmF0dXJlIjoiWnlhWmlLR1VsTEd6THRYNlZKUmZ6cGw1SHhvRXlmVWJXS01xUGt5SWhTcWZKc1o1QXNhUk1LWlFhT1hrNnFidGwwY0VGSlRzMWtFSVdqZVVVak1DL3hYMTlSd0haaURoSGYvR3FOaEZmcXJWRlJUaENZcUhYaEMzUWJHUWwyQlliWVgzcythL1U0L0RnQ0dwTWdLUlNOMGR0UDJVd2VUbmVtWEcra2FieGxNZjVZR2Y4ZXdJVGxQSTR3ZHV6ckNILzVuRHJ0cG5UVDVmL0tYWFFEaFhwZCs4aHlwQ0dxeTNqdVpGTUU0SGRHVm9oQWpjOUtpLzJoUGpCaGxKRncvZHBRQ1NqM1FKZjR3NUNRYjZZVkRrdUZ6a3NTMzNYVS9MK21Yb3JEOWdaU2wxdmVmR1NmQm81SDBUTGpnNHpJNXVpQ2hRdzlveWdpWXJYYldrczVoMS93PT0ifQ==
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to test7@example.com with license: eyJrZXkiOiJaTFRXLTk5QkYtRzJQNi1MSUJNIiwiZW1haWwiOiJ0ZXN0N0BleGFtcGxlLmNvbSIsInRpZXIiOiJkZXZlbG9wZXIiLCJpc3N1ZWRfYXQiOiIyMDI1LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAsIm1heF91c2VycyI6MSwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiXSwiaGFyZHdhcmVfaWQiOiJod190ZXN0Iiwic2lnbmF0dXJlIjoiYXFUenB1S1pMeTJ4ZCtMNmdIVkhYY3pySm8rRlNvd2FtYXRreUcyNE56bUovVy9qcllzTU8zUS92eUUzWVZoQW9tTllPNWZUYllpdlNDQ3BtdTRTWG02Wld6MlZFd3pZYjYwMTVaOGRSNVlja3Y4Q2VwSUpCRjE4bzExL1NWVDJ2b002R2RLNkhCS2VWTWRCYW1TRit3eDhzRjFpUG50Wms2NzVLTDZMWVFydi9SOW9uck5MTFVETW94dGhlTStIa3ZvOTc4UXlUcUtha01vS0wvWHZLUXplSTNNclhyV05aOGgrZklxYk93VEMrb2E3dEtTamtIV3dVQTdBWVNiZ0JvMFl1SDZpVVVSd09XcWtEVGhhWmFrWGN6dVJBWUhHRjlCTjhua2oyclpKTGJhWjVGdUxzL1ovT2JEbGgyZmlmRENUd1g0WHpVdzhTdzh2SUtWVzhRPT0ifQ==
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to test2@example.com with license: eyJrZXkiOiI3NEFPLVhGNTUtU0lTWi1XSEdMIiwiZW1haWwiOiJ0ZXN0MkBleGFtcGxlLmNvbSIsInRpZXIiOiJkZXZlbG9wZXIiLCJpc3N1ZWRfYXQiOiIyMDI1LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAsIm1heF91c2VycyI6MSwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiXSwiaGFyZHdhcmVfaWQiOiJod190ZXN0Iiwic2lnbmF0dXJlIjoiZUdRSjNyaldjelN2b2FWMmhVQnB6SnpwblhyR25oN3RvK1lJWG83KzN1cjQ2N2NnbXFlOURISmQzd0tFY1hwdDNhejBQMUl0cE54a0VEM1JJVXpIYmpkK1djcXpnYXRWS3ZQczhXZStNL2ZDSWVLRmh2OVlmSDUwS2ZZMEc3V2RRRlVnQVRhdDlaMTZ1N1hZZHRqRG9pTVdpUWl3TmhEL0VQTng2M0J1Si9JeXFWV21ZT2RQT3NLcGFHVWRtNytFRjRNQlBmVnJFTGhJc1p1WWNDSUhqNHR6S2tFcXRPTGc1SVo5MGdRK0FsdlZ4MFZuR1hPY1FrWTdLZUJ4dEdIOWxpb0pDR0t6VWhPS0xVUWZ1QUdqcDRjM21DZ2NlVnJKaG9ERkgvRFVyWG1DOFR0aW9RNjlYaWp6anlwdFMxeEowdGl4Mm1NSCt5VDZnWjJ3UVFlalpBPT0ifQ==
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to test3@example.com with license: eyJrZXkiOiI2WEg3LTAyVFUtSllJMy1JMDlHIiwiZW1haWwiOiJ0ZXN0M0BleGFtcGxlLmNvbSIsInRpZXIiOiJkZXZlbG9wZXIiLCJpc3N1ZWRfYXQiOiIyMDI1LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAsIm1heF91c2VycyI6MSwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiXSwiaGFyZHdhcmVfaWQiOiJod190ZXN0Iiwic2lnbmF0dXJlIjoiZXBIZHpxTUZBcmlKWUZ6TWhjbGdiT3VvbnBwdmZIWXB1Snh3QW52NFVrNzFUMUFObnZ2ektsM3YyVXYxOGs3c0xuUXdQcDdSV0JoVFVJV25LZXNtNUdNRnFtU3JWcjZaODExeU51cUN4akpxeEhZcHRHUlZzSkN1a21HeDRhV0dDamU0d2QyU0lsOTRDLy9HUzJsSHUxY2toUU9sNlQ3SFlxemNOb0JscURocEVMbnhQZnZGb0JaTWd6Y0JxeksxRXJxT3lKNytETndQNTkvVW9mNW9DYkVlQytNZWM2elZrTVE1eWlNZDJHU3hrMmNhVVR2cWhCNGNVYzlaQS9kT0VBdi9EYWFjSlI0QXVjSk1FVmt3cTc3OWZBenBGbWJhTE80bHhmSmxzMm56bEp1VkxQSjM3ODVrZStuVGp0elRZRjdjMTV1Q05iNXhqSmt3a1ZSVVZnPT0ifQ==
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to test4@example.com with license: eyJrZXkiOiJVSTJMLTNUNU8tRE5XNy1RTElCIiwiZW1haWwiOiJ0ZXN0NEBleGFtcGxlLmNvbSIsInRpZXIiOiJkZXZlbG9wZXIiLCJpc3N1ZWRfYXQiOiIyMDI1LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAsIm1heF91c2VycyI6MSwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiXSwiaGFyZHdhcmVfaWQiOiJod190ZXN0Iiwic2lnbmF0dXJlIjoiWnRlbExwY0lFdXZwY2k0VURkdEs0MVZsOVhib3JHL1JQQ1Byay9adGFwb3dQMldDZDZDRXRvdmZNZ1FHd3QrY1REU244ZjdoM1FDRlhFZTRCU3V5ZDF6bjFZVDVRL0E0enZyS3RZTlVRWUpXYUxCRTU2b2FGTFRleFFwd0p4c2t1TmlpbVdtU2NXamN1UHJHdE5rYlNkSWduOVR1Vmx1R1JBZTlPT2pvalJoSkQ2ZWR1YXhqclZLUmN2Nkh2Y1h6TFdlbDQ4QkREOC9jWEd5MU9HeEpRbVhFWVdTSk40bzVMZDk1bnp5RkcrNkp5b1hnY3NCa1ZaeE9OcEdUoptimizerVuMGl6YS9zMTROTnJRNlJWd1krVVp3a2IyV3dYWHlGaFdpa3dJWXNpOGozTjFoTysrQU9pa2NKOGFldzNBTUJMQWJiOFc3UXNYNGdGSytUNE0roptimizerk2TlZnPT0ifQ==
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to test8@example.com with license: eyJrZXkiOiI1MDEwLVg3NlktU0UwVC1SUkFaIiwiZW1haWwiOiJ0ZXN0OEBleGFtcGxlLmNvbSIsInRpZXIiOiJkZXZlbG9wZXIiLCJpc3N1ZWRfYXQiOiIyMDI1LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI2Ljc4MTE4Mi0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAsIm1heF91c2VycyI6MSwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiXSwiaGFyZHdhcmVfaWQiOiJod190ZXN0Iiwic2lnbmF0dXJlIjoiSkZuWFpSbStLUTlTeG5CdXErUzZIWFNQZ016R21NaGZIRm1wMUMyNkQraXhtQ3pncmp4OHozdWEvdW5CWFVRR2ZDbGg3Skk5S1djVkJ3VnEzRzlwUUN6ZW5pY0gySEd0UCtnTGFpczhTWlU1TENKOGNZR0xEdzdpdEFnS1RidWtDSnJwMHlad25pMWk1UGxma2hyeXhUeG5tVk82cThXSDVYZU5MNVoyTW9KejA0clRsVnNjNmVxL015SUFIZHBiUlBjNEorNWVMV3lBZURJL2pnZ0d1ZnkycjU4TUR1dVdseWtJb2czcDYycXZ6c3YvZzJyQm9oaFNPZUpnUnl1dUV2MXhiTGl0eEFqMWNVa1JtVzJ5MVJFaUJzekliOXdkRW1vMk5RYkp6THR4eEFIT2djNktqUlZWQm1uVDhldFNNa1BrSVk2aUZDRGVjUFE0optimizerNxTU93PT0ifQ==
+2025/08/19 19:51:26 License generated - Email: test1@example.com, Tier: developer, Customer: cust_test_1
+2025/08/19 19:51:26 License generated - Email: test6@example.com, Tier: developer, Customer: cust_test_6
+2025/08/19 19:51:26 License generated - Email: test3@example.com, Tier: developer, Customer: cust_test_3
+2025/08/19 19:51:26 License generated - Email: test5@example.com, Tier: developer, Customer: cust_test_5
+2025/08/19 19:51:26 License generated - Email: test0@example.com, Tier: developer, Customer: cust_test_0
+2025/08/19 19:51:26 License generated - Email: test9@example.com, Tier: developer, Customer: cust_test_9
+2025/08/19 19:51:26 License generated - Email: test2@example.com, Tier: developer, Customer: cust_test_2
+2025/08/19 19:51:26 License generated - Email: test7@example.com, Tier: developer, Customer: cust_test_7
+2025/08/19 19:51:26 License generated - Email: test8@example.com, Tier: developer, Customer: cust_test_8
+2025/08/19 19:51:26 License generated - Email: test4@example.com, Tier: developer, Customer: cust_test_4
+--- PASS: TestLicenseServer_ConcurrentGeneration (0.07s)
+=== RUN   TestLicenseServer_GenerateAndSendLicense_ErrorPath
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to  with license: eyJrZXkiOiJLVEtBLTVOM1MtQjVaNi1BV0Q1IiwiZW1haWwiOiIiLCJ0aWVyIjoiZGV2ZWxvcGVyIiwiaXNzdWVkX2F0IjoiMjAyNS0wOC0xOVQxOTo1MToyNi45MTA0MTU3LTA1OjAwIiwiZXhwaXJlc19hdCI6IjIwMjYtMDgtMTlUMTk6NTE6MjYuOTEwNDE1Ny0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAsIm1heF91c2VycyI6MSwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiXSwiaGFyZHdhcmVfaWQiOiJod18xMjMiLCJzaWduYXR1cmUiOiI0ZlBGbHhyVmVZZFBGWkl3b0tzNzYyTjdFUkZXVGxURkVUbCt4T043dTN4aGRaSUx6OFduTS9ZajdkUkR6clY2SmNSWGUwK3hVakdMVFErdXhUV2w3dkl2aC8zK0FPN082NTJqQmZyK0hhRU1DMXVNc1BZZEErVmQ1YXhZQm5YNzRtTU5NME93MFV2RU5IOWc0cXJUanAwYnp1ektUUSt0VFdRalMvT3E4clNnUjRuWXRSZ1AzQVNYNGtxTUx1V1dYQjVjWE1MUnhoS2tDYm42UHZwWERheXZrQ1I2YThXWlV3eW1VaCthc0xpOVgwbmo2Zm5jZHUycFk0amJoTUkraWJqTlZaUG85cHU1MzM2MDFZZDNPMUt5NkpUalFqY1RaMDkyS3kxU25lQ2creklsT0VuQkZEM2tCa09DNkozNEZPSmFReEFGYkN0Y2twZy9VblFzYkE9PSJ9
+2025/08/19 19:51:26 License generated - Email: , Tier: developer, Customer: cust_123
+2025/08/19 19:51:26 DEVELOPMENT MODE: Would send license email to test@example.com with license: eyJrZXkiOiJQR0JPLU9HNFctQ1lCTy1UV1lLIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwidGllciI6IiIsImlzc3VlZF9hdCI6IjIwMjUtMDgtMTlUMTk6NTE6MjYuOTE0NTMyNy0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI2LjkxNDUzMjctMDU6MDAiLCJtYXhfZG9jdW1lbnRzIjowLCJtYXhfdXNlcnMiOjAsImZlYXR1cmVzIjpbImJhc2ljX3NlYXJjaCIsInJlc3RfYXBpIiwic3FsaXRlX3N0b3JhZ2UiLCJzaW5nbGVfd29ya3NwYWNlIl0sImhhcmR3YXJlX2lkIjoiaHdfMTIzIiwic2lnbmF0dXJlIjoiRG9rTUtPZlRmZ1lEL1ZuaFVpWjVNdTRPeHlNTFh1SjJjRGhCYnp2Z0cwR2dXOHJJRGRWRDlFRnZHcjBwTFltUDROQlIvakFtUDEzazNSWGswbnUwOThOdmdNSzNRWlNUcEFDTjByQ3d3VWhDQUxnWkM0WWNiUTVYaXJFMDRYSVNVT0NPeFpESVZJV2NUbTJRQVMydDU4Mm9noptimizerZDUEJSU3FxOTVOWGZDSmltRktxdytPUWo1eFNDeDhncE50d3I5TmNRUnQ0YmVlWEdEako2dUVWZGhuL29wbmxNT1pkUzFmYnB0RXpHVm52YVFCVFlzczMwVWQxOURzWTdvc0FaOUtqcFVVc1h6TnJiN0FHWHdhcEZvdmFBTkk2QWpBakZqYXpSKzd2QTFUa3gyQmRsYU4xZlcvZndOZVhmZllLSk5xZnZRQVc1Z0IwYnhWN2hGeVcvazJnPT0ifQ==
+2025/08/19 19:51:26 License generated - Email: test@example.com, Tier: , Customer: cust_123
+--- PASS: TestLicenseServer_GenerateAndSendLicense_ErrorPath (0.13s)
+=== RUN   TestLicenseServer_GenerateAndSendLicense_AdditionalScenarios
+=== RUN   TestLicenseServer_GenerateAndSendLicense_AdditionalScenarios/very_long_customer_id
+2025/08/19 19:51:27 DEVELOPMENT MODE: Would send license email to test@example.com with license: eyJrZXkiOiJBM1ZVLVJQUFAtRUxNWi04Sk5CIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwidGllciI6ImRldmVsb3BlciIsImlzc3VlZF9hdCI6IjIwMjUtMDgtMTlUMTk6NTE6MjcuMjkwODA1Mi0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI3LjI5MDgwNTItMDU6MDAiLCJtYXhfZG9jdW1lbnRzIjoxMDAwLCJtYXhfdXNlcnMiOjEsImZlYXR1cmVzIjpbImJhc2ljX3NlYXJjaCIsInJlc3RfYXBpIiwic3FsaXRlX3N0b3JhZ2UiLCJzaW5nbGVfd29ya3NwYWNlIl0sImhhcmR3YXJlX2lkIjoiaHdfMTIzIiwic2lnbmF0dXJlIjoiUm84SlpORUlIQ21qeDJtQmViUTBIUWF1M3hYdUd3R2VVMHcyWGRFWGpYSUhnSkM4S1AyL1hWSFV4OUY0SDlUemZKOHBleEYrT0tpQkhZVTJJbjR0OXVudHBpamdJTzRyS2JqUDZCZkEwcERGRmVzdTd1Nlo2ejRKM3BrcVo5eG5wRHdVNC9VblI3QXZDWC9ZTVlrNVlaS0kzQXRwMWwwdStPdDQ4VzdyK3dSeDZ6bDd1UnYxTFJGTzNob3NneDgxSzF1TytlSVhjTEtEeEhFRWtwdk9tMFprRGd6SDlUcnJiN2tla20vbFQwRVZjbTVsOTFWdFQ2VTVjQVhDclkwZUxDWmV1bnNGdGFMa2k3ckdHLzdHM0lxSkNNd0JpZjMyaEh2SDg2dzRhcUNmSnJ4QVRtU3cvTWRjaUpTQWYwL3gzamtWMzY4RFFxdHNqSFBvMHV2aWhRPT0ifQ==
+2025/08/19 19:51:27 License generated - Email: test@example.com, Tier: developer, Customer: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+=== RUN   TestLicenseServer_GenerateAndSendLicense_AdditionalScenarios/special_characters_in_email
+2025/08/19 19:51:27 DEVELOPMENT MODE: Would send license email to test+special@example-domain.co.uk with license: eyJrZXkiOiJFSVJPLTBCVzktQUtDMi1YS09JIiwiZW1haWwiOiJ0ZXN0K3NwZWNpYWxAZXhhbXBsZS1kb21haW4uY28udWsiLCJ0aWVyIjoicHJvZmVzc2lvbmFsIiwiaXNzdWVkX2F0IjoiMjAyNS0wOC0xOVQxOTo1MToyNy4yOTQ0ODI5LTA1OjAwIiwiZXhwaXJlc19hdCI6IjIwMjYtMDgtMTlUMTk6NTE6MjcuMjk0NDgyOS0wNTowMCIsIm1heF9kb2N1bWVudHMiOjEwMDAwMCwibWF4X3VzZXJzIjoxMCwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiLCJ1bmxpbWl0ZWRfd29ya3NwYWNlcyIsImFkdmFuY2VkX3NtdCIsIjdkX3Njb3JpbmciLCJjYWNoaW5nIiwicHJpb3JpdHlfc3VwcG9ydCJdLCJoYXJkd2FyZV9pZCI6Imh3XzQ1NiIsInNpZ25hdHVyZSI6IklBd1FSb0hNeldJM1liY2RvODJtYWFTd0tndDJCR3Y5ZkRzTVNOWjh0VkJmd1ZVb3ZkazFId1ZWM3BHRll3eWRSdE54eVFrL25rN2ZFZy9ERENnNkk5dElBbHAvK3hqek5HUWdRNmdGNW15VUQ5b1pBN0ozbzNpZVJVcTJINGdLejIzdnYrcjRTTjNGN3QwK3hWRzhoQXU1OWptSzFvRlJ3R3NFNmFjRXFodUNuUGMzUGRpQzllaFdrYkEyZ0tVdmIvc0RmoptimizerdoeVVMbjNLUSt6SlIvVEVxdTlMY0Z4VGtlVURjcTJ0ZGZ5SEJIcTY5ODY3bENwUFo2cHdHS3MxMGttNC9IOUgyZHZ5T25GTXlpOUJ4SmNURlEzcTdOQmJtQy9vaFgvRklzT29FL2V6YVd0NFJ2RW94RVZsRTRpeDlWMlY2Z0lRczcrOTZHTGVGeG1mQ1FBZz09In0=
+2025/08/19 19:51:27 License generated - Email: test+special@example-domain.co.uk, Tier: professional, Customer: cust_123
+=== RUN   TestLicenseServer_GenerateAndSendLicense_AdditionalScenarios/unicode_in_customer_id
+2025/08/19 19:51:27 DEVELOPMENT MODE: Would send license email to test@example.com with license: eyJrZXkiOiJVOFhYLVIxU0UtMTVIVS1EUDVTIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwidGllciI6ImVudGVycHJpc2UiLCJpc3N1ZWRfYXQiOiIyMDI1LTA4LTE5VDE5OjUxOjI3LjI5Nzc5Ny0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI3LjI5Nzc5Ny0wNTowMCIsIm1heF9kb2N1bWVudHMiOjAsIm1heF91c2VycyI6MCwiZmVhdHVyZXMiOlsiYmFzaWNfc2VhcmNoIiwicmVzdF9hcGkiLCJzcWxpdGVfc3RvcmFnZSIsInNpbmdsZV93b3Jrc3BhY2UiLCJ1bmxpbWl0ZWRfd29ya3NwYWNlcyIsImFkdmFuY2VkX3NtdCIsIjdkX3Njb3JpbmciLCJjYWNoaW5nIiwicHJpb3JpdHlfc3VwcG9ydCIsIm11bHRpX3RlbmFudCIsInNzb19sZGFwIiwiY3VzdG9tX21jcCIsIndoaXRlX2xhYmVsIiwic291cmNlX2FjY2VzcyIsInNsYV9zdXBwb3J0IiwiY3VzdG9tX2ludGVncmF0aW9ucyIsInRlYW1fZGVwbG95bWVudCIsIm9uX3ByZW1pc2UiLCJhbmFseXRpY3MiLCJhdWRpdF90cmFpbHMiLCJjb21wbGlhbmNlX3JlcG9ydGluZyJdLCJoYXJkd2FyZV9pZCI6Imh3Xzc4OSIsInNpZ25hdHVyZSI6ImlaZjBkSjVvUEV1dS9PRTVwMUxOaUhsb0JmRXBrWXB0c1psZk5Zd0djLzdoZU45ektvNEMvVXp3algzRU9pS2pNQ2lNUldrNVBrSkgrVGRDU1RDSFk2YUNvNUVUTU43N3hTQ2E2Z280RkdvS05JYmVOUG5mdVA1OTZQWGRvQnNsa0pVVjAyeXZFTjFmT2tBalpTZk4wVm5iMmpUeGpXZG8rcmNHSTlEaHJHVUtCelZBVE1EbUV0a1cwWldRMTRHY2JKNGUzZDlzai9hY1g2VjRxRzZBUkV3VmV5VkpVdXM2UXpzZzdHdDJFTERPZjhIeHVzaGZjSG8va1pORHpVN3pjRFkvayswbnY5eURvV1h6SU5neWpYeENJZldneFpsVFhvTkNYY2NxV1JYMVR5MlVPRkgvRVZ4Tyt1ZVJxTVBnMEI1cCtpbzJ1eERlcUJ3ZFJvNm5YZz09In0=
+2025/08/19 19:51:27 License generated - Email: test@example.com, Tier: enterprise, Customer: cust_テスト_123
+=== RUN   TestLicenseServer_GenerateAndSendLicense_AdditionalScenarios/empty_hardware_id
+2025/08/19 19:51:27 DEVELOPMENT MODE: Would send license email to test@example.com with license: eyJrZXkiOiJVVlJELUpGT0QtODZaVi1LQkE4IiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwidGllciI6ImRldmVsb3BlciIsImlzc3VlZF9hdCI6IjIwMjUtMDgtMTlUMTk6NTE6MjcuMzAwOTE0OC0wNTowMCIsImV4cGlyZXNfYXQiOiIyMDI2LTA4LTE5VDE5OjUxOjI3LjMwMDkxNDgtMDU6MDAiLCJtYXhfZG9jdW1lbnRzIjoxMDAwLCJtYXhfdXNlcnMiOjEsImZlYXR1cmVzIjpbImJhc2ljX3NlYXJjaCIsInJlc3RfYXBpIiwic3FsaXRlX3N0b3JhZ2UiLCJzaW5nbGVfd29ya3NwYWNlIl0sImhhcmR3YXJlX2lkIjoiIiwic2lnbmF0dXJlIjoiWVduQVhtYVpZTnpJR3J2a2pYREJrM1hta0dJWEJ1aDlQblp6SGFBZVZtbHNSRVdTa1hJQkVWY3NUOW4xR1VhMGdwNVp4b3U4Rm8xUWpuZG9UQWVXdGswUkI0ckE2OU1tTTdJQlVESS9POXhEK20ydmx6M2pIdjVXS2piZkorYTQvQkh1bE9jdTQzaHJiVmVYN1lZY2dFZUZ6TmlWWFJQK0lQVk5PMnl6ZmhaV1NzR0kvYm9ZaXQwdlJ4NXphSis5VFRURmFoVmN2eWdWVFFrY1dLeTVsWWNpaWNkY3V1c01VVnZmaGZHeitMMWNjdXpmN3FSS2VzWXR4ZjF6RnBuTHhMdGYyMU5YQ0RoN0RlTDFEZ0tETjRuendPN1c4cDZOWFFEWHVXRnFNYXExMXdZczlHLzVsSXdZUVdrVjA5WjhMQWp1dU82WWZNdFdmRk1zNm1KQy93PT0ifQ==
+2025/08/19 19:51:27 License generated - Email: test@example.com, Tier: developer, Customer: cust_123
+=== RUN   TestLicenseServer_GenerateAndSendLicense_AdditionalScenarios/null_byte_in_email
+2025/08/19 19:51:27 DEVELOPMENT MODE: Would send license email to test@example.com evil with license: eyJrZXkiOiI4TjZXLUUyUDgtTTIyQi1NNEpZIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tXHUwMDAwZXZpbCIsInRpZXIiOiJkZXZlbG9wZXIiLCJpc3N1ZWRfYXQiOiIyMDI1LTA4LTE5VDE5OjUxOjI3LjMwNDA5ODMtMDU6MDAiLCJleHBpcmVzX2F0IjoiMjAyNi0wOC0xOVQxOTo1MToyNy4zMDQwOTgzLTA1OjAwIiwibWF4X2RvY3VtZW50cyI6MTAwMCwibWF4X3VzZXJzIjoxLCJmZWF0dXJlcyI6WyJiYXNpY19zZWFyY2giLCJyZXN0X2FwaSIsInNxbGl0ZV9zdG9yYWdlIiwic2luZ2xlX3dvcmtzcGFjZSJdLCJoYXJkd2FyZV9pZCI6Imh3XzEyMyIsInNpZ25hdHVyZSI6IlFMZk1KY1V5SHpQc05NeWVCTEdLYzFKK1hxclVGWG80YUFmdmlWdDVGdFR2MU5oNHJ5UDNvcVB0eVloK2hVSHlKdWRJMGMwcmNXRnlzaUsrV2FtOWU1eXpBMDA5b29yQVZXODlPcUN5bEtRa3V2V3pRZC94dHh3TkozQTRDUDZQL3hCSWYybUQ3NTZYa21lUUdtKzNYR1B1UEd2Tmt2ZDJFMkxKeW1rK2Z1cG91NDkvZjd5c2hoaXNBWkVZMHcrV21UL3o5SmVLN2FWbjF0eHY1eXdhZGZwRkd4bGlhdWUxSmNjRnpnTlBQOVJvSkViM0dCeis2WWhVa0gzZWNXMzJleFNzTUxSNXZwWG1KV1VCbHArSW9iVDN4dko5ekJqcU50optimizerZCenZHRWs3MXBGK1RXQlRlcG5WNFdUWGYxKzI4ZEQ5Vnk0YVFSOHppSHN3VDEyK2FhQT09In0=
+2025/08/19 19:51:27 License generated - Email: test@example.com evil, Tier: developer, Customer: cust_123
+--- PASS: TestLicenseServer_GenerateAndSendLicense_AdditionalScenarios (0.39s)
+    --- PASS: TestLicenseServer_GenerateAndSendLicense_AdditionalScenarios/very_long_customer_id (0.00s)
+    --- PASS: TestLicenseServer_GenerateAndSendLicense_AdditionalScenarios/special_characters_in_email (0.00s)
+    --- PASS: TestLicenseServer_GenerateAndSendLicense_AdditionalScenarios/unicode_in_customer_id (0.00s)
+    --- PASS: TestLicenseServer_GenerateAndSendLicense_AdditionalScenarios/empty_hardware_id (0.00s)
+    --- PASS: TestLicenseServer_GenerateAndSendLicense_AdditionalScenarios/null_byte_in_email (0.00s)
+=== RUN   TestLicenseServer_SendLicenseEmail_EmptyEmail
+2025/08/19 19:51:27 DEVELOPMENT MODE: Would send license email to  with license: test-license
+--- PASS: TestLicenseServer_SendLicenseEmail_EmptyEmail (0.19s)
+=== RUN   TestLoadConfig_optimizationPConfiguration
+--- PASS: TestLoadConfig_optimizationPConfiguration (0.00s)
+=== RUN   TestLoadConfig_AdditionalScenarios
+=== RUN   TestLoadConfig_AdditionalScenarios/missing_stripe_secret_key
+=== RUN   TestLoadConfig_AdditionalScenarios/missing_webhook_secret
+=== RUN   TestLoadConfig_AdditionalScenarios/missing_private_key_path
+=== RUN   TestLoadConfig_AdditionalScenarios/all_optimizationp_env_vars_set
+=== RUN   TestLoadConfig_AdditionalScenarios/invalid_port_number
+--- PASS: TestLoadConfig_AdditionalScenarios (0.00s)
+    --- PASS: TestLoadConfig_AdditionalScenarios/missing_stripe_secret_key (0.00s)
+    --- PASS: TestLoadConfig_AdditionalScenarios/missing_webhook_secret (0.00s)
+    --- PASS: TestLoadConfig_AdditionalScenarios/missing_private_key_path (0.00s)
+    --- PASS: TestLoadConfig_AdditionalScenarios/all_optimizationp_env_vars_set (0.00s)
+    --- PASS: TestLoadConfig_AdditionalScenarios/invalid_port_number (0.00s)
+=== RUN   TestLicenseServer_WebhookErrorScenarios
+=== RUN   TestLicenseServer_WebhookErrorScenarios/invalid_method_get
+=== RUN   TestLicenseServer_WebhookErrorScenarios/empty_body
+2025/08/19 19:51:27 Error verifying webhook signature: webhook has no Stripe-Signature header
+--- PASS: TestLicenseServer_WebhookErrorScenarios (0.33s)
+    --- PASS: TestLicenseServer_WebhookErrorScenarios/invalid_method_get (0.00s)
+    --- PASS: TestLicenseServer_WebhookErrorScenarios/empty_body (0.00s)
+=== RUN   TestLicenseServer_WebhookSuccessScenarios
+=== RUN   TestLicenseServer_WebhookSuccessScenarios/successful_checkout_completed
+2025/08/19 19:51:27 Error verifying webhook signature: webhook had no valid signature
+=== RUN   TestLicenseServer_WebhookSuccessScenarios/successful_subscription_created
+2025/08/19 19:51:27 Error verifying webhook signature: webhook had no valid signature
+=== RUN   TestLicenseServer_WebhookSuccessScenarios/successful_payment_succeeded
+2025/08/19 19:51:27 Error verifying webhook signature: webhook had no valid signature
+=== RUN   TestLicenseServer_WebhookSuccessScenarios/unhandled_event_type
+2025/08/19 19:51:27 Error verifying webhook signature: webhook had no valid signature
+--- PASS: TestLicenseServer_WebhookSuccessScenarios (0.16s)
+    --- PASS: TestLicenseServer_WebhookSuccessScenarios/successful_checkout_completed (0.00s)
+    --- PASS: TestLicenseServer_WebhookSuccessScenarios/successful_subscription_created (0.00s)
+    --- PASS: TestLicenseServer_WebhookSuccessScenarios/successful_payment_succeeded (0.00s)
+    --- PASS: TestLicenseServer_WebhookSuccessScenarios/unhandled_event_type (0.00s)
+=== RUN   TestLicenseServer_EnhancedEndpoints
+=== RUN   TestLicenseServer_EnhancedEndpoints/activate_endpoint
+=== RUN   TestLicenseServer_EnhancedEndpoints/activate_limit_exceeded
+=== RUN   TestLicenseServer_EnhancedEndpoints/deactivate_endpoint
+=== RUN   TestLicenseServer_EnhancedEndpoints/record_usage_endpoint
+=== RUN   TestLicenseServer_EnhancedEndpoints/analytics_endpoint
+=== RUN   TestLicenseServer_EnhancedEndpoints/security_events_endpoint
+--- PASS: TestLicenseServer_EnhancedEndpoints (0.09s)
+    --- PASS: TestLicenseServer_EnhancedEndpoints/activate_endpoint (0.00s)
+    --- PASS: TestLicenseServer_EnhancedEndpoints/activate_limit_exceeded (0.00s)
+    --- PASS: TestLicenseServer_EnhancedEndpoints/deactivate_endpoint (0.01s)
+    --- PASS: TestLicenseServer_EnhancedEndpoints/record_usage_endpoint (0.00s)
+    --- PASS: TestLicenseServer_EnhancedEndpoints/analytics_endpoint (0.00s)
+    --- PASS: TestLicenseServer_EnhancedEndpoints/security_events_endpoint (0.00s)
+=== RUN   TestLicenseServer_EnhancedLicenseGeneration
+=== RUN   TestLicenseServer_EnhancedLicenseGeneration/generate_and_send_with_tracking
+2025/08/19 19:51:28 DEVELOPMENT MODE: Would send license email to tracking@example.com with license: eyJrZXkiOiJORFJXLU8zQUEtUDdKTS1CS0JDIiwiZW1haWwiOiJ0cmFja2luZ0BleGFtcGxlLmNvbSIsInRpZXIiOiJwcm9mZXNzaW9uYWwiLCJpc3N1ZWRfYXQiOiIyMDI1LTA4LTE5VDE5OjUxOjI4LjIyOTY1NzgtMDU6MDAiLCJleHBpcmVzX2F0IjoiMjAyNi0wOC0xOVQxOTo1MToyOC4yMjk2NTc4LTA1OjAwIiwibWF4X2RvY3VtZW50cyI6MTAwMDAwLCJtYXhfdXNlcnMiOjEwLCJmZWF0dXJlcyI6WyJiYXNpY19zZWFyY2giLCJyZXN0X2FwaSIsInNxbGl0ZV9zdG9yYWdlIiwic2luZ2xlX3dvcmtzcGFjZSIsInVubGltaXRlZF93b3Jrc3BhY2VzIiwiYWR2YW5jZWRfc210IiwiN2Rfc2NvcmluZyIsImNhY2hpbmciLCJwcmlvcml0eV9zdXBwb3J0Il0sImhhcmR3YXJlX2lkIjoidHJhY2tpbmctaGFyZHdhcmUtMDAxIiwic2lnbmF0dXJlIjoiQWxrd0l4bHlLaDNvTFlYSSswWmloTGtLT2ZZeVBQZUtNZlltZFNsazBCNSsycFdxYXpLQVhoMytleU12c1QzRG5EemtZQ3hhWm0xb1ZScHY3UGNnN1E3NkJiY1dLVFhrY296UUgxMmlEVy9uWVJYck54dFZ1UGRCQ3pHbk81dWU5VitpZCtIMXNTUEJjelhLYUQyQkNRQzI0K24vMjRzeG1xTjZlZTR0bGlEeHJEbXZBYm9pKzlRSDNURVdBdUN4QlEwTjRhRmxTU2lFSE5mOXl1ZUNxTmQ0MmwwUnVGcWlod2U1TEMrdEVXUi9GM21KR0xIUGpseHlOblZJSlJKR2lTQVg3YUxlSlNycU5LbmJiRnpRMnNJbEFFYnJzMFVFRER4THVTZVpMdkt1VkF4bEFWQkRxQ3RPL01CWkhyZ0lVdWtYVWp3T1BpdFp4clBYRy9RZC9nPT0ifQ==
+2025/08/19 19:51:28 License generated - Email: tracking@example.com, Tier: professional, Customer: cust_tracking_123
+--- PASS: TestLicenseServer_EnhancedLicenseGeneration (0.15s)
+    --- PASS: TestLicenseServer_EnhancedLicenseGeneration/generate_and_send_with_tracking (0.00s)
+=== RUN   TestLicenseServer_ErrorHandling
+=== RUN   TestLicenseServer_ErrorHandling/activate_invalid_method
+=== RUN   TestLicenseServer_ErrorHandling/activate_invalid_json
+=== RUN   TestLicenseServer_ErrorHandling/usage_invalid_method
+=== RUN   TestLicenseServer_ErrorHandling/analytics_invalid_method
+--- PASS: TestLicenseServer_ErrorHandling (0.18s)
+    --- PASS: TestLicenseServer_ErrorHandling/activate_invalid_method (0.00s)
+    --- PASS: TestLicenseServer_ErrorHandling/activate_invalid_json (0.00s)
+    --- PASS: TestLicenseServer_ErrorHandling/usage_invalid_method (0.00s)
+    --- PASS: TestLicenseServer_ErrorHandling/analytics_invalid_method (0.00s)
+=== RUN   TestLicenseServer_ConcurrentRequests
+--- PASS: TestLicenseServer_ConcurrentRequests (0.54s)
+=== RUN   TestLicenseServer_UsageAnalyticsFlow
+2025/08/19 19:51:29 License activated: ANALYTIC... on hardware analytic... (activation 1/3)
+2025/08/19 19:51:29 License activated: ANALYTIC... on hardware analytic... (activation 1/3)
+2025/08/19 19:51:29 License activated: ANALYTIC... on hardware analytic... (activation 1/1)
+--- PASS: TestLicenseServer_UsageAnalyticsFlow (0.26s)
+=== RUN   TestLicenseServer_SecurityEventGeneration
+--- PASS: TestLicenseServer_SecurityEventGeneration (0.30s)
+=== RUN   TestLicenseServer_DatabasePersistence
+2025/08/19 19:51:29 License activated: PERSIST-... on hardware persist-... (activation 1/3)
+--- PASS: TestLicenseServer_DatabasePersistence (0.37s)
+PASS
+ok  	contextlite/cmd/license-server	(cached)
+?   	contextlite/cmd/production-check	[no test files]
+?   	contextlite/cmd/registry-runner	[no test files]
+=== RUN   TestFlagDefaults
+--- PASS: TestFlagDefaults (0.00s)
+=== RUN   TestFlagParsing
+--- PASS: TestFlagParsing (0.00s)
+=== RUN   TestValidationLogic
+=== RUN   TestValidationLogic/valid_normal
+=== RUN   TestValidationLogic/valid_high
+=== RUN   TestValidationLogic/valid_low
+=== RUN   TestValidationLogic/invalid_zero_docs
+=== RUN   TestValidationLogic/invalid_zero_budget
+=== RUN   TestValidationLogic/invalid_zero_iterations
+=== RUN   TestValidationLogic/invalid_negative_docs
+--- PASS: TestValidationLogic (0.00s)
+    --- PASS: TestValidationLogic/valid_normal (0.00s)
+    --- PASS: TestValidationLogic/valid_high (0.00s)
+    --- PASS: TestValidationLogic/valid_low (0.00s)
+    --- PASS: TestValidationLogic/invalid_zero_docs (0.00s)
+    --- PASS: TestValidationLogic/invalid_zero_budget (0.00s)
+    --- PASS: TestValidationLogic/invalid_zero_iterations (0.00s)
+    --- PASS: TestValidationLogic/invalid_negative_docs (0.00s)
+=== RUN   TestSystemsList
+--- PASS: TestSystemsList (0.00s)
+=== RUN   TestConfigurationValidation
+=== RUN   TestConfigurationValidation/valid_json_output
+=== RUN   TestConfigurationValidation/valid_csv_output
+=== RUN   TestConfigurationValidation/empty_output
+=== RUN   TestConfigurationValidation/empty_systems
+=== RUN   TestConfigurationValidation/valid_multiple_systems
+--- PASS: TestConfigurationValidation (0.00s)
+    --- PASS: TestConfigurationValidation/valid_json_output (0.00s)
+    --- PASS: TestConfigurationValidation/valid_csv_output (0.00s)
+    --- PASS: TestConfigurationValidation/empty_output (0.00s)
+    --- PASS: TestConfigurationValidation/empty_systems (0.00s)
+    --- PASS: TestConfigurationValidation/valid_multiple_systems (0.00s)
+PASS
+ok  	contextlite/cmd/sota-eval	(cached)
+?   	contextlite/docs/examples	[no test files]
+?   	contextlite/examples	[no test files]
+=== RUN   TestServer_HandleHealth
+--- PASS: TestServer_HandleHealth (0.07s)
+=== RUN   TestServer_HandleAddDocument
+--- PASS: TestServer_HandleAddDocument (0.01s)
+=== RUN   TestServer_HandleBulkAddDocuments
+    server_test.go:178: Expected 2 documents added, got [doc1 doc2] (may be normal)
+--- PASS: TestServer_HandleBulkAddDocuments (0.01s)
+=== RUN   TestServer_HandleSearchDocuments
+--- PASS: TestServer_HandleSearchDocuments (0.01s)
+=== RUN   TestServer_HandleUpdateWeights
+--- PASS: TestServer_HandleUpdateWeights (0.01s)
+=== RUN   TestServer_HandleResetWeights
+--- PASS: TestServer_HandleResetWeights (0.01s)
+=== RUN   TestServer_HandleInvalidateCache
+--- PASS: TestServer_HandleInvalidateCache (0.01s)
+=== RUN   TestServer_HandleCacheStats
+--- PASS: TestServer_HandleCacheStats (0.01s)
+=== RUN   TestServer_HandleStorageInfo
+    server_test.go:340: Storage info missing document_count (may be expected)
+--- PASS: TestServer_HandleStorageInfo (0.01s)
+=== RUN   TestServer_HandleoptimizationStats
+    server_test.go:363: optimization stats missing z3_version (may be expected)
+--- PASS: TestServer_HandleoptimizationStats (0.01s)
+=== RUN   TestServer_HandleDeleteDocument
+    server_test.go:393: Delete document test completed
+--- PASS: TestServer_HandleDeleteDocument (0.01s)
+=== RUN   TestServer_WriteJSON
+--- PASS: TestServer_WriteJSON (0.01s)
+=== RUN   TestServer_WriteError
+--- PASS: TestServer_WriteError (0.01s)
+=== RUN   TestServer_GetoptimizerVersion
+--- PASS: TestServer_GetoptimizerVersion (0.07s)
+=== RUN   TestServer_CalculateDocumentOverlap
+--- PASS: TestServer_CalculateDocumentOverlap (0.01s)
+=== RUN   TestServer_CalculateDiversityDifference
+--- PASS: TestServer_CalculateDiversityDifference (0.01s)
+=== RUN   TestServer_HandleScanWorkspace
+    server_test.go:522: Scan workspace returned status 400 (may be expected)
+    server_test.go:533: No files found in scan results (may be expected)
+--- PASS: TestServer_HandleScanWorkspace (0.01s)
+=== RUN   TestServer_AuthMiddleware
+--- PASS: TestServer_AuthMiddleware (0.01s)
+=== RUN   TestServer_HandleAssembleContext
+    server_test.go:600: handleAssembleContext test completed
+--- PASS: TestServer_HandleAssembleContext (0.01s)
+=== RUN   TestServer_HandleBaselineComparison
+    server_test.go:615: handleBaselineComparison returned status 200
+    server_test.go:616: handleBaselineComparison test completed
+--- PASS: TestServer_HandleBaselineComparison (0.01s)
+=== RUN   TestServer_HandleGetWeights
+    server_test.go:630: handleGetWeights returned status 400
+    server_test.go:633: handleGetWeights test completed
+--- PASS: TestServer_HandleGetWeights (0.01s)
+=== RUN   TestServer_ScanWorkspaceFiles
+    server_test.go:652: scanWorkspaceFiles returned 0 files
+    server_test.go:653: scanWorkspaceFiles test completed
+--- PASS: TestServer_ScanWorkspaceFiles (0.01s)
+=== RUN   TestServer_ServeHTTP
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000001] "GET http://example.com/health HTTP/1.1" from 192.0.2.1:1234 - 200 457B in 48.3778ms
+    server_test.go:671: ServeHTTP test completed
+--- PASS: TestServer_ServeHTTP (0.06s)
+=== RUN   TestServer_Start
+    server_test.go:684: Start method exists and is callable
+--- PASS: TestServer_Start (0.01s)
+=== RUN   TestServer_AuthMiddleware_Coverage
+--- PASS: TestServer_AuthMiddleware_Coverage (0.01s)
+=== RUN   TestServer_HandleAddDocument_Coverage
+    server_test.go:782: Empty document returned status 201
+--- PASS: TestServer_HandleAddDocument_Coverage (0.01s)
+=== RUN   TestServer_HandleDeleteDocument_Coverage
+    server_test.go:811: Missing document ID returned status 400
+--- PASS: TestServer_HandleDeleteDocument_Coverage (0.01s)
+=== RUN   TestServer_HandleSearchDocuments_Coverage
+    server_test.go:843: Empty query returned status 400
+--- PASS: TestServer_HandleSearchDocuments_Coverage (0.01s)
+=== RUN   TestServer_HandleGetWeights_Coverage
+    server_test.go:868: Non-existent workspace returned status 400
+--- PASS: TestServer_HandleGetWeights_Coverage (0.01s)
+=== RUN   TestServer_HandleScanWorkspace_Coverage
+    server_test.go:915: Non-existent workspace path returned status 400
+--- PASS: TestServer_HandleScanWorkspace_Coverage (0.01s)
+=== RUN   TestServer_StartDetailed
+    server_test.go:926: Server.Start function is available
+    server_test.go:934: Server.Start correctly returned error for invalid port: listen tcp: address -1: invalid port
+--- PASS: TestServer_StartDetailed (0.01s)
+=== RUN   TestServer_DeleteDocumentComprehensive
+    server_test.go:955: Delete document returned status 400
+--- PASS: TestServer_DeleteDocumentComprehensive (0.01s)
+=== RUN   TestServer_GetWeightsComprehensive
+    server_test.go:984: GetWeights returned status 400
+    server_test.go:992: GetWeights without workspace_path returned status 400
+--- PASS: TestServer_GetWeightsComprehensive (0.01s)
+=== RUN   TestServer_ResetWeightsComprehensive
+    server_test.go:1010: ResetWeights returned status 400
+    server_test.go:1018: ResetWeights without workspace_path returned status 400
+--- PASS: TestServer_ResetWeightsComprehensive (0.01s)
+=== RUN   TestServer_CacheOperations
+    server_test.go:1031: InvalidateCache returned status 200
+    server_test.go:1039: CacheStats returned status 200
+--- PASS: TestServer_CacheOperations (0.01s)
+=== RUN   TestServer_StorageInfo
+    server_test.go:1052: StorageInfo returned status 200
+    server_test.go:1059: Storage info response keys: [last_update total_documents database_size index_size]
+--- PASS: TestServer_StorageInfo (0.01s)
+=== RUN   TestServer_ScanWorkspaceDetailed
+    server_test.go:1102: ScanWorkspace returned status 400
+--- PASS: TestServer_ScanWorkspaceDetailed (0.01s)
+=== RUN   TestServer_HandleDeleteDocumentComprehensive
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000002] "DELETE http://example.com/api/v1/documents/delete-test-doc HTTP/1.1" from 192.0.2.1:1234 - 200 21B in 0s
+    server_test.go:1150: Delete document returned status: 200
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000003] "DELETE http://example.com/api/v1/documents/non-existent-doc HTTP/1.1" from 192.0.2.1:1234 - 200 21B in 0s
+    server_test.go:1158: Delete non-existent document returned status: 200
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000004] "DELETE http://example.com/api/v1/documents/invalid%20id HTTP/1.1" from 192.0.2.1:1234 - 200 21B in 514.6µs
+    server_test.go:1166: Delete with malformed ID returned status: 200
+--- PASS: TestServer_HandleDeleteDocumentComprehensive (0.01s)
+=== RUN   TestServer_HandleGetWeightsComprehensive
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000005] "GET http://example.com/api/v1/weights?workspace_path=/test/workspace HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+    server_test.go:1208: Get weights returned status: 403
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000006] "GET http://example.com/api/v1/weights?workspace_path=/non/existent HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+    server_test.go:1226: Get weights for non-existent workspace returned status: 403
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000007] "GET http://example.com/api/v1/weights HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+    server_test.go:1234: Get weights with missing workspace_path returned status: 403
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000008] "GET http://example.com/api/v1/weights?workspace_path= HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+    server_test.go:1242: Get weights with empty workspace_path returned status: 403
+--- PASS: TestServer_HandleGetWeightsComprehensive (0.01s)
+=== RUN   TestServer_HandleAssembleContextComprehensive
+    server_test.go:1298: Context assembly successful, documents: 0
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000009] "POST http://example.com/api/v1/context/assemble HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+    server_test.go:1325: Context assembly with missing query returned status: 403
+    server_test.go:1341: Context assembly with large limits returned status: 200
+--- PASS: TestServer_HandleAssembleContextComprehensive (0.02s)
+=== RUN   TestServer_HandleScanWorkspaceComprehensive
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000010] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 36B in 0s
+    server_test.go:1392: Scan workspace returned status: 400
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000011] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 36B in 0s
+    server_test.go:1416: Scan workspace with no patterns returned status: 400
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000012] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 36B in 0s
+    server_test.go:1430: Scan non-existent workspace returned status: 400
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000013] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 36B in 0s
+    server_test.go:1439: Scan with missing workspace_path returned status: 400
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000014] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 82B in 0s
+    server_test.go:1448: Scan with invalid JSON returned status: 400
+--- PASS: TestServer_HandleScanWorkspaceComprehensive (0.02s)
+=== RUN   TestServer_HandleScanWorkspaceEdgeCases
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000015] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 2217B in 1.0333ms
+    server_test.go:1467: Scan with large max_files returned status: 200
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000016] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 2217B in 1.0461ms
+    server_test.go:1481: Scan with zero max_files returned status: 200
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000017] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 51B in 524.2µs
+    server_test.go:1496: Scan with custom patterns returned status: 200
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000018] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 2217B in 518.8µs
+    server_test.go:1511: Scan with empty patterns returned status: 200
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000019] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 51B in 539.3µs
+    server_test.go:1524: Scan with special chars path returned status: 200
+--- PASS: TestServer_HandleScanWorkspaceEdgeCases (0.01s)
+=== RUN   TestServer_HandleGetWeightsEdgeCases
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000020] "GET http://example.com/api/v1/weights HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+    server_test.go:1536: Get weights without workspace returned status: 403
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000021] "GET http://example.com/api/v1/weights?workspace= HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+    server_test.go:1543: Get weights with empty workspace returned status: 403
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000022] "GET http://example.com/api/v1/weights?workspace=/nonexistent/workspace HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+    server_test.go:1550: Get weights for nonexistent workspace returned status: 403
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000023] "GET http://example.com/api/v1/weights?workspace=%2Ftest%2Fworkspace+with+spaces HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+    server_test.go:1558: Get weights with encoded path returned status: 403
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000024] "GET http://example.com/api/v1/weights?workspace=%2Ftest%2Fvery-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-workspace HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+    server_test.go:1566: Get weights with long path returned status: 403
+--- PASS: TestServer_HandleGetWeightsEdgeCases (0.01s)
+=== RUN   TestServer_HandleCacheAndStorageInfoEdgeCases
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000025] "DELETE http://example.com/api/v1/cache HTTP/1.1" from 192.0.2.1:1234 - 404 19B in 0s
+    server_test.go:1579: Cache invalidation 1 returned status: 404
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000026] "DELETE http://example.com/api/v1/cache HTTP/1.1" from 192.0.2.1:1234 - 404 19B in 0s
+    server_test.go:1579: Cache invalidation 2 returned status: 404
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000027] "DELETE http://example.com/api/v1/cache HTTP/1.1" from 192.0.2.1:1234 - 404 19B in 0s
+    server_test.go:1579: Cache invalidation 3 returned status: 404
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000028] "GET http://example.com/api/v1/cache/stats HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+    server_test.go:1588: Cache stats 1 returned status: 403
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000029] "GET http://example.com/api/v1/cache/stats HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+    server_test.go:1588: Cache stats 2 returned status: 403
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000030] "GET http://example.com/api/v1/cache/stats HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+    server_test.go:1588: Cache stats 3 returned status: 403
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000031] "GET http://example.com/api/v1/storage/info HTTP/1.1" from 192.0.2.1:1234 - 200 96B in 0s
+    server_test.go:1597: Storage info 1 returned status: 200
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000032] "GET http://example.com/api/v1/storage/info HTTP/1.1" from 192.0.2.1:1234 - 200 96B in 0s
+    server_test.go:1597: Storage info 2 returned status: 200
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000033] "GET http://example.com/api/v1/storage/info HTTP/1.1" from 192.0.2.1:1234 - 200 96B in 527.8µs
+    server_test.go:1597: Storage info 3 returned status: 200
+--- PASS: TestServer_HandleCacheAndStorageInfoEdgeCases (0.01s)
+=== RUN   TestServer_ScanWorkspaceFilesEdgeCases
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000034] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 947B in 522.5µs
+    server_test.go:1659: Scan with real files returned status: 200
+    server_test.go:1664: Scan found 5 files
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000035] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 227B in 522µs
+    server_test.go:1676: Scan with max_files=1 returned status: 200
+--- PASS: TestServer_ScanWorkspaceFilesEdgeCases (0.02s)
+PASS
+ok  	contextlite/internal/api	(cached)
+=== RUN   TestRateLimiter_BasicFunctionality
+--- PASS: TestRateLimiter_BasicFunctionality (0.00s)
+=== RUN   TestRateLimiter_EndpointSpecificLimits
+--- PASS: TestRateLimiter_EndpointSpecificLimits (0.00s)
+=== RUN   TestRateLimiter_DifferentIPs
+--- PASS: TestRateLimiter_DifferentIPs (0.00s)
+=== RUN   TestRateLimiter_HealthCheckExemption
+--- PASS: TestRateLimiter_HealthCheckExemption (0.00s)
+=== RUN   TestRateLimiter_Disabled
+--- PASS: TestRateLimiter_Disabled (0.00s)
+=== RUN   TestRateLimiter_XForwardedFor
+--- PASS: TestRateLimiter_XForwardedFor (0.00s)
+=== RUN   TestDefaultRateLimiterConfig
+--- PASS: TestDefaultRateLimiterConfig (0.00s)
+PASS
+ok  	contextlite/internal/api/middleware	(cached)
+=== RUN   TestLoadEngine
+--- PASS: TestLoadEngine (0.00s)
+=== RUN   TestPrivateEngineAvailable
+    engine_test.go:139: Private engine not available (expected in test environment)
+--- PASS: TestPrivateEngineAvailable (0.00s)
+=== RUN   TestGetEngineInfo
+--- PASS: TestGetEngineInfo (0.00s)
+=== RUN   TestCoreEngineBasicFunctionality
+--- PASS: TestCoreEngineBasicFunctionality (0.00s)
+=== RUN   TestCoreEngine_IndexDocument
+--- PASS: TestCoreEngine_IndexDocument (0.00s)
+=== RUN   TestCoreEngine_RemoveDocument
+--- PASS: TestCoreEngine_RemoveDocument (0.00s)
+=== RUN   TestCoreEngine_AssembleContext
+--- PASS: TestCoreEngine_AssembleContext (0.00s)
+=== RUN   TestCoreEngine_UpdateConfig
+--- PASS: TestCoreEngine_UpdateConfig (0.00s)
+=== RUN   TestCoreEngine_SearchCandidates
+--- PASS: TestCoreEngine_SearchCandidates (0.00s)
+=== RUN   TestCoreEngine_ScoreDocuments
+--- PASS: TestCoreEngine_ScoreDocuments (0.00s)
+=== RUN   TestCoreEngine_SelectDocuments
+--- PASS: TestCoreEngine_SelectDocuments (0.00s)
+=== RUN   TestCoreEngine_AssembleResult
+--- PASS: TestCoreEngine_AssembleResult (0.00s)
+=== RUN   TestCoreEngine_CalculateBM25
+--- PASS: TestCoreEngine_CalculateBM25 (0.00s)
+=== RUN   TestCoreEngine_CalculateRecency
+--- PASS: TestCoreEngine_CalculateRecency (0.00s)
+=== RUN   TestCoreEngine_IsDiverse
+--- PASS: TestCoreEngine_IsDiverse (0.00s)
+=== RUN   TestCoreEngine_EdgeCases
+=== RUN   TestCoreEngine_EdgeCases/empty_query
+=== RUN   TestCoreEngine_EdgeCases/empty_document_content
+=== RUN   TestCoreEngine_EdgeCases/null_document_times
+--- PASS: TestCoreEngine_EdgeCases (0.00s)
+    --- PASS: TestCoreEngine_EdgeCases/empty_query (0.00s)
+    --- PASS: TestCoreEngine_EdgeCases/empty_document_content (0.00s)
+    --- PASS: TestCoreEngine_EdgeCases/null_document_times (0.00s)
+PASS
+ok  	contextlite/internal/engine	(cached)
+?   	contextlite/internal/enterprise	[no test files]
+=== RUN   TestRecallAtK
+--- PASS: TestRecallAtK (0.00s)
+=== RUN   TestNDCGAtK
+--- PASS: TestNDCGAtK (0.00s)
+=== RUN   TestMAPCalculation
+--- PASS: TestMAPCalculation (0.00s)
+=== RUN   TestMRRCalculation
+--- PASS: TestMRRCalculation (0.00s)
+=== RUN   TestEvaluateQuery
+--- PASS: TestEvaluateQuery (0.00s)
+=== RUN   TestBatchEvaluate
+--- PASS: TestBatchEvaluate (0.00s)
+=== RUN   TestGroundTruthLoading
+--- PASS: TestGroundTruthLoading (0.00s)
+=== RUN   TestMRREdgeCases
+--- PASS: TestMRREdgeCases (0.00s)
+=== RUN   TestBatchEvaluateEdgeCases
+--- PASS: TestBatchEvaluateEdgeCases (0.00s)
+=== RUN   TestCalculateRecallAtKEdgeCases
+--- PASS: TestCalculateRecallAtKEdgeCases (0.00s)
+=== RUN   TestCalculateNDCGAtKEdgeCases
+--- PASS: TestCalculateNDCGAtKEdgeCases (0.00s)
+=== RUN   TestCalculateMAPEdgeCases
+--- PASS: TestCalculateMAPEdgeCases (0.00s)
+=== RUN   TestDefaultComparisonConfig
+--- PASS: TestDefaultComparisonConfig (0.00s)
+=== RUN   TestNewSOTAComparison
+--- PASS: TestNewSOTAComparison (0.00s)
+=== RUN   TestLoadEvaluationDataset
+2025/08/19 19:57:19 Loaded 6 evaluation queries across 3 query types
+--- PASS: TestLoadEvaluationDataset (0.00s)
+=== RUN   TestGenerateTestContent
+2025/08/19 19:57:19 Loaded 6 evaluation queries across 3 query types
+--- PASS: TestGenerateTestContent (0.00s)
+=== RUN   TestExecuteSystemQuery
+--- PASS: TestExecuteSystemQuery (0.00s)
+=== RUN   TestExecuteBM25Baseline
+--- PASS: TestExecuteBM25Baseline (0.00s)
+=== RUN   TestExecuteEmbeddingRetrieval
+--- PASS: TestExecuteEmbeddingRetrieval (0.00s)
+=== RUN   TestExecuteLLMReranking
+--- PASS: TestExecuteLLMReranking (0.00s)
+=== RUN   TestExecuteContextLiteoptimization
+    sota_test.go:244: ContextLite optimization latency was non-positive (expected for mock implementation)
+--- PASS: TestExecuteContextLiteoptimization (0.00s)
+=== RUN   TestEvaluateSystem
+2025/08/19 19:57:19 Loaded 6 evaluation queries across 3 query types
+--- PASS: TestEvaluateSystem (0.00s)
+=== RUN   TestGenerateSummary
+    sota_test.go:309: No significance tests performed (expected for mock data)
+--- PASS: TestGenerateSummary (0.00s)
+=== RUN   TestRankSystems
+--- PASS: TestRankSystems (0.00s)
+=== RUN   TestSaveResults
+2025/08/19 19:57:19 SOTA comparison results saved to: test_results.json
+--- PASS: TestSaveResults (0.00s)
+=== RUN   TestRunSOTAComparison
+2025/08/19 19:57:19 Starting SOTA comparison with 1 systems
+2025/08/19 19:57:19 Loaded 6 evaluation queries across 3 query types
+2025/08/19 19:57:19 Evaluating system: bm25_baseline
+2025/08/19 19:57:19 Completed bm25_baseline: Recall@5=0.095, nDCG@5=0.138, Latency=15.0ms
+2025/08/19 19:57:19 SOTA comparison results saved to: test_sota_results.json
+--- PASS: TestRunSOTAComparison (0.00s)
+=== RUN   TestPrintSummary
+
+=== SOTA RAG System Comparison Results ===
+Evaluation Date: 2025-08-19 19:57:19
+Queries Evaluated: 0
+Systems Tested: 1
+
+📊 Quality Rankings (Recall@5):
+1. contextlite_optimization: 0.850
+
+📈 Quality Rankings (nDCG@5):
+
+⚡ Efficiency Rankings (Latency):
+
+🏆 Best Overall System: contextlite_optimization
+⚡ Most Efficient System: 
+
+📋 Detailed results saved to: sota_comparison_results.json
+
+=== SOTA RAG System Comparison Results ===
+Evaluation Date: 2025-08-19 19:57:19
+Queries Evaluated: 0
+Systems Tested: 0
+
+📊 Quality Rankings (Recall@5):
+
+📈 Quality Rankings (nDCG@5):
+
+⚡ Efficiency Rankings (Latency):
+
+🏆 Best Overall System: 
+⚡ Most Efficient System: 
+
+📋 Detailed results saved to: sota_comparison_results.json
+--- PASS: TestPrintSummary (0.00s)
+PASS
+ok  	contextlite/internal/evaluation	(cached)
+=== RUN   TestLicenseManager_EdgeCases
+--- PASS: TestLicenseManager_EdgeCases (0.00s)
+=== RUN   TestFeatureGate_EdgeCases
+=== RUN   TestFeatureGate_EdgeCases/developer_basic_basic_search
+=== RUN   TestFeatureGate_EdgeCases/developer_basic_rest_api
+=== RUN   TestFeatureGate_EdgeCases/developer_basic_sqlite_storage
+=== RUN   TestFeatureGate_EdgeCases/developer_basic_single_workspace
+=== RUN   TestFeatureGate_EdgeCases/developer_advanced_unlimited_workspaces
+=== RUN   TestFeatureGate_EdgeCases/developer_advanced_advanced_optimization
+=== RUN   TestFeatureGate_EdgeCases/developer_advanced_7d_scoring
+=== RUN   TestFeatureGate_EdgeCases/developer_advanced_caching
+--- PASS: TestFeatureGate_EdgeCases (0.00s)
+    --- PASS: TestFeatureGate_EdgeCases/developer_basic_basic_search (0.00s)
+    --- PASS: TestFeatureGate_EdgeCases/developer_basic_rest_api (0.00s)
+    --- PASS: TestFeatureGate_EdgeCases/developer_basic_sqlite_storage (0.00s)
+    --- PASS: TestFeatureGate_EdgeCases/developer_basic_single_workspace (0.00s)
+    --- PASS: TestFeatureGate_EdgeCases/developer_advanced_unlimited_workspaces (0.00s)
+    --- PASS: TestFeatureGate_EdgeCases/developer_advanced_advanced_optimization (0.00s)
+    --- PASS: TestFeatureGate_EdgeCases/developer_advanced_7d_scoring (0.00s)
+    --- PASS: TestFeatureGate_EdgeCases/developer_advanced_caching (0.00s)
+=== RUN   TestLicenseTracker_ErrorCases
+2025/08/19 19:54:47 License activated: ... on hardware ... (activation 1/3)
+--- PASS: TestLicenseTracker_ErrorCases (0.05s)
+=== RUN   TestTrackedLicenseManager_ErrorCases
+--- PASS: TestTrackedLicenseManager_ErrorCases (0.00s)
+=== RUN   TestTrackedFeatureGate_ErrorCases
+--- PASS: TestTrackedFeatureGate_ErrorCases (0.01s)
+=== RUN   TestConcurrentOperations_MixedOperations
+2025/08/19 19:54:47 License activated: MIXED-I... on hardware hw-I... (activation 1/3)
+2025/08/19 19:54:47 License activated: MIXED-Q... on hardware hw-Q... (activation 1/3)
+2025/08/19 19:54:47 License activated: MIXED-M... on hardware hw-M... (activation 1/3)
+2025/08/19 19:54:47 License activated: MIXED-E... on hardware hw-E... (activation 1/3)
+--- PASS: TestConcurrentOperations_MixedOperations (0.05s)
+=== RUN   TestLicenseFeatures_AllTiers
+=== RUN   TestLicenseFeatures_AllTiers/developer
+=== RUN   TestLicenseFeatures_AllTiers/professional
+=== RUN   TestLicenseFeatures_AllTiers/enterprise
+--- PASS: TestLicenseFeatures_AllTiers (0.00s)
+    --- PASS: TestLicenseFeatures_AllTiers/developer (0.00s)
+    --- PASS: TestLicenseFeatures_AllTiers/professional (0.00s)
+    --- PASS: TestLicenseFeatures_AllTiers/enterprise (0.00s)
+=== RUN   TestMemoryUsage_NoLeaks
+2025/08/19 19:54:47 License activated: MEMORY-A... on hardware hw-memor... (activation 1/3)
+2025/08/19 19:54:47 License activated: MEMORY-B... on hardware hw-memor... (activation 1/3)
+2025/08/19 19:54:47 License activated: MEMORY-C... on hardware hw-memor... (activation 1/3)
+2025/08/19 19:54:47 License activated: MEMORY-D... on hardware hw-memor... (activation 1/3)
+2025/08/19 19:54:47 License activated: MEMORY-E... on hardware hw-memor... (activation 1/3)
+--- PASS: TestMemoryUsage_NoLeaks (0.05s)
+=== RUN   TestCoverageBoost80Percent
+=== RUN   TestCoverageBoost80Percent/ValidateTierLimits
+=== RUN   TestCoverageBoost80Percent/GetEnterpriseFeatures
+=== RUN   TestCoverageBoost80Percent/SaveActivationRecord
+=== RUN   TestCoverageBoost80Percent/GenerateInstallID
+=== RUN   TestCoverageBoost80Percent/ValidateLicense_DeepCoverage
+=== RUN   TestCoverageBoost80Percent/ValidateLicense_DeepCoverage/empty_license
+=== RUN   TestCoverageBoost80Percent/ValidateLicense_DeepCoverage/invalid_json
+=== RUN   TestCoverageBoost80Percent/ValidateLicense_DeepCoverage/missing_signature
+=== RUN   TestCoverageBoost80Percent/ValidateLicense_DeepCoverage/invalid_signature
+=== RUN   TestCoverageBoost80Percent/ValidateLicense_DeepCoverage/malformed_base64
+=== RUN   TestCoverageBoost80Percent/LoadLicenseWithActivation_Coverage
+=== RUN   TestCoverageBoost80Percent/LoadActivationRecord_Coverage
+=== RUN   TestCoverageBoost80Percent/StartOrGetTrial_Coverage
+=== RUN   TestCoverageBoost80Percent/EnhancedFeatureGate_Coverage
+=== RUN   TestCoverageBoost80Percent/GetFeatures_AllTiers
+=== RUN   TestCoverageBoost80Percent/ValidateLicense_InternalFunction
+=== RUN   TestCoverageBoost80Percent/VerifySignature_Coverage
+=== RUN   TestCoverageBoost80Percent/TrialManager_EdgeCases
+=== RUN   TestCoverageBoost80Percent/FeatureGate_RequireFeature_EdgeCases
+--- PASS: TestCoverageBoost80Percent (0.59s)
+    --- PASS: TestCoverageBoost80Percent/ValidateTierLimits (0.01s)
+    --- PASS: TestCoverageBoost80Percent/GetEnterpriseFeatures (0.00s)
+    --- PASS: TestCoverageBoost80Percent/SaveActivationRecord (0.00s)
+    --- PASS: TestCoverageBoost80Percent/GenerateInstallID (0.00s)
+    --- PASS: TestCoverageBoost80Percent/ValidateLicense_DeepCoverage (0.12s)
+        --- PASS: TestCoverageBoost80Percent/ValidateLicense_DeepCoverage/empty_license (0.00s)
+        --- PASS: TestCoverageBoost80Percent/ValidateLicense_DeepCoverage/invalid_json (0.00s)
+        --- PASS: TestCoverageBoost80Percent/ValidateLicense_DeepCoverage/missing_signature (0.00s)
+        --- PASS: TestCoverageBoost80Percent/ValidateLicense_DeepCoverage/invalid_signature (0.00s)
+        --- PASS: TestCoverageBoost80Percent/ValidateLicense_DeepCoverage/malformed_base64 (0.00s)
+    --- PASS: TestCoverageBoost80Percent/LoadLicenseWithActivation_Coverage (0.00s)
+    --- PASS: TestCoverageBoost80Percent/LoadActivationRecord_Coverage (0.00s)
+    --- PASS: TestCoverageBoost80Percent/StartOrGetTrial_Coverage (0.01s)
+    --- PASS: TestCoverageBoost80Percent/EnhancedFeatureGate_Coverage (0.01s)
+    --- PASS: TestCoverageBoost80Percent/GetFeatures_AllTiers (0.00s)
+    --- PASS: TestCoverageBoost80Percent/ValidateLicense_InternalFunction (0.02s)
+    --- PASS: TestCoverageBoost80Percent/VerifySignature_Coverage (0.41s)
+    --- PASS: TestCoverageBoost80Percent/TrialManager_EdgeCases (0.00s)
+    --- PASS: TestCoverageBoost80Percent/FeatureGate_RequireFeature_EdgeCases (0.00s)
+=== RUN   TestLicenseGeneration
+--- PASS: TestLicenseGeneration (0.08s)
+=== RUN   TestGenerateBasicLicense
+--- PASS: TestGenerateBasicLicense (0.15s)
+=== RUN   TestLicenseValidation
+--- PASS: TestLicenseValidation (0.01s)
+=== RUN   TestTrialSystem
+--- PASS: TestTrialSystem (0.01s)
+=== RUN   TestFeatureGateExtended
+--- PASS: TestFeatureGateExtended (0.00s)
+=== RUN   TestTrackedLicenseManagerExtended
+--- PASS: TestTrackedLicenseManagerExtended (0.00s)
+=== RUN   TestTrackedFeatureGateExtended
+--- PASS: TestTrackedFeatureGateExtended (0.00s)
+=== RUN   TestLicenseTrackerReactivation
+2025/08/19 19:54:48 License activated: REACT-TE... on hardware react-hw... (activation 1/3)
+--- PASS: TestLicenseTrackerReactivation (0.03s)
+=== RUN   TestLicenseLoadingEdgeCases
+--- PASS: TestLicenseLoadingEdgeCases (0.00s)
+=== RUN   TestFinal80PercentPush
+=== RUN   TestFinal80PercentPush/LoadLicenseWithActivation_FullCoverage
+=== RUN   TestFinal80PercentPush/ValidateLicense_AllPaths
+=== RUN   TestFinal80PercentPush/ValidateLicense_AllPaths/missing_key
+=== RUN   TestFinal80PercentPush/ValidateLicense_AllPaths/missing_email
+=== RUN   TestFinal80PercentPush/ValidateLicense_AllPaths/future_issued
+=== RUN   TestFinal80PercentPush/CheckAccess_AllFeaturePaths
+=== RUN   TestFinal80PercentPush/StartOrGetTrial_AllPaths
+=== RUN   TestFinal80PercentPush/EnhancedFeatureGate_AllMethods
+=== RUN   TestFinal80PercentPush/GetDefaultFeatures_AllTiers
+=== RUN   TestFinal80PercentPush/GenerateBasicLicense_Coverage
+=== RUN   TestFinal80PercentPush/ValidateWithServer_ErrorPaths
+=== RUN   TestFinal80PercentPush/TrialManager_AllMethods
+--- PASS: TestFinal80PercentPush (0.45s)
+    --- PASS: TestFinal80PercentPush/LoadLicenseWithActivation_FullCoverage (0.01s)
+    --- PASS: TestFinal80PercentPush/ValidateLicense_AllPaths (0.19s)
+        --- PASS: TestFinal80PercentPush/ValidateLicense_AllPaths/missing_key (0.01s)
+        --- PASS: TestFinal80PercentPush/ValidateLicense_AllPaths/missing_email (0.01s)
+        --- PASS: TestFinal80PercentPush/ValidateLicense_AllPaths/future_issued (0.01s)
+    --- PASS: TestFinal80PercentPush/CheckAccess_AllFeaturePaths (0.00s)
+    --- PASS: TestFinal80PercentPush/StartOrGetTrial_AllPaths (0.01s)
+    --- PASS: TestFinal80PercentPush/EnhancedFeatureGate_AllMethods (0.01s)
+    --- PASS: TestFinal80PercentPush/GetDefaultFeatures_AllTiers (0.00s)
+    --- PASS: TestFinal80PercentPush/GenerateBasicLicense_Coverage (0.22s)
+    --- PASS: TestFinal80PercentPush/ValidateWithServer_ErrorPaths (0.00s)
+    --- PASS: TestFinal80PercentPush/TrialManager_AllMethods (0.01s)
+=== RUN   TestFinalCoveragePush
+=== RUN   TestFinalCoveragePush/ValidateTierLimits_DirectCall
+=== RUN   TestFinalCoveragePush/GenerateInstallID_DirectCall
+=== RUN   TestFinalCoveragePush/ValidateLicense_ComprehensiveTest
+=== RUN   TestFinalCoveragePush/LoadLicenseWithActivation_AllPaths
+=== RUN   TestFinalCoveragePush/CheckAccess_AllScenarios
+=== RUN   TestFinalCoveragePush/PublicValidateLicense_EdgeCases
+=== RUN   TestFinalCoveragePush/PublicValidateLicense_EdgeCases/empty_string
+=== RUN   TestFinalCoveragePush/PublicValidateLicense_EdgeCases/just_whitespace
+=== RUN   TestFinalCoveragePush/PublicValidateLicense_EdgeCases/null_bytes
+=== RUN   TestFinalCoveragePush/PublicValidateLicense_EdgeCases/very_long_string
+=== RUN   TestFinalCoveragePush/PublicValidateLicense_EdgeCases/html_content
+=== RUN   TestFinalCoveragePush/PublicValidateLicense_EdgeCases/xml_content
+=== RUN   TestFinalCoveragePush/PublicValidateLicense_EdgeCases/random_json
+--- PASS: TestFinalCoveragePush (0.15s)
+    --- PASS: TestFinalCoveragePush/ValidateTierLimits_DirectCall (0.00s)
+    --- PASS: TestFinalCoveragePush/GenerateInstallID_DirectCall (0.00s)
+    --- PASS: TestFinalCoveragePush/ValidateLicense_ComprehensiveTest (0.01s)
+    --- PASS: TestFinalCoveragePush/LoadLicenseWithActivation_AllPaths (0.01s)
+    --- PASS: TestFinalCoveragePush/CheckAccess_AllScenarios (0.00s)
+    --- PASS: TestFinalCoveragePush/PublicValidateLicense_EdgeCases (0.12s)
+        --- PASS: TestFinalCoveragePush/PublicValidateLicense_EdgeCases/empty_string (0.00s)
+        --- PASS: TestFinalCoveragePush/PublicValidateLicense_EdgeCases/just_whitespace (0.00s)
+        --- PASS: TestFinalCoveragePush/PublicValidateLicense_EdgeCases/null_bytes (0.00s)
+        --- PASS: TestFinalCoveragePush/PublicValidateLicense_EdgeCases/very_long_string (0.00s)
+        --- PASS: TestFinalCoveragePush/PublicValidateLicense_EdgeCases/html_content (0.00s)
+        --- PASS: TestFinalCoveragePush/PublicValidateLicense_EdgeCases/xml_content (0.00s)
+        --- PASS: TestFinalCoveragePush/PublicValidateLicense_EdgeCases/random_json (0.00s)
+=== RUN   TestTrackedLicenseManager_NewTrackedLicenseManager
+--- PASS: TestTrackedLicenseManager_NewTrackedLicenseManager (0.00s)
+=== RUN   TestTrackedLicenseManager_RecordUsage
+--- PASS: TestTrackedLicenseManager_RecordUsage (0.00s)
+=== RUN   TestTrackedFeatureGate_NewTrackedFeatureGate
+--- PASS: TestTrackedFeatureGate_NewTrackedFeatureGate (0.00s)
+=== RUN   TestTrackedLicenseManager_NetworkErrors
+--- PASS: TestTrackedLicenseManager_NetworkErrors (0.00s)
+=== RUN   TestTrackedLicenseManager_DeactivateFromServer
+--- PASS: TestTrackedLicenseManager_DeactivateFromServer (0.00s)
+=== RUN   TestTrackedFeatureGate_RequireFeature
+--- PASS: TestTrackedFeatureGate_RequireFeature (0.00s)
+=== RUN   TestTrackedFeatureGate_TrackingMethods
+--- PASS: TestTrackedFeatureGate_TrackingMethods (0.00s)
+=== RUN   TestTrackedLicenseManager_ValidateWithServer
+--- PASS: TestTrackedLicenseManager_ValidateWithServer (0.00s)
+=== RUN   TestTrackedLicenseManager_ActivateWithServer
+--- PASS: TestTrackedLicenseManager_ActivateWithServer (0.00s)
+=== RUN   TestLicenseTracker_NewLicenseTracker
+--- PASS: TestLicenseTracker_NewLicenseTracker (0.01s)
+=== RUN   TestLicenseTracker_ActivateLicense
+=== RUN   TestLicenseTracker_ActivateLicense/successful_developer_activation
+2025/08/19 19:54:48 License activated: TEST-DEV... on hardware dev-hard... (activation 1/1)
+=== RUN   TestLicenseTracker_ActivateLicense/successful_professional_activation
+2025/08/19 19:54:48 License activated: TEST-PRO... on hardware pro-hard... (activation 1/3)
+=== RUN   TestLicenseTracker_ActivateLicense/successful_enterprise_activation
+2025/08/19 19:54:48 License activated: TEST-ENT... on hardware ent-hard... (activation 1/10)
+--- PASS: TestLicenseTracker_ActivateLicense (0.03s)
+    --- PASS: TestLicenseTracker_ActivateLicense/successful_developer_activation (0.00s)
+    --- PASS: TestLicenseTracker_ActivateLicense/successful_professional_activation (0.00s)
+    --- PASS: TestLicenseTracker_ActivateLicense/successful_enterprise_activation (0.00s)
+=== RUN   TestLicenseTracker_ActivationLimits
+2025/08/19 19:54:48 License activated: TEST-LIM... on hardware hardware... (activation 1/1)
+2025/08/19 19:54:48 License activated: TEST-PRO... on hardware pro-hard... (activation 1/3)
+2025/08/19 19:54:48 License activated: TEST-PRO... on hardware pro-hard... (activation 2/3)
+2025/08/19 19:54:48 License activated: TEST-PRO... on hardware pro-hard... (activation 3/3)
+--- PASS: TestLicenseTracker_ActivationLimits (0.04s)
+=== RUN   TestLicenseTracker_ValidateActivation
+2025/08/19 19:54:48 License activated: TEST-VAL... on hardware validate... (activation 1/3)
+--- PASS: TestLicenseTracker_ValidateActivation (0.02s)
+=== RUN   TestLicenseTracker_RecordUsage
+=== RUN   TestLicenseTracker_RecordUsage/app_startup
+=== RUN   TestLicenseTracker_RecordUsage/context_query
+=== RUN   TestLicenseTracker_RecordUsage/feature_request
+--- PASS: TestLicenseTracker_RecordUsage (0.03s)
+    --- PASS: TestLicenseTracker_RecordUsage/app_startup (0.00s)
+    --- PASS: TestLicenseTracker_RecordUsage/context_query (0.00s)
+    --- PASS: TestLicenseTracker_RecordUsage/feature_request (0.00s)
+=== RUN   TestLicenseTracker_GetAnalytics
+2025/08/19 19:54:48 License activated: ANAL-001... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: ANAL-002... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: ANAL-003... on hardware hardware... (activation 1/3)
+--- PASS: TestLicenseTracker_GetAnalytics (0.03s)
+=== RUN   TestLicenseTracker_SecurityEvents
+2025/08/19 19:54:48 License activated: SEC-TEST... on hardware hw-1... (activation 1/1)
+--- PASS: TestLicenseTracker_SecurityEvents (0.02s)
+=== RUN   TestLicenseTracker_DeactivateLicense
+2025/08/19 19:54:48 License activated: DEACT-TE... on hardware deact-ha... (activation 1/3)
+--- PASS: TestLicenseTracker_DeactivateLicense (0.03s)
+=== RUN   TestLicenseTracker_ConcurrentAccess
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+--- PASS: TestLicenseTracker_ConcurrentAccess (0.06s)
+=== RUN   TestLicenseTracker_DatabasePersistence
+2025/08/19 19:54:48 License activated: PERSIST-... on hardware persist-... (activation 1/3)
+--- PASS: TestLicenseTracker_DatabasePersistence (0.02s)
+=== RUN   TestRemainingZeroCoverage
+=== RUN   TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths
+=== RUN   TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Developer_ExceedsDocumentLimit
+=== RUN   TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Developer_ExceedsUserLimit
+=== RUN   TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Pro_TooFewDocuments
+=== RUN   TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Pro_ExceedsUserLimit
+=== RUN   TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Enterprise_ValidLimits
+=== RUN   TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Pro_ExactLimits
+=== RUN   TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Developer_ExactLimits
+=== RUN   TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Pro_UnlimitedDocuments
+=== RUN   TestRemainingZeroCoverage/GenerateInstallID_DirectCall
+--- PASS: TestRemainingZeroCoverage (0.00s)
+    --- PASS: TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths (0.00s)
+        --- PASS: TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Developer_ExceedsDocumentLimit (0.00s)
+        --- PASS: TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Developer_ExceedsUserLimit (0.00s)
+        --- PASS: TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Pro_TooFewDocuments (0.00s)
+        --- PASS: TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Pro_ExceedsUserLimit (0.00s)
+        --- PASS: TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Enterprise_ValidLimits (0.00s)
+        --- PASS: TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Pro_ExactLimits (0.00s)
+        --- PASS: TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Developer_ExactLimits (0.00s)
+        --- PASS: TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Pro_UnlimitedDocuments (0.00s)
+    --- PASS: TestRemainingZeroCoverage/GenerateInstallID_DirectCall (0.00s)
+PASS
+ok  	contextlite/internal/license	(cached)
+=== RUN   TestLicenseManager_NewLicenseManager
+--- PASS: TestLicenseManager_NewLicenseManager (0.00s)
+=== RUN   TestLicenseManager_GetFeatures
+--- PASS: TestLicenseManager_GetFeatures (0.00s)
+=== RUN   TestLicenseManager_HasFeature
+--- PASS: TestLicenseManager_HasFeature (0.00s)
+=== RUN   TestLicenseManager_GetMaxDocuments
+--- PASS: TestLicenseManager_GetMaxDocuments (0.00s)
+=== RUN   TestLicenseManager_GetTier
+--- PASS: TestLicenseManager_GetTier (0.00s)
+=== RUN   TestLicenseManager_IsInGracePeriod
+--- PASS: TestLicenseManager_IsInGracePeriod (0.00s)
+=== RUN   TestGenerateLicense
+=== RUN   TestGenerateLicense/valid_developer_license
+=== RUN   TestGenerateLicense/valid_professional_license
+=== RUN   TestGenerateLicense/valid_enterprise_license
+--- PASS: TestGenerateLicense (0.06s)
+    --- PASS: TestGenerateLicense/valid_developer_license (0.00s)
+    --- PASS: TestGenerateLicense/valid_professional_license (0.00s)
+    --- PASS: TestGenerateLicense/valid_enterprise_license (0.00s)
+=== RUN   TestValidateLicense
+=== RUN   TestValidateLicense/invalid_JSON
+=== RUN   TestValidateLicense/valid_JSON_structure_but_invalid_signature
+--- PASS: TestValidateLicense (0.13s)
+    --- PASS: TestValidateLicense/invalid_JSON (0.00s)
+    --- PASS: TestValidateLicense/valid_JSON_structure_but_invalid_signature (0.00s)
+=== RUN   TestLicenseFeatureGate
+--- PASS: TestLicenseFeatureGate (0.00s)
+=== RUN   TestLicenseKeyGeneration
+--- PASS: TestLicenseKeyGeneration (0.14s)
+PASS
+ok  	contextlite/internal/license/test	(cached)
+=== RUN   TestPipeline_Debug_DocumentRetrieval
+    debug_test.go:38: Found 1 documents for query 'main'
+    debug_test.go:40: Doc 0: ID=test-doc, Path=/test/main.go, Content=package main func main() golang programming
+    debug_test.go:57: Pipeline returned 1 documents
+--- PASS: TestPipeline_Debug_DocumentRetrieval (0.01s)
+=== RUN   TestPipeline_New
+--- PASS: TestPipeline_New (0.01s)
+=== RUN   TestPipeline_AssembleContext
+--- PASS: TestPipeline_AssembleContext (0.01s)
+=== RUN   TestPipeline_CacheOperations
+--- PASS: TestPipeline_CacheOperations (0.01s)
+=== RUN   TestPipeline_DocumentOperations
+--- PASS: TestPipeline_DocumentOperations (0.02s)
+=== RUN   TestPipeline_GetEngineStats
+--- PASS: TestPipeline_GetEngineStats (0.01s)
+=== RUN   TestPipeline_UpdateEngineConfig
+--- PASS: TestPipeline_UpdateEngineConfig (0.01s)
+=== RUN   TestPipeline_Close
+--- PASS: TestPipeline_Close (0.01s)
+=== RUN   TestPipeline_CacheKeyBuilding
+--- PASS: TestPipeline_CacheKeyBuilding (0.01s)
+=== RUN   TestPipeline_QueryHashing
+--- PASS: TestPipeline_QueryHashing (0.01s)
+=== RUN   TestTimingHelper
+    timing_test.go:22: Timing test within expected range: 2601μs = 2.601ms
+--- PASS: TestTimingHelper (0.00s)
+=== RUN   TestTimingPrecision
+    timing_test.go:49: Short operation timing: 0μs
+--- PASS: TestTimingPrecision (0.00s)
+=== RUN   TestTimingNanoseconds
+    timing_test.go:69: Timing nanoseconds test passed: 1554800ns ≈ 1554μs * 1000
+--- PASS: TestTimingNanoseconds (0.00s)
+PASS
+ok  	contextlite/internal/pipeline	(cached)
+?   	contextlite/internal/registry	[no test files]
+=== RUN   TestStorage_New
+--- PASS: TestStorage_New (0.01s)
+=== RUN   TestStorage_AddDocument
+--- PASS: TestStorage_AddDocument (0.01s)
+=== RUN   TestStorage_GetDocument
+--- PASS: TestStorage_GetDocument (0.01s)
+=== RUN   TestStorage_DeleteDocument
+--- PASS: TestStorage_DeleteDocument (0.01s)
+=== RUN   TestStorage_SearchDocuments
+--- PASS: TestStorage_SearchDocuments (0.02s)
+=== RUN   TestStorage_GetStorageStats
+    storage_test.go:255: Storage stats missing document_count (expected in some cases)
+--- PASS: TestStorage_GetStorageStats (0.01s)
+=== RUN   TestStorage_GetCacheStats
+--- PASS: TestStorage_GetCacheStats (0.01s)
+=== RUN   TestStorage_WorkspaceWeights
+--- PASS: TestStorage_WorkspaceWeights (0.01s)
+=== RUN   TestStorage_QueryCache
+    storage_test.go:352: GetQueryCache returned expected error for cache miss: sql: no rows in result set
+    storage_test.go:383: Cache retrieval error (may be expected due to serialization): sql: no rows in result set
+--- PASS: TestStorage_QueryCache (0.02s)
+=== RUN   TestStorage_GetCachedResultByKey
+    storage_test.go:437: Failed to get cached result by key (expected due to serialization): failed to unmarshal cached result: json: cannot unmarshal array into Go value of type types.QueryResult
+--- PASS: TestStorage_GetCachedResultByKey (0.02s)
+=== RUN   TestStorage_GetCorpusHash
+--- PASS: TestStorage_GetCorpusHash (0.01s)
+=== RUN   TestStorage_Close
+--- PASS: TestStorage_Close (0.02s)
+=== RUN   TestStorage_Migrations
+--- PASS: TestStorage_Migrations (0.01s)
+=== RUN   TestStorage_ConcurrentAccess
+    storage_test.go:584: document_count: <nil> (type: <nil>)
+--- PASS: TestStorage_ConcurrentAccess (0.03s)
+=== RUN   TestStorage_SearchFTS_Extended
+--- PASS: TestStorage_SearchFTS_Extended (0.01s)
+=== RUN   TestStorage_SearchLike_Extended
+    storage_test.go:639: LIKE search returned 1 results
+--- PASS: TestStorage_SearchLike_Extended (0.01s)
+=== RUN   TestStorage_SaveWorkspaceWeights_Extended
+--- PASS: TestStorage_SaveWorkspaceWeights_Extended (0.01s)
+=== RUN   TestStorage_SaveQueryCacheWithKey_Extended
+    storage_test.go:700: Expected error getting cached result by key: failed to unmarshal cached result: json: cannot unmarshal array into Go value of type types.QueryResult
+--- PASS: TestStorage_SaveQueryCacheWithKey_Extended (0.02s)
+=== RUN   TestStorage_ApplyMigrations_Extended
+--- PASS: TestStorage_ApplyMigrations_Extended (0.01s)
+=== RUN   TestStorage_ScanDocuments_Extended
+    storage_test.go:753: Scan test returned 2 documents
+--- PASS: TestStorage_ScanDocuments_Extended (0.01s)
+=== RUN   TestStorage_EdgeCases_Extended
+    storage_test.go:767: Empty query search returned 0 results
+    storage_test.go:773: Getting non-existent document returned expected error: sql: no rows in result set
+--- PASS: TestStorage_EdgeCases_Extended (0.01s)
+=== RUN   TestStorage_ErrorPaths
+    storage_test.go:798: Search with negative limit returned 0 results
+    storage_test.go:807: Long query returned 0 results
+--- PASS: TestStorage_ErrorPaths (0.01s)
+=== RUN   TestStorage_ComplexDocuments
+    storage_test.go:848: Unicode search returned 1 results
+--- PASS: TestStorage_ComplexDocuments (0.01s)
+=== RUN   TestStorage_LargeDocuments
+--- PASS: TestStorage_LargeDocuments (0.01s)
+=== RUN   TestStorage_DatabaseOperations
+    storage_test.go:913: Rapid search returned 0 results
+--- PASS: TestStorage_DatabaseOperations (0.03s)
+=== RUN   TestStorage_WorkspaceWeightsEdgeCases
+--- PASS: TestStorage_WorkspaceWeightsEdgeCases (0.01s)
+=== RUN   TestStorage_CacheComplexOperations
+--- PASS: TestStorage_CacheComplexOperations (0.02s)
+=== RUN   TestStorage_SaveQueryCache_Coverage
+    storage_test.go:1039: SaveQueryCache completed successfully
+--- PASS: TestStorage_SaveQueryCache_Coverage (0.01s)
+=== RUN   TestStorage_GetQueryCache_Coverage
+--- PASS: TestStorage_GetQueryCache_Coverage (0.01s)
+=== RUN   TestStorage_New_Coverage
+--- PASS: TestStorage_New_Coverage (0.01s)
+=== RUN   TestStorage_AddDocument_Coverage
+--- PASS: TestStorage_AddDocument_Coverage (0.01s)
+=== RUN   TestStorage_DeleteDocument_Coverage
+--- PASS: TestStorage_DeleteDocument_Coverage (0.01s)
+=== RUN   TestStorage_SearchLike_Coverage
+    storage_test.go:1202: Search for percent returned 2 results
+    storage_test.go:1208: Search for _ returned 0 results
+--- PASS: TestStorage_SearchLike_Coverage (0.01s)
+=== RUN   TestStorage_GetQueryCache_AllBranches
+    storage_test.go:1240: Cache retrieval error (expected due to serialization): sql: no rows in result set
+--- PASS: TestStorage_GetQueryCache_AllBranches (0.01s)
+=== RUN   TestStorage_InitSchema_EdgeCases
+--- PASS: TestStorage_InitSchema_EdgeCases (0.01s)
+=== RUN   TestStorage_GetCacheStats_EdgeCases
+    storage_test.go:1296: Cache stats with entries: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:5}
+--- PASS: TestStorage_GetCacheStats_EdgeCases (0.01s)
+=== RUN   TestStorage_DeleteDocument_AllPaths
+--- PASS: TestStorage_DeleteDocument_AllPaths (0.01s)
+=== RUN   TestStorage_GetQueryCacheComprehensive
+    storage_test.go:1351: Expected cache miss, got error: sql: no rows in result set
+    storage_test.go:1385: Cache retrieval may have serialization issues: sql: no rows in result set
+--- PASS: TestStorage_GetQueryCacheComprehensive (0.01s)
+=== RUN   TestStorage_SaveQueryCacheComprehensive
+    storage_test.go:1449: Successfully saved multiple cache entries
+--- PASS: TestStorage_SaveQueryCacheComprehensive (0.01s)
+=== RUN   TestStorage_DeleteDocumentComprehensive
+    storage_test.go:1501: Delete with empty ID returned: <nil>
+--- PASS: TestStorage_DeleteDocumentComprehensive (0.01s)
+=== RUN   TestStorage_GetCacheStatsComprehensive
+--- PASS: TestStorage_GetCacheStatsComprehensive (0.01s)
+=== RUN   TestStorage_NewWithInvalidPath
+    storage_test.go:1592: Path '/invalid/path/that/does/not/exist/test.db' was accepted (may be valid on this system)
+    storage_test.go:1611: Edge case path 'C:\Users\micha\AppData\Local\Temp\storage-test-edge-cases\test1.db' failed: failed to apply pragma PRAGMA journal_mode = WAL: unable to open database file: out of memory (14)
+    storage_test.go:1611: Edge case path 'C:\Users\micha\AppData\Local\Temp\storage-test-edge-cases\test2.db' failed: failed to apply pragma PRAGMA journal_mode = WAL: unable to open database file: out of memory (14)
+--- PASS: TestStorage_NewWithInvalidPath (0.01s)
+=== RUN   TestStorage_CacheOperationsWithKey
+    storage_test.go:1650: GetCachedResultByKey may have serialization issues: failed to unmarshal cached result: json: cannot unmarshal array into Go value of type types.QueryResult
+--- PASS: TestStorage_CacheOperationsWithKey (0.02s)
+=== RUN   TestStorage_InvalidateCache
+    storage_test.go:1719: Cache stats after invalidation: hits=0, misses=0, L2Size=0
+--- PASS: TestStorage_InvalidateCache (0.01s)
+=== RUN   TestStorage_GetStorageStatsComprehensive
+    storage_test.go:1741: Total documents: 0
+    storage_test.go:1745: Database size: 0.08 MB
+    storage_test.go:1749: Index size: 0.02 MB
+    storage_test.go:1772: Updated total documents: 1
+--- PASS: TestStorage_GetStorageStatsComprehensive (0.01s)
+=== RUN   TestStorage_GetCorpusHashComprehensive
+    storage_test.go:1788: Initial corpus hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    storage_test.go:1809: Corpus hash after adding document: d3d497f0f622ce046e134a09e67ea3d8ce4f786f129a83d0bf0aac3e30a2075c
+    storage_test.go:1834: Corpus hash after adding second document: f268ccae209650df346163e16aeb5dc04e5e87ee7315fcf9a7afe04f06813e31
+--- PASS: TestStorage_GetCorpusHashComprehensive (0.01s)
+=== RUN   TestStorage_NewErrorPaths
+    storage_test.go:1867: Correctly got error for invalid database: failed to apply pragma PRAGMA journal_mode = WAL: file is not a database (26)
+--- PASS: TestStorage_NewErrorPaths (0.00s)
+=== RUN   TestStorage_CacheEdgeCases
+    storage_test.go:1895: GetQueryCache with all empty correctly returned nil
+    storage_test.go:1898: GetQueryCache with all empty returned error: sql: no rows in result set
+    storage_test.go:1895: GetQueryCache with missing corpus/model/tokenizer correctly returned nil
+    storage_test.go:1898: GetQueryCache with missing corpus/model/tokenizer returned error: sql: no rows in result set
+    storage_test.go:1895: GetQueryCache with missing model/tokenizer correctly returned nil
+    storage_test.go:1898: GetQueryCache with missing model/tokenizer returned error: sql: no rows in result set
+    storage_test.go:1895: GetQueryCache with missing tokenizer correctly returned nil
+    storage_test.go:1898: GetQueryCache with missing tokenizer returned error: sql: no rows in result set
+    storage_test.go:1895: GetQueryCache with nonexistent entries correctly returned nil
+    storage_test.go:1898: GetQueryCache with nonexistent entries returned error: sql: no rows in result set
+    storage_test.go:1919: SaveQueryCache with edge case data succeeded
+    storage_test.go:1928: SaveQueryCache with past expiry succeeded
+--- PASS: TestStorage_CacheEdgeCases (0.01s)
+=== RUN   TestStorage_DocumentEdgeCases
+    storage_test.go:1948: DeleteDocument with ID '': <nil>
+    storage_test.go:1948: DeleteDocument with ID 'nonexistent-doc-id': <nil>
+    storage_test.go:1948: DeleteDocument with ID 'very-long-id-that-is-extremely-long-and-probably-not-realistic-but-tests-edge-cases': <nil>
+    storage_test.go:1948: DeleteDocument with ID 'id-with-special-chars-!@#$%^&*()': <nil>
+    storage_test.go:1955: GetDocument with ID '' correctly returned nil/error
+    storage_test.go:1955: GetDocument with ID 'nonexistent-doc-id' correctly returned nil/error
+    storage_test.go:1955: GetDocument with ID 'very-long-id-that-is-extremely-long-and-probably-not-realistic-but-tests-edge-cases' correctly returned nil/error
+    storage_test.go:1955: GetDocument with ID 'id-with-special-chars-!@#$%^&*()' correctly returned nil/error
+    storage_test.go:1974: Document ID auto-generated: 19b1c0004863f7a7
+    storage_test.go:1990: Successfully added large document with 20000 characters
+--- PASS: TestStorage_DocumentEdgeCases (0.01s)
+=== RUN   TestStorage_GetQueryCacheErrorPaths
+    storage_test.go:2027: Cache retrieval failed (may be due to serialization issues): sql: no rows in result set
+    storage_test.go:2050: Correctly failed to retrieve expired cache: sql: no rows in result set
+    storage_test.go:2069: GetQueryCache with all empty parameters correctly returned nil
+    storage_test.go:2072: GetQueryCache with all empty parameters returned error: sql: no rows in result set
+    storage_test.go:2069: GetQueryCache with partial parameters correctly returned nil
+    storage_test.go:2072: GetQueryCache with partial parameters returned error: sql: no rows in result set
+    storage_test.go:2069: GetQueryCache with nonexistent combination correctly returned nil
+    storage_test.go:2072: GetQueryCache with nonexistent combination returned error: sql: no rows in result set
+    storage_test.go:2069: GetQueryCache with mismatched corpus correctly returned nil
+    storage_test.go:2072: GetQueryCache with mismatched corpus returned error: sql: no rows in result set
+    storage_test.go:2069: GetQueryCache with mismatched model correctly returned nil
+    storage_test.go:2072: GetQueryCache with mismatched model returned error: sql: no rows in result set
+    storage_test.go:2069: GetQueryCache with mismatched tokenizer correctly returned nil
+    storage_test.go:2072: GetQueryCache with mismatched tokenizer returned error: sql: no rows in result set
+--- PASS: TestStorage_GetQueryCacheErrorPaths (0.01s)
+=== RUN   TestStorage_NewComprehensiveErrorPaths
+    storage_test.go:2099: Read-only path was accepted (permissions may differ on system)
+    storage_test.go:2110: Successfully created storage at C:\Users\micha\AppData\Local\Temp\storage-new-test\valid.db
+    storage_test.go:2118: Successfully reopened existing storage
+    storage_test.go:2130: Test database 0 succeeded
+    storage_test.go:2130: Test database 1 succeeded
+    storage_test.go:2130: Test database 2 succeeded
+--- PASS: TestStorage_NewComprehensiveErrorPaths (0.04s)
+=== RUN   TestStorage_SearchDocumentsComprehensive
+    storage_test.go:2189: Search for 'function' (common term) returned 2 results
+    storage_test.go:2189: Search for 'HTTP' (specific term) returned 1 results
+    storage_test.go:2189: Search for 'authentication' (long term) returned 1 results
+    storage_test.go:2189: Search for 'nonexistent' (no results) returned 0 results
+    storage_test.go:2189: Search for '' (empty query) returned 3 results
+    storage_test.go:2189: Search for 'Go JavaScript Python' (multiple terms) returned 0 results
+    storage_test.go:2200: Search with limit 0 returned 0 results
+    storage_test.go:2200: Search with limit 1 returned 1 results
+    storage_test.go:2200: Search with limit 100 returned 2 results
+    storage_test.go:2200: Search with limit 1000 returned 2 results
+--- PASS: TestStorage_SearchDocumentsComprehensive (0.01s)
+=== RUN   TestStorage_NewAdvancedEdgeCases
+    storage_test.go:2218: New with path '/invalid/path/that/should/not/exist/test.db' failed (case 0): failed to apply pragma PRAGMA journal_mode = WAL: unable to open database file: out of memory (14)
+    storage_test.go:2223: New with path '' succeeded (case 1)
+    storage_test.go:2223: New with path 'test_new_edge.db' succeeded (case 2)
+    storage_test.go:2264: Storage stats: map[avg_document_size:38 chars database_size:0.08 MB index_size:0.02 MB last_update:1755651440 total_documents:1]
+--- PASS: TestStorage_NewAdvancedEdgeCases (0.01s)
+=== RUN   TestStorage_GetCacheStatsAdvanced
+    storage_test.go:2279: Initial cache stats: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:0}
+    storage_test.go:2336: Cache stats after operations: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:3}
+    storage_test.go:2344: Cache invalidated successfully
+    storage_test.go:2352: Cache stats after invalidation: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:0}
+--- PASS: TestStorage_GetCacheStatsAdvanced (0.01s)
+=== RUN   TestStorage_SaveQueryCacheWithKeyAdvanced
+    storage_test.go:2410: SaveQueryCacheWithKey 0 with key 'test-cache-key-1' succeeded
+    storage_test.go:2410: SaveQueryCacheWithKey 1 with key 'test-cache-key-2' succeeded
+    storage_test.go:2410: SaveQueryCacheWithKey 2 with key '' succeeded
+    storage_test.go:2410: SaveQueryCacheWithKey 3 with key 'very-long-cache-key-that-should-still-work-properly-even-if-it-is-quite-long' succeeded
+    storage_test.go:2410: SaveQueryCacheWithKey 4 with key 'key-with-special-chars-!@#$%^&*()' succeeded
+    storage_test.go:2419: Cache stats after SaveQueryCacheWithKey operations: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:1}
+--- PASS: TestStorage_SaveQueryCacheWithKeyAdvanced (0.02s)
+=== RUN   TestStorage_ApplyMigrationsAndSchemaEdgeCases
+    storage_test.go:2462: Search after migration returned 1 results
+    storage_test.go:2490: SaveQueryCache succeeded after migration
+    storage_test.go:2498: GetQueryCache succeeded, cache hit: true
+--- PASS: TestStorage_ApplyMigrationsAndSchemaEdgeCases (0.01s)
+PASS
+ok  	contextlite/internal/storage	(cached)
+=== RUN   TestTimingHelper
+    timer_test.go:36: Timing test passed: 782μs = 0.782ms = 782300ns
+--- PASS: TestTimingHelper (0.00s)
+=== RUN   TestTimingPrecision
+    timer_test.go:55: Short operation timing: 0μs
+--- PASS: TestTimingPrecision (0.00s)
+PASS
+ok  	contextlite/internal/timing	(cached)
+=== RUN   TestLoadConfig_Default
+--- PASS: TestLoadConfig_Default (0.00s)
+=== RUN   TestLoadConfig_FromFile
+--- PASS: TestLoadConfig_FromFile (0.00s)
+=== RUN   TestLoadConfig_NonExistentFile
+--- PASS: TestLoadConfig_NonExistentFile (0.00s)
+=== RUN   TestLoadConfig_InvalidYAML
+--- PASS: TestLoadConfig_InvalidYAML (0.00s)
+=== RUN   TestConfig_ServerDefaults
+--- PASS: TestConfig_ServerDefaults (0.00s)
+=== RUN   TestConfig_optimizationDefaults
+--- PASS: TestConfig_optimizationDefaults (0.00s)
+=== RUN   TestConfig_WeightsDefaults
+--- PASS: TestConfig_WeightsDefaults (0.00s)
+=== RUN   TestConfig_TokenizerDefaults
+--- PASS: TestConfig_TokenizerDefaults (0.00s)
+=== RUN   TestConfig_CacheDefaults
+--- PASS: TestConfig_CacheDefaults (0.00s)
+=== RUN   TestConfig_EpsilonDefaults
+--- PASS: TestConfig_EpsilonDefaults (0.00s)
+=== RUN   TestConfig_PartialFile
+--- PASS: TestConfig_PartialFile (0.00s)
+=== RUN   TestConfig_EmptyFile
+--- PASS: TestConfig_EmptyFile (0.00s)
+=== RUN   TestConfig_EnvironmentOverride
+--- PASS: TestConfig_EnvironmentOverride (0.00s)
+=== RUN   TestConfig_ApplyEnvOverrides
+--- PASS: TestConfig_ApplyEnvOverrides (0.00s)
+=== RUN   TestConfig_DatabasePathOverride
+--- PASS: TestConfig_DatabasePathOverride (0.00s)
+=== RUN   TestConfig_ValidationErrors
+=== RUN   TestConfig_ValidationErrors/invalid_port_zero
+=== RUN   TestConfig_ValidationErrors/invalid_port_too_high
+=== RUN   TestConfig_ValidationErrors/invalid_timeout_zero
+=== RUN   TestConfig_ValidationErrors/invalid_max_candidates_zero
+=== RUN   TestConfig_ValidationErrors/valid_config
+--- PASS: TestConfig_ValidationErrors (0.01s)
+    --- PASS: TestConfig_ValidationErrors/invalid_port_zero (0.00s)
+    --- PASS: TestConfig_ValidationErrors/invalid_port_too_high (0.00s)
+    --- PASS: TestConfig_ValidationErrors/invalid_timeout_zero (0.00s)
+    --- PASS: TestConfig_ValidationErrors/invalid_max_candidates_zero (0.00s)
+    --- PASS: TestConfig_ValidationErrors/valid_config (0.00s)
+=== RUN   TestConfig_Validation
+=== RUN   TestConfig_Validation/valid_config
+=== RUN   TestConfig_Validation/invalid_port
+=== RUN   TestConfig_Validation/invalid_timeout
+--- PASS: TestConfig_Validation (0.00s)
+    --- PASS: TestConfig_Validation/valid_config (0.00s)
+    --- PASS: TestConfig_Validation/invalid_port (0.00s)
+    --- PASS: TestConfig_Validation/invalid_timeout (0.00s)
+=== RUN   TestConfig_ValidateComprehensive
+--- PASS: TestConfig_ValidateComprehensive (0.00s)
+=== RUN   TestConfig_ValidateDatabasePath
+    config_test.go:932: Read-only directory validation result: <nil>
+--- PASS: TestConfig_ValidateDatabasePath (0.00s)
+PASS
+ok  	contextlite/pkg/config	(cached)
+=== RUN   TestTokenEstimator_EstimateTokens
+=== RUN   TestTokenEstimator_EstimateTokens/empty_string
+=== RUN   TestTokenEstimator_EstimateTokens/simple_sentence
+=== RUN   TestTokenEstimator_EstimateTokens/longer_text
+=== RUN   TestTokenEstimator_EstimateTokens/punctuation_heavy
+--- PASS: TestTokenEstimator_EstimateTokens (0.00s)
+    --- PASS: TestTokenEstimator_EstimateTokens/empty_string (0.00s)
+    --- PASS: TestTokenEstimator_EstimateTokens/simple_sentence (0.00s)
+    --- PASS: TestTokenEstimator_EstimateTokens/longer_text (0.00s)
+    --- PASS: TestTokenEstimator_EstimateTokens/punctuation_heavy (0.00s)
+=== RUN   TestNewTokenEstimator
+--- PASS: TestNewTokenEstimator (0.00s)
+=== RUN   TestTokenEstimator_DifferentModels
+=== RUN   TestTokenEstimator_DifferentModels/gpt-4
+=== RUN   TestTokenEstimator_DifferentModels/gpt-3.5-turbo
+=== RUN   TestTokenEstimator_DifferentModels/claude-3
+=== RUN   TestTokenEstimator_DifferentModels/text-davinci-003
+--- PASS: TestTokenEstimator_DifferentModels (0.00s)
+    --- PASS: TestTokenEstimator_DifferentModels/gpt-4 (0.00s)
+    --- PASS: TestTokenEstimator_DifferentModels/gpt-3.5-turbo (0.00s)
+    --- PASS: TestTokenEstimator_DifferentModels/claude-3 (0.00s)
+    --- PASS: TestTokenEstimator_DifferentModels/text-davinci-003 (0.00s)
+=== RUN   TestTokenEstimator_CodeSamples
+=== RUN   TestTokenEstimator_CodeSamples/go_function
+=== RUN   TestTokenEstimator_CodeSamples/json_data
+=== RUN   TestTokenEstimator_CodeSamples/sql_query
+=== RUN   TestTokenEstimator_CodeSamples/markdown_text
+--- PASS: TestTokenEstimator_CodeSamples (0.00s)
+    --- PASS: TestTokenEstimator_CodeSamples/go_function (0.00s)
+    --- PASS: TestTokenEstimator_CodeSamples/json_data (0.00s)
+    --- PASS: TestTokenEstimator_CodeSamples/sql_query (0.00s)
+    --- PASS: TestTokenEstimator_CodeSamples/markdown_text (0.00s)
+=== RUN   TestTokenEstimator_EdgeCases
+=== RUN   TestTokenEstimator_EdgeCases/only_whitespace
+=== RUN   TestTokenEstimator_EdgeCases/only_punctuation
+=== RUN   TestTokenEstimator_EdgeCases/mixed_languages
+=== RUN   TestTokenEstimator_EdgeCases/very_long_word
+=== RUN   TestTokenEstimator_EdgeCases/unicode_chars
+--- PASS: TestTokenEstimator_EdgeCases (0.00s)
+    --- PASS: TestTokenEstimator_EdgeCases/only_whitespace (0.00s)
+    --- PASS: TestTokenEstimator_EdgeCases/only_punctuation (0.00s)
+    --- PASS: TestTokenEstimator_EdgeCases/mixed_languages (0.00s)
+    --- PASS: TestTokenEstimator_EdgeCases/very_long_word (0.00s)
+    --- PASS: TestTokenEstimator_EdgeCases/unicode_chars (0.00s)
+=== RUN   TestTokenEstimator_LargeText
+--- PASS: TestTokenEstimator_LargeText (0.00s)
+=== RUN   TestTokenEstimator_Consistency
+--- PASS: TestTokenEstimator_Consistency (0.00s)
+=== RUN   TestTokenEstimator_Scaling
+--- PASS: TestTokenEstimator_Scaling (0.00s)
+=== RUN   TestTokenEstimator_EmptyModel
+--- PASS: TestTokenEstimator_EmptyModel (0.00s)
+=== RUN   TestTokenEstimator_BoundaryConditions
+=== RUN   TestTokenEstimator_BoundaryConditions/single_character
+=== RUN   TestTokenEstimator_BoundaryConditions/single_space
+=== RUN   TestTokenEstimator_BoundaryConditions/single_newline
+=== RUN   TestTokenEstimator_BoundaryConditions/single_punctuation
+=== RUN   TestTokenEstimator_BoundaryConditions/single_number
+--- PASS: TestTokenEstimator_BoundaryConditions (0.00s)
+    --- PASS: TestTokenEstimator_BoundaryConditions/single_character (0.00s)
+    --- PASS: TestTokenEstimator_BoundaryConditions/single_space (0.00s)
+    --- PASS: TestTokenEstimator_BoundaryConditions/single_newline (0.00s)
+    --- PASS: TestTokenEstimator_BoundaryConditions/single_punctuation (0.00s)
+    --- PASS: TestTokenEstimator_BoundaryConditions/single_number (0.00s)
+PASS
+ok  	contextlite/pkg/tokens	(cached)
+?   	contextlite/pkg/types	[no test files]
+?   	contextlite/scripts	[no test files]
+=== RUN   TestLicenseManager_NewLicenseManager
+--- PASS: TestLicenseManager_NewLicenseManager (0.00s)
+=== RUN   TestLicenseManager_GetFeatures
+=== RUN   TestLicenseManager_GetFeatures/no_license_defaults_to_developer
+=== RUN   TestLicenseManager_GetFeatures/developer_tier
+=== RUN   TestLicenseManager_GetFeatures/professional_tier
+=== RUN   TestLicenseManager_GetFeatures/enterprise_tier
+--- PASS: TestLicenseManager_GetFeatures (0.00s)
+    --- PASS: TestLicenseManager_GetFeatures/no_license_defaults_to_developer (0.00s)
+    --- PASS: TestLicenseManager_GetFeatures/developer_tier (0.00s)
+    --- PASS: TestLicenseManager_GetFeatures/professional_tier (0.00s)
+    --- PASS: TestLicenseManager_GetFeatures/enterprise_tier (0.00s)
+=== RUN   TestLicenseManager_HasFeature
+--- PASS: TestLicenseManager_HasFeature (0.00s)
+=== RUN   TestLicenseManager_GetMaxDocuments
+--- PASS: TestLicenseManager_GetMaxDocuments (0.00s)
+=== RUN   TestLicenseManager_GetTier
+--- PASS: TestLicenseManager_GetTier (0.00s)
+=== RUN   TestLicenseManager_IsInGracePeriod
+--- PASS: TestLicenseManager_IsInGracePeriod (0.00s)
+=== RUN   TestGenerateLicense
+=== RUN   TestGenerateLicense/valid_developer_license
+=== RUN   TestGenerateLicense/valid_professional_license
+=== RUN   TestGenerateLicense/valid_enterprise_license
+--- PASS: TestGenerateLicense (0.11s)
+    --- PASS: TestGenerateLicense/valid_developer_license (0.00s)
+    --- PASS: TestGenerateLicense/valid_professional_license (0.00s)
+    --- PASS: TestGenerateLicense/valid_enterprise_license (0.00s)
+=== RUN   TestValidateLicense
+=== RUN   TestValidateLicense/valid_license
+=== RUN   TestValidateLicense/invalid_JSON
+=== RUN   TestValidateLicense/tampered_signature
+--- PASS: TestValidateLicense (0.08s)
+    --- PASS: TestValidateLicense/valid_license (0.00s)
+    --- PASS: TestValidateLicense/invalid_JSON (0.00s)
+    --- PASS: TestValidateLicense/tampered_signature (0.00s)
+=== RUN   TestLicenseFeatureGate
+--- PASS: TestLicenseFeatureGate (0.00s)
+=== RUN   TestLicenseTierFeatures
+=== RUN   TestLicenseTierFeatures/developer_features
+=== RUN   TestLicenseTierFeatures/professional_features
+=== RUN   TestLicenseTierFeatures/enterprise_features
+--- PASS: TestLicenseTierFeatures (0.00s)
+    --- PASS: TestLicenseTierFeatures/developer_features (0.00s)
+    --- PASS: TestLicenseTierFeatures/professional_features (0.00s)
+    --- PASS: TestLicenseTierFeatures/enterprise_features (0.00s)
+=== RUN   TestLicenseKeyGeneration
+--- PASS: TestLicenseKeyGeneration (0.34s)
+PASS
+ok  	contextlite/test	(cached)
+?   	contextlite/test/helpers	[no test files]
+=== RUN   TestContextLiteStartup
+    startup_test.go:13: Testing ContextLite basic startup...
+    startup_test.go:24: Configuration loaded successfully!
+    startup_test.go:25: Server host: 127.0.0.1
+    startup_test.go:26: Server port: 8082
+    startup_test.go:27: Database path: ./contextlite_fresh.db
+    startup_test.go:30: Initializing storage...
+    startup_test.go:37: Storage initialized successfully!
+    startup_test.go:38: Test completed successfully!
+--- PASS: TestContextLiteStartup (0.00s)
+PASS
+ok  	contextlite/test/integration	(cached)
+=== RUN   TestGoClientIntegration
+=== RUN   TestGoClientIntegration/ServerConnectivity
+    go_test.go:44: ✅ Go client can connect to ContextLite server
+=== RUN   TestGoClientIntegration/DocumentIndexing
+    go_test.go:68: ✅ Go client can index documents
+=== RUN   TestGoClientIntegration/SearchRetrieval
+    go_test.go:92: No documents returned from search - this may be expected if no documents are indexed
+    go_test.go:98: ✅ Search completed in 1.9379ms
+    go_test.go:101: ✅ Go client can search and retrieve documents
+=== RUN   TestGoClientIntegration/ContextAssembly
+    go_test.go:138: ✅ Context assembly completed in 1.0719ms
+    go_test.go:141: ✅ Go client can assemble context for AI requests
+--- PASS: TestGoClientIntegration (0.08s)
+    --- PASS: TestGoClientIntegration/ServerConnectivity (0.07s)
+    --- PASS: TestGoClientIntegration/DocumentIndexing (0.00s)
+    --- PASS: TestGoClientIntegration/SearchRetrieval (0.00s)
+    --- PASS: TestGoClientIntegration/ContextAssembly (0.00s)
+=== RUN   TestGoClientPerformance
+=== RUN   TestGoClientPerformance/ConcurrentAccess
+    go_test.go:196: ✅ Concurrent access successful: 50 requests in 25.1071ms (avg: 502.142µs per request)
+--- PASS: TestGoClientPerformance (0.03s)
+    --- PASS: TestGoClientPerformance/ConcurrentAccess (0.03s)
+PASS
+ok  	contextlite/test/integration_suite	(cached)
+=== RUN   TestLicenseTier_String
+=== RUN   TestLicenseTier_String/developer
+=== RUN   TestLicenseTier_String/professional
+=== RUN   TestLicenseTier_String/enterprise
+=== RUN   TestLicenseTier_String/unknown
+--- PASS: TestLicenseTier_String (0.00s)
+    --- PASS: TestLicenseTier_String/developer (0.00s)
+    --- PASS: TestLicenseTier_String/professional (0.00s)
+    --- PASS: TestLicenseTier_String/enterprise (0.00s)
+    --- PASS: TestLicenseTier_String/unknown (0.00s)
+=== RUN   TestLicenseTier_IsValid
+=== RUN   TestLicenseTier_IsValid/developer
+=== RUN   TestLicenseTier_IsValid/professional
+=== RUN   TestLicenseTier_IsValid/enterprise
+=== RUN   TestLicenseTier_IsValid/invalid
+=== RUN   TestLicenseTier_IsValid/#00
+--- PASS: TestLicenseTier_IsValid (0.00s)
+    --- PASS: TestLicenseTier_IsValid/developer (0.00s)
+    --- PASS: TestLicenseTier_IsValid/professional (0.00s)
+    --- PASS: TestLicenseTier_IsValid/enterprise (0.00s)
+    --- PASS: TestLicenseTier_IsValid/invalid (0.00s)
+    --- PASS: TestLicenseTier_IsValid/#00 (0.00s)
+=== RUN   TestGenerateLicense
+=== RUN   TestGenerateLicense/valid_developer_license
+=== RUN   TestGenerateLicense/valid_professional_license
+=== RUN   TestGenerateLicense/valid_enterprise_license
+=== RUN   TestGenerateLicense/empty_email
+=== RUN   TestGenerateLicense/invalid_tier
+=== RUN   TestGenerateLicense/empty_hardware_id
+--- PASS: TestGenerateLicense (0.13s)
+    --- PASS: TestGenerateLicense/valid_developer_license (0.00s)
+    --- PASS: TestGenerateLicense/valid_professional_license (0.00s)
+    --- PASS: TestGenerateLicense/valid_enterprise_license (0.00s)
+    --- PASS: TestGenerateLicense/empty_email (0.00s)
+    --- PASS: TestGenerateLicense/invalid_tier (0.00s)
+    --- PASS: TestGenerateLicense/empty_hardware_id (0.00s)
+=== RUN   TestValidateLicense
+=== RUN   TestValidateLicense/valid_license_structure
+=== RUN   TestValidateLicense/empty_license
+=== RUN   TestValidateLicense/invalid_json
+--- PASS: TestValidateLicense (0.21s)
+    --- PASS: TestValidateLicense/valid_license_structure (0.00s)
+    --- PASS: TestValidateLicense/empty_license (0.00s)
+    --- PASS: TestValidateLicense/invalid_json (0.00s)
+=== RUN   TestLicenseExpiration
+--- PASS: TestLicenseExpiration (0.21s)
+=== RUN   TestLicenseHardwareBinding
+=== RUN   TestLicenseHardwareBinding/developer_no_hardware_binding
+=== RUN   TestLicenseHardwareBinding/professional_hardware_binding
+=== RUN   TestLicenseHardwareBinding/enterprise_no_hardware_binding
+--- PASS: TestLicenseHardwareBinding (0.19s)
+    --- PASS: TestLicenseHardwareBinding/developer_no_hardware_binding (0.00s)
+    --- PASS: TestLicenseHardwareBinding/professional_hardware_binding (0.00s)
+    --- PASS: TestLicenseHardwareBinding/enterprise_no_hardware_binding (0.00s)
+=== RUN   TestFeatureAccess
+=== RUN   TestFeatureAccess/developer_tier_features
+=== RUN   TestFeatureAccess/professional_tier_features
+=== RUN   TestFeatureAccess/enterprise_tier_features
+--- PASS: TestFeatureAccess (0.08s)
+    --- PASS: TestFeatureAccess/developer_tier_features (0.00s)
+    --- PASS: TestFeatureAccess/professional_tier_features (0.00s)
+    --- PASS: TestFeatureAccess/enterprise_tier_features (0.00s)
+=== RUN   TestConcurrentLicenseOperations
+=== RUN   TestConcurrentLicenseOperations/concurrent_generation
+=== RUN   TestConcurrentLicenseOperations/concurrent_validation
+--- PASS: TestConcurrentLicenseOperations (0.19s)
+    --- PASS: TestConcurrentLicenseOperations/concurrent_generation (0.02s)
+    --- PASS: TestConcurrentLicenseOperations/concurrent_validation (0.00s)
+=== RUN   TestLicenseErrorConditions
+=== RUN   TestLicenseErrorConditions/nil_private_key
+=== RUN   TestLicenseErrorConditions/nil_public_key
+=== RUN   TestLicenseErrorConditions/malformed_license_data
+--- PASS: TestLicenseErrorConditions (0.22s)
+    --- PASS: TestLicenseErrorConditions/nil_private_key (0.00s)
+    --- PASS: TestLicenseErrorConditions/nil_public_key (0.00s)
+    --- PASS: TestLicenseErrorConditions/malformed_license_data (0.00s)
+=== RUN   TestLicenseFormat
+--- PASS: TestLicenseFormat (0.38s)
+PASS
+ok  	contextlite/test/license	(cached)
+?   	contextlite/test_results	[no test files]
+[0;32m✅ PASSED: Go Tests[0m
+
+[0;34m🔍 Running: Go Vet[0m
+[0;32m✅ PASSED: Go Vet[0m
+
+[0;34m🔍 Running: errcheck (Unchecked Errors)[0m
+cmd\contextlite\main.go:61:19:	defer logger.Sync()
+cmd\contextlite\main.go:91:21:	defer storage.Close()
+cmd\license-server\main.go:110:27:	json.NewEncoder(w).Encode(map[string]string{
+cmd\license-server\main.go:275:25:	ls.tracker.RecordUsage(licenseData[:16], "system", "license_generated", metadata, "")
+cmd\license-server\main.go:360:28:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:368:27:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:414:27:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:448:28:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:456:27:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:507:28:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:515:27:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:543:28:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:551:27:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:586:28:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:594:27:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:619:28:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:627:27:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:653:28:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main.go:661:27:	json.NewEncoder(w).Encode(map[string]interface{}{
+cmd\license-server\main_test.go:40:12:	pem.Encode(keyFile, privateKeyPEM)
+cmd\license-server\main_test.go:41:15:	keyFile.Close()
+cmd\license-server\main_test.go:639:14:	os.Unsetenv(key)
+cmd\license-server\main_test.go:646:14:	os.Setenv(key, value)
+cmd\license-server\main_test.go:659:12:	os.Setenv("STRIPE_SECRET_KEY", "sk_test_fake")
+cmd\license-server\main_test.go:660:12:	os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test_fake")
+cmd\license-server\main_test.go:661:12:	os.Setenv("PORT", "8081")
+cmd\license-server\main_test.go:662:12:	os.Setenv("optimizationP_PORT", "587")
+cmd\license-server\main_test.go:663:12:	os.Setenv("PRIVATE_KEY_PATH", "./test_key.pem")
+cmd\license-server\main_test.go:892:11:	os.Remove(filepath.Join(tmpDir, "test_private_key.pem"))
+cmd\license-server\main_test.go:1045:12:	os.Setenv(key, value)
+cmd\license-server\main_test.go:1051:15:	os.Unsetenv(key)
+cmd\license-server\main_test.go:1324:12:	os.Setenv("optimizationP_PORT", originaloptimizationPPort)
+cmd\license-server\main_test.go:1325:12:	os.Setenv("FROM_EMAIL", originalFromEmail)
+cmd\license-server\main_test.go:1326:12:	os.Setenv("PRIVATE_KEY_PATH", originalPrivateKeyPath)
+cmd\license-server\main_test.go:1327:12:	os.Setenv("STRIPE_SECRET_KEY", originalStripeKey)
+cmd\license-server\main_test.go:1328:12:	os.Setenv("STRIPE_WEBHOOK_SECRET", originalWebhookSecret)
+cmd\license-server\main_test.go:1332:11:	os.Setenv("STRIPE_SECRET_KEY", "sk_test_123")
+cmd\license-server\main_test.go:1333:11:	os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test_123")
+cmd\license-server\main_test.go:1334:11:	os.Setenv("optimizationP_PORT", "2525")
+cmd\license-server\main_test.go:1335:11:	os.Setenv("FROM_EMAIL", "custom@example.com")
+cmd\license-server\main_test.go:1336:11:	os.Setenv("PRIVATE_KEY_PATH", "./private_key.pem")
+cmd\license-server\main_test.go:1357:12:	os.Setenv("STRIPE_SECRET_KEY", originalStripeKey)
+cmd\license-server\main_test.go:1358:12:	os.Setenv("STRIPE_WEBHOOK_SECRET", originalWebhookSecret)
+cmd\license-server\main_test.go:1359:12:	os.Setenv("PRIVATE_KEY_PATH", originalPrivateKeyPath)
+cmd\license-server\main_test.go:1360:12:	os.Setenv("optimizationP_HOST", originaloptimizationPHost)
+cmd\license-server\main_test.go:1361:12:	os.Setenv("optimizationP_USER", originaloptimizationPUser)
+cmd\license-server\main_test.go:1362:12:	os.Setenv("optimizationP_PASS", originaloptimizationPPass)
+cmd\license-server\main_test.go:1363:12:	os.Setenv("PORT", originalPort)
+cmd\license-server\main_test.go:1375:16:	os.Unsetenv("STRIPE_SECRET_KEY")
+cmd\license-server\main_test.go:1376:14:	os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
+cmd\license-server\main_test.go:1377:14:	os.Setenv("PRIVATE_KEY_PATH", "./test.pem")
+cmd\license-server\main_test.go:1385:14:	os.Setenv("STRIPE_SECRET_KEY", "sk_test_123")
+cmd\license-server\main_test.go:1386:16:	os.Unsetenv("STRIPE_WEBHOOK_SECRET")
+cmd\license-server\main_test.go:1387:14:	os.Setenv("PRIVATE_KEY_PATH", "./test.pem")
+cmd\license-server\main_test.go:1395:14:	os.Setenv("STRIPE_SECRET_KEY", "sk_test_123")
+cmd\license-server\main_test.go:1396:14:	os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
+cmd\license-server\main_test.go:1397:16:	os.Unsetenv("PRIVATE_KEY_PATH")
+cmd\license-server\main_test.go:1404:14:	os.Setenv("STRIPE_SECRET_KEY", "sk_test_123")
+cmd\license-server\main_test.go:1405:14:	os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
+cmd\license-server\main_test.go:1406:14:	os.Setenv("PRIVATE_KEY_PATH", "./test.pem")
+cmd\license-server\main_test.go:1407:14:	os.Setenv("optimizationP_HOST", "optimizationp.gmail.com")
+cmd\license-server\main_test.go:1408:14:	os.Setenv("optimizationP_USER", "test@gmail.com")
+cmd\license-server\main_test.go:1409:14:	os.Setenv("optimizationP_PASS", "password123")
+cmd\license-server\main_test.go:1410:14:	os.Setenv("PORT", "9000")
+cmd\license-server\main_test.go:1417:14:	os.Setenv("STRIPE_SECRET_KEY", "sk_test_123")
+cmd\license-server\main_test.go:1418:14:	os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
+cmd\license-server\main_test.go:1419:14:	os.Setenv("PRIVATE_KEY_PATH", "./test.pem")
+cmd\license-server\main_test.go:1420:14:	os.Setenv("PORT", "invalid_port")
+cmd\license-server\main_tracking_test.go:32:28:	defer server.tracker.Close()
+cmd\license-server\main_tracking_test.go:195:28:	defer server.tracker.Close()
+cmd\license-server\main_tracking_test.go:218:28:	defer server.tracker.Close()
+cmd\license-server\main_tracking_test.go:301:28:	defer server.tracker.Close()
+cmd\license-server\main_tracking_test.go:456:28:	defer server.tracker.Close()
+cmd\license-server\main_tracking_test.go:534:23:	server.tracker.Close()
+cmd\license-server\main_tracking_test.go:553:23:	server.tracker.Close()
+cmd\license-server\main_tracking_test.go:563:23:	server.tracker.Close()
+cmd\license-server\main_tracking_test.go:566:29:	defer server.tracker.Close()
+cmd\license-server\main_tracking_test.go:587:28:	defer server.tracker.Close()
+cmd\license-server\main_tracking_test.go:617:28:	defer server.tracker.Close()
+cmd\registry-runner\main.go:87:17:	json.Unmarshal(data, registry)
+cmd\registry-runner\main.go:142:11:	os.Remove("temp_coverage.out")
+examples\comprehensive_demo.go:46:17:	defer os.Remove(cfg.Storage.DatabasePath) // Clean up
+internal\api\middleware\rate_limiter_test.go:23:10:	w.Write([]byte("OK"))
+internal\api\server.go:1020:27:	json.NewEncoder(w).Encode(data)
+internal\api\server_test.go:31:14:	os.RemoveAll("test_*.db")
+internal\api\server_test.go:72:14:	store.Close()
+internal\api\server_test.go:73:12:	os.Remove(dbPath)
+internal\api\server_test.go:196:19:	store.AddDocument(ctx, doc)
+internal\api\server_test.go:381:19:	store.AddDocument(ctx, doc)
+internal\api\server_test.go:544:10:	w.Write([]byte("authenticated"))
+internal\api\server_test.go:577:19:	store.AddDocument(ctx, doc)
+internal\api\server_test.go:698:10:	w.Write([]byte("authenticated"))
+internal\api\server_test.go:720:10:	w.Write([]byte("authenticated"))
+internal\api\server_test.go:1611:20:	defer os.RemoveAll(tempDir)
+internal\api\server_test.go:1663:17:	json.Unmarshal(w.Body.Bytes(), &response)
+internal\enterprise\mcp.go:155:18:	defer rows.Close()
+internal\enterprise\mcp.go:273:24:	mm.SetMCPServerStatus(serverID, "failed")
+internal\enterprise\mcp.go:279:24:	mm.SetMCPServerStatus(serverID, "unhealthy")
+internal\enterprise\mcp.go:565:23:	defer resp.Body.Close()
+internal\enterprise\tenant.go:159:18:	defer rows.Close()
+internal\enterprise\tenant.go:236:16:	defer db.Close()
+internal\evaluation\sota.go:526:18:	defer file.Close()
+internal\evaluation\sota_test.go:72:28:	sota.LoadEvaluationDataset()
+internal\evaluation\sota_test.go:254:28:	sota.LoadEvaluationDataset()
+internal\evaluation\sota_test.go:401:11:	os.Remove(config.OutputPath)
+internal\evaluation\sota_test.go:424:11:	os.Remove(config.OutputPath)
+internal\license\comprehensive_test.go:72:17:	defer os.Remove(dbPath)
+internal\license\comprehensive_test.go:77:21:	defer tracker.Close()
+internal\license\comprehensive_test.go:143:17:	defer os.Remove(dbPath)
+internal\license\comprehensive_test.go:147:21:	defer tracker.Close()
+internal\license\comprehensive_test.go:226:17:	defer os.Remove(dbPath)
+internal\license\coverage_80_percent_test.go:23:18:	defer os.Remove(licenseFile)
+internal\license\coverage_80_percent_test.go:38:15:	os.WriteFile(licenseFile, []byte(testLicense), 0644)
+internal\license\coverage_80_percent_test.go:145:14:	os.MkdirAll(filepath.Dir(activationFile), 0755)
+internal\license\coverage_80_percent_test.go:146:21:	defer os.RemoveAll(filepath.Dir(activationFile))
+internal\license\coverage_80_percent_test.go:149:15:	os.WriteFile(activationFile, []byte("{invalid json}"), 0644)
+internal\license\coverage_80_percent_test.go:228:18:	defer os.Remove(licenseFile)
+internal\license\coverage_80_percent_test.go:238:16:	os.WriteFile(licenseFile, []byte(license), 0644)
+internal\license\coverage_boost_test.go:58:13:	os.MkdirAll(licenseDir, 0755)
+internal\license\coverage_boost_test.go:59:20:	defer os.RemoveAll(licenseDir)
+internal\license\coverage_boost_test.go:64:14:	os.WriteFile(licensePath, []byte(testLicense), 0644)
+internal\license\coverage_boost_test.go:85:17:	defer os.Remove(trialPath)
+internal\license\coverage_boost_test.go:171:17:	defer os.Remove(dbPath)
+internal\license\coverage_boost_test.go:175:21:	defer tracker.Close()
+internal\license\final_80_percent_test.go:29:15:	os.WriteFile(invalidFile, []byte("invalid json{"), 0644)
+internal\license\final_80_percent_test.go:30:18:	defer os.Remove(invalidFile)
+internal\license\final_80_percent_test.go:44:15:	os.WriteFile(noSigFile, licenseData, 0644)
+internal\license\final_80_percent_test.go:45:18:	defer os.Remove(noSigFile)
+internal\license\final_80_percent_test.go:103:17:	os.WriteFile(licenseFile, licenseData, 0644)
+internal\license\final_80_percent_test.go:104:20:	defer os.Remove(licenseFile)
+internal\license\final_80_percent_test.go:152:15:	os.RemoveAll(trialDir)
+internal\license\final_80_percent_test.go:169:15:	os.WriteFile(trialFile, []byte("{invalid json}"), 0644)
+internal\license\final_coverage_push_test.go:55:15:	os.RemoveAll(filepath.Dir(trialFile))
+internal\license\final_coverage_push_test.go:89:15:	os.WriteFile(validFile, validBytes, 0644)
+internal\license\final_coverage_push_test.go:90:18:	defer os.Remove(validFile)
+internal\license\final_coverage_push_test.go:101:15:	os.WriteFile(expiredFile, expiredBytes, 0644)
+internal\license\final_coverage_push_test.go:102:18:	defer os.Remove(expiredFile)
+internal\license\final_coverage_push_test.go:112:15:	os.WriteFile(invalidFile, invalidBytes, 0644)
+internal\license\final_coverage_push_test.go:113:18:	defer os.Remove(invalidFile)
+internal\license\final_coverage_push_test.go:139:15:	os.WriteFile(validFile, []byte(validLicense), 0644)
+internal\license\final_coverage_push_test.go:140:18:	defer os.Remove(validFile)
+internal\license\final_coverage_push_test.go:147:15:	os.WriteFile(invalidFile, []byte("{invalid json}"), 0644)
+internal\license\final_coverage_push_test.go:148:18:	defer os.Remove(invalidFile)
+internal\license\license.go:203:15:	os.WriteFile(firstRunPath, []byte(time.Now().Format(time.RFC3339)), 0644)
+internal\license\tracked.go:99:23:	defer resp.Body.Close()
+internal\license\tracked.go:151:18:	resp.Body.Close()
+internal\license\tracked.go:217:23:	defer resp.Body.Close()
+internal\license\tracked.go:221:27:	tlm.clearActivationRecord()
+internal\license\tracked.go:234:13:	os.MkdirAll(contextDir, 0755)
+internal\license\tracked.go:319:25:	tfg.tracker.RecordUsage("feature_request", metadata)
+internal\license\tracked.go:334:25:	tfg.tracker.RecordUsage("app_startup", metadata)
+internal\license\tracked.go:346:25:	tfg.tracker.RecordUsage("context_query", metadata)
+internal\license\tracked.go:357:25:	tfg.tracker.RecordUsage("error_event", metadata)
+internal\license\tracked_test.go:43:29:	json.NewEncoder(w).Encode(response)
+internal\license\tracked_test.go:109:29:	json.NewEncoder(w).Encode(response)
+internal\license\tracked_test.go:137:29:	json.NewEncoder(w).Encode(response)
+internal\license\tracked_test.go:164:29:	json.NewEncoder(w).Encode(response)
+internal\license\tracked_test.go:190:29:	json.NewEncoder(w).Encode(response)
+internal\license\tracked_test.go:234:28:	json.NewEncoder(w).Encode(response)
+internal\license\tracking.go:177:20:	lt.updateLastSeen(existing.ActivationID)
+internal\license\tracking.go:200:25:	lt.recordSecurityEvent(licenseKey, "activation_limit_exceeded",
+internal\license\tracking.go:228:21:	lt.recordUsageEvent(licenseKey, activationID, "license_activated", "", ipAddress)
+internal\license\tracking.go:254:25:	lt.recordSecurityEvent(licenseKey, "validation_failed",
+internal\license\tracking.go:260:25:	lt.recordSecurityEvent(licenseKey, "unauthorized_access",
+internal\license\tracking.go:266:25:	lt.recordSecurityEvent(licenseKey, "inactive_license_access",
+internal\license\tracking.go:272:19:	lt.updateLastSeen(activation.ActivationID)
+internal\license\tracking.go:288:21:	lt.recordUsageEvent(licenseKey, "", "license_deactivated", "", "")
+internal\license\tracking.go:300:21:	lt.recordUsageEvent(licenseKey, "", "license_reactivated", "", "")
+internal\license\tracking.go:348:18:	defer rows.Close()
+internal\license\tracking.go:474:18:	defer rows.Close()
+internal\license\tracking_test.go:18:17:	defer os.Remove(dbPath)
+internal\license\tracking_test.go:33:17:	defer os.Remove(dbPath)
+internal\license\tracking_test.go:37:21:	defer tracker.Close()
+internal\license\tracking_test.go:114:17:	defer os.Remove(dbPath)
+internal\license\tracking_test.go:118:21:	defer tracker.Close()
+internal\license\tracking_test.go:150:17:	defer os.Remove(dbPath)
+internal\license\tracking_test.go:154:21:	defer tracker.Close()
+internal\license\tracking_test.go:183:17:	defer os.Remove(dbPath)
+internal\license\tracking_test.go:187:21:	defer tracker.Close()
+internal\license\tracking_test.go:240:17:	defer os.Remove(dbPath)
+internal\license\tracking_test.go:244:21:	defer tracker.Close()
+internal\license\tracking_test.go:271:17:	defer os.Remove(dbPath)
+internal\license\tracking_test.go:275:21:	defer tracker.Close()
+internal\license\tracking_test.go:306:17:	defer os.Remove(dbPath)
+internal\license\tracking_test.go:310:21:	defer tracker.Close()
+internal\license\tracking_test.go:337:17:	defer os.Remove(dbPath)
+internal\license\tracking_test.go:341:21:	defer tracker.Close()
+internal\license\tracking_test.go:374:17:	defer os.Remove(dbPath)
+internal\license\tracking_test.go:387:16:	tracker.Close()
+internal\license\tracking_test.go:394:22:	defer tracker.Close()
+internal\license\tracking_test.go:407:17:	defer os.Remove(dbPath)
+internal\license\tracking_test.go:411:21:	defer tracker.Close()
+internal\license\tracking_test.go:429:17:	defer os.Remove(dbPath)
+internal\license\tracking_test.go:433:21:	defer tracker.Close()
+internal\license\tracking_test.go:451:17:	defer os.Remove(dbPath)
+internal\license\tracking_test.go:455:21:	defer tracker.Close()
+internal\license\trial.go:43:13:	os.MkdirAll(contextDir, 0755)
+internal\license\trial.go:66:15:	tm.saveTrial(trial)
+internal\pipeline\assembly.go:241:33:	p.storage.SaveQueryCacheWithKey(ctx, queryHash, corpusHash, modelID, tokenizerVersion, cacheKey, result, expiresAt)
+internal\pipeline\pipeline_test.go:20:14:	os.RemoveAll("test_*.db")
+internal\pipeline\pipeline_test.go:54:14:	store.Close()
+internal\pipeline\pipeline_test.go:55:12:	os.Remove(dbPath)
+internal\pipeline\pipeline_test.go:93:17:	defer os.Remove(dbPath)
+internal\pipeline\pipeline_test.go:99:19:	defer store.Close()
+internal\registry\test_hooks.go:221:22:	registry.SaveToFile(registryPath)
+internal\storage\sqlite.go:173:19:	defer rows.Close()
+internal\storage\sqlite.go:290:19:	defer tx.Rollback()
+internal\storage\sqlite.go:351:18:	defer rows.Close()
+internal\storage\sqlite.go:370:18:	defer rows.Close()
+internal\storage\sqlite.go:432:19:	defer tx.Rollback()
+internal\storage\sqlite.go:574:19:	defer rows.Close()
+internal\storage\sqlite.go:596:18:	defer rows.Close()
+internal\storage\sqlite.go:686:18:	defer rows.Close()
+internal\storage\storage_test.go:32:14:	os.RemoveAll("test_*.db")
+internal\storage\storage_test.go:45:16:	storage.Close()
+internal\storage\storage_test.go:46:12:	os.Remove(dbPath)
+internal\storage\storage_test.go:54:17:	defer os.Remove(dbPath)
+internal\storage\storage_test.go:60:21:	defer storage.Close()
+internal\storage\storage_test.go:119:21:	storage.AddDocument(ctx, doc)
+internal\storage\storage_test.go:149:21:	storage.AddDocument(ctx, doc)
+internal\storage\storage_test.go:205:22:	storage.AddDocument(ctx, doc)
+internal\storage\storage_test.go:245:22:	storage.AddDocument(ctx, doc)
+internal\storage\storage_test.go:471:21:	storage.AddDocument(ctx, doc)
+internal\storage\storage_test.go:491:17:	defer os.Remove(dbPath)
+internal\storage\storage_test.go:513:17:	defer os.Remove(dbPath)
+internal\storage\storage_test.go:520:21:	defer storage.Close()
+internal\storage\storage_test.go:549:23:	storage.AddDocument(ctx, doc)
+internal\storage\storage_test.go:564:23:	storage.AddDocument(ctx, doc)
+internal\storage\storage_test.go:604:21:	storage.AddDocument(ctx, doc)
+internal\storage\storage_test.go:631:21:	storage.AddDocument(ctx, doc)
+internal\storage\storage_test.go:744:22:	storage.AddDocument(ctx, doc)
+internal\storage\storage_test.go:1079:16:	storage1.Close()
+internal\storage\storage_test.go:1086:17:	storage2.Close()
+internal\storage\storage_test.go:1194:22:	storage.AddDocument(ctx, doc)
+internal\storage\storage_test.go:1256:15:	storage.Close()
+internal\storage\storage_test.go:1263:16:	storage2.Close()
+internal\storage\storage_test.go:1591:17:	storage.Close()
+internal\storage\storage_test.go:1600:20:	defer os.RemoveAll(tempDir)
+internal\storage\storage_test.go:1613:17:	storage.Close()
+internal\storage\storage_test.go:1847:20:	defer os.RemoveAll(tempDir)
+internal\storage\storage_test.go:1856:12:	file.Close()
+internal\storage\storage_test.go:1864:16:	storage.Close()
+internal\storage\storage_test.go:2085:20:	defer os.RemoveAll(tempDir)
+internal\storage\storage_test.go:2098:17:	storage.Close()
+internal\storage\storage_test.go:2109:16:	storage.Close()
+internal\storage\storage_test.go:2117:18:	storage2.Close()
+internal\storage\storage_test.go:2129:17:	storage.Close()
+internal\storage\storage_test.go:2220:18:	storage.Close()
+internal\storage\storage_test.go:2225:18:	storage.Close()
+internal\storage\storage_test.go:2236:20:	defer os.RemoveAll(tempDir)
+internal\storage\storage_test.go:2243:21:	defer storage.Close()
+internal\storage\storage_test.go:2431:20:	defer os.RemoveAll(tempDir)
+internal\storage\storage_test.go:2440:21:	defer storage.Close()
+pkg\config\config_test.go:31:17:	defer os.Remove(tmpfile.Name())
+pkg\config\config_test.go:36:15:	tmpfile.Close()
+pkg\config\config_test.go:457:17:	defer os.Remove(tmpfile.Name())
+pkg\config\config_test.go:462:15:	tmpfile.Close()
+pkg\config\config_test.go:468:15:	os.Unsetenv("CONTEXTLITE_PORT")
+pkg\config\config_test.go:470:13:	os.Setenv("CONTEXTLITE_PORT", originalPort)
+pkg\config\config_test.go:474:11:	os.Setenv("CONTEXTLITE_PORT", "7777")
+pkg\config\config_test.go:494:15:	os.Unsetenv("CONTEXTLITE_HOST")
+pkg\config\config_test.go:496:13:	os.Setenv("CONTEXTLITE_HOST", originalHost)
+pkg\config\config_test.go:500:11:	os.Setenv("CONTEXTLITE_HOST", "custom-host")
+pkg\config\config_test.go:517:17:	defer os.Remove(tmpfile.Name())
+pkg\config\config_test.go:519:15:	tmpfile.Write([]byte(tempConfig))
+pkg\config\config_test.go:520:15:	tmpfile.Close()
+pkg\config\config_test.go:537:15:	os.Unsetenv("CONTEXTLITE_DB_PATH")
+pkg\config\config_test.go:539:13:	os.Setenv("CONTEXTLITE_DB_PATH", originalDBPath)
+pkg\config\config_test.go:543:11:	os.Setenv("CONTEXTLITE_DB_PATH", "/custom/db/path")
+pkg\config\config_test.go:560:17:	defer os.Remove(tmpfile.Name())
+pkg\config\config_test.go:562:15:	tmpfile.Write([]byte(tempConfig))
+pkg\config\config_test.go:563:15:	tmpfile.Close()
+pkg\config\config_test.go:652:19:	defer os.Remove(tmpfile.Name())
+pkg\config\config_test.go:654:17:	tmpfile.Write([]byte(tc.configContent))
+pkg\config\config_test.go:655:17:	tmpfile.Close()
+scripts\update_coverage_registry.go:167:11:	os.Remove("temp_coverage.out")
+scripts\update_coverage_registry.go:174:17:	defer os.Remove("temp_coverage.out")
+scripts\update_coverage_registry.go:215:11:	os.Remove("temp_coverage.out")
+test\helpers\server.go:53:18:	s.Storage.Close()
+test\helpers\server.go:56:12:	os.Remove(s.DBPath)
+test\helpers\server.go:75:23:	defer resp.Body.Close()
+test\helpers\server.go:90:23:	defer resp.Body.Close()
+test\integration\startup_test.go:35:21:	defer storage.Close()
+test\integration_suite\go_test.go:39:24:	defer resp.Body.Close()
+test\integration_suite\go_test.go:63:24:	defer resp.Body.Close()
+test\integration_suite\go_test.go:84:24:	defer resp.Body.Close()
+test\integration_suite\go_test.go:129:24:	defer resp.Body.Close()
+test\integration_suite\go_test.go:167:21:	resp.Body.Close()
+test\license\license_test.go:469:26:	license.GenerateLicense("test@example.com", license.TierDeveloper, "hw123", nil)
+test\license\license_test.go:562:12:	os.Remove(filepath.Join(tmpDir, "test_private_key.pem"))
+test\license\license_test.go:563:12:	os.Remove(filepath.Join(tmpDir, "test_public_key.pem"))
+test\license_test.go:235:19:	json.Unmarshal(licenseJSON, &lic)
+test_results\update_registry.go:37:23:	json.Unmarshal(data, &registry)
+test_results\update_registry.go:109:17:	os.WriteFile(registryPath, data, 0644)
+[0;31m❌ FAILED: errcheck (Unchecked Errors)[0m
+[0;34m🔍 Running: staticcheck (Static Analysis)[0m
+[0;32m✅ PASSED: staticcheck (Static Analysis)[0m
+
+[0;34m🔍 Running: Vulnerability Scan (govulncheck)[0m
+No vulnerabilities found.
+[0;32m✅ PASSED: No vulnerabilities found[0m
+
+[0;34m🔍 Running: Go Mod Tidy[0m
+[0;32m✅ PASSED: Go Mod Tidy[0m
+
+[0;34m🔍 Running: License File Present[0m
+[0;32m✅ PASSED: License File Present[0m
+
+[0;34m🔍 Running: README Present[0m
+[0;32m✅ PASSED: README Present[0m
+
+================================================
+[0;34m📊 VALIDATION RESULTS[0m
+================================================
+Passed: [0;32m8[0m
+Failed: [0;31m1[0m
+
+[0;31m❌ 1 CHECK(S) FAILED![0m
+
+Please fix the issues above before pushing to GitHub.
+This will save time by avoiding failed CI/CD runs.
