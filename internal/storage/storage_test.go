@@ -25,19 +25,6 @@ func workspaceWeightsToFeatureWeights(w *types.WorkspaceWeights) types.FeatureWe
 	}
 }
 
-func featureWeightsToWorkspaceWeights(f types.FeatureWeights, workspacePath string) *types.WorkspaceWeights {
-	return &types.WorkspaceWeights{
-		WorkspacePath:      workspacePath,
-		RelevanceWeight:    f.Relevance,
-		RecencyWeight:      f.Recency,
-		EntanglementWeight: f.Entanglement,
-		DiversityWeight:    f.Specificity,
-		RedundancyPenalty:  f.Uncertainty,
-		UpdateCount:        0,
-		LastUpdated:        time.Now().Format(time.RFC3339),
-	}
-}
-
 func TestMain(m *testing.M) {
 	// Setup
 	code := m.Run()
@@ -1670,6 +1657,7 @@ func TestStorage_CacheOperationsWithKey(t *testing.T) {
 	
 	// Test with non-existent key
 	result, err = storage.GetCachedResultByKey(ctx, "non-existent-keyed-cache")
+	_ = err // Suppress unused variable warning
 	if result == nil {
 		t.Logf("Correctly got nil for non-existent key")
 	}

@@ -32,7 +32,7 @@ func TestLicenseGeneration(t *testing.T) {
 	// Test ValidateLicense - just test that it doesn't crash
 	publicKey := &privateKey.PublicKey
 	_, err = ValidateLicense(license, publicKey)
-	// ValidateLicense can return errors for invalid data, that's expected
+	_ = err // Suppress unused variable warning - ValidateLicense can return errors for invalid data, that's expected
 	
 	// Test with invalid license - should return error gracefully
 	_, err = ValidateLicense("invalid", publicKey)

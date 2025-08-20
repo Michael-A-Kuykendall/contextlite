@@ -1,0 +1,4 @@
+# errcheck exclusions - one function per line
+encoding/json.(*Encoder).Encode
+go.uber.org/zap.(*Logger).Sync
+(*bytes.Buffer).Write

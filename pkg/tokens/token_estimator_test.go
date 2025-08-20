@@ -61,6 +61,7 @@ func TestNewTokenEstimator(t *testing.T) {
 	estimator := NewTokenEstimator("gpt-4")
 	if estimator == nil {
 		t.Error("NewTokenEstimator() returned nil")
+		return // Avoid nil pointer dereference
 	}
 	if estimator.model != "gpt-4" {
 		t.Errorf("NewTokenEstimator() model = %v, expected %v", estimator.model, "gpt-4")
@@ -75,6 +76,7 @@ func TestTokenEstimator_DifferentModels(t *testing.T) {
 			estimator := NewTokenEstimator(model)
 			if estimator == nil {
 				t.Errorf("NewTokenEstimator() returned nil for model %s", model)
+				return // Avoid nil pointer dereference
 			}
 			if estimator.model != model {
 				t.Errorf("NewTokenEstimator() model = %v, expected %v", estimator.model, model)
