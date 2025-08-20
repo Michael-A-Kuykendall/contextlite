@@ -24,20 +24,20 @@ jobs:
           echo "Repository: ${{ github.repository }}"
           
           # Test if we can access GitHub API
-          curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          curl -H "Authorization: token ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}" \
                -H "Accept: application/vnd.github.v3+json" \
                https://api.github.com/user
                
           echo ""
           echo "🔍 Testing Token Scopes"
-          curl -I -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          curl -I -H "Authorization: token ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}" \
                   https://api.github.com/user 2>&1 | grep -i "x-oauth-scopes" || echo "No scopes header found"
 
       - name: Check if homebrew-core fork exists
         id: check_fork
         run: |
           echo "🔍 Checking if ${{ github.actor }}/homebrew-core fork exists"
-          if curl -s -f -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          if curl -s -f -H "Authorization: token ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}" \
                   "https://api.github.com/repos/${{ github.actor }}/homebrew-core" > /dev/null; then
             echo "fork_exists=true" >> $GITHUB_OUTPUT
             echo "✅ Fork exists"
@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "🍺 Creating fork of homebrew-core"
           curl -X POST \
-               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Authorization: token ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}" \
                -H "Accept: application/vnd.github.v3+json" \
                https://api.github.com/repos/Homebrew/homebrew-core/forks
           
@@ -61,7 +61,7 @@ jobs:
       - name: Clone homebrew-core fork
         run: |
           echo "🍺 Cloning your fork of homebrew-core"
-          git clone --depth=1 https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.actor }}/homebrew-core.git
+          git clone --depth=1 https://${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}@github.com/${{ github.actor }}/homebrew-core.git
           cd homebrew-core
           
           # Set up git config
@@ -160,7 +160,7 @@ jobs:
           
           # Create PR using GitHub API
           curl -X POST \
-               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Authorization: token ${{ secrets.HOMEBREW_GITHUB_API_TOKEN }}" \
                -H "Accept: application/vnd.github.v3+json" \
                -d "{
                  \"title\": \"contextlite ${{ github.event.inputs.version }}\",
