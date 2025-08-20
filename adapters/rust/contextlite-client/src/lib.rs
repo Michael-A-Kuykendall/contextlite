@@ -14,13 +14,13 @@
 //! 
 //! ## Quick Start
 //! 
-//! ```rust
+//! ```rust,no_run
 //! use contextlite_client::{ContextLiteClient, ClientConfig, Document, SearchQuery};
 //! 
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     // Create a client with default configuration
-//!     let client = ContextLiteClient::new()?;
+//!     let client = ContextLiteClient::new("http://localhost:8080")?;
 //!     
 //!     // Or with custom configuration
 //!     let config = ClientConfig::new("http://localhost:8083")
@@ -46,12 +46,12 @@
 //! 
 //! The client provides comprehensive error handling with detailed error messages:
 //! 
-//! ```rust
+//! ```rust,no_run
 //! use contextlite_client::{ContextLiteClient, ContextLiteError};
 //! 
 //! #[tokio::main]
 //! async fn main() {
-//!     let client = ContextLiteClient::new().unwrap();
+//!     let client = ContextLiteClient::new("http://localhost:8080").unwrap();
 //!     
 //!     match client.health().await {
 //!         Ok(health) => println!("Server is healthy: {}", health.status),
