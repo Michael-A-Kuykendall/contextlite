@@ -48,6 +48,7 @@ jobs:
           go test ./internal/storage -v
           go test ./pkg/config -v
           go test ./pkg/tokens -v
+          go test ./cmd/contextlite -v
 
   build-and-release:
     needs: test
@@ -144,7 +145,7 @@ jobs:
         1. Add contextlite to your PATH
         2. Run: \`contextlite --help\`
         3. Start server: \`contextlite\`
-        4. Visit: http://localhost:8080/health
+        4. Visit: http://localhost:8082/health
         
         ## 14-Day Trial
         - Full optimization optimization available for 14 days
@@ -195,13 +196,13 @@ jobs:
       run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
       
     - name: Create Release
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v1
       id: create_release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ steps.version.outputs.version }}
-        release_name: ContextLite ${{ steps.version.outputs.version }}
+        name: ContextLite ${{ steps.version.outputs.version }}
         body: |
           ## 🚀 ContextLite ${{ steps.version.outputs.version }}
           
@@ -231,16 +232,5 @@ jobs:
           Download the binary for your platform below ⬇️
         draft: false
         prerelease: false
-        
-    - name: Upload Release Assets
-      run: |
-        for file in contextlite-*/contextlite-*; do
-          if [ -f "$file" ]; then
-            echo "Uploading $file..."
-            curl -X POST \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Content-Type: application/octet-stream" \
-              --data-binary @"$file" \
-              "${{ steps.create_release.outputs.upload_url }}?name=$(basename $file)"
-          fi
-        done
+        files: |
+          contextlite-*/contextlite-*.*
