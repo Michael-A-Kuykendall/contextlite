@@ -15,6 +15,9 @@ build/
 
 # Dependency directories
 vendor/
+node_modules/
+npm-wrapper/node_modules/
+vscode-extension/node_modules/
 
 # Go workspace file
 go.work

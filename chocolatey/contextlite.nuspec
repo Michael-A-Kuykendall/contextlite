@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>contextlite</id>
-    <version>1.0.0</version>
+    <version>1.0.8</version>
     <packageSourceUrl>https://github.com/Michael-A-Kuykendall/contextlite/tree/main/chocolatey</packageSourceUrl>
     <owners>ContextLite Team</owners>
     <title>ContextLite</title>
@@ -53,7 +53,7 @@ Visit https://docs.contextlite.com for complete documentation.
 
 This Chocolatey package installs the ContextLite binary and makes it available system-wide via PATH.
     ]]></description>
-    <releaseNotes>https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/v1.0.0</releaseNotes>
+    <releaseNotes>https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/v1.0.8</releaseNotes>
     <dependencies>
       <!-- No dependencies - single binary -->
     </dependencies>

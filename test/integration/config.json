@@ -1,0 +1,28 @@
+{
+  "test_port_base": 19000,
+  "timeout_seconds": 30,
+  "expected_version": "1.0.4",
+  "test_platforms": [
+    "direct-binary",
+    "npm",
+    "pypi", 
+    "docker",
+    "vscode-extension",
+    "hugging-face"
+  ],
+  "endpoints_to_test": [
+    "/health",
+    "/api/v1/trial/info",
+    "/license/status"
+  ],
+  "test_metadata": {
+    "created": "2025-08-20",
+    "purpose": "Validate all deployment channels work correctly",
+    "critical_endpoints": [
+      "https://huggingface.co/spaces/MikeKuykendall/contextlite-download",
+      "https://registry.npmjs.org/contextlite",
+      "https://pypi.org/project/contextlite/",
+      "https://hub.docker.com/r/michaelakuykendall/contextlite"
+    ]
+  }
+}

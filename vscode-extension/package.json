@@ -2,7 +2,7 @@
   "name": "contextlite",
   "displayName": "ContextLite - Intelligent Context Engine",
   "description": "Lightning-fast context retrieval for AI coding assistants. Zero-dependency local search with quantum-inspired scoring.",
-  "version": "1.0.0",
+  "version": "1.0.7",
   "publisher": "ContextLite",
   "engines": {
     "vscode": "^1.85.0"
