@@ -100,6 +100,18 @@ jobs:
             release/*.tar.gz
             release/*.zip
 
+      - name: Trigger website update
+        if: success()
+        run: |
+          echo "🚀 Release ${{ steps.version.outputs.version }} published successfully!"
+          echo "The download page will automatically update with new release assets."
+          echo "Release URL: https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/v${{ steps.version.outputs.version }}"
+          
+          # Optional: Send webhook to trigger website rebuild if needed
+          # curl -X POST "${{ secrets.WEBSITE_WEBHOOK_URL }}" \
+          #   -H "Content-Type: application/json" \
+          #   -d '{"version": "${{ steps.version.outputs.version }}", "event": "release_published"}'
+
   publish-npm:
     runs-on: ubuntu-latest
     steps:
