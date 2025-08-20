@@ -301,8 +301,8 @@ jobs:
           cd chocolatey-package
           $version = "${{ steps.version.outputs.version }}"
           $content = Get-Content "contextlite.nuspec" -Raw
-          $content = $content -replace '<version>.*</version>', "<version>$version</version>"
-          $content = $content -replace 'releases/tag/v[\d\.]+', "releases/tag/v$version"
+          $content = $content -replace 'VERSION_PLACEHOLDER', $version
+          $content = $content -replace 'releases/tag/VERSION_PLACEHOLDER', "releases/tag/v$version"
           Set-Content "contextlite.nuspec" -Value $content
           
           # Download the Windows binary to get checksum
@@ -314,10 +314,8 @@ jobs:
           
           # Update install script with new URL and checksum
           $installScript = Get-Content "tools\chocolateyinstall.ps1" -Raw
-          $installScript = $installScript -replace 'https://github\.com/[^'']+', $downloadUrl
-          $installScript = $installScript -replace 'YOUR_CHECKSUM_HERE', $checksum
-          $installScript = $installScript -replace 'v[\d\.]+', "v$version"
-          $installScript = $installScript -replace '[\d\.]+(?=-windows)', $version
+          $installScript = $installScript -replace 'RELEASE_URL_PLACEHOLDER', $downloadUrl
+          $installScript = $installScript -replace 'RELEASE_CHECKSUM_PLACEHOLDER', $checksum
           Set-Content "tools\chocolateyinstall.ps1" -Value $installScript
           
           Write-Host "Updated Chocolatey package files for version $version"
