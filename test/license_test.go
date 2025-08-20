@@ -5,7 +5,6 @@ import (
 	"crypto/rsa"
 	"encoding/base64"
 	"encoding/json"
-	"path/filepath"
 	"testing"
 
 	"contextlite/internal/license"
@@ -360,12 +359,6 @@ func TestLicenseKeyGeneration(t *testing.T) {
 	assert.Equal(t, '-', keyParts[4])
 	assert.Equal(t, '-', keyParts[9])
 	assert.Equal(t, '-', keyParts[14])
-}
-
-// Helper function to get test-specific first run path
-func getTestFirstRunPath(t *testing.T) string {
-	tempDir := t.TempDir()
-	return filepath.Join(tempDir, ".contextlite_first_run")
 }
 
 // Benchmark license operations
