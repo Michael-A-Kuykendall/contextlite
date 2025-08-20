@@ -298,22 +298,28 @@ jobs:
           
           # Update version in nuspec file
           cd chocolatey-package
+          $version = "${{ steps.version.outputs.version }}"
           $content = Get-Content "contextlite.nuspec" -Raw
-          $content = $content -replace '<version>.*</version>', '<version>${{ steps.version.outputs.version }}</version>'
+          $content = $content -replace '<version>.*</version>', "<version>$version</version>"
+          $content = $content -replace 'releases/tag/v[\d\.]+', "releases/tag/v$version"
           Set-Content "contextlite.nuspec" -Value $content
           
           # Download the Windows binary to get checksum
-          $downloadUrl = "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ steps.version.outputs.version }}/contextlite-${{ steps.version.outputs.version }}-windows-amd64.zip"
+          $downloadUrl = "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v$version/contextlite-$version-windows-amd64.zip"
+          Write-Host "Downloading from: $downloadUrl"
           Invoke-WebRequest -Uri $downloadUrl -OutFile "contextlite-windows.zip"
           $checksum = (Get-FileHash "contextlite-windows.zip" -Algorithm SHA256).Hash
+          Write-Host "Calculated checksum: $checksum"
           
           # Update install script with new URL and checksum
           $installScript = Get-Content "tools\chocolateyinstall.ps1" -Raw
-          $installScript = $installScript -replace 'https://github\.com/[^/]+/[^/]+/releases/download/v[^/]+/[^'']+', $downloadUrl
+          $installScript = $installScript -replace 'https://github\.com/[^'']+', $downloadUrl
           $installScript = $installScript -replace 'YOUR_CHECKSUM_HERE', $checksum
-          $installScript = $installScript -replace 'v\d+\.\d+\.\d+', "v${{ steps.version.outputs.version }}"
-          $installScript = $installScript -replace '\d+\.\d+\.\d+', "${{ steps.version.outputs.version }}"
+          $installScript = $installScript -replace 'v[\d\.]+', "v$version"
+          $installScript = $installScript -replace '[\d\.]+(?=-windows)', $version
           Set-Content "tools\chocolateyinstall.ps1" -Value $installScript
+          
+          Write-Host "Updated Chocolatey package files for version $version"
 
       - name: Build Chocolatey package
         shell: powershell
@@ -714,11 +720,27 @@ jobs:
           node-version: '18'
           registry-url: 'https://npm.pkg.github.com'
 
-      - name: Publish to GitHub Packages
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Prepare GitHub Package
         run: |
           cp -r npm-wrapper github-package
           cd github-package
+          # Update package name for GitHub Packages
           sed -i 's/"name": "contextlite"/"name": "@michael-a-kuykendall\/contextlite"/' package.json
+          # Update version
+          sed -i 's/"version": ".*"/"version": "${{ steps.version.outputs.version }}"/' package.json
+          
+      - name: Publish to GitHub Packages
+        run: |
+          cd github-package
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
