@@ -270,7 +270,6 @@ jobs:
 
   publish-chocolatey:
     runs-on: windows-latest
-    needs: build-and-release
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -494,7 +493,6 @@ jobs:
 
   publish-homebrew:
     runs-on: macos-latest
-    needs: build-and-release
     timeout-minutes: 10
     steps:
       - name: Checkout
