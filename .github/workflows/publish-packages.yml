@@ -64,12 +64,12 @@ jobs:
 
       - name: Create GitHub Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ContextLite ${{ steps.version.outputs.version }}
+          tag_name: ${{ github.ref_name }}
+          name: ContextLite ${{ steps.version.outputs.version }}
           body: |
             🧪 **Alpha Testing Release**
             
@@ -91,18 +91,9 @@ jobs:
             **Package Managers:** Available on npm, PyPI, Docker Hub, and more.
           draft: false
           prerelease: true
-
-      - name: Upload Release Assets
-        run: |
-          upload_url=$(echo '${{ steps.create_release.outputs.upload_url }}' | sed 's/{?name,label}//')
-          
-          for file in release/*.tar.gz release/*.zip; do
-            filename=$(basename "$file")
-            curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                 -H "Content-Type: application/octet-stream" \
-                 --data-binary @"$file" \
-                 "${upload_url}?name=${filename}"
-          done
+          files: |
+            release/*.tar.gz
+            release/*.zip
 
   publish-npm:
     runs-on: ubuntu-latest
