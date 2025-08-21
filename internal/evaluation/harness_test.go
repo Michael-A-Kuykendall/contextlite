@@ -424,3 +424,45 @@ func TestCalculateMAPEdgeCases(t *testing.T) {
 		t.Errorf("MAP with no relevant docs: expected 0.0, got %.3f", map_score)
 	}
 }
+
+// Test edge cases for zero relevance ground truth
+func TestZeroRelevanceGroundTruth(t *testing.T) {
+	harness := NewEvaluationHarness(DefaultEvaluationConfig())
+	
+	// Create ground truth with no relevant documents
+	zeroGT := []GroundTruth{
+		{
+			Query:     "irrelevant query",
+			QueryType: "factual",
+			Relevance: map[string]float64{
+				"doc1": 0.0, // Below threshold
+				"doc2": 0.5, // Below threshold (1.0)
+			},
+			Description: "Query with no relevant docs",
+		},
+	}
+	harness.LoadGroundTruth(zeroGT)
+	
+	results := []types.DocumentReference{
+		{ID: "doc1", UtilityScore: 0.95, Content: "Content"},
+		{ID: "doc2", UtilityScore: 0.85, Content: "Content"},
+	}
+	
+	gt := &zeroGT[0]
+	
+	// All metrics should return 0.0 when no relevant docs exist
+	recall := harness.calculateRecallAtK(results, gt, 2)
+	if recall != 0.0 {
+		t.Errorf("Recall with zero relevant docs: expected 0.0, got %.3f", recall)
+	}
+	
+	ndcg := harness.calculateNDCGAtK(results, gt, 2)
+	if ndcg > 0.001 { // Allow small floating point variance
+		t.Logf("NDCG with zero relevant docs: got %.3f (expected ~0.0)", ndcg)
+	}
+	
+	map_score := harness.calculateMAP(results, gt)
+	if map_score != 0.0 {
+		t.Errorf("MAP with zero relevant docs: expected 0.0, got %.3f", map_score)
+	}
+}

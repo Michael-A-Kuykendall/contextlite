@@ -941,3 +941,160 @@ func TestConfig_ValidateDatabasePath(t *testing.T) {
 		t.Logf("Read-only directory validation result: %v", err)
 	}
 }
+
+// Test Load with empty config path (should use default)
+func TestConfig_LoadDefaultPath(t *testing.T) {
+	// Create default config directory and file for testing
+	err := os.MkdirAll("configs", 0755)
+	if err != nil && !os.IsExist(err) {
+		t.Fatalf("Failed to create configs directory: %v", err)
+	}
+	
+	defaultContent := `
+server:
+  host: "localhost"
+  port: 8080
+storage:
+  database_path: ":memory:"
+optimization:
+  solver_timeout_ms: 1000
+  max_candidates: 50
+  objective_style: "weighted-sum"
+`
+	
+	err = os.WriteFile("configs/default.yaml", []byte(defaultContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to write default config: %v", err)
+	}
+	defer os.Remove("configs/default.yaml")
+	
+	// Test loading with empty path (should use default)
+	cfg, err := Load("")
+	if err != nil {
+		t.Fatalf("Failed to load default config: %v", err)
+	}
+	
+	if cfg.Server.Port != 8080 {
+		t.Errorf("Expected default port 8080, got %d", cfg.Server.Port)
+	}
+}
+
+// Test environment variable overrides with all supported variables
+func TestConfig_AllEnvironmentOverrides(t *testing.T) {
+	// Create temporary config file
+	tempConfig := `
+server:
+  host: "localhost"
+  port: 8080
+  auth_token: "default-token"
+storage:
+  database_path: ":memory:"
+optimization:
+  solver_timeout_ms: 1000
+  max_candidates: 50
+  objective_style: "weighted-sum"
+`
+	
+	tmpfile, err := os.CreateTemp("", "test_all_env_*.yaml")
+	if err != nil {
+		t.Fatalf("Failed to create temp config file: %v", err)
+	}
+	defer os.Remove(tmpfile.Name())
+	
+	tmpfile.Write([]byte(tempConfig))
+	tmpfile.Close()
+	
+	// Save original environment variables
+	originalVars := map[string]string{
+		"CONTEXTLITE_PORT":       os.Getenv("CONTEXTLITE_PORT"),
+		"CONTEXTLITE_HOST":       os.Getenv("CONTEXTLITE_HOST"),
+		"CONTEXTLITE_DB_PATH":    os.Getenv("CONTEXTLITE_DB_PATH"),
+		"CONTEXTLITE_AUTH_TOKEN": os.Getenv("CONTEXTLITE_AUTH_TOKEN"),
+	}
+	
+	// Cleanup function to restore environment
+	defer func() {
+		for key, value := range originalVars {
+			if value == "" {
+				os.Unsetenv(key)
+			} else {
+				os.Setenv(key, value)
+			}
+		}
+	}()
+	
+	// Set environment variables
+	os.Setenv("CONTEXTLITE_PORT", "9999")
+	os.Setenv("CONTEXTLITE_HOST", "custom-host")
+	os.Setenv("CONTEXTLITE_DB_PATH", "/custom/db/path.db")
+	os.Setenv("CONTEXTLITE_AUTH_TOKEN", "custom-token")
+	
+	cfg, err := Load(tmpfile.Name())
+	if err != nil {
+		t.Fatalf("Failed to load config with env overrides: %v", err)
+	}
+	
+	// Note: CONTEXTLITE_PORT override is commented out in the code
+	// so we only test the overrides that are actually implemented
+	if cfg.Server.Host != "custom-host" {
+		t.Errorf("Expected host 'custom-host', got '%s'", cfg.Server.Host)
+	}
+	
+	if cfg.Storage.DatabasePath != "/custom/db/path.db" {
+		t.Errorf("Expected database path '/custom/db/path.db', got '%s'", cfg.Storage.DatabasePath)
+	}
+	
+	if cfg.Server.AuthToken != "custom-token" {
+		t.Errorf("Expected auth token 'custom-token', got '%s'", cfg.Server.AuthToken)
+	}
+}
+
+// Test applyEnvOverrides with empty environment variables
+func TestConfig_EmptyEnvironmentOverrides(t *testing.T) {
+	// Create temporary config file
+	tempConfig := `
+server:
+  host: "localhost"
+  port: 8080
+  auth_token: "default-token"
+storage:
+  database_path: ":memory:"
+optimization:
+  solver_timeout_ms: 1000
+  max_candidates: 50
+  objective_style: "weighted-sum"
+`
+	
+	tmpfile, err := os.CreateTemp("", "test_empty_env_*.yaml")
+	if err != nil {
+		t.Fatalf("Failed to create temp config file: %v", err)
+	}
+	defer os.Remove(tmpfile.Name())
+	
+	tmpfile.Write([]byte(tempConfig))
+	tmpfile.Close()
+	
+	// Ensure environment variables are empty
+	os.Unsetenv("CONTEXTLITE_PORT")
+	os.Unsetenv("CONTEXTLITE_HOST")
+	os.Unsetenv("CONTEXTLITE_DB_PATH")
+	os.Unsetenv("CONTEXTLITE_AUTH_TOKEN")
+	
+	cfg, err := Load(tmpfile.Name())
+	if err != nil {
+		t.Fatalf("Failed to load config with empty env: %v", err)
+	}
+	
+	// Values should remain as configured in file
+	if cfg.Server.Host != "localhost" {
+		t.Errorf("Expected host 'localhost', got '%s'", cfg.Server.Host)
+	}
+	
+	if cfg.Storage.DatabasePath != ":memory:" {
+		t.Errorf("Expected database path ':memory:', got '%s'", cfg.Storage.DatabasePath)
+	}
+	
+	if cfg.Server.AuthToken != "default-token" {
+		t.Errorf("Expected auth token 'default-token', got '%s'", cfg.Server.AuthToken)
+	}
+}
