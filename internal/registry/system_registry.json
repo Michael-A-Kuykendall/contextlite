@@ -1,5 +1,61 @@
 {
   "components": {
+    "AnotherComponent": {
+      "name": "AnotherComponent",
+      "package": "another/package",
+      "coverage": 0.85,
+      "tests_passing": 3,
+      "tests_total": 3,
+      "production_ready": true,
+      "priority": "",
+      "revenue_impact": "",
+      "last_updated": "2025-08-21T08:53:51.8798191-05:00",
+      "functions": [],
+      "dependencies": [],
+      "performance_metrics": {}
+    },
+    "RegistryIntegration": {
+      "name": "RegistryIntegration",
+      "package": "internal/registry",
+      "coverage": 0.85,
+      "tests_passing": 3,
+      "tests_total": 3,
+      "production_ready": true,
+      "priority": "",
+      "revenue_impact": "",
+      "last_updated": "2025-08-21T08:53:51.9156402-05:00",
+      "functions": [],
+      "dependencies": [],
+      "performance_metrics": {}
+    },
+    "TestComponent": {
+      "name": "TestComponent",
+      "package": "test/package",
+      "coverage": 0.85,
+      "tests_passing": 3,
+      "tests_total": 3,
+      "production_ready": true,
+      "priority": "",
+      "revenue_impact": "",
+      "last_updated": "2025-08-21T08:53:51.9027996-05:00",
+      "functions": [],
+      "dependencies": [],
+      "performance_metrics": {}
+    },
+    "TestRegistry": {
+      "name": "TestRegistry",
+      "package": "internal/registry",
+      "coverage": 0.85,
+      "tests_passing": 3,
+      "tests_total": 3,
+      "production_ready": true,
+      "priority": "",
+      "revenue_impact": "",
+      "last_updated": "2025-08-21T08:53:51.8915896-05:00",
+      "functions": [],
+      "dependencies": [],
+      "performance_metrics": {}
+    },
     "api": {
       "name": "API Layer",
       "package": "./internal/api",
@@ -9,7 +65,10 @@
       "production_ready": false,
       "priority": "HIGH",
       "revenue_impact": "HIGH",
-      "last_updated": "2025-08-20T02:48:12.5564301-05:00"
+      "last_updated": "2025-08-20T02:48:12.5564301-05:00",
+      "functions": null,
+      "dependencies": null,
+      "performance_metrics": null
     },
     "config": {
       "name": "Configuration",
@@ -20,7 +79,10 @@
       "production_ready": true,
       "priority": "MEDIUM",
       "revenue_impact": "LOW",
-      "last_updated": "2025-08-20T02:48:23.229515-05:00"
+      "last_updated": "2025-08-20T02:48:23.229515-05:00",
+      "functions": null,
+      "dependencies": null,
+      "performance_metrics": null
     },
     "contextlite": {
       "name": "Main Server",
@@ -31,7 +93,10 @@
       "production_ready": false,
       "priority": "HIGH",
       "revenue_impact": "HIGH",
-      "last_updated": "2025-08-20T02:48:15.0074104-05:00"
+      "last_updated": "2025-08-20T02:48:15.0074104-05:00",
+      "functions": null,
+      "dependencies": null,
+      "performance_metrics": null
     },
     "engine": {
       "name": "Context Engine",
@@ -42,7 +107,10 @@
       "production_ready": false,
       "priority": "CRITICAL",
       "revenue_impact": "HIGH",
-      "last_updated": "2025-08-20T02:48:10.9829398-05:00"
+      "last_updated": "2025-08-20T02:48:10.9829398-05:00",
+      "functions": null,
+      "dependencies": null,
+      "performance_metrics": null
     },
     "evaluation": {
       "name": "Evaluation System",
@@ -53,7 +121,10 @@
       "production_ready": true,
       "priority": "LOW",
       "revenue_impact": "LOW",
-      "last_updated": "2025-08-20T02:48:13.561034-05:00"
+      "last_updated": "2025-08-20T02:48:13.561034-05:00",
+      "functions": null,
+      "dependencies": null,
+      "performance_metrics": null
     },
     "license": {
       "name": "License System",
@@ -64,7 +135,10 @@
       "production_ready": true,
       "priority": "CRITICAL",
       "revenue_impact": "CRITICAL",
-      "last_updated": "2025-08-20T02:48:17.975845-05:00"
+      "last_updated": "2025-08-20T02:48:17.975845-05:00",
+      "functions": null,
+      "dependencies": null,
+      "performance_metrics": null
     },
     "license-server": {
       "name": "License Server",
@@ -75,7 +149,10 @@
       "production_ready": true,
       "priority": "CRITICAL",
       "revenue_impact": "CRITICAL",
-      "last_updated": "2025-08-20T02:48:09.9869784-05:00"
+      "last_updated": "2025-08-20T02:48:09.9869784-05:00",
+      "functions": null,
+      "dependencies": null,
+      "performance_metrics": null
     },
     "pipeline": {
       "name": "Processing Pipeline",
@@ -86,7 +163,10 @@
       "production_ready": false,
       "priority": "MEDIUM",
       "revenue_impact": "MEDIUM",
-      "last_updated": "2025-08-20T02:48:22.0497045-05:00"
+      "last_updated": "2025-08-20T02:48:22.0497045-05:00",
+      "functions": null,
+      "dependencies": null,
+      "performance_metrics": null
     },
     "storage": {
       "name": "Storage Layer",
@@ -97,7 +177,10 @@
       "production_ready": true,
       "priority": "HIGH",
       "revenue_impact": "MEDIUM",
-      "last_updated": "2025-08-20T02:48:20.3175489-05:00"
+      "last_updated": "2025-08-20T02:48:20.3175489-05:00",
+      "functions": null,
+      "dependencies": null,
+      "performance_metrics": null
     },
     "timing": {
       "name": "Timing Utils",
@@ -108,7 +191,10 @@
       "production_ready": true,
       "priority": "LOW",
       "revenue_impact": "LOW",
-      "last_updated": "2025-08-20T02:47:39.6554402-05:00"
+      "last_updated": "2025-08-20T02:47:39.6554402-05:00",
+      "functions": null,
+      "dependencies": null,
+      "performance_metrics": null
     },
     "tokens": {
       "name": "Token Processing",
@@ -119,13 +205,19 @@
       "production_ready": true,
       "priority": "MEDIUM",
       "revenue_impact": "LOW",
-      "last_updated": "2025-08-20T02:48:24.2523986-05:00"
+      "last_updated": "2025-08-20T02:48:24.2523986-05:00",
+      "functions": null,
+      "dependencies": null,
+      "performance_metrics": null
     }
   },
+  "last_update": "0001-01-01T00:00:00Z",
+  "overall_coverage": 0.7986,
+  "system_health": "TESTING_IN_PROGRESS",
+  "production_readiness": 73.33333333333333,
   "critical_alerts": [
+    "LOW_COVERAGE: License Server below 80% coverage (75.9%)",
     "LOW_COVERAGE: Context Engine below 80% coverage (50.0%)",
-    "LOW_COVERAGE: License System below 80% coverage (77.2%)",
-    "LOW_COVERAGE: License Server below 80% coverage (75.9%)"
-  ],
-  "last_updated": "2025-08-20T02:47:38.6349745-05:00"
+    "LOW_COVERAGE: License System below 80% coverage (77.2%)"
+  ]
 }
