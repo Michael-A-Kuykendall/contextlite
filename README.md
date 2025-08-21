@@ -141,18 +141,10 @@ curl -X POST http://localhost:8080/api/v1/weights/update \
 - **HTTP API**: Complete REST API for context assembly and document management
 - **Configuration System**: Flexible YAML-based configuration with workspace-specific weights
 
-### 🔄 In Progress
-- **Evaluation Accuracy**: Investigating timing measurement accuracy in SOTA comparison
-- **Scale Testing**: Validation beyond small datasets (current: 1-4 documents)
-- **Real System Integration**: Moving from simulation-based to actual HTTP API evaluation
-
-### 📋 Technical Documentation
-- [`docs/DEPLOYMENT_MANAGEMENT.md`](docs/DEPLOYMENT_MANAGEMENT.md) - Platform deployment & Hugging Face management
-- [`docs/MARKETING_BLAST_STRATEGY.md`](docs/MARKETING_BLAST_STRATEGY.md) - Cross-platform marketing exploitation guide
-- [`docs/FEATURE_FORMULAS.md`](docs/FEATURE_FORMULAS.md) - Complete 7D feature implementation
-- [`docs/GOLDEN_RECORD_STEP5.md`](docs/GOLDEN_RECORD_STEP5.md) - SOTA evaluation status & issues
-- [`HUGGING_FACE_MANAGEMENT.md`](HUGGING_FACE_MANAGEMENT.md) - Detailed Hugging Face administration guide
-- [`archive/README.md`](archive/README.md) - Historical development artifacts
+### 📋 Documentation
+- **[Technical Documentation](docs/)** - Architecture, testing, and deployment guides
+- **[Contributing Guide](CONTRIBUTING.md)** - Development setup and guidelines  
+- **[Development Context](CLAUDE.md)** - AI assistant setup for contributors
 
 ## 🧮 optimization Optimization
 
