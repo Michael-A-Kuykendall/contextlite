@@ -19,7 +19,7 @@ Running the same checks as GitHub Actions...
 === RUN   TestServerComponentsIntegration
     main_test.go:99: License loading failed as expected in test environment
     main_test.go:127: All server components initialized successfully
---- PASS: TestServerComponentsIntegration (0.02s)
+--- PASS: TestServerComponentsIntegration (0.01s)
 === RUN   TestServerConfiguration
 --- PASS: TestServerConfiguration (0.00s)
 === RUN   TestGracefulShutdown
@@ -31,17 +31,17 @@ Running the same checks as GitHub Actions...
 === RUN   TestConfigurationLoading
 === RUN   TestConfigurationLoading/valid_minimal_config
 === RUN   TestConfigurationLoading/config_with_all_sections
---- PASS: TestConfigurationLoading (0.02s)
-    --- PASS: TestConfigurationLoading/valid_minimal_config (0.01s)
-    --- PASS: TestConfigurationLoading/config_with_all_sections (0.01s)
+--- PASS: TestConfigurationLoading (0.00s)
+    --- PASS: TestConfigurationLoading/valid_minimal_config (0.00s)
+    --- PASS: TestConfigurationLoading/config_with_all_sections (0.00s)
 === RUN   TestMainServerInitialization
     main_test.go:377: License loading failed as expected in test environment: failed to read license file: open : The system cannot find the file specified.
     main_test.go:440: Main server initialization test passed
---- PASS: TestMainServerInitialization (0.01s)
+--- PASS: TestMainServerInitialization (0.00s)
 === RUN   TestServerStartupAndShutdown
     main_test.go:488: License loading failed as expected: failed to read license file: open : The system cannot find the file specified.
     main_test.go:536: Server shutdown completed successfully
---- PASS: TestServerStartupAndShutdown (0.11s)
+--- PASS: TestServerStartupAndShutdown (0.10s)
 === RUN   TestSignalHandling
 --- PASS: TestSignalHandling (0.00s)
 === RUN   TestConfigPathHandling
@@ -51,33 +51,33 @@ Running the same checks as GitHub Actions...
 --- PASS: TestConfigPathHandling (0.01s)
     --- PASS: TestConfigPathHandling/valid_config_file (0.00s)
     --- PASS: TestConfigPathHandling/nonexistent_config_file (0.00s)
-    --- PASS: TestConfigPathHandling/invalid_config_content (0.01s)
+    --- PASS: TestConfigPathHandling/invalid_config_content (0.00s)
 === RUN   TestComponentIntegration
-    main_test.go:739: Component integration test passed successfully
---- PASS: TestComponentIntegration (0.01s)
+    main_test.go:735: Component integration test passed successfully
+--- PASS: TestComponentIntegration (0.00s)
 === RUN   TestErrorHandling
 === RUN   TestErrorHandling/invalid_logger_level
 === RUN   TestErrorHandling/config_validation
-    main_test.go:781: Config validation correctly failed: invalid configuration: invalid server port: -1
+    main_test.go:777: Config validation correctly failed: invalid configuration: invalid server port: -1
 === RUN   TestErrorHandling/component_initialization
-    main_test.go:839: All components initialized successfully
---- PASS: TestErrorHandling (0.02s)
+    main_test.go:835: All components initialized successfully
+--- PASS: TestErrorHandling (0.01s)
     --- PASS: TestErrorHandling/invalid_logger_level (0.00s)
-    --- PASS: TestErrorHandling/config_validation (0.01s)
+    --- PASS: TestErrorHandling/config_validation (0.00s)
     --- PASS: TestErrorHandling/component_initialization (0.01s)
 === RUN   TestRunServer
-{"level":"info","ts":1755650914.5170865,"caller":"contextlite/main.go:63","msg":"Starting ContextLite","config":"C:\\Users\\micha\\AppData\\Local\\Temp\\TestRunServer1408352373\\001\\run_server_config.yaml"}
-{"level":"info","ts":1755650914.5255568,"caller":"contextlite/main.go:70","msg":"License/Trial Status","tier":"professional","status":"trial_active","message":"Trial active: 13 days remaining"}
-{"level":"info","ts":1755650914.5255568,"caller":"contextlite/main.go:79","msg":"Trial Information","days_remaining":13,"first_run":true}
-{"level":"info","ts":1755650914.5271664,"caller":"contextlite/main.go:93","msg":"Storage initialized","database":":memory:"}
-{"level":"info","ts":1755650914.5276837,"caller":"contextlite/main.go:125","msg":"Server started successfully. Press Ctrl+C to stop."}
-{"level":"info","ts":1755650914.5276837,"caller":"contextlite/main.go:118","msg":"Starting HTTP server","address":"127.0.0.1:8085"}
-{"level":"info","ts":1755650914.7093256,"caller":"contextlite/main.go:132","msg":"Test requested shutdown..."}
-{"level":"info","ts":1755650914.7093256,"caller":"contextlite/main.go:146","msg":"Server exited gracefully"}
-    main_test.go:887: runServer completed successfully
+{"level":"info","ts":1755651429.7318885,"caller":"contextlite/main.go:63","msg":"Starting ContextLite","config":"C:\\Users\\micha\\AppData\\Local\\Temp\\TestRunServer4016679030\\001\\run_server_config.yaml"}
+{"level":"info","ts":1755651429.7382147,"caller":"contextlite/main.go:70","msg":"License/Trial Status","tier":"professional","status":"trial_active","message":"Trial active: 13 days remaining"}
+{"level":"info","ts":1755651429.7382147,"caller":"contextlite/main.go:79","msg":"Trial Information","days_remaining":13,"first_run":true}
+{"level":"info","ts":1755651429.7397494,"caller":"contextlite/main.go:93","msg":"Storage initialized","database":":memory:"}
+{"level":"info","ts":1755651429.7407515,"caller":"contextlite/main.go:125","msg":"Server started successfully. Press Ctrl+C to stop."}
+{"level":"info","ts":1755651429.7407515,"caller":"contextlite/main.go:118","msg":"Starting HTTP server","address":"127.0.0.1:8085"}
+{"level":"info","ts":1755651429.9313822,"caller":"contextlite/main.go:132","msg":"Test requested shutdown..."}
+{"level":"info","ts":1755651429.9313822,"caller":"contextlite/main.go:146","msg":"Server exited gracefully"}
+    main_test.go:883: runServer completed successfully
 --- PASS: TestRunServer (0.20s)
 === RUN   TestRunServerConfigError
-    main_test.go:901: runServer correctly failed with config error: failed to load config: failed to read config file /nonexistent/config/path.yaml: open /nonexistent/config/path.yaml: The system cannot find the path specified.
+    main_test.go:897: runServer correctly failed with config error: failed to load config: failed to read config file /nonexistent/config/path.yaml: open /nonexistent/config/path.yaml: The system cannot find the path specified.
 --- PASS: TestRunServerConfigError (0.00s)
 PASS
 ok  	contextlite/cmd/contextlite	(cached)
@@ -398,7 +398,7 @@ ok  	contextlite/cmd/contextlite	(cached)
 2025/08/19 19:51:29 License activated: PERSIST-... on hardware persist-... (activation 1/3)
 --- PASS: TestLicenseServer_DatabasePersistence (0.37s)
 PASS
-ok  	contextlite/cmd/license-server	27.095s
+ok  	contextlite/cmd/license-server	(cached)
 ?   	contextlite/cmd/production-check	[no test files]
 ?   	contextlite/cmd/registry-runner	[no test files]
 === RUN   TestFlagDefaults
@@ -440,41 +440,41 @@ ok  	contextlite/cmd/sota-eval	(cached)
 ?   	contextlite/docs/examples	[no test files]
 ?   	contextlite/examples	[no test files]
 === RUN   TestServer_HandleHealth
---- PASS: TestServer_HandleHealth (0.14s)
+--- PASS: TestServer_HandleHealth (0.07s)
 === RUN   TestServer_HandleAddDocument
---- PASS: TestServer_HandleAddDocument (0.02s)
+--- PASS: TestServer_HandleAddDocument (0.01s)
 === RUN   TestServer_HandleBulkAddDocuments
     server_test.go:178: Expected 2 documents added, got [doc1 doc2] (may be normal)
---- PASS: TestServer_HandleBulkAddDocuments (0.02s)
+--- PASS: TestServer_HandleBulkAddDocuments (0.01s)
 === RUN   TestServer_HandleSearchDocuments
---- PASS: TestServer_HandleSearchDocuments (0.02s)
+--- PASS: TestServer_HandleSearchDocuments (0.01s)
 === RUN   TestServer_HandleUpdateWeights
---- PASS: TestServer_HandleUpdateWeights (0.02s)
+--- PASS: TestServer_HandleUpdateWeights (0.01s)
 === RUN   TestServer_HandleResetWeights
---- PASS: TestServer_HandleResetWeights (0.02s)
+--- PASS: TestServer_HandleResetWeights (0.01s)
 === RUN   TestServer_HandleInvalidateCache
---- PASS: TestServer_HandleInvalidateCache (0.02s)
+--- PASS: TestServer_HandleInvalidateCache (0.01s)
 === RUN   TestServer_HandleCacheStats
---- PASS: TestServer_HandleCacheStats (0.02s)
+--- PASS: TestServer_HandleCacheStats (0.01s)
 === RUN   TestServer_HandleStorageInfo
     server_test.go:340: Storage info missing document_count (may be expected)
---- PASS: TestServer_HandleStorageInfo (0.02s)
+--- PASS: TestServer_HandleStorageInfo (0.01s)
 === RUN   TestServer_HandleSMTStats
     server_test.go:363: SMT stats missing z3_version (may be expected)
---- PASS: TestServer_HandleSMTStats (0.02s)
+--- PASS: TestServer_HandleSMTStats (0.01s)
 === RUN   TestServer_HandleDeleteDocument
     server_test.go:393: Delete document test completed
---- PASS: TestServer_HandleDeleteDocument (0.04s)
+--- PASS: TestServer_HandleDeleteDocument (0.01s)
 === RUN   TestServer_WriteJSON
---- PASS: TestServer_WriteJSON (0.02s)
+--- PASS: TestServer_WriteJSON (0.01s)
 === RUN   TestServer_WriteError
---- PASS: TestServer_WriteError (0.02s)
+--- PASS: TestServer_WriteError (0.01s)
 === RUN   TestServer_GetZ3Version
---- PASS: TestServer_GetZ3Version (0.09s)
+--- PASS: TestServer_GetZ3Version (0.07s)
 === RUN   TestServer_CalculateDocumentOverlap
 --- PASS: TestServer_CalculateDocumentOverlap (0.01s)
 === RUN   TestServer_CalculateDiversityDifference
---- PASS: TestServer_CalculateDiversityDifference (0.02s)
+--- PASS: TestServer_CalculateDiversityDifference (0.01s)
 === RUN   TestServer_HandleScanWorkspace
     server_test.go:522: Scan workspace returned status 400 (may be expected)
     server_test.go:533: No files found in scan results (may be expected)
@@ -483,7 +483,7 @@ ok  	contextlite/cmd/sota-eval	(cached)
 --- PASS: TestServer_AuthMiddleware (0.01s)
 === RUN   TestServer_HandleAssembleContext
     server_test.go:600: handleAssembleContext test completed
---- PASS: TestServer_HandleAssembleContext (0.02s)
+--- PASS: TestServer_HandleAssembleContext (0.01s)
 === RUN   TestServer_HandleBaselineComparison
     server_test.go:615: handleBaselineComparison returned status 200
     server_test.go:616: handleBaselineComparison test completed
@@ -495,31 +495,31 @@ ok  	contextlite/cmd/sota-eval	(cached)
 === RUN   TestServer_ScanWorkspaceFiles
     server_test.go:652: scanWorkspaceFiles returned 0 files
     server_test.go:653: scanWorkspaceFiles test completed
---- PASS: TestServer_ScanWorkspaceFiles (0.02s)
+--- PASS: TestServer_ScanWorkspaceFiles (0.01s)
 === RUN   TestServer_ServeHTTP
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000001] "GET http://example.com/health HTTP/1.1" from 192.0.2.1:1234 - 200 457B in 62.8457ms
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000001] "GET http://example.com/health HTTP/1.1" from 192.0.2.1:1234 - 200 457B in 48.3778ms
     server_test.go:671: ServeHTTP test completed
---- PASS: TestServer_ServeHTTP (0.08s)
+--- PASS: TestServer_ServeHTTP (0.06s)
 === RUN   TestServer_Start
     server_test.go:684: Start method exists and is callable
---- PASS: TestServer_Start (0.02s)
+--- PASS: TestServer_Start (0.01s)
 === RUN   TestServer_AuthMiddleware_Coverage
---- PASS: TestServer_AuthMiddleware_Coverage (0.02s)
+--- PASS: TestServer_AuthMiddleware_Coverage (0.01s)
 === RUN   TestServer_HandleAddDocument_Coverage
     server_test.go:782: Empty document returned status 201
---- PASS: TestServer_HandleAddDocument_Coverage (0.02s)
+--- PASS: TestServer_HandleAddDocument_Coverage (0.01s)
 === RUN   TestServer_HandleDeleteDocument_Coverage
     server_test.go:811: Missing document ID returned status 400
---- PASS: TestServer_HandleDeleteDocument_Coverage (0.02s)
+--- PASS: TestServer_HandleDeleteDocument_Coverage (0.01s)
 === RUN   TestServer_HandleSearchDocuments_Coverage
     server_test.go:843: Empty query returned status 400
---- PASS: TestServer_HandleSearchDocuments_Coverage (0.02s)
+--- PASS: TestServer_HandleSearchDocuments_Coverage (0.01s)
 === RUN   TestServer_HandleGetWeights_Coverage
     server_test.go:868: Non-existent workspace returned status 400
---- PASS: TestServer_HandleGetWeights_Coverage (0.02s)
+--- PASS: TestServer_HandleGetWeights_Coverage (0.01s)
 === RUN   TestServer_HandleScanWorkspace_Coverage
     server_test.go:915: Non-existent workspace path returned status 400
---- PASS: TestServer_HandleScanWorkspace_Coverage (0.02s)
+--- PASS: TestServer_HandleScanWorkspace_Coverage (0.01s)
 === RUN   TestServer_StartDetailed
     server_test.go:926: Server.Start function is available
     server_test.go:934: Server.Start correctly returned error for invalid port: listen tcp: address -1: invalid port
@@ -541,98 +541,98 @@ ok  	contextlite/cmd/sota-eval	(cached)
 --- PASS: TestServer_CacheOperations (0.01s)
 === RUN   TestServer_StorageInfo
     server_test.go:1052: StorageInfo returned status 200
-    server_test.go:1059: Storage info response keys: [database_size index_size last_update total_documents]
---- PASS: TestServer_StorageInfo (0.02s)
+    server_test.go:1059: Storage info response keys: [last_update total_documents database_size index_size]
+--- PASS: TestServer_StorageInfo (0.01s)
 === RUN   TestServer_ScanWorkspaceDetailed
     server_test.go:1102: ScanWorkspace returned status 400
---- PASS: TestServer_ScanWorkspaceDetailed (0.03s)
+--- PASS: TestServer_ScanWorkspaceDetailed (0.01s)
 === RUN   TestServer_HandleDeleteDocumentComprehensive
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000002] "DELETE http://example.com/api/v1/documents/delete-test-doc HTTP/1.1" from 192.0.2.1:1234 - 200 21B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000002] "DELETE http://example.com/api/v1/documents/delete-test-doc HTTP/1.1" from 192.0.2.1:1234 - 200 21B in 0s
     server_test.go:1150: Delete document returned status: 200
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000003] "DELETE http://example.com/api/v1/documents/non-existent-doc HTTP/1.1" from 192.0.2.1:1234 - 200 21B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000003] "DELETE http://example.com/api/v1/documents/non-existent-doc HTTP/1.1" from 192.0.2.1:1234 - 200 21B in 0s
     server_test.go:1158: Delete non-existent document returned status: 200
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000004] "DELETE http://example.com/api/v1/documents/invalid%20id HTTP/1.1" from 192.0.2.1:1234 - 200 21B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000004] "DELETE http://example.com/api/v1/documents/invalid%20id HTTP/1.1" from 192.0.2.1:1234 - 200 21B in 514.6µs
     server_test.go:1166: Delete with malformed ID returned status: 200
---- PASS: TestServer_HandleDeleteDocumentComprehensive (0.02s)
+--- PASS: TestServer_HandleDeleteDocumentComprehensive (0.01s)
 === RUN   TestServer_HandleGetWeightsComprehensive
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000005] "GET http://example.com/api/v1/weights?workspace_path=/test/workspace HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000005] "GET http://example.com/api/v1/weights?workspace_path=/test/workspace HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
     server_test.go:1208: Get weights returned status: 403
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000006] "GET http://example.com/api/v1/weights?workspace_path=/non/existent HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000006] "GET http://example.com/api/v1/weights?workspace_path=/non/existent HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
     server_test.go:1226: Get weights for non-existent workspace returned status: 403
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000007] "GET http://example.com/api/v1/weights HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000007] "GET http://example.com/api/v1/weights HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
     server_test.go:1234: Get weights with missing workspace_path returned status: 403
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000008] "GET http://example.com/api/v1/weights?workspace_path= HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000008] "GET http://example.com/api/v1/weights?workspace_path= HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
     server_test.go:1242: Get weights with empty workspace_path returned status: 403
---- PASS: TestServer_HandleGetWeightsComprehensive (0.03s)
+--- PASS: TestServer_HandleGetWeightsComprehensive (0.01s)
 === RUN   TestServer_HandleAssembleContextComprehensive
     server_test.go:1298: Context assembly successful, documents: 0
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000009] "POST http://example.com/api/v1/context/assemble HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000009] "POST http://example.com/api/v1/context/assemble HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
     server_test.go:1325: Context assembly with missing query returned status: 403
     server_test.go:1341: Context assembly with large limits returned status: 200
 --- PASS: TestServer_HandleAssembleContextComprehensive (0.02s)
 === RUN   TestServer_HandleScanWorkspaceComprehensive
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000010] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 36B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000010] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 36B in 0s
     server_test.go:1392: Scan workspace returned status: 400
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000011] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 36B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000011] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 36B in 0s
     server_test.go:1416: Scan workspace with no patterns returned status: 400
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000012] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 36B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000012] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 36B in 0s
     server_test.go:1430: Scan non-existent workspace returned status: 400
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000013] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 36B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000013] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 36B in 0s
     server_test.go:1439: Scan with missing workspace_path returned status: 400
-2025/08/19 19:29:16 [MikesPC/LRASomIJ63-000014] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 82B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000014] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 400 82B in 0s
     server_test.go:1448: Scan with invalid JSON returned status: 400
---- PASS: TestServer_HandleScanWorkspaceComprehensive (0.05s)
+--- PASS: TestServer_HandleScanWorkspaceComprehensive (0.02s)
 === RUN   TestServer_HandleScanWorkspaceEdgeCases
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000015] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 2217B in 1.6907ms
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000015] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 2217B in 1.0333ms
     server_test.go:1467: Scan with large max_files returned status: 200
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000016] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 2217B in 1.0808ms
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000016] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 2217B in 1.0461ms
     server_test.go:1481: Scan with zero max_files returned status: 200
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000017] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 51B in 1.0592ms
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000017] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 51B in 524.2µs
     server_test.go:1496: Scan with custom patterns returned status: 200
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000018] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 2217B in 1.0756ms
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000018] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 2217B in 518.8µs
     server_test.go:1511: Scan with empty patterns returned status: 200
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000019] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 51B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000019] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 51B in 539.3µs
     server_test.go:1524: Scan with special chars path returned status: 200
---- PASS: TestServer_HandleScanWorkspaceEdgeCases (0.02s)
+--- PASS: TestServer_HandleScanWorkspaceEdgeCases (0.01s)
 === RUN   TestServer_HandleGetWeightsEdgeCases
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000020] "GET http://example.com/api/v1/weights HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000020] "GET http://example.com/api/v1/weights HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
     server_test.go:1536: Get weights without workspace returned status: 403
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000021] "GET http://example.com/api/v1/weights?workspace= HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000021] "GET http://example.com/api/v1/weights?workspace= HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
     server_test.go:1543: Get weights with empty workspace returned status: 403
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000022] "GET http://example.com/api/v1/weights?workspace=/nonexistent/workspace HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000022] "GET http://example.com/api/v1/weights?workspace=/nonexistent/workspace HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
     server_test.go:1550: Get weights for nonexistent workspace returned status: 403
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000023] "GET http://example.com/api/v1/weights?workspace=%2Ftest%2Fworkspace+with+spaces HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000023] "GET http://example.com/api/v1/weights?workspace=%2Ftest%2Fworkspace+with+spaces HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
     server_test.go:1558: Get weights with encoded path returned status: 403
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000024] "GET http://example.com/api/v1/weights?workspace=%2Ftest%2Fvery-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-workspace HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000024] "GET http://example.com/api/v1/weights?workspace=%2Ftest%2Fvery-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-very-long-path-segment-workspace HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
     server_test.go:1566: Get weights with long path returned status: 403
 --- PASS: TestServer_HandleGetWeightsEdgeCases (0.01s)
 === RUN   TestServer_HandleCacheAndStorageInfoEdgeCases
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000025] "DELETE http://example.com/api/v1/cache HTTP/1.1" from 192.0.2.1:1234 - 404 19B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000025] "DELETE http://example.com/api/v1/cache HTTP/1.1" from 192.0.2.1:1234 - 404 19B in 0s
     server_test.go:1579: Cache invalidation 1 returned status: 404
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000026] "DELETE http://example.com/api/v1/cache HTTP/1.1" from 192.0.2.1:1234 - 404 19B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000026] "DELETE http://example.com/api/v1/cache HTTP/1.1" from 192.0.2.1:1234 - 404 19B in 0s
     server_test.go:1579: Cache invalidation 2 returned status: 404
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000027] "DELETE http://example.com/api/v1/cache HTTP/1.1" from 192.0.2.1:1234 - 404 19B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000027] "DELETE http://example.com/api/v1/cache HTTP/1.1" from 192.0.2.1:1234 - 404 19B in 0s
     server_test.go:1579: Cache invalidation 3 returned status: 404
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000028] "GET http://example.com/api/v1/cache/stats HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000028] "GET http://example.com/api/v1/cache/stats HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
     server_test.go:1588: Cache stats 1 returned status: 403
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000029] "GET http://example.com/api/v1/cache/stats HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000029] "GET http://example.com/api/v1/cache/stats HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
     server_test.go:1588: Cache stats 2 returned status: 403
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000030] "GET http://example.com/api/v1/cache/stats HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000030] "GET http://example.com/api/v1/cache/stats HTTP/1.1" from 192.0.2.1:1234 - 403 96B in 0s
     server_test.go:1588: Cache stats 3 returned status: 403
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000031] "GET http://example.com/api/v1/storage/info HTTP/1.1" from 192.0.2.1:1234 - 200 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000031] "GET http://example.com/api/v1/storage/info HTTP/1.1" from 192.0.2.1:1234 - 200 96B in 0s
     server_test.go:1597: Storage info 1 returned status: 200
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000032] "GET http://example.com/api/v1/storage/info HTTP/1.1" from 192.0.2.1:1234 - 200 96B in 528.2µs
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000032] "GET http://example.com/api/v1/storage/info HTTP/1.1" from 192.0.2.1:1234 - 200 96B in 0s
     server_test.go:1597: Storage info 2 returned status: 200
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000033] "GET http://example.com/api/v1/storage/info HTTP/1.1" from 192.0.2.1:1234 - 200 96B in 0s
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000033] "GET http://example.com/api/v1/storage/info HTTP/1.1" from 192.0.2.1:1234 - 200 96B in 527.8µs
     server_test.go:1597: Storage info 3 returned status: 200
 --- PASS: TestServer_HandleCacheAndStorageInfoEdgeCases (0.01s)
 === RUN   TestServer_ScanWorkspaceFilesEdgeCases
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000034] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 947B in 1.0556ms
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000034] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 947B in 522.5µs
     server_test.go:1659: Scan with real files returned status: 200
     server_test.go:1664: Scan found 5 files
-2025/08/19 19:29:17 [MikesPC/LRASomIJ63-000035] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 227B in 529.4µs
+2025/08/19 19:54:47 [MikesPC/0swgYVGSWX-000035] "POST http://example.com/api/v1/documents/workspace HTTP/1.1" from 192.0.2.1:1234 - 200 227B in 522µs
     server_test.go:1676: Scan with max_files=1 returned status: 200
---- PASS: TestServer_ScanWorkspaceFilesEdgeCases (0.03s)
+--- PASS: TestServer_ScanWorkspaceFilesEdgeCases (0.02s)
 PASS
 ok  	contextlite/internal/api	(cached)
 === RUN   TestRateLimiter_BasicFunctionality
@@ -722,10 +722,10 @@ ok  	contextlite/internal/engine	(cached)
 === RUN   TestNewSOTAComparison
 --- PASS: TestNewSOTAComparison (0.00s)
 === RUN   TestLoadEvaluationDataset
-2025/08/19 19:29:16 Loaded 6 evaluation queries across 3 query types
+2025/08/19 19:57:19 Loaded 6 evaluation queries across 3 query types
 --- PASS: TestLoadEvaluationDataset (0.00s)
 === RUN   TestGenerateTestContent
-2025/08/19 19:29:16 Loaded 6 evaluation queries across 3 query types
+2025/08/19 19:57:19 Loaded 6 evaluation queries across 3 query types
 --- PASS: TestGenerateTestContent (0.00s)
 === RUN   TestExecuteSystemQuery
 --- PASS: TestExecuteSystemQuery (0.00s)
@@ -736,30 +736,30 @@ ok  	contextlite/internal/engine	(cached)
 === RUN   TestExecuteLLMReranking
 --- PASS: TestExecuteLLMReranking (0.00s)
 === RUN   TestExecuteContextLiteSMT
-    sota_test.go:242: ContextLite SMT latency was non-positive (expected for mock implementation)
+    sota_test.go:244: ContextLite SMT latency was non-positive (expected for mock implementation)
 --- PASS: TestExecuteContextLiteSMT (0.00s)
 === RUN   TestEvaluateSystem
-2025/08/19 19:29:16 Loaded 6 evaluation queries across 3 query types
+2025/08/19 19:57:19 Loaded 6 evaluation queries across 3 query types
 --- PASS: TestEvaluateSystem (0.00s)
 === RUN   TestGenerateSummary
-    sota_test.go:307: No significance tests performed (expected for mock data)
+    sota_test.go:309: No significance tests performed (expected for mock data)
 --- PASS: TestGenerateSummary (0.00s)
 === RUN   TestRankSystems
 --- PASS: TestRankSystems (0.00s)
 === RUN   TestSaveResults
-2025/08/19 19:29:16 SOTA comparison results saved to: test_results.json
+2025/08/19 19:57:19 SOTA comparison results saved to: test_results.json
 --- PASS: TestSaveResults (0.00s)
 === RUN   TestRunSOTAComparison
-2025/08/19 19:29:16 Starting SOTA comparison with 1 systems
-2025/08/19 19:29:16 Loaded 6 evaluation queries across 3 query types
-2025/08/19 19:29:16 Evaluating system: bm25_baseline
-2025/08/19 19:29:16 Completed bm25_baseline: Recall@5=0.095, nDCG@5=0.138, Latency=15.0ms
-2025/08/19 19:29:16 SOTA comparison results saved to: test_sota_results.json
+2025/08/19 19:57:19 Starting SOTA comparison with 1 systems
+2025/08/19 19:57:19 Loaded 6 evaluation queries across 3 query types
+2025/08/19 19:57:19 Evaluating system: bm25_baseline
+2025/08/19 19:57:19 Completed bm25_baseline: Recall@5=0.095, nDCG@5=0.138, Latency=15.0ms
+2025/08/19 19:57:19 SOTA comparison results saved to: test_sota_results.json
 --- PASS: TestRunSOTAComparison (0.00s)
 === RUN   TestPrintSummary
 
 === SOTA RAG System Comparison Results ===
-Evaluation Date: 2025-08-19 19:29:16
+Evaluation Date: 2025-08-19 19:57:19
 Queries Evaluated: 0
 Systems Tested: 1
 
@@ -776,7 +776,7 @@ Systems Tested: 1
 📋 Detailed results saved to: sota_comparison_results.json
 
 === SOTA RAG System Comparison Results ===
-Evaluation Date: 2025-08-19 19:29:16
+Evaluation Date: 2025-08-19 19:57:19
 Queries Evaluated: 0
 Systems Tested: 0
 
@@ -814,18 +814,18 @@ ok  	contextlite/internal/evaluation	(cached)
     --- PASS: TestFeatureGate_EdgeCases/developer_advanced_7d_scoring (0.00s)
     --- PASS: TestFeatureGate_EdgeCases/developer_advanced_caching (0.00s)
 === RUN   TestLicenseTracker_ErrorCases
-2025/08/19 19:29:16 License activated: ... on hardware ... (activation 1/3)
---- PASS: TestLicenseTracker_ErrorCases (0.09s)
+2025/08/19 19:54:47 License activated: ... on hardware ... (activation 1/3)
+--- PASS: TestLicenseTracker_ErrorCases (0.05s)
 === RUN   TestTrackedLicenseManager_ErrorCases
 --- PASS: TestTrackedLicenseManager_ErrorCases (0.00s)
 === RUN   TestTrackedFeatureGate_ErrorCases
---- PASS: TestTrackedFeatureGate_ErrorCases (0.02s)
+--- PASS: TestTrackedFeatureGate_ErrorCases (0.01s)
 === RUN   TestConcurrentOperations_MixedOperations
-2025/08/19 19:29:16 License activated: MIXED-E... on hardware hw-E... (activation 1/3)
-2025/08/19 19:29:16 License activated: MIXED-I... on hardware hw-I... (activation 1/3)
-2025/08/19 19:29:16 License activated: MIXED-M... on hardware hw-M... (activation 1/3)
-2025/08/19 19:29:16 License activated: MIXED-Q... on hardware hw-Q... (activation 1/3)
---- PASS: TestConcurrentOperations_MixedOperations (0.08s)
+2025/08/19 19:54:47 License activated: MIXED-I... on hardware hw-I... (activation 1/3)
+2025/08/19 19:54:47 License activated: MIXED-Q... on hardware hw-Q... (activation 1/3)
+2025/08/19 19:54:47 License activated: MIXED-M... on hardware hw-M... (activation 1/3)
+2025/08/19 19:54:47 License activated: MIXED-E... on hardware hw-E... (activation 1/3)
+--- PASS: TestConcurrentOperations_MixedOperations (0.05s)
 === RUN   TestLicenseFeatures_AllTiers
 === RUN   TestLicenseFeatures_AllTiers/developer
 === RUN   TestLicenseFeatures_AllTiers/professional
@@ -835,12 +835,12 @@ ok  	contextlite/internal/evaluation	(cached)
     --- PASS: TestLicenseFeatures_AllTiers/professional (0.00s)
     --- PASS: TestLicenseFeatures_AllTiers/enterprise (0.00s)
 === RUN   TestMemoryUsage_NoLeaks
-2025/08/19 19:29:16 License activated: MEMORY-A... on hardware hw-memor... (activation 1/3)
-2025/08/19 19:29:16 License activated: MEMORY-B... on hardware hw-memor... (activation 1/3)
-2025/08/19 19:29:16 License activated: MEMORY-C... on hardware hw-memor... (activation 1/3)
-2025/08/19 19:29:16 License activated: MEMORY-D... on hardware hw-memor... (activation 1/3)
-2025/08/19 19:29:16 License activated: MEMORY-E... on hardware hw-memor... (activation 1/3)
---- PASS: TestMemoryUsage_NoLeaks (0.09s)
+2025/08/19 19:54:47 License activated: MEMORY-A... on hardware hw-memor... (activation 1/3)
+2025/08/19 19:54:47 License activated: MEMORY-B... on hardware hw-memor... (activation 1/3)
+2025/08/19 19:54:47 License activated: MEMORY-C... on hardware hw-memor... (activation 1/3)
+2025/08/19 19:54:47 License activated: MEMORY-D... on hardware hw-memor... (activation 1/3)
+2025/08/19 19:54:47 License activated: MEMORY-E... on hardware hw-memor... (activation 1/3)
+--- PASS: TestMemoryUsage_NoLeaks (0.05s)
 === RUN   TestCoverageBoost80Percent
 === RUN   TestCoverageBoost80Percent/ValidateTierLimits
 === RUN   TestCoverageBoost80Percent/GetEnterpriseFeatures
@@ -861,12 +861,12 @@ ok  	contextlite/internal/evaluation	(cached)
 === RUN   TestCoverageBoost80Percent/VerifySignature_Coverage
 === RUN   TestCoverageBoost80Percent/TrialManager_EdgeCases
 === RUN   TestCoverageBoost80Percent/FeatureGate_RequireFeature_EdgeCases
---- PASS: TestCoverageBoost80Percent (1.25s)
+--- PASS: TestCoverageBoost80Percent (0.59s)
     --- PASS: TestCoverageBoost80Percent/ValidateTierLimits (0.01s)
     --- PASS: TestCoverageBoost80Percent/GetEnterpriseFeatures (0.00s)
     --- PASS: TestCoverageBoost80Percent/SaveActivationRecord (0.00s)
-    --- PASS: TestCoverageBoost80Percent/GenerateInstallID (0.01s)
-    --- PASS: TestCoverageBoost80Percent/ValidateLicense_DeepCoverage (0.47s)
+    --- PASS: TestCoverageBoost80Percent/GenerateInstallID (0.00s)
+    --- PASS: TestCoverageBoost80Percent/ValidateLicense_DeepCoverage (0.12s)
         --- PASS: TestCoverageBoost80Percent/ValidateLicense_DeepCoverage/empty_license (0.00s)
         --- PASS: TestCoverageBoost80Percent/ValidateLicense_DeepCoverage/invalid_json (0.00s)
         --- PASS: TestCoverageBoost80Percent/ValidateLicense_DeepCoverage/missing_signature (0.00s)
@@ -877,18 +877,18 @@ ok  	contextlite/internal/evaluation	(cached)
     --- PASS: TestCoverageBoost80Percent/StartOrGetTrial_Coverage (0.01s)
     --- PASS: TestCoverageBoost80Percent/EnhancedFeatureGate_Coverage (0.01s)
     --- PASS: TestCoverageBoost80Percent/GetFeatures_AllTiers (0.00s)
-    --- PASS: TestCoverageBoost80Percent/ValidateLicense_InternalFunction (0.03s)
-    --- PASS: TestCoverageBoost80Percent/VerifySignature_Coverage (0.70s)
+    --- PASS: TestCoverageBoost80Percent/ValidateLicense_InternalFunction (0.02s)
+    --- PASS: TestCoverageBoost80Percent/VerifySignature_Coverage (0.41s)
     --- PASS: TestCoverageBoost80Percent/TrialManager_EdgeCases (0.00s)
     --- PASS: TestCoverageBoost80Percent/FeatureGate_RequireFeature_EdgeCases (0.00s)
 === RUN   TestLicenseGeneration
---- PASS: TestLicenseGeneration (0.14s)
+--- PASS: TestLicenseGeneration (0.08s)
 === RUN   TestGenerateBasicLicense
---- PASS: TestGenerateBasicLicense (0.04s)
+--- PASS: TestGenerateBasicLicense (0.15s)
 === RUN   TestLicenseValidation
 --- PASS: TestLicenseValidation (0.01s)
 === RUN   TestTrialSystem
---- PASS: TestTrialSystem (0.02s)
+--- PASS: TestTrialSystem (0.01s)
 === RUN   TestFeatureGateExtended
 --- PASS: TestFeatureGateExtended (0.00s)
 === RUN   TestTrackedLicenseManagerExtended
@@ -896,8 +896,8 @@ ok  	contextlite/internal/evaluation	(cached)
 === RUN   TestTrackedFeatureGateExtended
 --- PASS: TestTrackedFeatureGateExtended (0.00s)
 === RUN   TestLicenseTrackerReactivation
-2025/08/19 19:29:17 License activated: REACT-TE... on hardware react-hw... (activation 1/3)
---- PASS: TestLicenseTrackerReactivation (0.04s)
+2025/08/19 19:54:48 License activated: REACT-TE... on hardware react-hw... (activation 1/3)
+--- PASS: TestLicenseTrackerReactivation (0.03s)
 === RUN   TestLicenseLoadingEdgeCases
 --- PASS: TestLicenseLoadingEdgeCases (0.00s)
 === RUN   TestFinal80PercentPush
@@ -913,17 +913,17 @@ ok  	contextlite/internal/evaluation	(cached)
 === RUN   TestFinal80PercentPush/GenerateBasicLicense_Coverage
 === RUN   TestFinal80PercentPush/ValidateWithServer_ErrorPaths
 === RUN   TestFinal80PercentPush/TrialManager_AllMethods
---- PASS: TestFinal80PercentPush (0.39s)
+--- PASS: TestFinal80PercentPush (0.45s)
     --- PASS: TestFinal80PercentPush/LoadLicenseWithActivation_FullCoverage (0.01s)
-    --- PASS: TestFinal80PercentPush/ValidateLicense_AllPaths (0.17s)
+    --- PASS: TestFinal80PercentPush/ValidateLicense_AllPaths (0.19s)
         --- PASS: TestFinal80PercentPush/ValidateLicense_AllPaths/missing_key (0.01s)
         --- PASS: TestFinal80PercentPush/ValidateLicense_AllPaths/missing_email (0.01s)
         --- PASS: TestFinal80PercentPush/ValidateLicense_AllPaths/future_issued (0.01s)
     --- PASS: TestFinal80PercentPush/CheckAccess_AllFeaturePaths (0.00s)
-    --- PASS: TestFinal80PercentPush/StartOrGetTrial_AllPaths (0.02s)
+    --- PASS: TestFinal80PercentPush/StartOrGetTrial_AllPaths (0.01s)
     --- PASS: TestFinal80PercentPush/EnhancedFeatureGate_AllMethods (0.01s)
     --- PASS: TestFinal80PercentPush/GetDefaultFeatures_AllTiers (0.00s)
-    --- PASS: TestFinal80PercentPush/GenerateBasicLicense_Coverage (0.17s)
+    --- PASS: TestFinal80PercentPush/GenerateBasicLicense_Coverage (0.22s)
     --- PASS: TestFinal80PercentPush/ValidateWithServer_ErrorPaths (0.00s)
     --- PASS: TestFinal80PercentPush/TrialManager_AllMethods (0.01s)
 === RUN   TestFinalCoveragePush
@@ -940,13 +940,13 @@ ok  	contextlite/internal/evaluation	(cached)
 === RUN   TestFinalCoveragePush/PublicValidateLicense_EdgeCases/html_content
 === RUN   TestFinalCoveragePush/PublicValidateLicense_EdgeCases/xml_content
 === RUN   TestFinalCoveragePush/PublicValidateLicense_EdgeCases/random_json
---- PASS: TestFinalCoveragePush (0.10s)
+--- PASS: TestFinalCoveragePush (0.15s)
     --- PASS: TestFinalCoveragePush/ValidateTierLimits_DirectCall (0.00s)
     --- PASS: TestFinalCoveragePush/GenerateInstallID_DirectCall (0.00s)
-    --- PASS: TestFinalCoveragePush/ValidateLicense_ComprehensiveTest (0.02s)
+    --- PASS: TestFinalCoveragePush/ValidateLicense_ComprehensiveTest (0.01s)
     --- PASS: TestFinalCoveragePush/LoadLicenseWithActivation_AllPaths (0.01s)
     --- PASS: TestFinalCoveragePush/CheckAccess_AllScenarios (0.00s)
-    --- PASS: TestFinalCoveragePush/PublicValidateLicense_EdgeCases (0.06s)
+    --- PASS: TestFinalCoveragePush/PublicValidateLicense_EdgeCases (0.12s)
         --- PASS: TestFinalCoveragePush/PublicValidateLicense_EdgeCases/empty_string (0.00s)
         --- PASS: TestFinalCoveragePush/PublicValidateLicense_EdgeCases/just_whitespace (0.00s)
         --- PASS: TestFinalCoveragePush/PublicValidateLicense_EdgeCases/null_bytes (0.00s)
@@ -963,7 +963,7 @@ ok  	contextlite/internal/evaluation	(cached)
 === RUN   TestTrackedLicenseManager_NetworkErrors
 --- PASS: TestTrackedLicenseManager_NetworkErrors (0.00s)
 === RUN   TestTrackedLicenseManager_DeactivateFromServer
---- PASS: TestTrackedLicenseManager_DeactivateFromServer (0.01s)
+--- PASS: TestTrackedLicenseManager_DeactivateFromServer (0.00s)
 === RUN   TestTrackedFeatureGate_RequireFeature
 --- PASS: TestTrackedFeatureGate_RequireFeature (0.00s)
 === RUN   TestTrackedFeatureGate_TrackingMethods
@@ -973,27 +973,27 @@ ok  	contextlite/internal/evaluation	(cached)
 === RUN   TestTrackedLicenseManager_ActivateWithServer
 --- PASS: TestTrackedLicenseManager_ActivateWithServer (0.00s)
 === RUN   TestLicenseTracker_NewLicenseTracker
---- PASS: TestLicenseTracker_NewLicenseTracker (0.02s)
+--- PASS: TestLicenseTracker_NewLicenseTracker (0.01s)
 === RUN   TestLicenseTracker_ActivateLicense
 === RUN   TestLicenseTracker_ActivateLicense/successful_developer_activation
-2025/08/19 19:29:18 License activated: TEST-DEV... on hardware dev-hard... (activation 1/1)
+2025/08/19 19:54:48 License activated: TEST-DEV... on hardware dev-hard... (activation 1/1)
 === RUN   TestLicenseTracker_ActivateLicense/successful_professional_activation
-2025/08/19 19:29:18 License activated: TEST-PRO... on hardware pro-hard... (activation 1/3)
+2025/08/19 19:54:48 License activated: TEST-PRO... on hardware pro-hard... (activation 1/3)
 === RUN   TestLicenseTracker_ActivateLicense/successful_enterprise_activation
-2025/08/19 19:29:18 License activated: TEST-ENT... on hardware ent-hard... (activation 1/10)
+2025/08/19 19:54:48 License activated: TEST-ENT... on hardware ent-hard... (activation 1/10)
 --- PASS: TestLicenseTracker_ActivateLicense (0.03s)
-    --- PASS: TestLicenseTracker_ActivateLicense/successful_developer_activation (0.01s)
+    --- PASS: TestLicenseTracker_ActivateLicense/successful_developer_activation (0.00s)
     --- PASS: TestLicenseTracker_ActivateLicense/successful_professional_activation (0.00s)
     --- PASS: TestLicenseTracker_ActivateLicense/successful_enterprise_activation (0.00s)
 === RUN   TestLicenseTracker_ActivationLimits
-2025/08/19 19:29:18 License activated: TEST-LIM... on hardware hardware... (activation 1/1)
-2025/08/19 19:29:18 License activated: TEST-PRO... on hardware pro-hard... (activation 1/3)
-2025/08/19 19:29:18 License activated: TEST-PRO... on hardware pro-hard... (activation 2/3)
-2025/08/19 19:29:18 License activated: TEST-PRO... on hardware pro-hard... (activation 3/3)
---- PASS: TestLicenseTracker_ActivationLimits (0.05s)
+2025/08/19 19:54:48 License activated: TEST-LIM... on hardware hardware... (activation 1/1)
+2025/08/19 19:54:48 License activated: TEST-PRO... on hardware pro-hard... (activation 1/3)
+2025/08/19 19:54:48 License activated: TEST-PRO... on hardware pro-hard... (activation 2/3)
+2025/08/19 19:54:48 License activated: TEST-PRO... on hardware pro-hard... (activation 3/3)
+--- PASS: TestLicenseTracker_ActivationLimits (0.04s)
 === RUN   TestLicenseTracker_ValidateActivation
-2025/08/19 19:29:18 License activated: TEST-VAL... on hardware validate... (activation 1/3)
---- PASS: TestLicenseTracker_ValidateActivation (0.05s)
+2025/08/19 19:54:48 License activated: TEST-VAL... on hardware validate... (activation 1/3)
+--- PASS: TestLicenseTracker_ValidateActivation (0.02s)
 === RUN   TestLicenseTracker_RecordUsage
 === RUN   TestLicenseTracker_RecordUsage/app_startup
 === RUN   TestLicenseTracker_RecordUsage/context_query
@@ -1003,31 +1003,31 @@ ok  	contextlite/internal/evaluation	(cached)
     --- PASS: TestLicenseTracker_RecordUsage/context_query (0.00s)
     --- PASS: TestLicenseTracker_RecordUsage/feature_request (0.00s)
 === RUN   TestLicenseTracker_GetAnalytics
-2025/08/19 19:29:18 License activated: ANAL-001... on hardware hardware... (activation 1/3)
-2025/08/19 19:29:18 License activated: ANAL-002... on hardware hardware... (activation 1/3)
-2025/08/19 19:29:18 License activated: ANAL-003... on hardware hardware... (activation 1/3)
---- PASS: TestLicenseTracker_GetAnalytics (0.05s)
+2025/08/19 19:54:48 License activated: ANAL-001... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: ANAL-002... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: ANAL-003... on hardware hardware... (activation 1/3)
+--- PASS: TestLicenseTracker_GetAnalytics (0.03s)
 === RUN   TestLicenseTracker_SecurityEvents
-2025/08/19 19:29:18 License activated: SEC-TEST... on hardware hw-1... (activation 1/1)
---- PASS: TestLicenseTracker_SecurityEvents (0.03s)
+2025/08/19 19:54:48 License activated: SEC-TEST... on hardware hw-1... (activation 1/1)
+--- PASS: TestLicenseTracker_SecurityEvents (0.02s)
 === RUN   TestLicenseTracker_DeactivateLicense
-2025/08/19 19:29:18 License activated: DEACT-TE... on hardware deact-ha... (activation 1/3)
+2025/08/19 19:54:48 License activated: DEACT-TE... on hardware deact-ha... (activation 1/3)
 --- PASS: TestLicenseTracker_DeactivateLicense (0.03s)
 === RUN   TestLicenseTracker_ConcurrentAccess
-2025/08/19 19:29:18 License activated: CONCURRE... on hardware hardware... (activation 1/3)
-2025/08/19 19:29:18 License activated: CONCURRE... on hardware hardware... (activation 1/3)
-2025/08/19 19:29:18 License activated: CONCURRE... on hardware hardware... (activation 1/3)
-2025/08/19 19:29:18 License activated: CONCURRE... on hardware hardware... (activation 1/3)
-2025/08/19 19:29:18 License activated: CONCURRE... on hardware hardware... (activation 1/3)
-2025/08/19 19:29:18 License activated: CONCURRE... on hardware hardware... (activation 1/3)
-2025/08/19 19:29:18 License activated: CONCURRE... on hardware hardware... (activation 1/3)
-2025/08/19 19:29:18 License activated: CONCURRE... on hardware hardware... (activation 1/3)
-2025/08/19 19:29:18 License activated: CONCURRE... on hardware hardware... (activation 1/3)
-2025/08/19 19:29:18 License activated: CONCURRE... on hardware hardware... (activation 1/3)
---- PASS: TestLicenseTracker_ConcurrentAccess (0.07s)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+2025/08/19 19:54:48 License activated: CONCURRE... on hardware hardware... (activation 1/3)
+--- PASS: TestLicenseTracker_ConcurrentAccess (0.06s)
 === RUN   TestLicenseTracker_DatabasePersistence
-2025/08/19 19:29:18 License activated: PERSIST-... on hardware persist-... (activation 1/3)
---- PASS: TestLicenseTracker_DatabasePersistence (0.03s)
+2025/08/19 19:54:48 License activated: PERSIST-... on hardware persist-... (activation 1/3)
+--- PASS: TestLicenseTracker_DatabasePersistence (0.02s)
 === RUN   TestRemainingZeroCoverage
 === RUN   TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths
 === RUN   TestRemainingZeroCoverage/ValidateTierLimits_AllErrorPaths/Developer_ExceedsDocumentLimit
@@ -1088,253 +1088,253 @@ ok  	contextlite/internal/license/test	(cached)
     debug_test.go:38: Found 1 documents for query 'main'
     debug_test.go:40: Doc 0: ID=test-doc, Path=/test/main.go, Content=package main func main() golang programming
     debug_test.go:57: Pipeline returned 1 documents
---- PASS: TestPipeline_Debug_DocumentRetrieval (0.02s)
+--- PASS: TestPipeline_Debug_DocumentRetrieval (0.01s)
 === RUN   TestPipeline_New
 --- PASS: TestPipeline_New (0.01s)
 === RUN   TestPipeline_AssembleContext
---- PASS: TestPipeline_AssembleContext (0.02s)
+--- PASS: TestPipeline_AssembleContext (0.01s)
 === RUN   TestPipeline_CacheOperations
---- PASS: TestPipeline_CacheOperations (0.03s)
+--- PASS: TestPipeline_CacheOperations (0.01s)
 === RUN   TestPipeline_DocumentOperations
---- PASS: TestPipeline_DocumentOperations (0.03s)
+--- PASS: TestPipeline_DocumentOperations (0.02s)
 === RUN   TestPipeline_GetEngineStats
---- PASS: TestPipeline_GetEngineStats (0.02s)
+--- PASS: TestPipeline_GetEngineStats (0.01s)
 === RUN   TestPipeline_UpdateEngineConfig
---- PASS: TestPipeline_UpdateEngineConfig (0.02s)
+--- PASS: TestPipeline_UpdateEngineConfig (0.01s)
 === RUN   TestPipeline_Close
 --- PASS: TestPipeline_Close (0.01s)
 === RUN   TestPipeline_CacheKeyBuilding
 --- PASS: TestPipeline_CacheKeyBuilding (0.01s)
 === RUN   TestPipeline_QueryHashing
---- PASS: TestPipeline_QueryHashing (0.02s)
+--- PASS: TestPipeline_QueryHashing (0.01s)
 === RUN   TestTimingHelper
-    timing_test.go:22: Timing test within expected range: 2392μs = 2.392ms
+    timing_test.go:22: Timing test within expected range: 2601μs = 2.601ms
 --- PASS: TestTimingHelper (0.00s)
 === RUN   TestTimingPrecision
     timing_test.go:49: Short operation timing: 0μs
 --- PASS: TestTimingPrecision (0.00s)
 === RUN   TestTimingNanoseconds
-    timing_test.go:69: Timing nanoseconds test passed: 1589500ns ≈ 1589μs * 1000
+    timing_test.go:69: Timing nanoseconds test passed: 1554800ns ≈ 1554μs * 1000
 --- PASS: TestTimingNanoseconds (0.00s)
 PASS
 ok  	contextlite/internal/pipeline	(cached)
 ?   	contextlite/internal/registry	[no test files]
 === RUN   TestStorage_New
---- PASS: TestStorage_New (0.02s)
+--- PASS: TestStorage_New (0.01s)
 === RUN   TestStorage_AddDocument
---- PASS: TestStorage_AddDocument (0.02s)
+--- PASS: TestStorage_AddDocument (0.01s)
 === RUN   TestStorage_GetDocument
 --- PASS: TestStorage_GetDocument (0.01s)
 === RUN   TestStorage_DeleteDocument
---- PASS: TestStorage_DeleteDocument (0.02s)
+--- PASS: TestStorage_DeleteDocument (0.01s)
 === RUN   TestStorage_SearchDocuments
 --- PASS: TestStorage_SearchDocuments (0.02s)
 === RUN   TestStorage_GetStorageStats
-    storage_test.go:268: Storage stats missing document_count (expected in some cases)
---- PASS: TestStorage_GetStorageStats (0.02s)
+    storage_test.go:255: Storage stats missing document_count (expected in some cases)
+--- PASS: TestStorage_GetStorageStats (0.01s)
 === RUN   TestStorage_GetCacheStats
---- PASS: TestStorage_GetCacheStats (0.02s)
+--- PASS: TestStorage_GetCacheStats (0.01s)
 === RUN   TestStorage_WorkspaceWeights
---- PASS: TestStorage_WorkspaceWeights (0.02s)
+--- PASS: TestStorage_WorkspaceWeights (0.01s)
 === RUN   TestStorage_QueryCache
-    storage_test.go:365: GetQueryCache returned expected error for cache miss: sql: no rows in result set
-    storage_test.go:396: Cache retrieval error (may be expected due to serialization): sql: no rows in result set
+    storage_test.go:352: GetQueryCache returned expected error for cache miss: sql: no rows in result set
+    storage_test.go:383: Cache retrieval error (may be expected due to serialization): sql: no rows in result set
 --- PASS: TestStorage_QueryCache (0.02s)
 === RUN   TestStorage_GetCachedResultByKey
-    storage_test.go:450: Failed to get cached result by key (expected due to serialization): failed to unmarshal cached result: json: cannot unmarshal array into Go value of type types.QueryResult
+    storage_test.go:437: Failed to get cached result by key (expected due to serialization): failed to unmarshal cached result: json: cannot unmarshal array into Go value of type types.QueryResult
 --- PASS: TestStorage_GetCachedResultByKey (0.02s)
 === RUN   TestStorage_GetCorpusHash
---- PASS: TestStorage_GetCorpusHash (0.02s)
+--- PASS: TestStorage_GetCorpusHash (0.01s)
 === RUN   TestStorage_Close
---- PASS: TestStorage_Close (0.01s)
+--- PASS: TestStorage_Close (0.02s)
 === RUN   TestStorage_Migrations
 --- PASS: TestStorage_Migrations (0.01s)
 === RUN   TestStorage_ConcurrentAccess
-    storage_test.go:597: document_count: <nil> (type: <nil>)
+    storage_test.go:584: document_count: <nil> (type: <nil>)
 --- PASS: TestStorage_ConcurrentAccess (0.03s)
 === RUN   TestStorage_SearchFTS_Extended
 --- PASS: TestStorage_SearchFTS_Extended (0.01s)
 === RUN   TestStorage_SearchLike_Extended
-    storage_test.go:652: LIKE search returned 1 results
+    storage_test.go:639: LIKE search returned 1 results
 --- PASS: TestStorage_SearchLike_Extended (0.01s)
 === RUN   TestStorage_SaveWorkspaceWeights_Extended
 --- PASS: TestStorage_SaveWorkspaceWeights_Extended (0.01s)
 === RUN   TestStorage_SaveQueryCacheWithKey_Extended
-    storage_test.go:713: Expected error getting cached result by key: failed to unmarshal cached result: json: cannot unmarshal array into Go value of type types.QueryResult
+    storage_test.go:700: Expected error getting cached result by key: failed to unmarshal cached result: json: cannot unmarshal array into Go value of type types.QueryResult
 --- PASS: TestStorage_SaveQueryCacheWithKey_Extended (0.02s)
 === RUN   TestStorage_ApplyMigrations_Extended
 --- PASS: TestStorage_ApplyMigrations_Extended (0.01s)
 === RUN   TestStorage_ScanDocuments_Extended
-    storage_test.go:766: Scan test returned 2 documents
+    storage_test.go:753: Scan test returned 2 documents
 --- PASS: TestStorage_ScanDocuments_Extended (0.01s)
 === RUN   TestStorage_EdgeCases_Extended
-    storage_test.go:780: Empty query search returned 0 results
-    storage_test.go:786: Getting non-existent document returned expected error: sql: no rows in result set
+    storage_test.go:767: Empty query search returned 0 results
+    storage_test.go:773: Getting non-existent document returned expected error: sql: no rows in result set
 --- PASS: TestStorage_EdgeCases_Extended (0.01s)
 === RUN   TestStorage_ErrorPaths
-    storage_test.go:811: Search with negative limit returned 0 results
-    storage_test.go:820: Long query returned 0 results
---- PASS: TestStorage_ErrorPaths (0.02s)
+    storage_test.go:798: Search with negative limit returned 0 results
+    storage_test.go:807: Long query returned 0 results
+--- PASS: TestStorage_ErrorPaths (0.01s)
 === RUN   TestStorage_ComplexDocuments
-    storage_test.go:861: Unicode search returned 1 results
+    storage_test.go:848: Unicode search returned 1 results
 --- PASS: TestStorage_ComplexDocuments (0.01s)
 === RUN   TestStorage_LargeDocuments
 --- PASS: TestStorage_LargeDocuments (0.01s)
 === RUN   TestStorage_DatabaseOperations
-    storage_test.go:926: Rapid search returned 0 results
---- PASS: TestStorage_DatabaseOperations (0.05s)
+    storage_test.go:913: Rapid search returned 0 results
+--- PASS: TestStorage_DatabaseOperations (0.03s)
 === RUN   TestStorage_WorkspaceWeightsEdgeCases
 --- PASS: TestStorage_WorkspaceWeightsEdgeCases (0.01s)
 === RUN   TestStorage_CacheComplexOperations
 --- PASS: TestStorage_CacheComplexOperations (0.02s)
 === RUN   TestStorage_SaveQueryCache_Coverage
-    storage_test.go:1052: SaveQueryCache completed successfully
+    storage_test.go:1039: SaveQueryCache completed successfully
 --- PASS: TestStorage_SaveQueryCache_Coverage (0.01s)
 === RUN   TestStorage_GetQueryCache_Coverage
 --- PASS: TestStorage_GetQueryCache_Coverage (0.01s)
 === RUN   TestStorage_New_Coverage
---- PASS: TestStorage_New_Coverage (0.02s)
+--- PASS: TestStorage_New_Coverage (0.01s)
 === RUN   TestStorage_AddDocument_Coverage
 --- PASS: TestStorage_AddDocument_Coverage (0.01s)
 === RUN   TestStorage_DeleteDocument_Coverage
 --- PASS: TestStorage_DeleteDocument_Coverage (0.01s)
 === RUN   TestStorage_SearchLike_Coverage
-    storage_test.go:1215: Search for percent returned 2 results
-    storage_test.go:1221: Search for _ returned 0 results
+    storage_test.go:1202: Search for percent returned 2 results
+    storage_test.go:1208: Search for _ returned 0 results
 --- PASS: TestStorage_SearchLike_Coverage (0.01s)
 === RUN   TestStorage_GetQueryCache_AllBranches
-    storage_test.go:1253: Cache retrieval error (expected due to serialization): sql: no rows in result set
+    storage_test.go:1240: Cache retrieval error (expected due to serialization): sql: no rows in result set
 --- PASS: TestStorage_GetQueryCache_AllBranches (0.01s)
 === RUN   TestStorage_InitSchema_EdgeCases
---- PASS: TestStorage_InitSchema_EdgeCases (0.02s)
+--- PASS: TestStorage_InitSchema_EdgeCases (0.01s)
 === RUN   TestStorage_GetCacheStats_EdgeCases
-    storage_test.go:1309: Cache stats with entries: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:5}
+    storage_test.go:1296: Cache stats with entries: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:5}
 --- PASS: TestStorage_GetCacheStats_EdgeCases (0.01s)
 === RUN   TestStorage_DeleteDocument_AllPaths
 --- PASS: TestStorage_DeleteDocument_AllPaths (0.01s)
 === RUN   TestStorage_GetQueryCacheComprehensive
-    storage_test.go:1364: Expected cache miss, got error: sql: no rows in result set
-    storage_test.go:1398: Cache retrieval may have serialization issues: sql: no rows in result set
+    storage_test.go:1351: Expected cache miss, got error: sql: no rows in result set
+    storage_test.go:1385: Cache retrieval may have serialization issues: sql: no rows in result set
 --- PASS: TestStorage_GetQueryCacheComprehensive (0.01s)
 === RUN   TestStorage_SaveQueryCacheComprehensive
-    storage_test.go:1462: Successfully saved multiple cache entries
+    storage_test.go:1449: Successfully saved multiple cache entries
 --- PASS: TestStorage_SaveQueryCacheComprehensive (0.01s)
 === RUN   TestStorage_DeleteDocumentComprehensive
-    storage_test.go:1514: Delete with empty ID returned: <nil>
+    storage_test.go:1501: Delete with empty ID returned: <nil>
 --- PASS: TestStorage_DeleteDocumentComprehensive (0.01s)
 === RUN   TestStorage_GetCacheStatsComprehensive
 --- PASS: TestStorage_GetCacheStatsComprehensive (0.01s)
 === RUN   TestStorage_NewWithInvalidPath
-    storage_test.go:1605: Path '/invalid/path/that/does/not/exist/test.db' was accepted (may be valid on this system)
-    storage_test.go:1624: Edge case path 'C:\Users\micha\AppData\Local\Temp\storage-test-edge-cases\test1.db' failed: failed to apply pragma PRAGMA journal_mode = WAL: unable to open database file: out of memory (14)
-    storage_test.go:1624: Edge case path 'C:\Users\micha\AppData\Local\Temp\storage-test-edge-cases\test2.db' failed: failed to apply pragma PRAGMA journal_mode = WAL: unable to open database file: out of memory (14)
+    storage_test.go:1592: Path '/invalid/path/that/does/not/exist/test.db' was accepted (may be valid on this system)
+    storage_test.go:1611: Edge case path 'C:\Users\micha\AppData\Local\Temp\storage-test-edge-cases\test1.db' failed: failed to apply pragma PRAGMA journal_mode = WAL: unable to open database file: out of memory (14)
+    storage_test.go:1611: Edge case path 'C:\Users\micha\AppData\Local\Temp\storage-test-edge-cases\test2.db' failed: failed to apply pragma PRAGMA journal_mode = WAL: unable to open database file: out of memory (14)
 --- PASS: TestStorage_NewWithInvalidPath (0.01s)
 === RUN   TestStorage_CacheOperationsWithKey
-    storage_test.go:1663: GetCachedResultByKey may have serialization issues: failed to unmarshal cached result: json: cannot unmarshal array into Go value of type types.QueryResult
---- PASS: TestStorage_CacheOperationsWithKey (0.03s)
+    storage_test.go:1650: GetCachedResultByKey may have serialization issues: failed to unmarshal cached result: json: cannot unmarshal array into Go value of type types.QueryResult
+--- PASS: TestStorage_CacheOperationsWithKey (0.02s)
 === RUN   TestStorage_InvalidateCache
-    storage_test.go:1731: Cache stats after invalidation: hits=0, misses=0, L2Size=0
+    storage_test.go:1719: Cache stats after invalidation: hits=0, misses=0, L2Size=0
 --- PASS: TestStorage_InvalidateCache (0.01s)
 === RUN   TestStorage_GetStorageStatsComprehensive
-    storage_test.go:1753: Total documents: 0
-    storage_test.go:1757: Database size: 0.08 MB
-    storage_test.go:1761: Index size: 0.02 MB
-    storage_test.go:1784: Updated total documents: 1
+    storage_test.go:1741: Total documents: 0
+    storage_test.go:1745: Database size: 0.08 MB
+    storage_test.go:1749: Index size: 0.02 MB
+    storage_test.go:1772: Updated total documents: 1
 --- PASS: TestStorage_GetStorageStatsComprehensive (0.01s)
 === RUN   TestStorage_GetCorpusHashComprehensive
-    storage_test.go:1800: Initial corpus hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-    storage_test.go:1821: Corpus hash after adding document: d3d497f0f622ce046e134a09e67ea3d8ce4f786f129a83d0bf0aac3e30a2075c
-    storage_test.go:1846: Corpus hash after adding second document: f268ccae209650df346163e16aeb5dc04e5e87ee7315fcf9a7afe04f06813e31
+    storage_test.go:1788: Initial corpus hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    storage_test.go:1809: Corpus hash after adding document: d3d497f0f622ce046e134a09e67ea3d8ce4f786f129a83d0bf0aac3e30a2075c
+    storage_test.go:1834: Corpus hash after adding second document: f268ccae209650df346163e16aeb5dc04e5e87ee7315fcf9a7afe04f06813e31
 --- PASS: TestStorage_GetCorpusHashComprehensive (0.01s)
 === RUN   TestStorage_NewErrorPaths
-    storage_test.go:1879: Correctly got error for invalid database: failed to apply pragma PRAGMA journal_mode = WAL: file is not a database (26)
---- PASS: TestStorage_NewErrorPaths (0.01s)
+    storage_test.go:1867: Correctly got error for invalid database: failed to apply pragma PRAGMA journal_mode = WAL: file is not a database (26)
+--- PASS: TestStorage_NewErrorPaths (0.00s)
 === RUN   TestStorage_CacheEdgeCases
-    storage_test.go:1907: GetQueryCache with all empty correctly returned nil
-    storage_test.go:1910: GetQueryCache with all empty returned error: sql: no rows in result set
-    storage_test.go:1907: GetQueryCache with missing corpus/model/tokenizer correctly returned nil
-    storage_test.go:1910: GetQueryCache with missing corpus/model/tokenizer returned error: sql: no rows in result set
-    storage_test.go:1907: GetQueryCache with missing model/tokenizer correctly returned nil
-    storage_test.go:1910: GetQueryCache with missing model/tokenizer returned error: sql: no rows in result set
-    storage_test.go:1907: GetQueryCache with missing tokenizer correctly returned nil
-    storage_test.go:1910: GetQueryCache with missing tokenizer returned error: sql: no rows in result set
-    storage_test.go:1907: GetQueryCache with nonexistent entries correctly returned nil
-    storage_test.go:1910: GetQueryCache with nonexistent entries returned error: sql: no rows in result set
-    storage_test.go:1931: SaveQueryCache with edge case data succeeded
-    storage_test.go:1940: SaveQueryCache with past expiry succeeded
+    storage_test.go:1895: GetQueryCache with all empty correctly returned nil
+    storage_test.go:1898: GetQueryCache with all empty returned error: sql: no rows in result set
+    storage_test.go:1895: GetQueryCache with missing corpus/model/tokenizer correctly returned nil
+    storage_test.go:1898: GetQueryCache with missing corpus/model/tokenizer returned error: sql: no rows in result set
+    storage_test.go:1895: GetQueryCache with missing model/tokenizer correctly returned nil
+    storage_test.go:1898: GetQueryCache with missing model/tokenizer returned error: sql: no rows in result set
+    storage_test.go:1895: GetQueryCache with missing tokenizer correctly returned nil
+    storage_test.go:1898: GetQueryCache with missing tokenizer returned error: sql: no rows in result set
+    storage_test.go:1895: GetQueryCache with nonexistent entries correctly returned nil
+    storage_test.go:1898: GetQueryCache with nonexistent entries returned error: sql: no rows in result set
+    storage_test.go:1919: SaveQueryCache with edge case data succeeded
+    storage_test.go:1928: SaveQueryCache with past expiry succeeded
 --- PASS: TestStorage_CacheEdgeCases (0.01s)
 === RUN   TestStorage_DocumentEdgeCases
-    storage_test.go:1960: DeleteDocument with ID '': <nil>
-    storage_test.go:1960: DeleteDocument with ID 'nonexistent-doc-id': <nil>
-    storage_test.go:1960: DeleteDocument with ID 'very-long-id-that-is-extremely-long-and-probably-not-realistic-but-tests-edge-cases': <nil>
-    storage_test.go:1960: DeleteDocument with ID 'id-with-special-chars-!@#$%^&*()': <nil>
-    storage_test.go:1967: GetDocument with ID '' correctly returned nil/error
-    storage_test.go:1967: GetDocument with ID 'nonexistent-doc-id' correctly returned nil/error
-    storage_test.go:1967: GetDocument with ID 'very-long-id-that-is-extremely-long-and-probably-not-realistic-but-tests-edge-cases' correctly returned nil/error
-    storage_test.go:1967: GetDocument with ID 'id-with-special-chars-!@#$%^&*()' correctly returned nil/error
-    storage_test.go:1986: Document ID auto-generated: 19b1c0004863f7a7
-    storage_test.go:2002: Successfully added large document with 20000 characters
---- PASS: TestStorage_DocumentEdgeCases (0.02s)
+    storage_test.go:1948: DeleteDocument with ID '': <nil>
+    storage_test.go:1948: DeleteDocument with ID 'nonexistent-doc-id': <nil>
+    storage_test.go:1948: DeleteDocument with ID 'very-long-id-that-is-extremely-long-and-probably-not-realistic-but-tests-edge-cases': <nil>
+    storage_test.go:1948: DeleteDocument with ID 'id-with-special-chars-!@#$%^&*()': <nil>
+    storage_test.go:1955: GetDocument with ID '' correctly returned nil/error
+    storage_test.go:1955: GetDocument with ID 'nonexistent-doc-id' correctly returned nil/error
+    storage_test.go:1955: GetDocument with ID 'very-long-id-that-is-extremely-long-and-probably-not-realistic-but-tests-edge-cases' correctly returned nil/error
+    storage_test.go:1955: GetDocument with ID 'id-with-special-chars-!@#$%^&*()' correctly returned nil/error
+    storage_test.go:1974: Document ID auto-generated: 19b1c0004863f7a7
+    storage_test.go:1990: Successfully added large document with 20000 characters
+--- PASS: TestStorage_DocumentEdgeCases (0.01s)
 === RUN   TestStorage_GetQueryCacheErrorPaths
-    storage_test.go:2039: Cache retrieval failed (may be due to serialization issues): sql: no rows in result set
-    storage_test.go:2062: Correctly failed to retrieve expired cache: sql: no rows in result set
-    storage_test.go:2081: GetQueryCache with all empty parameters correctly returned nil
-    storage_test.go:2084: GetQueryCache with all empty parameters returned error: sql: no rows in result set
-    storage_test.go:2081: GetQueryCache with partial parameters correctly returned nil
-    storage_test.go:2084: GetQueryCache with partial parameters returned error: sql: no rows in result set
-    storage_test.go:2081: GetQueryCache with nonexistent combination correctly returned nil
-    storage_test.go:2084: GetQueryCache with nonexistent combination returned error: sql: no rows in result set
-    storage_test.go:2081: GetQueryCache with mismatched corpus correctly returned nil
-    storage_test.go:2084: GetQueryCache with mismatched corpus returned error: sql: no rows in result set
-    storage_test.go:2081: GetQueryCache with mismatched model correctly returned nil
-    storage_test.go:2084: GetQueryCache with mismatched model returned error: sql: no rows in result set
-    storage_test.go:2081: GetQueryCache with mismatched tokenizer correctly returned nil
-    storage_test.go:2084: GetQueryCache with mismatched tokenizer returned error: sql: no rows in result set
+    storage_test.go:2027: Cache retrieval failed (may be due to serialization issues): sql: no rows in result set
+    storage_test.go:2050: Correctly failed to retrieve expired cache: sql: no rows in result set
+    storage_test.go:2069: GetQueryCache with all empty parameters correctly returned nil
+    storage_test.go:2072: GetQueryCache with all empty parameters returned error: sql: no rows in result set
+    storage_test.go:2069: GetQueryCache with partial parameters correctly returned nil
+    storage_test.go:2072: GetQueryCache with partial parameters returned error: sql: no rows in result set
+    storage_test.go:2069: GetQueryCache with nonexistent combination correctly returned nil
+    storage_test.go:2072: GetQueryCache with nonexistent combination returned error: sql: no rows in result set
+    storage_test.go:2069: GetQueryCache with mismatched corpus correctly returned nil
+    storage_test.go:2072: GetQueryCache with mismatched corpus returned error: sql: no rows in result set
+    storage_test.go:2069: GetQueryCache with mismatched model correctly returned nil
+    storage_test.go:2072: GetQueryCache with mismatched model returned error: sql: no rows in result set
+    storage_test.go:2069: GetQueryCache with mismatched tokenizer correctly returned nil
+    storage_test.go:2072: GetQueryCache with mismatched tokenizer returned error: sql: no rows in result set
 --- PASS: TestStorage_GetQueryCacheErrorPaths (0.01s)
 === RUN   TestStorage_NewComprehensiveErrorPaths
-    storage_test.go:2111: Read-only path was accepted (permissions may differ on system)
-    storage_test.go:2122: Successfully created storage at C:\Users\micha\AppData\Local\Temp\storage-new-test\valid.db
-    storage_test.go:2130: Successfully reopened existing storage
-    storage_test.go:2142: Test database 0 succeeded
-    storage_test.go:2142: Test database 1 succeeded
-    storage_test.go:2142: Test database 2 succeeded
---- PASS: TestStorage_NewComprehensiveErrorPaths (0.07s)
+    storage_test.go:2099: Read-only path was accepted (permissions may differ on system)
+    storage_test.go:2110: Successfully created storage at C:\Users\micha\AppData\Local\Temp\storage-new-test\valid.db
+    storage_test.go:2118: Successfully reopened existing storage
+    storage_test.go:2130: Test database 0 succeeded
+    storage_test.go:2130: Test database 1 succeeded
+    storage_test.go:2130: Test database 2 succeeded
+--- PASS: TestStorage_NewComprehensiveErrorPaths (0.04s)
 === RUN   TestStorage_SearchDocumentsComprehensive
-    storage_test.go:2201: Search for 'function' (common term) returned 2 results
-    storage_test.go:2201: Search for 'HTTP' (specific term) returned 1 results
-    storage_test.go:2201: Search for 'authentication' (long term) returned 1 results
-    storage_test.go:2201: Search for 'nonexistent' (no results) returned 0 results
-    storage_test.go:2201: Search for '' (empty query) returned 3 results
-    storage_test.go:2201: Search for 'Go JavaScript Python' (multiple terms) returned 0 results
-    storage_test.go:2212: Search with limit 0 returned 0 results
-    storage_test.go:2212: Search with limit 1 returned 1 results
-    storage_test.go:2212: Search with limit 100 returned 2 results
-    storage_test.go:2212: Search with limit 1000 returned 2 results
+    storage_test.go:2189: Search for 'function' (common term) returned 2 results
+    storage_test.go:2189: Search for 'HTTP' (specific term) returned 1 results
+    storage_test.go:2189: Search for 'authentication' (long term) returned 1 results
+    storage_test.go:2189: Search for 'nonexistent' (no results) returned 0 results
+    storage_test.go:2189: Search for '' (empty query) returned 3 results
+    storage_test.go:2189: Search for 'Go JavaScript Python' (multiple terms) returned 0 results
+    storage_test.go:2200: Search with limit 0 returned 0 results
+    storage_test.go:2200: Search with limit 1 returned 1 results
+    storage_test.go:2200: Search with limit 100 returned 2 results
+    storage_test.go:2200: Search with limit 1000 returned 2 results
 --- PASS: TestStorage_SearchDocumentsComprehensive (0.01s)
 === RUN   TestStorage_NewAdvancedEdgeCases
-    storage_test.go:2230: New with path '/invalid/path/that/should/not/exist/test.db' failed (case 0): failed to apply pragma PRAGMA journal_mode = WAL: unable to open database file: out of memory (14)
-    storage_test.go:2235: New with path '' succeeded (case 1)
-    storage_test.go:2235: New with path 'test_new_edge.db' succeeded (case 2)
-    storage_test.go:2276: Storage stats: map[avg_document_size:38 chars database_size:0.08 MB index_size:0.02 MB last_update:1755649757 total_documents:1]
---- PASS: TestStorage_NewAdvancedEdgeCases (0.02s)
+    storage_test.go:2218: New with path '/invalid/path/that/should/not/exist/test.db' failed (case 0): failed to apply pragma PRAGMA journal_mode = WAL: unable to open database file: out of memory (14)
+    storage_test.go:2223: New with path '' succeeded (case 1)
+    storage_test.go:2223: New with path 'test_new_edge.db' succeeded (case 2)
+    storage_test.go:2264: Storage stats: map[avg_document_size:38 chars database_size:0.08 MB index_size:0.02 MB last_update:1755651440 total_documents:1]
+--- PASS: TestStorage_NewAdvancedEdgeCases (0.01s)
 === RUN   TestStorage_GetCacheStatsAdvanced
-    storage_test.go:2291: Initial cache stats: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:0}
-    storage_test.go:2348: Cache stats after operations: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:3}
-    storage_test.go:2356: Cache invalidated successfully
-    storage_test.go:2364: Cache stats after invalidation: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:0}
+    storage_test.go:2279: Initial cache stats: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:0}
+    storage_test.go:2336: Cache stats after operations: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:3}
+    storage_test.go:2344: Cache invalidated successfully
+    storage_test.go:2352: Cache stats after invalidation: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:0}
 --- PASS: TestStorage_GetCacheStatsAdvanced (0.01s)
 === RUN   TestStorage_SaveQueryCacheWithKeyAdvanced
-    storage_test.go:2422: SaveQueryCacheWithKey 0 with key 'test-cache-key-1' succeeded
-    storage_test.go:2422: SaveQueryCacheWithKey 1 with key 'test-cache-key-2' succeeded
-    storage_test.go:2422: SaveQueryCacheWithKey 2 with key '' succeeded
-    storage_test.go:2422: SaveQueryCacheWithKey 3 with key 'very-long-cache-key-that-should-still-work-properly-even-if-it-is-quite-long' succeeded
-    storage_test.go:2422: SaveQueryCacheWithKey 4 with key 'key-with-special-chars-!@#$%^&*()' succeeded
-    storage_test.go:2431: Cache stats after SaveQueryCacheWithKey operations: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:1}
+    storage_test.go:2410: SaveQueryCacheWithKey 0 with key 'test-cache-key-1' succeeded
+    storage_test.go:2410: SaveQueryCacheWithKey 1 with key 'test-cache-key-2' succeeded
+    storage_test.go:2410: SaveQueryCacheWithKey 2 with key '' succeeded
+    storage_test.go:2410: SaveQueryCacheWithKey 3 with key 'very-long-cache-key-that-should-still-work-properly-even-if-it-is-quite-long' succeeded
+    storage_test.go:2410: SaveQueryCacheWithKey 4 with key 'key-with-special-chars-!@#$%^&*()' succeeded
+    storage_test.go:2419: Cache stats after SaveQueryCacheWithKey operations: &{Hits:0 Misses:0 HitRate:0 L1Size:0 L2Size:1}
 --- PASS: TestStorage_SaveQueryCacheWithKeyAdvanced (0.02s)
 === RUN   TestStorage_ApplyMigrationsAndSchemaEdgeCases
-    storage_test.go:2474: Search after migration returned 1 results
-    storage_test.go:2502: SaveQueryCache succeeded after migration
-    storage_test.go:2510: GetQueryCache succeeded, cache hit: true
+    storage_test.go:2462: Search after migration returned 1 results
+    storage_test.go:2490: SaveQueryCache succeeded after migration
+    storage_test.go:2498: GetQueryCache succeeded, cache hit: true
 --- PASS: TestStorage_ApplyMigrationsAndSchemaEdgeCases (0.01s)
 PASS
 ok  	contextlite/internal/storage	(cached)
@@ -1347,9 +1347,9 @@ ok  	contextlite/internal/storage	(cached)
 PASS
 ok  	contextlite/internal/timing	(cached)
 === RUN   TestLoadConfig_Default
---- PASS: TestLoadConfig_Default (0.02s)
+--- PASS: TestLoadConfig_Default (0.00s)
 === RUN   TestLoadConfig_FromFile
---- PASS: TestLoadConfig_FromFile (0.01s)
+--- PASS: TestLoadConfig_FromFile (0.00s)
 === RUN   TestLoadConfig_NonExistentFile
 --- PASS: TestLoadConfig_NonExistentFile (0.00s)
 === RUN   TestLoadConfig_InvalidYAML
@@ -1367,13 +1367,13 @@ ok  	contextlite/internal/timing	(cached)
 === RUN   TestConfig_EpsilonDefaults
 --- PASS: TestConfig_EpsilonDefaults (0.00s)
 === RUN   TestConfig_PartialFile
---- PASS: TestConfig_PartialFile (0.01s)
+--- PASS: TestConfig_PartialFile (0.00s)
 === RUN   TestConfig_EmptyFile
---- PASS: TestConfig_EmptyFile (0.01s)
+--- PASS: TestConfig_EmptyFile (0.00s)
 === RUN   TestConfig_EnvironmentOverride
---- PASS: TestConfig_EnvironmentOverride (0.01s)
+--- PASS: TestConfig_EnvironmentOverride (0.00s)
 === RUN   TestConfig_ApplyEnvOverrides
---- PASS: TestConfig_ApplyEnvOverrides (0.01s)
+--- PASS: TestConfig_ApplyEnvOverrides (0.00s)
 === RUN   TestConfig_DatabasePathOverride
 --- PASS: TestConfig_DatabasePathOverride (0.00s)
 === RUN   TestConfig_ValidationErrors
@@ -1382,12 +1382,12 @@ ok  	contextlite/internal/timing	(cached)
 === RUN   TestConfig_ValidationErrors/invalid_timeout_zero
 === RUN   TestConfig_ValidationErrors/invalid_max_candidates_zero
 === RUN   TestConfig_ValidationErrors/valid_config
---- PASS: TestConfig_ValidationErrors (0.03s)
-    --- PASS: TestConfig_ValidationErrors/invalid_port_zero (0.01s)
-    --- PASS: TestConfig_ValidationErrors/invalid_port_too_high (0.01s)
-    --- PASS: TestConfig_ValidationErrors/invalid_timeout_zero (0.01s)
+--- PASS: TestConfig_ValidationErrors (0.01s)
+    --- PASS: TestConfig_ValidationErrors/invalid_port_zero (0.00s)
+    --- PASS: TestConfig_ValidationErrors/invalid_port_too_high (0.00s)
+    --- PASS: TestConfig_ValidationErrors/invalid_timeout_zero (0.00s)
     --- PASS: TestConfig_ValidationErrors/invalid_max_candidates_zero (0.00s)
-    --- PASS: TestConfig_ValidationErrors/valid_config (0.01s)
+    --- PASS: TestConfig_ValidationErrors/valid_config (0.00s)
 === RUN   TestConfig_Validation
 === RUN   TestConfig_Validation/valid_config
 === RUN   TestConfig_Validation/invalid_port
@@ -1399,7 +1399,7 @@ ok  	contextlite/internal/timing	(cached)
 === RUN   TestConfig_ValidateComprehensive
 --- PASS: TestConfig_ValidateComprehensive (0.00s)
 === RUN   TestConfig_ValidateDatabasePath
-    config_test.go:931: Read-only directory validation result: <nil>
+    config_test.go:932: Read-only directory validation result: <nil>
 --- PASS: TestConfig_ValidateDatabasePath (0.00s)
 PASS
 ok  	contextlite/pkg/config	(cached)
@@ -1645,165 +1645,15 @@ ok  	contextlite/test/license	(cached)
 [0;32m✅ PASSED: Go Vet[0m
 
 [0;34m🔍 Running: errcheck (Unchecked Errors)[0m
-cmd\contextlite\main.go:61:19:	defer logger.Sync()
 cmd\contextlite\main.go:91:21:	defer storage.Close()
-cmd\license-server\main.go:110:27:	json.NewEncoder(w).Encode(map[string]string{
 cmd\license-server\main.go:275:25:	ls.tracker.RecordUsage(licenseData[:16], "system", "license_generated", metadata, "")
-cmd\license-server\main.go:360:28:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:368:27:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:414:27:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:448:28:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:456:27:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:507:28:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:515:27:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:543:28:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:551:27:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:586:28:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:594:27:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:619:28:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:627:27:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:653:28:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main.go:661:27:	json.NewEncoder(w).Encode(map[string]interface{}{
-cmd\license-server\main_test.go:40:12:	pem.Encode(keyFile, privateKeyPEM)
-cmd\license-server\main_test.go:41:15:	keyFile.Close()
-cmd\license-server\main_test.go:639:14:	os.Unsetenv(key)
-cmd\license-server\main_test.go:646:14:	os.Setenv(key, value)
-cmd\license-server\main_test.go:659:12:	os.Setenv("STRIPE_SECRET_KEY", "sk_test_fake")
-cmd\license-server\main_test.go:660:12:	os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test_fake")
-cmd\license-server\main_test.go:661:12:	os.Setenv("PORT", "8081")
-cmd\license-server\main_test.go:662:12:	os.Setenv("SMTP_PORT", "587")
-cmd\license-server\main_test.go:663:12:	os.Setenv("PRIVATE_KEY_PATH", "./test_key.pem")
-cmd\license-server\main_test.go:892:11:	os.Remove(filepath.Join(tmpDir, "test_private_key.pem"))
-cmd\license-server\main_test.go:1045:12:	os.Setenv(key, value)
-cmd\license-server\main_test.go:1051:15:	os.Unsetenv(key)
-cmd\license-server\main_test.go:1324:12:	os.Setenv("SMTP_PORT", originalSMTPPort)
-cmd\license-server\main_test.go:1325:12:	os.Setenv("FROM_EMAIL", originalFromEmail)
-cmd\license-server\main_test.go:1326:12:	os.Setenv("PRIVATE_KEY_PATH", originalPrivateKeyPath)
-cmd\license-server\main_test.go:1327:12:	os.Setenv("STRIPE_SECRET_KEY", originalStripeKey)
-cmd\license-server\main_test.go:1328:12:	os.Setenv("STRIPE_WEBHOOK_SECRET", originalWebhookSecret)
-cmd\license-server\main_test.go:1332:11:	os.Setenv("STRIPE_SECRET_KEY", "sk_test_123")
-cmd\license-server\main_test.go:1333:11:	os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test_123")
-cmd\license-server\main_test.go:1334:11:	os.Setenv("SMTP_PORT", "2525")
-cmd\license-server\main_test.go:1335:11:	os.Setenv("FROM_EMAIL", "custom@example.com")
-cmd\license-server\main_test.go:1336:11:	os.Setenv("PRIVATE_KEY_PATH", "./private_key.pem")
-cmd\license-server\main_test.go:1357:12:	os.Setenv("STRIPE_SECRET_KEY", originalStripeKey)
-cmd\license-server\main_test.go:1358:12:	os.Setenv("STRIPE_WEBHOOK_SECRET", originalWebhookSecret)
-cmd\license-server\main_test.go:1359:12:	os.Setenv("PRIVATE_KEY_PATH", originalPrivateKeyPath)
-cmd\license-server\main_test.go:1360:12:	os.Setenv("SMTP_HOST", originalSMTPHost)
-cmd\license-server\main_test.go:1361:12:	os.Setenv("SMTP_USER", originalSMTPUser)
-cmd\license-server\main_test.go:1362:12:	os.Setenv("SMTP_PASS", originalSMTPPass)
-cmd\license-server\main_test.go:1363:12:	os.Setenv("PORT", originalPort)
-cmd\license-server\main_test.go:1375:16:	os.Unsetenv("STRIPE_SECRET_KEY")
-cmd\license-server\main_test.go:1376:14:	os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
-cmd\license-server\main_test.go:1377:14:	os.Setenv("PRIVATE_KEY_PATH", "./test.pem")
-cmd\license-server\main_test.go:1385:14:	os.Setenv("STRIPE_SECRET_KEY", "sk_test_123")
-cmd\license-server\main_test.go:1386:16:	os.Unsetenv("STRIPE_WEBHOOK_SECRET")
-cmd\license-server\main_test.go:1387:14:	os.Setenv("PRIVATE_KEY_PATH", "./test.pem")
-cmd\license-server\main_test.go:1395:14:	os.Setenv("STRIPE_SECRET_KEY", "sk_test_123")
-cmd\license-server\main_test.go:1396:14:	os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
-cmd\license-server\main_test.go:1397:16:	os.Unsetenv("PRIVATE_KEY_PATH")
-cmd\license-server\main_test.go:1404:14:	os.Setenv("STRIPE_SECRET_KEY", "sk_test_123")
-cmd\license-server\main_test.go:1405:14:	os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
-cmd\license-server\main_test.go:1406:14:	os.Setenv("PRIVATE_KEY_PATH", "./test.pem")
-cmd\license-server\main_test.go:1407:14:	os.Setenv("SMTP_HOST", "smtp.gmail.com")
-cmd\license-server\main_test.go:1408:14:	os.Setenv("SMTP_USER", "test@gmail.com")
-cmd\license-server\main_test.go:1409:14:	os.Setenv("SMTP_PASS", "password123")
-cmd\license-server\main_test.go:1410:14:	os.Setenv("PORT", "9000")
-cmd\license-server\main_test.go:1417:14:	os.Setenv("STRIPE_SECRET_KEY", "sk_test_123")
-cmd\license-server\main_test.go:1418:14:	os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
-cmd\license-server\main_test.go:1419:14:	os.Setenv("PRIVATE_KEY_PATH", "./test.pem")
-cmd\license-server\main_test.go:1420:14:	os.Setenv("PORT", "invalid_port")
-cmd\license-server\main_tracking_test.go:32:28:	defer server.tracker.Close()
-cmd\license-server\main_tracking_test.go:195:28:	defer server.tracker.Close()
-cmd\license-server\main_tracking_test.go:218:28:	defer server.tracker.Close()
-cmd\license-server\main_tracking_test.go:301:28:	defer server.tracker.Close()
-cmd\license-server\main_tracking_test.go:456:28:	defer server.tracker.Close()
-cmd\license-server\main_tracking_test.go:534:23:	server.tracker.Close()
-cmd\license-server\main_tracking_test.go:553:23:	server.tracker.Close()
-cmd\license-server\main_tracking_test.go:563:23:	server.tracker.Close()
-cmd\license-server\main_tracking_test.go:566:29:	defer server.tracker.Close()
-cmd\license-server\main_tracking_test.go:587:28:	defer server.tracker.Close()
-cmd\license-server\main_tracking_test.go:617:28:	defer server.tracker.Close()
-cmd\registry-runner\main.go:87:17:	json.Unmarshal(data, registry)
-cmd\registry-runner\main.go:142:11:	os.Remove("temp_coverage.out")
-examples\comprehensive_demo.go:46:17:	defer os.Remove(cfg.Storage.DatabasePath) // Clean up
-internal\api\middleware\rate_limiter_test.go:23:10:	w.Write([]byte("OK"))
-internal\api\server.go:1020:27:	json.NewEncoder(w).Encode(data)
-internal\api\server_test.go:31:14:	os.RemoveAll("test_*.db")
-internal\api\server_test.go:72:14:	store.Close()
-internal\api\server_test.go:73:12:	os.Remove(dbPath)
-internal\api\server_test.go:196:19:	store.AddDocument(ctx, doc)
-internal\api\server_test.go:381:19:	store.AddDocument(ctx, doc)
-internal\api\server_test.go:544:10:	w.Write([]byte("authenticated"))
-internal\api\server_test.go:577:19:	store.AddDocument(ctx, doc)
-internal\api\server_test.go:698:10:	w.Write([]byte("authenticated"))
-internal\api\server_test.go:720:10:	w.Write([]byte("authenticated"))
-internal\api\server_test.go:1611:20:	defer os.RemoveAll(tempDir)
-internal\api\server_test.go:1663:17:	json.Unmarshal(w.Body.Bytes(), &response)
-internal\enterprise\mcp.go:155:18:	defer rows.Close()
 internal\enterprise\mcp.go:273:24:	mm.SetMCPServerStatus(serverID, "failed")
 internal\enterprise\mcp.go:279:24:	mm.SetMCPServerStatus(serverID, "unhealthy")
-internal\enterprise\mcp.go:565:23:	defer resp.Body.Close()
-internal\enterprise\tenant.go:159:18:	defer rows.Close()
-internal\enterprise\tenant.go:236:16:	defer db.Close()
-internal\evaluation\sota.go:526:18:	defer file.Close()
-internal\evaluation\sota_test.go:72:28:	sota.LoadEvaluationDataset()
-internal\evaluation\sota_test.go:252:28:	sota.LoadEvaluationDataset()
-internal\evaluation\sota_test.go:399:11:	os.Remove(config.OutputPath)
-internal\evaluation\sota_test.go:422:11:	os.Remove(config.OutputPath)
-internal\license\comprehensive_test.go:72:17:	defer os.Remove(dbPath)
-internal\license\comprehensive_test.go:77:21:	defer tracker.Close()
-internal\license\comprehensive_test.go:143:17:	defer os.Remove(dbPath)
-internal\license\comprehensive_test.go:147:21:	defer tracker.Close()
-internal\license\comprehensive_test.go:226:17:	defer os.Remove(dbPath)
-internal\license\coverage_80_percent_test.go:23:18:	defer os.Remove(licenseFile)
-internal\license\coverage_80_percent_test.go:38:15:	os.WriteFile(licenseFile, []byte(testLicense), 0644)
-internal\license\coverage_80_percent_test.go:145:14:	os.MkdirAll(filepath.Dir(activationFile), 0755)
-internal\license\coverage_80_percent_test.go:146:21:	defer os.RemoveAll(filepath.Dir(activationFile))
-internal\license\coverage_80_percent_test.go:149:15:	os.WriteFile(activationFile, []byte("{invalid json}"), 0644)
-internal\license\coverage_80_percent_test.go:228:18:	defer os.Remove(licenseFile)
-internal\license\coverage_80_percent_test.go:238:16:	os.WriteFile(licenseFile, []byte(license), 0644)
-internal\license\coverage_boost_test.go:58:13:	os.MkdirAll(licenseDir, 0755)
-internal\license\coverage_boost_test.go:59:20:	defer os.RemoveAll(licenseDir)
-internal\license\coverage_boost_test.go:64:14:	os.WriteFile(licensePath, []byte(testLicense), 0644)
-internal\license\coverage_boost_test.go:85:17:	defer os.Remove(trialPath)
-internal\license\coverage_boost_test.go:171:17:	defer os.Remove(dbPath)
-internal\license\coverage_boost_test.go:175:21:	defer tracker.Close()
-internal\license\final_80_percent_test.go:29:15:	os.WriteFile(invalidFile, []byte("invalid json{"), 0644)
-internal\license\final_80_percent_test.go:30:18:	defer os.Remove(invalidFile)
-internal\license\final_80_percent_test.go:44:15:	os.WriteFile(noSigFile, licenseData, 0644)
-internal\license\final_80_percent_test.go:45:18:	defer os.Remove(noSigFile)
-internal\license\final_80_percent_test.go:103:17:	os.WriteFile(licenseFile, licenseData, 0644)
-internal\license\final_80_percent_test.go:104:20:	defer os.Remove(licenseFile)
-internal\license\final_80_percent_test.go:152:15:	os.RemoveAll(trialDir)
-internal\license\final_80_percent_test.go:169:15:	os.WriteFile(trialFile, []byte("{invalid json}"), 0644)
-internal\license\final_coverage_push_test.go:55:15:	os.RemoveAll(filepath.Dir(trialFile))
-internal\license\final_coverage_push_test.go:89:15:	os.WriteFile(validFile, validBytes, 0644)
-internal\license\final_coverage_push_test.go:90:18:	defer os.Remove(validFile)
-internal\license\final_coverage_push_test.go:101:15:	os.WriteFile(expiredFile, expiredBytes, 0644)
-internal\license\final_coverage_push_test.go:102:18:	defer os.Remove(expiredFile)
-internal\license\final_coverage_push_test.go:112:15:	os.WriteFile(invalidFile, invalidBytes, 0644)
-internal\license\final_coverage_push_test.go:113:18:	defer os.Remove(invalidFile)
-internal\license\final_coverage_push_test.go:139:15:	os.WriteFile(validFile, []byte(validLicense), 0644)
-internal\license\final_coverage_push_test.go:140:18:	defer os.Remove(validFile)
-internal\license\final_coverage_push_test.go:147:15:	os.WriteFile(invalidFile, []byte("{invalid json}"), 0644)
-internal\license\final_coverage_push_test.go:148:18:	defer os.Remove(invalidFile)
-internal\license\license.go:203:15:	os.WriteFile(firstRunPath, []byte(time.Now().Format(time.RFC3339)), 0644)
-internal\license\tracked.go:99:23:	defer resp.Body.Close()
-internal\license\tracked.go:151:18:	resp.Body.Close()
-internal\license\tracked.go:217:23:	defer resp.Body.Close()
 internal\license\tracked.go:221:27:	tlm.clearActivationRecord()
-internal\license\tracked.go:234:13:	os.MkdirAll(contextDir, 0755)
 internal\license\tracked.go:319:25:	tfg.tracker.RecordUsage("feature_request", metadata)
 internal\license\tracked.go:334:25:	tfg.tracker.RecordUsage("app_startup", metadata)
 internal\license\tracked.go:346:25:	tfg.tracker.RecordUsage("context_query", metadata)
 internal\license\tracked.go:357:25:	tfg.tracker.RecordUsage("error_event", metadata)
-internal\license\tracked_test.go:43:29:	json.NewEncoder(w).Encode(response)
-internal\license\tracked_test.go:109:29:	json.NewEncoder(w).Encode(response)
-internal\license\tracked_test.go:137:29:	json.NewEncoder(w).Encode(response)
-internal\license\tracked_test.go:164:29:	json.NewEncoder(w).Encode(response)
-internal\license\tracked_test.go:190:29:	json.NewEncoder(w).Encode(response)
-internal\license\tracked_test.go:234:28:	json.NewEncoder(w).Encode(response)
 internal\license\tracking.go:177:20:	lt.updateLastSeen(existing.ActivationID)
 internal\license\tracking.go:200:25:	lt.recordSecurityEvent(licenseKey, "activation_limit_exceeded",
 internal\license\tracking.go:228:21:	lt.recordUsageEvent(licenseKey, activationID, "license_activated", "", ipAddress)
@@ -1813,162 +1663,14 @@ internal\license\tracking.go:266:25:	lt.recordSecurityEvent(licenseKey, "inactiv
 internal\license\tracking.go:272:19:	lt.updateLastSeen(activation.ActivationID)
 internal\license\tracking.go:288:21:	lt.recordUsageEvent(licenseKey, "", "license_deactivated", "", "")
 internal\license\tracking.go:300:21:	lt.recordUsageEvent(licenseKey, "", "license_reactivated", "", "")
-internal\license\tracking.go:348:18:	defer rows.Close()
-internal\license\tracking.go:474:18:	defer rows.Close()
-internal\license\tracking_test.go:18:17:	defer os.Remove(dbPath)
-internal\license\tracking_test.go:33:17:	defer os.Remove(dbPath)
-internal\license\tracking_test.go:37:21:	defer tracker.Close()
-internal\license\tracking_test.go:114:17:	defer os.Remove(dbPath)
-internal\license\tracking_test.go:118:21:	defer tracker.Close()
-internal\license\tracking_test.go:150:17:	defer os.Remove(dbPath)
-internal\license\tracking_test.go:154:21:	defer tracker.Close()
-internal\license\tracking_test.go:183:17:	defer os.Remove(dbPath)
-internal\license\tracking_test.go:187:21:	defer tracker.Close()
-internal\license\tracking_test.go:240:17:	defer os.Remove(dbPath)
-internal\license\tracking_test.go:244:21:	defer tracker.Close()
-internal\license\tracking_test.go:271:17:	defer os.Remove(dbPath)
-internal\license\tracking_test.go:275:21:	defer tracker.Close()
-internal\license\tracking_test.go:306:17:	defer os.Remove(dbPath)
-internal\license\tracking_test.go:310:21:	defer tracker.Close()
-internal\license\tracking_test.go:337:17:	defer os.Remove(dbPath)
-internal\license\tracking_test.go:341:21:	defer tracker.Close()
-internal\license\tracking_test.go:374:17:	defer os.Remove(dbPath)
-internal\license\tracking_test.go:387:16:	tracker.Close()
-internal\license\tracking_test.go:394:22:	defer tracker.Close()
-internal\license\tracking_test.go:407:17:	defer os.Remove(dbPath)
-internal\license\tracking_test.go:411:21:	defer tracker.Close()
-internal\license\tracking_test.go:429:17:	defer os.Remove(dbPath)
-internal\license\tracking_test.go:433:21:	defer tracker.Close()
-internal\license\tracking_test.go:451:17:	defer os.Remove(dbPath)
-internal\license\tracking_test.go:455:21:	defer tracker.Close()
-internal\license\trial.go:43:13:	os.MkdirAll(contextDir, 0755)
 internal\license\trial.go:66:15:	tm.saveTrial(trial)
 internal\pipeline\assembly.go:241:33:	p.storage.SaveQueryCacheWithKey(ctx, queryHash, corpusHash, modelID, tokenizerVersion, cacheKey, result, expiresAt)
-internal\pipeline\pipeline_test.go:20:14:	os.RemoveAll("test_*.db")
-internal\pipeline\pipeline_test.go:54:14:	store.Close()
-internal\pipeline\pipeline_test.go:55:12:	os.Remove(dbPath)
-internal\pipeline\pipeline_test.go:93:17:	defer os.Remove(dbPath)
-internal\pipeline\pipeline_test.go:99:19:	defer store.Close()
 internal\registry\test_hooks.go:221:22:	registry.SaveToFile(registryPath)
-internal\storage\sqlite.go:173:19:	defer rows.Close()
-internal\storage\sqlite.go:290:19:	defer tx.Rollback()
-internal\storage\sqlite.go:351:18:	defer rows.Close()
-internal\storage\sqlite.go:370:18:	defer rows.Close()
-internal\storage\sqlite.go:432:19:	defer tx.Rollback()
-internal\storage\sqlite.go:574:19:	defer rows.Close()
-internal\storage\sqlite.go:596:18:	defer rows.Close()
-internal\storage\sqlite.go:686:18:	defer rows.Close()
-internal\storage\storage_test.go:45:14:	os.RemoveAll("test_*.db")
-internal\storage\storage_test.go:58:16:	storage.Close()
-internal\storage\storage_test.go:59:12:	os.Remove(dbPath)
-internal\storage\storage_test.go:67:17:	defer os.Remove(dbPath)
-internal\storage\storage_test.go:73:21:	defer storage.Close()
-internal\storage\storage_test.go:132:21:	storage.AddDocument(ctx, doc)
-internal\storage\storage_test.go:162:21:	storage.AddDocument(ctx, doc)
-internal\storage\storage_test.go:218:22:	storage.AddDocument(ctx, doc)
-internal\storage\storage_test.go:258:22:	storage.AddDocument(ctx, doc)
-internal\storage\storage_test.go:484:21:	storage.AddDocument(ctx, doc)
-internal\storage\storage_test.go:504:17:	defer os.Remove(dbPath)
-internal\storage\storage_test.go:526:17:	defer os.Remove(dbPath)
-internal\storage\storage_test.go:533:21:	defer storage.Close()
-internal\storage\storage_test.go:562:23:	storage.AddDocument(ctx, doc)
-internal\storage\storage_test.go:577:23:	storage.AddDocument(ctx, doc)
-internal\storage\storage_test.go:617:21:	storage.AddDocument(ctx, doc)
-internal\storage\storage_test.go:644:21:	storage.AddDocument(ctx, doc)
-internal\storage\storage_test.go:757:22:	storage.AddDocument(ctx, doc)
-internal\storage\storage_test.go:1092:16:	storage1.Close()
-internal\storage\storage_test.go:1099:17:	storage2.Close()
-internal\storage\storage_test.go:1207:22:	storage.AddDocument(ctx, doc)
-internal\storage\storage_test.go:1269:15:	storage.Close()
-internal\storage\storage_test.go:1276:16:	storage2.Close()
-internal\storage\storage_test.go:1604:17:	storage.Close()
-internal\storage\storage_test.go:1613:20:	defer os.RemoveAll(tempDir)
-internal\storage\storage_test.go:1626:17:	storage.Close()
-internal\storage\storage_test.go:1859:20:	defer os.RemoveAll(tempDir)
-internal\storage\storage_test.go:1868:12:	file.Close()
-internal\storage\storage_test.go:1876:16:	storage.Close()
-internal\storage\storage_test.go:2097:20:	defer os.RemoveAll(tempDir)
-internal\storage\storage_test.go:2110:17:	storage.Close()
-internal\storage\storage_test.go:2121:16:	storage.Close()
-internal\storage\storage_test.go:2129:18:	storage2.Close()
-internal\storage\storage_test.go:2141:17:	storage.Close()
-internal\storage\storage_test.go:2232:18:	storage.Close()
-internal\storage\storage_test.go:2237:18:	storage.Close()
-internal\storage\storage_test.go:2248:20:	defer os.RemoveAll(tempDir)
-internal\storage\storage_test.go:2255:21:	defer storage.Close()
-internal\storage\storage_test.go:2443:20:	defer os.RemoveAll(tempDir)
-internal\storage\storage_test.go:2452:21:	defer storage.Close()
-pkg\config\config_test.go:31:17:	defer os.Remove(tmpfile.Name())
-pkg\config\config_test.go:36:15:	tmpfile.Close()
-pkg\config\config_test.go:456:17:	defer os.Remove(tmpfile.Name())
-pkg\config\config_test.go:461:15:	tmpfile.Close()
-pkg\config\config_test.go:467:15:	os.Unsetenv("CONTEXTLITE_PORT")
-pkg\config\config_test.go:469:13:	os.Setenv("CONTEXTLITE_PORT", originalPort)
-pkg\config\config_test.go:473:11:	os.Setenv("CONTEXTLITE_PORT", "7777")
-pkg\config\config_test.go:493:15:	os.Unsetenv("CONTEXTLITE_HOST")
-pkg\config\config_test.go:495:13:	os.Setenv("CONTEXTLITE_HOST", originalHost)
-pkg\config\config_test.go:499:11:	os.Setenv("CONTEXTLITE_HOST", "custom-host")
-pkg\config\config_test.go:516:17:	defer os.Remove(tmpfile.Name())
-pkg\config\config_test.go:518:15:	tmpfile.Write([]byte(tempConfig))
-pkg\config\config_test.go:519:15:	tmpfile.Close()
-pkg\config\config_test.go:536:15:	os.Unsetenv("CONTEXTLITE_DB_PATH")
-pkg\config\config_test.go:538:13:	os.Setenv("CONTEXTLITE_DB_PATH", originalDBPath)
-pkg\config\config_test.go:542:11:	os.Setenv("CONTEXTLITE_DB_PATH", "/custom/db/path")
-pkg\config\config_test.go:559:17:	defer os.Remove(tmpfile.Name())
-pkg\config\config_test.go:561:15:	tmpfile.Write([]byte(tempConfig))
-pkg\config\config_test.go:562:15:	tmpfile.Close()
-pkg\config\config_test.go:651:19:	defer os.Remove(tmpfile.Name())
-pkg\config\config_test.go:653:17:	tmpfile.Write([]byte(tc.configContent))
-pkg\config\config_test.go:654:17:	tmpfile.Close()
-scripts\update_coverage_registry.go:167:11:	os.Remove("temp_coverage.out")
-scripts\update_coverage_registry.go:174:17:	defer os.Remove("temp_coverage.out")
-scripts\update_coverage_registry.go:215:11:	os.Remove("temp_coverage.out")
 test\helpers\server.go:53:18:	s.Storage.Close()
-test\helpers\server.go:56:12:	os.Remove(s.DBPath)
-test\helpers\server.go:75:23:	defer resp.Body.Close()
-test\helpers\server.go:90:23:	defer resp.Body.Close()
-test\integration\startup_test.go:35:21:	defer storage.Close()
-test\integration_suite\go_test.go:39:24:	defer resp.Body.Close()
-test\integration_suite\go_test.go:63:24:	defer resp.Body.Close()
-test\integration_suite\go_test.go:84:24:	defer resp.Body.Close()
-test\integration_suite\go_test.go:129:24:	defer resp.Body.Close()
-test\integration_suite\go_test.go:167:21:	resp.Body.Close()
-test\license\license_test.go:469:26:	license.GenerateLicense("test@example.com", license.TierDeveloper, "hw123", nil)
-test\license\license_test.go:562:12:	os.Remove(filepath.Join(tmpDir, "test_private_key.pem"))
-test\license\license_test.go:563:12:	os.Remove(filepath.Join(tmpDir, "test_public_key.pem"))
-test\license_test.go:235:19:	json.Unmarshal(licenseJSON, &lic)
-test_results\update_registry.go:37:23:	json.Unmarshal(data, &registry)
-test_results\update_registry.go:109:17:	os.WriteFile(registryPath, data, 0644)
 [0;31m❌ FAILED: errcheck (Unchecked Errors)[0m
 [0;34m🔍 Running: staticcheck (Static Analysis)[0m
-cmd\contextlite\main_test.go:544:5: this nil check is never true (SA4031)
-	cmd\contextlite\main_test.go:543:10: this is the value of quit
-cmd\contextlite\main_test.go:720:5: this nil check is never true (SA4031)
-	cmd\contextlite\main_test.go:711:13: this is the value of server
-internal\engine\loader.go:87:6: func getExecutablePath is unused (U1000)
-internal\enterprise\mcp.go:535:9: error strings should not be capitalized (ST1005)
-internal\evaluation\sota_test.go:113:2: this value of latency is never used (SA4006)
-internal\evaluation\sota_test.go:113:2: this value of memory is never used (SA4006)
-internal\evaluation\sota_test.go:123:2: this value of latency is never used (SA4006)
-internal\evaluation\sota_test.go:123:2: this value of memory is never used (SA4006)
-internal\license\comprehensive_test.go:135:2: this value of err is never used (SA4006)
-internal\license\coverage_boost_test.go:34:2: this value of err is never used (SA4006)
-internal\license\trial.go:121:15: should use time.Until instead of t.Sub(time.Now()) (S1024)
-internal\pipeline\pipeline_test.go:247:11: possible nil pointer dereference (SA5011)
-	internal\pipeline\pipeline_test.go:242:5: this check suggests that the pointer can be nil
-internal\storage\storage_test.go:28:6: func featureWeightsToWorkspaceWeights is unused (U1000)
-internal\storage\storage_test.go:1672:2: this value of err is never used (SA4006)
-pkg\config\config_test.go:49:9: possible nil pointer dereference (SA5011)
-	pkg\config\config_test.go:44:5: this check suggests that the pointer can be nil
-pkg\config\config_test.go:53:9: possible nil pointer dereference (SA5011)
-	pkg\config\config_test.go:44:5: this check suggests that the pointer can be nil
-pkg\config\config_test.go:57:9: possible nil pointer dereference (SA5011)
-	pkg\config\config_test.go:44:5: this check suggests that the pointer can be nil
-pkg\tokens\token_estimator_test.go:65:15: possible nil pointer dereference (SA5011)
-	pkg\tokens\token_estimator_test.go:62:5: this check suggests that the pointer can be nil
-pkg\tokens\token_estimator_test.go:79:17: possible nil pointer dereference (SA5011)
-	pkg\tokens\token_estimator_test.go:76:7: this check suggests that the pointer can be nil
-[0;31m❌ FAILED: staticcheck (Static Analysis)[0m
+[0;32m✅ PASSED: staticcheck (Static Analysis)[0m
+
 [0;34m🔍 Running: Vulnerability Scan (govulncheck)[0m
 No vulnerabilities found.
 [0;32m✅ PASSED: No vulnerabilities found[0m
@@ -1985,10 +1687,10 @@ No vulnerabilities found.
 ================================================
 [0;34m📊 VALIDATION RESULTS[0m
 ================================================
-Passed: [0;32m7[0m
-Failed: [0;31m2[0m
+Passed: [0;32m8[0m
+Failed: [0;31m1[0m
 
-[0;31m❌ 2 CHECK(S) FAILED![0m
+[0;31m❌ 1 CHECK(S) FAILED![0m
 
 Please fix the issues above before pushing to GitHub.
 This will save time by avoiding failed CI/CD runs.

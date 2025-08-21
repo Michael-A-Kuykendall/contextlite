@@ -248,3 +248,383 @@ func TestMockFeatureGate(t *testing.T) {
 		t.Error("Expected ValidateCustomMCP to fail for Basic tier")
 	}
 }
+
+func TestGenerateTenantID(t *testing.T) {
+	id1, err := generateTenantID()
+	if err != nil {
+		t.Fatalf("Failed to generate tenant ID: %v", err)
+	}
+	
+	if len(id1) != 32 { // 16 bytes = 32 hex chars
+		t.Errorf("Expected tenant ID length to be 32, got %d", len(id1))
+	}
+	
+	// Generate another ID to ensure uniqueness
+	id2, err := generateTenantID()
+	if err != nil {
+		t.Fatalf("Failed to generate second tenant ID: %v", err)
+	}
+	
+	if id1 == id2 {
+		t.Error("Expected different tenant IDs, got duplicate")
+	}
+}
+
+func TestInitTenantSchema(t *testing.T) {
+	// Use in-memory database for testing
+	db, err := sql.Open("sqlite", ":memory:")
+	if err != nil {
+		t.Fatalf("Failed to create in-memory database: %v", err)
+	}
+	defer db.Close()
+	
+	// Test successful schema creation
+	err = InitTenantSchema(db)
+	if err != nil {
+		t.Fatalf("Failed to initialize tenant schema: %v", err)
+	}
+	
+	// Verify table was created
+	var count int
+	err = db.QueryRow("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='tenants'").Scan(&count)
+	if err != nil {
+		t.Fatalf("Failed to query table existence: %v", err)
+	}
+	if count != 1 {
+		t.Errorf("Expected 1 tenants table, found %d", count)
+	}
+	
+	// Test calling InitTenantSchema twice (should not error)
+	err = InitTenantSchema(db)
+	if err != nil {
+		t.Errorf("Second call to InitTenantSchema should succeed: %v", err)
+	}
+}
+
+func TestTenantManager_CreateTenant(t *testing.T) {
+	// Create test database
+	db, err := sql.Open("sqlite", ":memory:")
+	if err != nil {
+		t.Fatalf("Failed to create database: %v", err)
+	}
+	defer db.Close()
+	
+	// Initialize schema
+	if err := InitTenantSchema(db); err != nil {
+		t.Fatalf("Failed to initialize schema: %v", err)
+	}
+	
+	// Test with Enterprise license (should succeed)
+	enterpriseGate := newMockFeatureGate("Enterprise")
+	manager := NewTenantManager(db, enterpriseGate)
+	
+	settings := TenantSettings{
+		MaxUsers:       50,
+		MaxDocuments:   5000,
+		RetentionDays:  30,
+		AllowedDomains: []string{"test.com"},
+		SSOEnabled:     false,
+		CustomMCP:      false,
+		Analytics:      true,
+	}
+	
+	tenant, err := manager.CreateTenant("Test Corp", "test-corp", "org-123", settings)
+	if err != nil {
+		t.Fatalf("Failed to create tenant: %v", err)
+	}
+	
+	if tenant == nil {
+		t.Fatal("Expected tenant to be created")
+	}
+	if tenant.Name != "Test Corp" {
+		t.Errorf("Expected name 'Test Corp', got %s", tenant.Name)
+	}
+	if tenant.Domain != "test-corp" {
+		t.Errorf("Expected domain 'test-corp', got %s", tenant.Domain)
+	}
+	if tenant.OrgID != "org-123" {
+		t.Errorf("Expected org ID 'org-123', got %s", tenant.OrgID)
+	}
+	
+	// Test with Basic license (should fail)
+	basicGate := newMockFeatureGate("Basic")
+	basicManager := NewTenantManager(db, basicGate)
+	
+	_, err = basicManager.CreateTenant("Basic Corp", "basic-corp", "org-456", settings)
+	if err == nil {
+		t.Error("Expected CreateTenant to fail with Basic license")
+	}
+}
+
+func TestTenantManager_GetTenant(t *testing.T) {
+	// Create test database and schema
+	db, err := sql.Open("sqlite", ":memory:")
+	if err != nil {
+		t.Fatalf("Failed to create database: %v", err)
+	}
+	defer db.Close()
+	
+	if err := InitTenantSchema(db); err != nil {
+		t.Fatalf("Failed to initialize schema: %v", err)
+	}
+	
+	enterpriseGate := newMockFeatureGate("Enterprise")
+	manager := NewTenantManager(db, enterpriseGate)
+	
+	// Create a tenant first
+	settings := TenantSettings{MaxUsers: 100}
+	tenant, err := manager.CreateTenant("Test Corp", "test-corp", "org-123", settings)
+	if err != nil {
+		t.Fatalf("Failed to create tenant: %v", err)
+	}
+	
+	// Test retrieving the tenant
+	retrieved, err := manager.GetTenant(tenant.ID)
+	if err != nil {
+		t.Fatalf("Failed to get tenant: %v", err)
+	}
+	
+	if retrieved.ID != tenant.ID {
+		t.Errorf("Expected ID %s, got %s", tenant.ID, retrieved.ID)
+	}
+	if retrieved.Name != tenant.Name {
+		t.Errorf("Expected name %s, got %s", tenant.Name, retrieved.Name)
+	}
+	
+	// Test getting non-existent tenant
+	_, err = manager.GetTenant("non-existent")
+	if err == nil {
+		t.Error("Expected error when getting non-existent tenant")
+	}
+}
+
+func TestTenantManager_GetTenantByDomain(t *testing.T) {
+	// Create test database and schema
+	db, err := sql.Open("sqlite", ":memory:")
+	if err != nil {
+		t.Fatalf("Failed to create database: %v", err)
+	}
+	defer db.Close()
+	
+	if err := InitTenantSchema(db); err != nil {
+		t.Fatalf("Failed to initialize schema: %v", err)
+	}
+	
+	enterpriseGate := newMockFeatureGate("Enterprise")
+	manager := NewTenantManager(db, enterpriseGate)
+	
+	// Create a tenant first
+	settings := TenantSettings{MaxUsers: 100}
+	tenant, err := manager.CreateTenant("Test Corp", "test-corp", "org-123", settings)
+	if err != nil {
+		t.Fatalf("Failed to create tenant: %v", err)
+	}
+	
+	// Test retrieving by domain
+	retrieved, err := manager.GetTenantByDomain("test-corp")
+	if err != nil {
+		t.Fatalf("Failed to get tenant by domain: %v", err)
+	}
+	
+	if retrieved.ID != tenant.ID {
+		t.Errorf("Expected ID %s, got %s", tenant.ID, retrieved.ID)
+	}
+	
+	// Test getting non-existent domain
+	_, err = manager.GetTenantByDomain("non-existent")
+	if err == nil {
+		t.Error("Expected error when getting tenant by non-existent domain")
+	}
+}
+
+func TestTenantManager_ListTenants(t *testing.T) {
+	// Create test database and schema
+	db, err := sql.Open("sqlite", ":memory:")
+	if err != nil {
+		t.Fatalf("Failed to create database: %v", err)
+	}
+	defer db.Close()
+	
+	if err := InitTenantSchema(db); err != nil {
+		t.Fatalf("Failed to initialize schema: %v", err)
+	}
+	
+	enterpriseGate := newMockFeatureGate("Enterprise")
+	manager := NewTenantManager(db, enterpriseGate)
+	
+	// Create multiple tenants in same org
+	settings := TenantSettings{MaxUsers: 100}
+	tenant1, err := manager.CreateTenant("Corp 1", "corp1", "org-123", settings)
+	if err != nil {
+		t.Fatalf("Failed to create tenant 1: %v", err)
+	}
+	
+	tenant2, err := manager.CreateTenant("Corp 2", "corp2", "org-123", settings)
+	if err != nil {
+		t.Fatalf("Failed to create tenant 2: %v", err)
+	}
+	
+	// Create tenant in different org
+	_, err = manager.CreateTenant("Other Corp", "other", "org-456", settings)
+	if err != nil {
+		t.Fatalf("Failed to create other tenant: %v", err)
+	}
+	
+	// Test listing tenants for org-123
+	tenants, err := manager.ListTenants("org-123")
+	if err != nil {
+		t.Fatalf("Failed to list tenants: %v", err)
+	}
+	
+	if len(tenants) != 2 {
+		t.Errorf("Expected 2 tenants for org-123, got %d", len(tenants))
+	}
+	
+	// Verify tenant IDs are present
+	foundTenant1, foundTenant2 := false, false
+	for _, tenant := range tenants {
+		if tenant.ID == tenant1.ID {
+			foundTenant1 = true
+		}
+		if tenant.ID == tenant2.ID {
+			foundTenant2 = true
+		}
+	}
+	if !foundTenant1 || !foundTenant2 {
+		t.Error("Expected to find both created tenants in list")
+	}
+	
+	// Test listing tenants for different org
+	otherTenants, err := manager.ListTenants("org-456")
+	if err != nil {
+		t.Fatalf("Failed to list other tenants: %v", err)
+	}
+	
+	if len(otherTenants) != 1 {
+		t.Errorf("Expected 1 tenant for org-456, got %d", len(otherTenants))
+	}
+	
+	// Test listing for non-existent org
+	emptyTenants, err := manager.ListTenants("non-existent")
+	if err != nil {
+		t.Fatalf("Failed to list tenants for non-existent org: %v", err)
+	}
+	if len(emptyTenants) != 0 {
+		t.Errorf("Expected 0 tenants for non-existent org, got %d", len(emptyTenants))
+	}
+}
+
+func TestTenantManager_UpdateTenantSettings(t *testing.T) {
+	// Create test database and schema
+	db, err := sql.Open("sqlite", ":memory:")
+	if err != nil {
+		t.Fatalf("Failed to create database: %v", err)
+	}
+	defer db.Close()
+	
+	if err := InitTenantSchema(db); err != nil {
+		t.Fatalf("Failed to initialize schema: %v", err)
+	}
+	
+	enterpriseGate := newMockFeatureGate("Enterprise")
+	manager := NewTenantManager(db, enterpriseGate)
+	
+	// Create a tenant first
+	originalSettings := TenantSettings{
+		MaxUsers:     50,
+		MaxDocuments: 1000,
+		SSOEnabled:   false,
+		Analytics:    false,
+	}
+	tenant, err := manager.CreateTenant("Test Corp", "test-corp", "org-123", originalSettings)
+	if err != nil {
+		t.Fatalf("Failed to create tenant: %v", err)
+	}
+	
+	// Update settings
+	updatedSettings := TenantSettings{
+		MaxUsers:     100,
+		MaxDocuments: 5000,
+		SSOEnabled:   true,
+		SSOProvider:  "okta",
+		Analytics:    true,
+		CustomMCP:    true,
+	}
+	
+	err = manager.UpdateTenantSettings(tenant.ID, updatedSettings)
+	if err != nil {
+		t.Fatalf("Failed to update tenant settings: %v", err)
+	}
+	
+	// Verify settings were updated
+	retrieved, err := manager.GetTenant(tenant.ID)
+	if err != nil {
+		t.Fatalf("Failed to retrieve updated tenant: %v", err)
+	}
+	
+	if retrieved.Settings.MaxUsers != 100 {
+		t.Errorf("Expected MaxUsers 100, got %d", retrieved.Settings.MaxUsers)
+	}
+	if retrieved.Settings.MaxDocuments != 5000 {
+		t.Errorf("Expected MaxDocuments 5000, got %d", retrieved.Settings.MaxDocuments)
+	}
+	if !retrieved.Settings.SSOEnabled {
+		t.Error("Expected SSO to be enabled")
+	}
+	if retrieved.Settings.SSOProvider != "okta" {
+		t.Errorf("Expected SSO provider 'okta', got %s", retrieved.Settings.SSOProvider)
+	}
+	if !retrieved.Settings.Analytics {
+		t.Error("Expected Analytics to be enabled")
+	}
+	if !retrieved.Settings.CustomMCP {
+		t.Error("Expected CustomMCP to be enabled")
+	}
+}
+
+func TestTenantManager_DeleteTenant(t *testing.T) {
+	// Create test database and schema
+	db, err := sql.Open("sqlite", ":memory:")
+	if err != nil {
+		t.Fatalf("Failed to create database: %v", err)
+	}
+	defer db.Close()
+	
+	if err := InitTenantSchema(db); err != nil {
+		t.Fatalf("Failed to initialize schema: %v", err)
+	}
+	
+	enterpriseGate := newMockFeatureGate("Enterprise")
+	manager := NewTenantManager(db, enterpriseGate)
+	
+	// Create a tenant first
+	settings := TenantSettings{MaxUsers: 100}
+	tenant, err := manager.CreateTenant("Test Corp", "test-corp", "org-123", settings)
+	if err != nil {
+		t.Fatalf("Failed to create tenant: %v", err)
+	}
+	
+	// Verify tenant exists
+	_, err = manager.GetTenant(tenant.ID)
+	if err != nil {
+		t.Fatalf("Tenant should exist before deletion: %v", err)
+	}
+	
+	// Delete tenant
+	err = manager.DeleteTenant(tenant.ID)
+	if err != nil {
+		t.Fatalf("Failed to delete tenant: %v", err)
+	}
+	
+	// Verify tenant no longer exists
+	_, err = manager.GetTenant(tenant.ID)
+	if err == nil {
+		t.Error("Expected error when getting deleted tenant")
+	}
+	
+	// Test deleting non-existent tenant
+	err = manager.DeleteTenant("non-existent")
+	if err == nil {
+		t.Error("Expected error when deleting non-existent tenant")
+	}
+}

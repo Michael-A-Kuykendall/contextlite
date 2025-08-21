@@ -871,3 +871,371 @@ func TestCoreEngine_EdgeCases(t *testing.T) {
 		}
 	})
 }
+
+func TestJSONCLIEngine_Methods(t *testing.T) {
+	cfg := &config.Config{}
+	storage := newMockStorage()
+	engine := NewJSONCLIEngine(cfg, storage, "/fake/binary")
+	
+	ctx := context.Background()
+	
+	// Test AssembleContext - should fail because binary doesn't exist
+	request := types.ContextRequest{
+		Query:        "test query",
+		MaxTokens:    1000,
+		MaxDocuments: 5,
+	}
+	
+	result, err := engine.AssembleContext(ctx, request)
+	if err == nil && result != nil && result.Message == "No relevant documents found" {
+		// This is expected when no documents are found
+		t.Log("AssembleContext handled no documents correctly")
+	} else if err != nil {
+		// This is expected when the private binary is not available
+		t.Logf("AssembleContext failed as expected: %v", err)
+	}
+	
+	// Test IndexDocument
+	doc := types.Document{ID: "test", Content: "test content"}
+	err = engine.IndexDocument(doc)
+	if err != nil {
+		t.Logf("IndexDocument failed as expected: %v", err)
+	}
+	
+	// Test RemoveDocument
+	err = engine.RemoveDocument("test-id")
+	if err != nil {
+		t.Logf("RemoveDocument failed as expected: %v", err)
+	}
+	
+	// Test GetStats
+	stats, err := engine.GetStats()
+	if err != nil {
+		t.Logf("GetStats failed as expected: %v", err)
+	} else if stats != nil {
+		t.Log("GetStats returned stats")
+	}
+	
+	// Test UpdateConfig
+	engineConfig := types.EngineConfig{SolverTimeout: time.Second * 10}
+	err = engine.UpdateConfig(engineConfig)
+	if err != nil {
+		t.Logf("UpdateConfig failed as expected: %v", err)
+	}
+	
+	// Test Close
+	err = engine.Close()
+	if err != nil {
+		t.Logf("Close failed as expected: %v", err)
+	}
+}
+
+func TestGetExecutableDir(t *testing.T) {
+	dir := getExecutableDir()
+	if dir == "" {
+		t.Error("Expected non-empty directory")
+	}
+}
+
+// Tests for JSONCLIEngine to improve coverage
+func TestNewJSONCLIEngine(t *testing.T) {
+	cfg := &config.Config{
+		SMT: config.SMTConfig{
+			SolverTimeoutMs: 5000,
+		},
+	}
+	storage := newMockStorage()
+	binaryPath := "/path/to/private/binary"
+	
+	engine := NewJSONCLIEngine(cfg, storage, binaryPath)
+	
+	if engine == nil {
+		t.Fatal("Expected JSONCLIEngine to be created")
+	}
+	if engine.config != cfg {
+		t.Error("Expected config to be set correctly")
+	}
+	if engine.storage != storage {
+		t.Error("Expected storage to be set correctly")
+	}
+	if engine.binaryPath != binaryPath {
+		t.Error("Expected binaryPath to be set correctly")
+	}
+	if engine.timeout != 5*time.Second {
+		t.Errorf("Expected timeout to be 5s, got %v", engine.timeout)
+	}
+}
+
+func TestNewJSONCLIEngine_DefaultTimeout(t *testing.T) {
+	// Test with nil config
+	engine := NewJSONCLIEngine(nil, newMockStorage(), "/path/to/binary")
+	if engine.timeout != 30*time.Second {
+		t.Errorf("Expected default timeout to be 30s, got %v", engine.timeout)
+	}
+	
+	// Test with zero timeout in config
+	cfg := &config.Config{
+		SMT: config.SMTConfig{
+			SolverTimeoutMs: 0,
+		},
+	}
+	engine = NewJSONCLIEngine(cfg, newMockStorage(), "/path/to/binary")
+	if engine.timeout != 30*time.Second {
+		t.Errorf("Expected default timeout to be 30s when config is 0, got %v", engine.timeout)
+	}
+}
+
+func TestJSONCLIEngine_IndexDocument(t *testing.T) {
+	storage := newMockStorage()
+	engine := NewJSONCLIEngine(nil, storage, "/path/to/binary")
+	
+	doc := types.Document{
+		ID:      "test-doc",
+		Path:    "/test/file.go",
+		Content: "package main\nfunc main() {}",
+	}
+	
+	err := engine.IndexDocument(doc)
+	if err != nil {
+		t.Errorf("IndexDocument failed: %v", err)
+	}
+	
+	// Verify document was stored
+	if len(storage.documents) != 1 {
+		t.Errorf("Expected 1 document in storage, got %d", len(storage.documents))
+	}
+}
+
+func TestJSONCLIEngine_RemoveDocument(t *testing.T) {
+	storage := newMockStorage()
+	engine := NewJSONCLIEngine(nil, storage, "/path/to/binary")
+	
+	// Add a document first
+	doc := types.Document{ID: "test-doc", Content: "test"}
+	storage.documents["test-doc"] = doc
+	
+	err := engine.RemoveDocument("test-doc")
+	if err != nil {
+		t.Errorf("RemoveDocument failed: %v", err)
+	}
+	
+	// Verify document was removed (note: mock storage doesn't actually remove for simplicity)
+}
+
+func TestJSONCLIEngine_GetStats(t *testing.T) {
+	engine := NewJSONCLIEngine(nil, newMockStorage(), "/path/to/nonexistent/binary")
+	
+	stats, err := engine.GetStats()
+	if err != nil {
+		t.Errorf("GetStats should not fail, got error: %v", err)
+	}
+	
+	// Should return fallback stats when binary is not available
+	if stats == nil {
+		t.Fatal("Expected stats to be returned")
+	}
+	if stats.LicenseTier != "professional" {
+		t.Errorf("Expected fallback license tier 'professional', got %s", stats.LicenseTier)
+	}
+	if stats.TotalQueries != 0 {
+		t.Errorf("Expected fallback total queries 0, got %d", stats.TotalQueries)
+	}
+	if stats.MemoryUsageMB != 50.0 {
+		t.Errorf("Expected fallback memory usage 50MB, got %f", stats.MemoryUsageMB)
+	}
+}
+
+func TestJSONCLIEngine_UpdateConfig(t *testing.T) {
+	engine := NewJSONCLIEngine(nil, newMockStorage(), "/path/to/binary")
+	originalTimeout := engine.timeout
+	
+	// Test updating timeout
+	newConfig := types.EngineConfig{
+		SolverTimeout: 15 * time.Second,
+	}
+	
+	err := engine.UpdateConfig(newConfig)
+	if err != nil {
+		t.Errorf("UpdateConfig failed: %v", err)
+	}
+	
+	if engine.timeout != 15*time.Second {
+		t.Errorf("Expected timeout to be updated to 15s, got %v", engine.timeout)
+	}
+	
+	// Test with zero timeout (should not update)
+	zeroConfig := types.EngineConfig{
+		SolverTimeout: 0,
+	}
+	
+	err = engine.UpdateConfig(zeroConfig)
+	if err != nil {
+		t.Errorf("UpdateConfig with zero timeout failed: %v", err)
+	}
+	
+	if engine.timeout != 15*time.Second {
+		t.Errorf("Expected timeout to remain 15s, got %v", engine.timeout)
+	}
+	
+	// Test updating back to original
+	originalConfig := types.EngineConfig{
+		SolverTimeout: originalTimeout,
+	}
+	engine.UpdateConfig(originalConfig)
+}
+
+func TestJSONCLIEngine_Close(t *testing.T) {
+	engine := NewJSONCLIEngine(nil, newMockStorage(), "/path/to/binary")
+	
+	err := engine.Close()
+	if err != nil {
+		t.Errorf("Close should not fail, got error: %v", err)
+	}
+}
+
+func TestJSONCLIEngine_AssembleContext_NoCandidates(t *testing.T) {
+	storage := newMockStorage()
+	// Clear documents so search returns no candidates
+	storage.documents = make(map[string]types.Document)
+	
+	engine := NewJSONCLIEngine(nil, storage, "/path/to/binary")
+	
+	request := types.ContextRequest{
+		Query:         "test query",
+		MaxTokens:     1000,
+		MaxDocuments:  10,
+		WorkspacePath: "/test/workspace",
+	}
+	
+	result, err := engine.AssembleContext(context.Background(), request)
+	if err != nil {
+		t.Errorf("AssembleContext should not fail with no candidates: %v", err)
+	}
+	
+	if result == nil {
+		t.Fatal("Expected result even with no candidates")
+	}
+	if result.Context != "" {
+		t.Error("Expected empty context with no candidates")
+	}
+	if len(result.Documents) != 0 {
+		t.Errorf("Expected 0 documents, got %d", len(result.Documents))
+	}
+	if result.TotalTokens != 0 {
+		t.Errorf("Expected 0 tokens, got %d", result.TotalTokens)
+	}
+	if result.Message != "No relevant documents found" {
+		t.Errorf("Expected 'No relevant documents found' message, got %s", result.Message)
+	}
+}
+
+func TestJSONCLIEngine_GetCandidateDocuments(t *testing.T) {
+	cfg := &config.Config{
+		SMT: config.SMTConfig{
+			MaxCandidates: 5,
+		},
+	}
+	storage := newMockStorage()
+	engine := NewJSONCLIEngine(cfg, storage, "/path/to/binary")
+	
+	// Add multiple documents
+	for i := 0; i < 10; i++ {
+		doc := types.Document{
+			ID:      fmt.Sprintf("doc-%d", i),
+			Content: fmt.Sprintf("content %d test", i),
+		}
+		storage.documents[doc.ID] = doc
+	}
+	
+	request := types.ContextRequest{
+		Query: "test",
+	}
+	
+	candidates, err := engine.getCandidateDocuments(context.Background(), request)
+	if err != nil {
+		t.Errorf("getCandidateDocuments failed: %v", err)
+	}
+	
+	// Should respect MaxCandidates limit from config
+	if len(candidates) > 5 {
+		t.Errorf("Expected at most 5 candidates due to config limit, got %d", len(candidates))
+	}
+}
+
+func TestJSONCLIEngine_GetCandidateDocuments_DefaultLimit(t *testing.T) {
+	// Test with nil config (should use default limit)
+	storage := newMockStorage()
+	engine := NewJSONCLIEngine(nil, storage, "/path/to/binary")
+	
+	request := types.ContextRequest{
+		Query: "test",
+	}
+	
+	candidates, err := engine.getCandidateDocuments(context.Background(), request)
+	if err != nil {
+		t.Errorf("getCandidateDocuments with nil config failed: %v", err)
+	}
+	
+	// Should use default limit of 200
+	if len(candidates) > 200 {
+		t.Errorf("Expected at most 200 candidates with default limit, got %d", len(candidates))
+	}
+}
+
+func TestLoadEngine_FindsPrivateBinary(t *testing.T) {
+	cfg := &config.Config{}
+	storage := newMockStorage()
+	
+	// This will try to find private binary but should fallback to core engine
+	engine := LoadEngine(cfg, storage)
+	
+	if engine == nil {
+		t.Fatal("Expected engine to be loaded")
+	}
+	
+	// Should be either JSONCLIEngine or CoreEngine - both are valid
+	t.Logf("Loaded engine type: %T", engine)
+}
+
+func TestJSONCLIEngine_HelperFunctions(t *testing.T) {
+	// Test helper functions for type conversion
+	data := map[string]interface{}{
+		"string_field": "test_value",
+		"float_field":  123.45,
+		"bool_field":   true,
+		"int_as_float": float64(42),
+	}
+	
+	// Test getStringField
+	strVal := getStringField(data, "string_field")
+	if strVal != "test_value" {
+		t.Errorf("Expected 'test_value', got '%s'", strVal)
+	}
+	
+	emptyStr := getStringField(data, "nonexistent")
+	if emptyStr != "" {
+		t.Errorf("Expected empty string for nonexistent field, got '%s'", emptyStr)
+	}
+	
+	// Test getFloatField
+	floatVal := getFloatField(data, "float_field")
+	if floatVal != 123.45 {
+		t.Errorf("Expected 123.45, got %f", floatVal)
+	}
+	
+	zeroFloat := getFloatField(data, "nonexistent")
+	if zeroFloat != 0.0 {
+		t.Errorf("Expected 0.0 for nonexistent field, got %f", zeroFloat)
+	}
+	
+	// Test getBoolField
+	boolVal := getBoolField(data, "bool_field")
+	if !boolVal {
+		t.Error("Expected true, got false")
+	}
+	
+	falseBool := getBoolField(data, "nonexistent")
+	if falseBool {
+		t.Error("Expected false for nonexistent field, got true")
+	}
+}

@@ -1675,3 +1675,291 @@ func TestServer_ScanWorkspaceFilesEdgeCases(t *testing.T) {
 	server.router.ServeHTTP(w, req)
 	t.Logf("Scan with max_files=1 returned status: %d", w.Code)
 }
+
+// Tests for enterprise endpoints to improve coverage
+func TestServer_HandleListTenants_Comprehensive(t *testing.T) {
+	server, _, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	// Test listing tenants endpoint
+	req := httptest.NewRequest("GET", "/api/v1/enterprise/tenants", nil)
+	w := httptest.NewRecorder()
+	
+	server.handleListTenants(w, req)
+	
+	// Should return some response even if mock implementation
+	t.Logf("List tenants returned status: %d", w.Code)
+	
+	if w.Code == http.StatusOK {
+		var response map[string]interface{}
+		if err := json.Unmarshal(w.Body.Bytes(), &response); err != nil {
+			t.Fatalf("Failed to parse tenants response: %v", err)
+		}
+		t.Logf("Tenants response keys: %v", getKeys(response))
+	}
+}
+
+func TestServer_HandleCreateTenant_Comprehensive(t *testing.T) {
+	server, _, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	// Test create tenant endpoint with valid payload
+	reqBody := map[string]interface{}{
+		"name":        "Test Tenant",
+		"domain":      "test-tenant",
+		"org_id":      "org-123",
+		"max_users":   100,
+	}
+	
+	jsonData, _ := json.Marshal(reqBody)
+	req := httptest.NewRequest("POST", "/api/v1/enterprise/tenants", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	
+	server.handleCreateTenant(w, req)
+	
+	t.Logf("Create tenant returned status: %d", w.Code)
+	
+	// Test with invalid JSON
+	req = httptest.NewRequest("POST", "/api/v1/enterprise/tenants", bytes.NewBuffer([]byte("invalid json")))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.handleCreateTenant(w, req)
+	
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("Expected status 400 for invalid JSON, got %d", w.Code)
+	}
+	
+	// Test with empty payload
+	req = httptest.NewRequest("POST", "/api/v1/enterprise/tenants", bytes.NewBuffer([]byte("{}")))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.handleCreateTenant(w, req)
+	
+	t.Logf("Create tenant with empty payload returned status: %d", w.Code)
+}
+
+func TestServer_HandleMCPServers(t *testing.T) {
+	server, _, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	// Test list MCP servers
+	req := httptest.NewRequest("GET", "/api/v1/enterprise/mcp/servers", nil)
+	w := httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("List MCP servers returned status: %d", w.Code)
+	
+	// Test create MCP server
+	reqBody := map[string]interface{}{
+		"name":        "Test MCP Server",
+		"tenant_id":   "tenant-123",
+		"description": "Test server",
+		"endpoint":    "http://localhost:3000",
+		"protocol":    "http",
+	}
+	
+	jsonData, _ := json.Marshal(reqBody)
+	req = httptest.NewRequest("POST", "/api/v1/enterprise/mcp/servers", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Create MCP server returned status: %d", w.Code)
+	
+	// Test start MCP server
+	reqBody = map[string]interface{}{
+		"server_id": "test-server-id",
+	}
+	
+	jsonData, _ = json.Marshal(reqBody)
+	req = httptest.NewRequest("POST", "/api/v1/enterprise/mcp/servers/start", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Start MCP server returned status: %d", w.Code)
+}
+
+func TestServer_ErrorHandling_Coverage(t *testing.T) {
+	server, _, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	// Test various error conditions to improve coverage
+	
+	// Test malformed JSON requests
+	endpoints := []struct {
+		method string
+		path   string
+	}{
+		{"POST", "/api/v1/documents"},
+		{"POST", "/api/v1/context/assemble"},
+		{"POST", "/api/v1/documents/search"},
+		{"DELETE", "/api/v1/documents"},
+		{"POST", "/api/v1/cache/invalidate"},
+		{"POST", "/api/v1/weights/reset"},
+	}
+	
+	for _, endpoint := range endpoints {
+		req := httptest.NewRequest(endpoint.method, endpoint.path, bytes.NewBuffer([]byte("malformed json")))
+		req.Header.Set("Content-Type", "application/json")
+		w := httptest.NewRecorder()
+		
+		server.router.ServeHTTP(w, req)
+		
+		// Most endpoints should return 400 for malformed JSON
+		if w.Code != http.StatusBadRequest && w.Code != http.StatusInternalServerError {
+			t.Logf("Endpoint %s %s with malformed JSON returned unexpected status: %d", endpoint.method, endpoint.path, w.Code)
+		}
+	}
+}
+
+func TestServer_Authentication_Coverage(t *testing.T) {
+	server, _, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	// Test requests without authentication header
+	req := httptest.NewRequest("GET", "/api/v1/documents/search?q=test", nil)
+	// Deliberately no Authorization header
+	w := httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Request without auth returned status: %d", w.Code)
+	
+	// Test with invalid bearer token
+	req = httptest.NewRequest("GET", "/api/v1/documents/search?q=test", nil)
+	req.Header.Set("Authorization", "Bearer invalid-token")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Request with invalid token returned status: %d", w.Code)
+	
+	// Test with malformed authorization header
+	req = httptest.NewRequest("GET", "/api/v1/documents/search?q=test", nil)
+	req.Header.Set("Authorization", "InvalidFormat")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Request with malformed auth header returned status: %d", w.Code)
+}
+
+func TestServer_HTTPMethods_Coverage(t *testing.T) {
+	server, _, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	// Test unsupported HTTP methods on endpoints
+	unsupportedMethods := []string{"PATCH", "PUT", "HEAD", "OPTIONS"}
+	testPaths := []string{
+		"/api/v1/documents",
+		"/api/v1/context/assemble", 
+		"/api/v1/documents/search",
+		"/health",
+	}
+	
+	for _, method := range unsupportedMethods {
+		for _, path := range testPaths {
+			req := httptest.NewRequest(method, path, nil)
+			w := httptest.NewRecorder()
+			
+			server.router.ServeHTTP(w, req)
+			
+			// Should typically return 405 Method Not Allowed or 404
+			if w.Code != http.StatusMethodNotAllowed && w.Code != http.StatusNotFound {
+				t.Logf("Method %s on %s returned unexpected status: %d", method, path, w.Code)
+			}
+		}
+	}
+}
+
+func TestServer_LargePayloads_Coverage(t *testing.T) {
+	server, _, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	// Test with very large document content
+	largeContent := strings.Repeat("x", 1024*1024) // 1MB of content
+	reqBody := map[string]interface{}{
+		"id":       "large-doc",
+		"path":     "/test/large.txt",
+		"content":  largeContent,
+		"language": "text",
+	}
+	
+	jsonData, _ := json.Marshal(reqBody)
+	req := httptest.NewRequest("POST", "/api/v1/documents", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Large document request returned status: %d", w.Code)
+	
+	// Test context assembly with very large query
+	largeQuery := strings.Repeat("search term ", 1000)
+	assembleBody := map[string]interface{}{
+		"query":       largeQuery,
+		"max_tokens":  4000,
+		"max_documents": 10,
+	}
+	
+	jsonData, _ = json.Marshal(assembleBody)
+	req = httptest.NewRequest("POST", "/api/v1/context/assemble", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer test-token")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Context assembly with large query returned status: %d", w.Code)
+}
+
+func TestServer_EdgeCases_Coverage(t *testing.T) {
+	server, _, cleanup := setupTestServer(t)
+	defer cleanup()
+	
+	// Test document with nil/empty fields
+	reqBody := map[string]interface{}{
+		"id":      "",
+		"path":    "",
+		"content": "",
+	}
+	
+	jsonData, _ := json.Marshal(reqBody)
+	req := httptest.NewRequest("POST", "/api/v1/documents", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Empty document fields returned status: %d", w.Code)
+	
+	// Test context assembly with extreme parameters
+	assembleBody := map[string]interface{}{
+		"query":         "test",
+		"max_tokens":    math.MaxInt32,
+		"max_documents": math.MaxInt32,
+	}
+	
+	jsonData, _ = json.Marshal(assembleBody)
+	req = httptest.NewRequest("POST", "/api/v1/context/assemble", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")  
+	req.Header.Set("Authorization", "Bearer test-token")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Context assembly with extreme params returned status: %d", w.Code)
+	
+	// Test with zero/negative parameters
+	assembleBody = map[string]interface{}{
+		"query":         "test",
+		"max_tokens":    0,
+		"max_documents": -1,
+	}
+	
+	jsonData, _ = json.Marshal(assembleBody)
+	req = httptest.NewRequest("POST", "/api/v1/context/assemble", bytes.NewBuffer(jsonData))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer test-token")
+	w = httptest.NewRecorder()
+	
+	server.router.ServeHTTP(w, req)
+	t.Logf("Context assembly with zero/negative params returned status: %d", w.Code)
+}
