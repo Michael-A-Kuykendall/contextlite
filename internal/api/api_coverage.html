@@ -1,0 +1,1349 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>api: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">contextlite/internal/api/server.go (80.5%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package api
+
+import (
+        "context"
+        "encoding/json"
+        "fmt"
+        "net/http"
+        "os"
+        "os/exec"
+        "path/filepath"
+        "strconv"
+        "strings"
+        "time"
+
+        "github.com/go-chi/chi/v5"
+        "github.com/go-chi/chi/v5/middleware"
+        "github.com/go-chi/cors"
+        "go.uber.org/zap"
+
+        apimiddleware "contextlite/internal/api/middleware"
+        "contextlite/pkg/config"
+        "contextlite/pkg/types"
+)
+
+// Server provides the HTTP API server
+type Server struct {
+        router      *chi.Mux
+        engine      types.ContextEngine
+        storage     types.StorageInterface
+        config      *config.Config
+        logger      *zap.Logger
+        featureGate types.FeatureGate
+}
+
+// New creates a new API server
+func New(engine types.ContextEngine, storage types.StorageInterface, config *config.Config, logger *zap.Logger, featureGate types.FeatureGate) *Server <span class="cov8" title="1">{
+        s := &amp;Server{
+                engine:      engine,
+                storage:     storage,
+                config:      config,
+                logger:      logger,
+                featureGate: featureGate,
+        }
+        
+        s.setupRoutes()
+        return s
+}</span>
+
+// setupRoutes configures the HTTP routes
+func (s *Server) setupRoutes() <span class="cov8" title="1">{
+        r := chi.NewRouter()
+        
+        // Middleware
+        r.Use(middleware.RequestID)
+        r.Use(middleware.RealIP)
+        r.Use(middleware.Logger)
+        r.Use(middleware.Recoverer)
+        r.Use(middleware.Timeout(60 * time.Second))
+        
+        // Rate limiting middleware
+        rateLimiterConfig := apimiddleware.RateLimiterConfig{
+                Enabled:           s.config.Server.RateLimiting.Enabled,
+                RequestsPerMinute: s.config.Server.RateLimiting.RequestsPerMinute,
+                Burst:             s.config.Server.RateLimiting.Burst,
+                EndpointSpecific:  s.config.Server.RateLimiting.EndpointSpecific,
+        }
+        rateLimiter := apimiddleware.NewRateLimiter(rateLimiterConfig)
+        r.Use(rateLimiter.Middleware())
+        
+        // CORS if enabled
+        if s.config.Server.CORSEnabled </span><span class="cov0" title="0">{
+                r.Use(cors.Handler(cors.Options{
+                        AllowedOrigins:   []string{"*"},
+                        AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+                        AllowedHeaders:   []string{"*"},
+                        ExposedHeaders:   []string{"Link"},
+                        AllowCredentials: true,
+                        MaxAge:           300,
+                }))
+        }</span>
+        
+        // Health check (no auth required)
+        <span class="cov8" title="1">r.Get("/health", s.handleHealth)
+        
+        // License status (no auth required)
+        r.Get("/license/status", s.handleLicenseStatus)
+        
+        // API routes with authentication
+        r.Route("/api/v1", func(r chi.Router) </span><span class="cov8" title="1">{
+                // Bearer token authentication for all API routes
+                r.Use(s.authMiddleware)
+                
+                // License and trial information
+                r.Get("/license/status", s.handleLicenseStatus)
+                r.Get("/trial/info", s.handleTrialInfo)
+                
+                // Context assembly (requires Professional+)
+                r.With(s.requireProfessional).Post("/context/assemble", s.handleAssembleContext)
+                
+                // Lightweight RAG endpoints (requires Professional+)
+                r.With(s.requireProfessional).Post("/rank", s.handleRank)
+                r.With(s.requireProfessional).Post("/snippet", s.handleSnippet)
+                
+                // Baseline comparison (requires Professional+)
+                r.With(s.requireProfessional).Post("/context/baseline", s.handleBaselineComparison)
+                
+                // Document management (Basic features - all tiers)
+                r.Post("/documents", s.handleAddDocument)
+                r.Post("/documents/bulk", s.handleBulkAddDocuments)
+                r.Post("/documents/workspace", s.handleScanWorkspace)
+                r.Delete("/documents/{id}", s.handleDeleteDocument)
+                r.Get("/documents/search", s.handleSearchDocuments)
+                
+                // Weight management (requires Professional+)
+                r.With(s.requireProfessional).Post("/weights/update", s.handleUpdateWeights)
+                r.With(s.requireProfessional).Get("/weights", s.handleGetWeights)
+                r.With(s.requireProfessional).Post("/weights/reset", s.handleResetWeights)
+                
+                // Cache management (requires Professional+)
+                r.With(s.requireProfessional).Post("/cache/invalidate", s.handleInvalidateCache)
+                r.With(s.requireProfessional).Get("/cache/stats", s.handleCacheStats)
+                
+                // System info (Basic for all, detailed for Professional+)
+                r.Get("/storage/info", s.handleStorageInfo)
+                r.With(s.requireProfessional).Get("/optimization/stats", s.handleoptimizationStats)
+                
+                // Enterprise-only endpoints
+                r.Route("/enterprise", func(r chi.Router) </span><span class="cov8" title="1">{
+                        r.Use(s.requireEnterprise)
+                        r.Get("/tenants", s.handleListTenants)
+                        r.Post("/tenants", s.handleCreateTenant)
+                        r.Get("/mcp/servers", s.handleListMCPServers)
+                        r.Post("/mcp/servers", s.handleCreateMCPServer)
+                }</span>)
+        })
+        
+        <span class="cov8" title="1">s.router = r</span>
+}
+
+// authMiddleware validates bearer token authentication
+func (s *Server) authMiddleware(next http.Handler) http.Handler <span class="cov8" title="1">{
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                // Skip auth if no token is configured
+                if s.config.Server.AuthToken == "" </span><span class="cov8" title="1">{
+                        next.ServeHTTP(w, r)
+                        return
+                }</span>
+                
+                <span class="cov8" title="1">authHeader := r.Header.Get("Authorization")
+                if authHeader == "" </span><span class="cov8" title="1">{
+                        s.writeError(w, http.StatusUnauthorized, "Missing Authorization header")
+                        return
+                }</span>
+                
+                <span class="cov8" title="1">const bearerPrefix = "Bearer "
+                if len(authHeader) &lt; len(bearerPrefix) || authHeader[:len(bearerPrefix)] != bearerPrefix </span><span class="cov0" title="0">{
+                        s.writeError(w, http.StatusUnauthorized, "Invalid Authorization header format")
+                        return
+                }</span>
+                
+                <span class="cov8" title="1">token := authHeader[len(bearerPrefix):]
+                if token != s.config.Server.AuthToken </span><span class="cov8" title="1">{
+                        s.writeError(w, http.StatusUnauthorized, "Invalid bearer token")
+                        return
+                }</span>
+                
+                <span class="cov8" title="1">next.ServeHTTP(w, r)</span>
+        })
+}
+
+// requireProfessional ensures the user has Professional or Enterprise license
+func (s *Server) requireProfessional(next http.Handler) http.Handler <span class="cov8" title="1">{
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                if err := s.featureGate.RequireProfessional(); err != nil </span><span class="cov8" title="1">{
+                        s.writeError(w, http.StatusForbidden, "Professional license required: "+err.Error())
+                        return
+                }</span>
+                <span class="cov0" title="0">next.ServeHTTP(w, r)</span>
+        })
+}
+
+// requireEnterprise ensures the user has Enterprise license
+func (s *Server) requireEnterprise(next http.Handler) http.Handler <span class="cov8" title="1">{
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                        if err := s.featureGate.RequireEnterprise(); err != nil </span><span class="cov8" title="1">{
+                        s.writeError(w, http.StatusForbidden, "Enterprise license required: "+err.Error())
+                        return
+                }</span>
+                <span class="cov0" title="0">next.ServeHTTP(w, r)</span>
+        })
+}
+
+// ServeHTTP implements http.Handler
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        s.router.ServeHTTP(w, r)
+}</span>
+
+// Start starts the HTTP server
+func (s *Server) Start() error <span class="cov8" title="1">{
+        addr := s.config.Server.Host + ":" + strconv.Itoa(s.config.Server.Port)
+        s.logger.Info("Starting HTTP server", zap.String("address", addr))
+        
+        server := &amp;http.Server{
+                Addr:         addr,
+                Handler:      s,
+                ReadTimeout:  30 * time.Second,
+                WriteTimeout: 30 * time.Second,
+                IdleTimeout:  120 * time.Second,
+        }
+        
+        return server.ListenAndServe()
+}</span>
+
+// Health check endpoint
+func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // Get optimizer version info
+        z3Version := s.getoptimizerVersion()
+        
+        // Get database stats
+        dbStats := s.getDatabaseStats()
+        
+        response := map[string]interface{}{
+                "status":    "healthy",
+                "timestamp": time.Now().Unix(),
+                "version":   "1.0.0",
+                "optimization": map[string]interface{}{
+                        "solver":   "optimizer",
+                        "version":  z3Version,
+                        "enabled":  true,
+                        "policy":   "optimization optimization selects document subsets to maximize utility while minimizing redundancy using budget management",
+                },
+                "database": dbStats,
+                "features": map[string]bool{
+                        "cache_enabled":     true,
+                        "fts_search":       true, 
+                        "quantum_scoring":  true,
+                        "optimization_optimization": true,
+                },
+        }
+        
+        s.writeJSON(w, http.StatusOK, response)
+}</span>
+
+// Context assembly endpoint
+func (s *Server) handleAssembleContext(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        var req types.AssembleRequest
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
+                return
+        }</span>
+        
+        // Apply defaults
+        <span class="cov8" title="1">if req.MaxTokens &lt;= 0 </span><span class="cov0" title="0">{
+                req.MaxTokens = s.config.Tokenizer.MaxTokensDefault
+        }</span>
+        <span class="cov8" title="1">if req.MaxDocuments &lt;= 0 </span><span class="cov0" title="0">{
+                req.MaxDocuments = 10
+        }</span>
+        <span class="cov8" title="1">if req.ModelID == "" </span><span class="cov8" title="1">{
+                req.ModelID = s.config.Tokenizer.ModelID
+        }</span>
+        <span class="cov8" title="1">if !req.Useoptimization </span><span class="cov8" title="1">{
+                req.Useoptimization = true // Default to optimization optimization
+        }</span>
+        <span class="cov8" title="1">if req.UseCache </span><span class="cov0" title="0">{
+                req.UseCache = true // Default to using cache
+        }</span>
+        
+        // Assemble context
+        <span class="cov8" title="1">ctx := r.Context()
+        
+        // Convert AssembleRequest to ContextRequest for engine interface
+        contextReq := types.ContextRequest{
+                Query:         req.Query,
+                MaxTokens:     req.MaxTokens,
+                MaxDocuments:  req.MaxDocuments,
+                WorkspacePath: req.WorkspacePath,
+        }
+        
+        result, err := s.engine.AssembleContext(ctx, contextReq)
+        if err != nil </span><span class="cov0" title="0">{
+                s.logger.Error("Failed to assemble context", zap.Error(err))
+                s.writeError(w, http.StatusInternalServerError, "Failed to assemble context: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">s.writeJSON(w, http.StatusOK, result)</span>
+}
+
+// Baseline comparison endpoint
+func (s *Server) handleBaselineComparison(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        var req types.AssembleRequest
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov0" title="0">{
+                s.writeError(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
+                return
+        }</span>
+        
+        // Apply defaults
+        <span class="cov8" title="1">if req.MaxTokens &lt;= 0 </span><span class="cov8" title="1">{
+                req.MaxTokens = s.config.Tokenizer.MaxTokensDefault
+        }</span>
+        <span class="cov8" title="1">if req.MaxDocuments &lt;= 0 </span><span class="cov8" title="1">{
+                req.MaxDocuments = 10
+        }</span>
+        <span class="cov8" title="1">if req.ModelID == "" </span><span class="cov8" title="1">{
+                req.ModelID = s.config.Tokenizer.ModelID
+        }</span>
+        
+        <span class="cov8" title="1">ctx := r.Context()
+        
+        // Get Advanced results
+        req.Useoptimization = true
+        req.UseCache = false // Force fresh computation for comparison
+        
+        contextReq := types.ContextRequest{
+                Query:         req.Query,
+                MaxTokens:     req.MaxTokens,
+                MaxDocuments:  req.MaxDocuments,
+                WorkspacePath: req.WorkspacePath,
+        }
+        
+        optimizationResult, err := s.engine.AssembleContext(ctx, contextReq)
+        if err != nil </span><span class="cov0" title="0">{
+                s.logger.Error("Failed to get optimization results", zap.Error(err))
+                s.writeError(w, http.StatusInternalServerError, "Failed to get optimization results: "+err.Error())
+                return
+        }</span>
+        
+        // Get all documents for baseline comparison
+        <span class="cov8" title="1">allDocs, err := s.storage.SearchDocuments(ctx, req.Query, 1000) // Get more docs for baseline
+        if err != nil </span><span class="cov0" title="0">{
+                s.logger.Error("Failed to search documents for baseline", zap.Error(err))
+                s.writeError(w, http.StatusInternalServerError, "Failed to search documents: "+err.Error())
+                return
+        }</span>
+        
+        // Run simple baseline (basic text matching + document length)
+        <span class="cov8" title="1">baselineResults := s.simpleBaseline(allDocs, req.Query, req.MaxDocuments)
+        
+        // Create baseline response format
+        baselineDocRefs := make([]types.DocumentReference, len(baselineResults))
+        for i, doc := range baselineResults </span><span class="cov0" title="0">{
+                baselineDocRefs[i] = types.DocumentReference{
+                        ID:              doc.ID,
+                        Path:            doc.Path,
+                        Content:         doc.Content,
+                        Language:        doc.Language,
+                        UtilityScore:    0.5, // Simple baseline score
+                        RelevanceScore:  0.5,
+                        RecencyScore:    0.5,
+                        InclusionReason: "baseline_selected",
+                }
+        }</span>
+        
+        <span class="cov8" title="1">baselineResponse := &amp;types.QueryResult{
+                Query:          req.Query,
+                Documents:      baselineDocRefs,
+                CoherenceScore: 1.0, // Assume baseline is coherent
+                optimizationMetrics: types.optimizationMetrics{
+                        Objective:       0, // No optimization optimization
+                        VariableCount:   0,
+                        ConstraintCount: 0,
+                        optimizationWallMs:       0,
+                        FallbackReason:  "baseline_method",
+                },
+                CacheKey: "", // No cache for baseline
+        }
+        
+        // Compare results  
+        optimizationMetrics := types.optimizationResult{}
+        if optimizationResult.optimizationMetrics != nil </span><span class="cov0" title="0">{
+                optimizationMetrics = *optimizationResult.optimizationMetrics
+        }</span>
+        
+        <span class="cov8" title="1">comparison := map[string]interface{}{
+                "query": req.Query,
+                "optimization_optimized": map[string]interface{}{
+                        "documents":        optimizationResult.Documents,
+                        "coherence_score":  optimizationResult.CoherenceScore,
+                        "optimization_objective":    optimizationMetrics.Objective,
+                        "solve_time_ms":    float64(optimizationMetrics.SolveTimeUs) / 1000,
+                        "variables":        optimizationMetrics.VariableCount,
+                        "budgets":      optimizationMetrics.ConstraintCount,
+                        "method":           "optimization_optimization",
+                },
+                "baseline": map[string]interface{}{
+                        "documents":        baselineResponse.Documents,
+                        "coherence_score":  baselineResponse.CoherenceScore,
+                        "method":           "BM25_MMR",
+                },
+                "comparison": map[string]interface{}{
+                        "document_overlap": s.calculateDocumentOverlap(optimizationResult.Documents, baselineResponse.Documents),
+                        "optimization_speedup":      "N/A", // optimization is optimization, not speed improvement
+                        "diversity_diff":   s.calculateDiversityDifference(optimizationResult.Documents, baselineResponse.Documents),
+                },
+        }
+        
+        s.writeJSON(w, http.StatusOK, comparison)</span>
+}
+
+// Add single document
+func (s *Server) handleAddDocument(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        var doc types.Document
+        if err := json.NewDecoder(r.Body).Decode(&amp;doc); err != nil </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Invalid document: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">ctx := r.Context()
+        if err := s.storage.AddDocument(ctx, &amp;doc); err != nil </span><span class="cov0" title="0">{
+                s.logger.Error("Failed to add document", zap.Error(err))
+                s.writeError(w, http.StatusInternalServerError, "Failed to add document: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">s.writeJSON(w, http.StatusCreated, map[string]string{"id": doc.ID})</span>
+}
+
+// Bulk add documents
+func (s *Server) handleBulkAddDocuments(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        var docs []types.Document
+        if err := json.NewDecoder(r.Body).Decode(&amp;docs); err != nil </span><span class="cov0" title="0">{
+                s.writeError(w, http.StatusBadRequest, "Invalid documents: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">ctx := r.Context()
+        var added []string
+        var errors []string
+        
+        for _, doc := range docs </span><span class="cov8" title="1">{
+                if err := s.storage.AddDocument(ctx, &amp;doc); err != nil </span><span class="cov0" title="0">{
+                        errors = append(errors, "Failed to add "+doc.Path+": "+err.Error())
+                }</span> else<span class="cov8" title="1"> {
+                        added = append(added, doc.ID)
+                }</span>
+        }
+        
+        <span class="cov8" title="1">response := map[string]interface{}{
+                "added":  added,
+                "errors": errors,
+                "total":  len(docs),
+        }
+        
+        s.writeJSON(w, http.StatusOK, response)</span>
+}
+
+// Scan workspace directory
+func (s *Server) handleScanWorkspace(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        var req struct {
+                Path           string   `json:"path"`
+                IncludePatterns []string `json:"include_patterns,omitempty"`
+                ExcludePatterns []string `json:"exclude_patterns,omitempty"`
+                MaxFiles       int      `json:"max_files,omitempty"`
+        }
+        
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Invalid request: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">if req.Path == "" </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Workspace path required")
+                return
+        }</span>
+        
+        <span class="cov8" title="1">if req.MaxFiles == 0 </span><span class="cov8" title="1">{
+                req.MaxFiles = 1000 // Default limit
+        }</span>
+        
+        // Default include patterns for code files
+        <span class="cov8" title="1">if len(req.IncludePatterns) == 0 </span><span class="cov8" title="1">{
+                req.IncludePatterns = []string{"*.go", "*.js", "*.ts", "*.py", "*.java", "*.cpp", "*.h", "*.md", "*.txt"}
+        }</span>
+        
+        // Default exclude patterns
+        <span class="cov8" title="1">if len(req.ExcludePatterns) == 0 </span><span class="cov8" title="1">{
+                req.ExcludePatterns = []string{"node_modules", ".git", "build", "dist", "*.log", "*.tmp"}
+        }</span>
+        
+        <span class="cov8" title="1">ctx := r.Context()
+        files, err := s.scanWorkspaceFiles(ctx, req.Path, req.IncludePatterns, req.ExcludePatterns, req.MaxFiles)
+        if err != nil </span><span class="cov0" title="0">{
+                s.logger.Error("Failed to scan workspace", zap.String("path", req.Path), zap.Error(err))
+                s.writeError(w, http.StatusInternalServerError, "Failed to scan workspace: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">response := map[string]interface{}{
+                "scanned_files": len(files),
+                "indexed_files": 0, // Will be updated as files are processed
+                "files":         files,
+        }
+        
+        s.writeJSON(w, http.StatusOK, response)</span>
+}
+
+// Delete document
+func (s *Server) handleDeleteDocument(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        id := chi.URLParam(r, "id")
+        if id == "" </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Document ID required")
+                return
+        }</span>
+        
+        <span class="cov8" title="1">ctx := r.Context()
+        if err := s.storage.DeleteDocument(ctx, id); err != nil </span><span class="cov0" title="0">{
+                s.logger.Error("Failed to delete document", zap.String("id", id), zap.Error(err))
+                s.writeError(w, http.StatusInternalServerError, "Failed to delete document: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">s.writeJSON(w, http.StatusOK, map[string]string{"status": "deleted"})</span>
+}
+
+// Search documents
+func (s *Server) handleSearchDocuments(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        query := r.URL.Query().Get("q")
+        if query == "" </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Query parameter 'q' required")
+                return
+        }</span>
+        
+        <span class="cov8" title="1">limitStr := r.URL.Query().Get("limit")
+        limit := 20 // Default limit
+        if limitStr != "" </span><span class="cov8" title="1">{
+                if parsed, err := strconv.Atoi(limitStr); err == nil &amp;&amp; parsed &gt; 0 </span><span class="cov8" title="1">{
+                        limit = parsed
+                }</span>
+        }
+        
+        <span class="cov8" title="1">ctx := r.Context()
+        docs, err := s.storage.SearchDocuments(ctx, query, limit)
+        if err != nil </span><span class="cov0" title="0">{
+                s.logger.Error("Failed to search documents", zap.Error(err))
+                s.writeError(w, http.StatusInternalServerError, "Failed to search documents: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">s.writeJSON(w, http.StatusOK, map[string]interface{}{
+                "query":     query,
+                "documents": docs,
+                "total":     len(docs),
+        })</span>
+}
+
+// Update workspace weights
+func (s *Server) handleUpdateWeights(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        var feedback types.UserFeedback
+        if err := json.NewDecoder(r.Body).Decode(&amp;feedback); err != nil </span><span class="cov0" title="0">{
+                s.writeError(w, http.StatusBadRequest, "Invalid feedback: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">ctx := r.Context()
+        
+        // Get current workspace weights
+        weights, err := s.storage.GetWorkspaceWeights(ctx, feedback.WorkspacePath)
+        if err != nil </span><span class="cov8" title="1">{
+                // Create default weights if not found
+                weights = &amp;types.WorkspaceWeights{
+                        WorkspacePath:      feedback.WorkspacePath,
+                        RelevanceWeight:    0.3,
+                        RecencyWeight:      0.2,
+                        EntanglementWeight: 0.15,
+                        DiversityWeight:    0.15,
+                        RedundancyPenalty:  0.2,
+                        UpdateCount:        0,
+                }
+        }</span>
+        
+        // Apply learning rate adjustments based on feedback
+        <span class="cov8" title="1">learningRate := 0.1
+        
+        // Positive feedback (accepted docs) - increase relevance-related weights
+        if len(feedback.AcceptedDocs) &gt; 0 </span><span class="cov8" title="1">{
+                weights.RelevanceWeight *= (1 + learningRate)
+                weights.RecencyWeight *= (1 + learningRate * 0.5)
+                weights.EntanglementWeight *= (1 + learningRate * 0.3)
+        }</span>
+        
+        // Negative feedback (rejected docs) - decrease weights and increase diversity
+        <span class="cov8" title="1">if len(feedback.RejectedDocs) &gt; 0 </span><span class="cov8" title="1">{
+                weights.RelevanceWeight *= (1 - learningRate * 0.5)
+                weights.DiversityWeight *= (1 + learningRate * 0.3)
+                weights.RedundancyPenalty *= (1 + learningRate * 0.2)
+        }</span>
+        
+        // Normalize weights to reasonable ranges
+        <span class="cov8" title="1">total := weights.RelevanceWeight + weights.RecencyWeight + weights.EntanglementWeight + weights.DiversityWeight
+        if total &gt; 0 </span><span class="cov8" title="1">{
+                weights.RelevanceWeight /= total
+                weights.RecencyWeight /= total
+                weights.EntanglementWeight /= total
+                weights.DiversityWeight /= total
+        }</span>
+        
+        // Update metadata
+        <span class="cov8" title="1">weights.UpdateCount++
+        weights.LastUpdated = time.Now().Format(time.RFC3339)
+        
+        // Save updated weights
+        featureWeights := types.FeatureWeights{
+                Relevance:    weights.RelevanceWeight,
+                Recency:      weights.RecencyWeight,
+                Entanglement: weights.EntanglementWeight,
+                Prior:        0.0, // Not available in WorkspaceWeights
+                Authority:    0.0, // Not available in WorkspaceWeights
+                Specificity:  weights.DiversityWeight,
+                Uncertainty:  weights.RedundancyPenalty,
+        }
+        if err := s.storage.SaveWorkspaceWeights(feedback.WorkspacePath, featureWeights); err != nil </span><span class="cov0" title="0">{
+                s.writeError(w, http.StatusInternalServerError, "Failed to save weights: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">s.writeJSON(w, http.StatusOK, map[string]interface{}{
+                "status": "weights updated",
+                "weights": weights,
+        })</span>
+}
+
+// Get workspace weights
+func (s *Server) handleGetWeights(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        workspacePath := r.URL.Query().Get("workspace")
+        if workspacePath == "" </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Workspace path required")
+                return
+        }</span>
+        
+        <span class="cov0" title="0">ctx := r.Context()
+        weights, err := s.storage.GetWorkspaceWeights(ctx, workspacePath)
+        if err != nil </span><span class="cov0" title="0">{
+                s.writeError(w, http.StatusNotFound, "Workspace weights not found")
+                return
+        }</span>
+        
+        <span class="cov0" title="0">s.writeJSON(w, http.StatusOK, weights)</span>
+}
+
+// Reset workspace weights
+func (s *Server) handleResetWeights(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        workspacePath := r.URL.Query().Get("workspace")
+        if workspacePath == "" </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Workspace path required")
+                return
+        }</span>
+        
+        // Create default weights
+        <span class="cov8" title="1">defaultWeights := &amp;types.WorkspaceWeights{
+                WorkspacePath:      workspacePath,
+                RelevanceWeight:    0.3,
+                RecencyWeight:      0.2,
+                EntanglementWeight: 0.15,
+                DiversityWeight:    0.15,
+                RedundancyPenalty:  0.2,
+                UpdateCount:        0,
+                LastUpdated:        time.Now().Format(time.RFC3339),
+        }
+        
+        // Save default weights
+        defaultFeatureWeights := types.FeatureWeights{
+                Relevance:    defaultWeights.RelevanceWeight,
+                Recency:      defaultWeights.RecencyWeight,
+                Entanglement: defaultWeights.EntanglementWeight,
+                Prior:        0.0,
+                Authority:    0.0,
+                Specificity:  defaultWeights.DiversityWeight,
+                Uncertainty:  defaultWeights.RedundancyPenalty,
+        }
+        if err := s.storage.SaveWorkspaceWeights(workspacePath, defaultFeatureWeights); err != nil </span><span class="cov0" title="0">{
+                s.writeError(w, http.StatusInternalServerError, "Failed to reset weights: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">s.writeJSON(w, http.StatusOK, map[string]interface{}{
+                "status": "weights reset to defaults",
+                "weights": defaultWeights,
+        })</span>
+}
+
+// Invalidate cache
+func (s *Server) handleInvalidateCache(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        ctx := r.Context()
+        // Execute cache invalidation by deleting all cache entries
+        err := s.storage.InvalidateCache(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                s.logger.Error("Failed to invalidate cache", zap.Error(err))
+                s.writeError(w, http.StatusInternalServerError, "Failed to invalidate cache: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">s.writeJSON(w, http.StatusOK, map[string]string{
+                "status": "cache invalidated",
+                "message": "All cached results have been cleared",
+        })</span>
+}
+
+// Cache stats
+func (s *Server) handleCacheStats(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        ctx := r.Context()
+        stats, err := s.storage.GetCacheStats(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                s.logger.Error("Failed to get cache stats", zap.Error(err))
+                s.writeError(w, http.StatusInternalServerError, "Failed to get cache stats: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">s.writeJSON(w, http.StatusOK, stats)</span>
+}
+
+// Storage info
+func (s *Server) handleStorageInfo(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        ctx := r.Context()
+        info, err := s.storage.GetStorageStats(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                s.logger.Error("Failed to get storage info", zap.Error(err))
+                s.writeError(w, http.StatusInternalServerError, "Failed to get storage info: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">s.writeJSON(w, http.StatusOK, info)</span>
+}
+
+// optimization stats
+func (s *Server) handleoptimizationStats(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // TODO: Get actual optimization system statistics
+        stats := map[string]interface{}{
+                "total_solves":        0,
+                "average_solve_time":  "0ms",
+                "fallback_rate":       0.0,
+                "optimality_gap":      0.0,
+        }
+        
+        s.writeJSON(w, http.StatusOK, stats)
+}</span>
+
+// Enterprise tenant management endpoints
+func (s *Server) handleListTenants(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // This would integrate with the enterprise tenant manager
+        tenants := []map[string]interface{}{
+                {
+                        "id":          "demo-tenant",
+                        "name":        "Demo Organization",
+                        "status":      "active",
+                        "created_at":  time.Now().Add(-24*time.Hour).Unix(),
+                        "user_count":  5,
+                },
+        }
+        
+        s.writeJSON(w, http.StatusOK, map[string]interface{}{
+                "tenants": tenants,
+                "total":   len(tenants),
+        })
+}</span>
+
+func (s *Server) handleCreateTenant(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        var req struct {
+                Name     string `json:"name"`
+                Domain   string `json:"domain"`
+                Settings map[string]interface{} `json:"settings,omitempty"`
+        }
+        
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Invalid request: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">if req.Name == "" || req.Domain == "" </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Name and domain required")
+                return
+        }</span>
+        
+        // Generate tenant ID
+        <span class="cov8" title="1">tenantID := fmt.Sprintf("tenant_%d", time.Now().Unix())
+        
+        response := map[string]interface{}{
+                "id":         tenantID,
+                "name":       req.Name,
+                "domain":     req.Domain,
+                "status":     "active",
+                "created_at": time.Now().Unix(),
+                "database_url": fmt.Sprintf("./data/%s.db", tenantID),
+        }
+        
+        s.writeJSON(w, http.StatusCreated, response)</span>
+}
+
+// Enterprise MCP server management endpoints
+func (s *Server) handleListMCPServers(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        servers := []map[string]interface{}{
+                {
+                        "id":        "jira-integration",
+                        "name":      "Jira Integration",
+                        "type":      "jira",
+                        "status":    "active",
+                        "endpoint":  "http://localhost:3001",
+                        "created_at": time.Now().Add(-2*time.Hour).Unix(),
+                },
+                {
+                        "id":        "slack-bot",
+                        "name":      "Slack Bot",
+                        "type":      "slack",
+                        "status":    "active",
+                        "endpoint":  "http://localhost:3002",
+                        "created_at": time.Now().Add(-1*time.Hour).Unix(),
+                },
+        }
+        
+        s.writeJSON(w, http.StatusOK, map[string]interface{}{
+                "servers": servers,
+                "total":   len(servers),
+        })
+}</span>
+
+func (s *Server) handleCreateMCPServer(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        var req struct {
+                Name   string                 `json:"name"`
+                Type   string                 `json:"type"`
+                Config map[string]interface{} `json:"config"`
+        }
+        
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Invalid request: "+err.Error())
+                return
+        }</span>
+        
+        <span class="cov8" title="1">if req.Name == "" || req.Type == "" </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Name and type required")
+                return
+        }</span>
+        
+        // Generate server ID
+        <span class="cov8" title="1">serverID := fmt.Sprintf("mcp_%d", time.Now().Unix())
+        port := 3000 + len(serverID)%1000 // Simple port allocation
+        
+        response := map[string]interface{}{
+                "id":         serverID,
+                "name":       req.Name,
+                "type":       req.Type,
+                "status":     "deploying",
+                "endpoint":   fmt.Sprintf("http://localhost:%d", port),
+                "created_at": time.Now().Unix(),
+                "config":     req.Config,
+        }
+        
+        s.writeJSON(w, http.StatusCreated, response)</span>
+}
+
+// Helper methods
+
+// getoptimizerVersion returns the optimization engine version information
+func (s *Server) getoptimizerVersion() string <span class="cov8" title="1">{
+        // Try to get optimizer version by running z3 --version
+        cmd := exec.Command("z3", "--version")
+        output, err := cmd.Output()
+        if err != nil </span><span class="cov0" title="0">{
+                // Fallback if z3 not available
+                return "optimizer not available"
+        }</span>
+        
+        // Parse version from output like "optimizer version 4.15.2 - 64 bit"
+        <span class="cov8" title="1">version := strings.TrimSpace(string(output))
+        if strings.Contains(version, "optimizer version") </span><span class="cov8" title="1">{
+                parts := strings.Fields(version)
+                if len(parts) &gt;= 3 </span><span class="cov8" title="1">{
+                        return parts[2] // Extract version number
+                }</span>
+        }
+        
+        <span class="cov0" title="0">return strings.TrimSpace(version)</span>
+}
+
+// scanWorkspaceFiles scans a directory for relevant files
+func (s *Server) scanWorkspaceFiles(ctx context.Context, workspacePath string, includePatterns, excludePatterns []string, maxFiles int) ([]map[string]interface{}, error) <span class="cov8" title="1">{
+        var files []map[string]interface{}
+        
+        err := filepath.Walk(workspacePath, func(path string, info os.FileInfo, err error) error </span><span class="cov8" title="1">{
+                if err != nil </span><span class="cov8" title="1">{
+                        return nil // Skip files we can't read
+                }</span>
+                
+                <span class="cov8" title="1">if info.IsDir() </span><span class="cov8" title="1">{
+                        // Check if directory should be excluded
+                        dirName := filepath.Base(path)
+                        for _, pattern := range excludePatterns </span><span class="cov8" title="1">{
+                                if matched, _ := filepath.Match(pattern, dirName); matched </span><span class="cov0" title="0">{
+                                        return filepath.SkipDir
+                                }</span>
+                        }
+                        <span class="cov8" title="1">return nil</span>
+                }
+                
+                // Check file size (skip very large files)
+                <span class="cov8" title="1">if info.Size() &gt; 100*1024 </span><span class="cov0" title="0">{ // 100KB limit
+                        return nil
+                }</span>
+                
+                // Check if file matches include patterns
+                <span class="cov8" title="1">fileName := filepath.Base(path)
+                matched := false
+                for _, pattern := range includePatterns </span><span class="cov8" title="1">{
+                        if m, _ := filepath.Match(pattern, fileName); m </span><span class="cov8" title="1">{
+                                matched = true
+                                break</span>
+                        }
+                }
+                
+                <span class="cov8" title="1">if !matched </span><span class="cov8" title="1">{
+                        return nil
+                }</span>
+                
+                // Check exclude patterns
+                <span class="cov8" title="1">for _, pattern := range excludePatterns </span><span class="cov8" title="1">{
+                        if matched, _ := filepath.Match(pattern, fileName); matched </span><span class="cov0" title="0">{
+                                return nil
+                        }</span>
+                }
+                
+                // Stop if we've hit the file limit
+                <span class="cov8" title="1">if len(files) &gt;= maxFiles </span><span class="cov8" title="1">{
+                        return filepath.SkipDir
+                }</span>
+                
+                <span class="cov8" title="1">relPath, _ := filepath.Rel(workspacePath, path)
+                files = append(files, map[string]interface{}{
+                        "path":         relPath,
+                        "full_path":    path,
+                        "size_bytes":   info.Size(),
+                        "modified_at":  info.ModTime().Unix(),
+                        "extension":    filepath.Ext(path),
+                })
+                
+                return nil</span>
+        })
+        
+        <span class="cov8" title="1">return files, err</span>
+}
+
+// getDatabaseStats returns basic database statistics
+func (s *Server) getDatabaseStats() map[string]interface{} <span class="cov8" title="1">{
+        
+        // Get real storage stats
+        ctx := context.Background()
+        storageStats, err := s.storage.GetStorageStats(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                // Fallback to default stats if query fails
+                return map[string]interface{}{
+                        "documents_indexed": "0",
+                        "cache_entries":     "active", 
+                        "fts_enabled":       true,
+                        "last_optimized":    time.Now().Add(-1 * time.Hour).Unix(),
+                }
+        }</span>
+        
+        // Extract document count and format appropriately
+        <span class="cov8" title="1">docCount, ok := storageStats["total_documents"].(int)
+        if !ok </span><span class="cov0" title="0">{
+                docCount = 0
+        }</span>
+        
+        <span class="cov8" title="1">var docCountStr string
+        if docCount == 0 </span><span class="cov8" title="1">{
+                docCountStr = "0"
+        }</span> else<span class="cov0" title="0"> if docCount &gt;= 10000 </span><span class="cov0" title="0">{
+                docCountStr = "10000+"
+        }</span> else<span class="cov0" title="0"> {
+                docCountStr = fmt.Sprintf("%d", docCount)
+        }</span>
+        
+        <span class="cov8" title="1">return map[string]interface{}{
+                "documents_indexed": docCountStr,
+                "cache_entries":     "active", 
+                "fts_enabled":       true,
+                "last_optimized":    time.Now().Add(-1 * time.Hour).Unix(),
+        }</span>
+}
+
+// calculateDocumentOverlap computes the percentage of documents that appear in both result sets
+func (s *Server) calculateDocumentOverlap(optimizationDocs, baselineDocs []types.DocumentReference) float64 <span class="cov8" title="1">{
+        if len(optimizationDocs) == 0 || len(baselineDocs) == 0 </span><span class="cov8" title="1">{
+                return 0.0
+        }</span>
+        
+        <span class="cov8" title="1">optimizationIDs := make(map[string]bool)
+        for _, doc := range optimizationDocs </span><span class="cov8" title="1">{
+                optimizationIDs[doc.ID] = true
+        }</span>
+        
+        <span class="cov8" title="1">overlap := 0
+        for _, doc := range baselineDocs </span><span class="cov8" title="1">{
+                if optimizationIDs[doc.ID] </span><span class="cov8" title="1">{
+                        overlap++
+                }</span>
+        }
+        
+        // Calculate overlap as percentage of smaller set
+        <span class="cov8" title="1">smaller := len(optimizationDocs)
+        if len(baselineDocs) &lt; smaller </span><span class="cov0" title="0">{
+                smaller = len(baselineDocs)
+        }</span>
+        
+        <span class="cov8" title="1">return float64(overlap) / float64(smaller)</span>
+}
+
+// calculateDiversityDifference computes the difference in diversity scores between methods
+func (s *Server) calculateDiversityDifference(optimizationDocs, baselineDocs []types.DocumentReference) float64 <span class="cov8" title="1">{
+        if len(optimizationDocs) == 0 || len(baselineDocs) == 0 </span><span class="cov8" title="1">{
+                return 0.0
+        }</span>
+        
+        // For DocumentReference, we don't have direct diversity scores, so return 0
+        // In a full implementation, you'd calculate diversity from the documents themselves
+        <span class="cov8" title="1">return 0.0</span>
+}
+
+func (s *Server) writeJSON(w http.ResponseWriter, status int, data interface{}) <span class="cov8" title="1">{
+        w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(status)
+        json.NewEncoder(w).Encode(data)
+}</span>
+
+func (s *Server) writeError(w http.ResponseWriter, status int, message string) <span class="cov8" title="1">{
+        s.writeJSON(w, status, map[string]string{"error": message})
+}</span>
+
+// --- RAG convenience types ---
+type rankRequest struct {
+        Query     string `json:"query"`
+        K         int    `json:"k"`
+        BudgetMs  int    `json:"budget_ms"`
+        MaxTokens int    `json:"max_tokens,omitempty"`
+        UseCache  bool   `json:"use_cache,omitempty"`
+}
+
+type position struct { Line int `json:"line"`; Character int `json:"character"` }
+
+type rangeJSON struct { Start position `json:"start"`; End position `json:"end"` }
+
+type rankItem struct {
+        File    string     `json:"file"`
+        Range   *rangeJSON `json:"range,omitempty"`
+        Snippet string     `json:"snippet"`
+        Score   float64    `json:"score"`
+        Why     string     `json:"why"`
+}
+
+type rankResponse struct {
+        Items []rankItem `json:"items"`
+        P99Ms int        `json:"p99_ms"`
+}
+
+type snippetRequest struct {
+        File  string   `json:"file"`
+        Start position `json:"start"`
+        End   position `json:"end"`
+}
+
+type snippetResponse struct {
+        Snippet string `json:"snippet"`
+}
+
+// --- /api/v1/rank ---
+func (s *Server) handleRank(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        var reqBody rankRequest
+        if err := json.NewDecoder(r.Body).Decode(&amp;reqBody); err != nil </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
+                return
+        }</span>
+        <span class="cov8" title="1">if reqBody.Query == "" </span><span class="cov8" title="1">{ 
+                s.writeError(w, http.StatusBadRequest, "query required")
+                return 
+        }</span>
+
+        // Map to ContextRequest
+        <span class="cov8" title="1">cr := types.ContextRequest{
+                Query:         reqBody.Query,
+                MaxTokens:     s.config.Tokenizer.MaxTokensDefault,
+                MaxDocuments:  10,
+                WorkspacePath: "",
+        }
+        if reqBody.K &gt; 0 </span><span class="cov8" title="1">{ cr.MaxDocuments = reqBody.K }</span>
+        <span class="cov8" title="1">if reqBody.MaxTokens &gt; 0 </span><span class="cov0" title="0">{ cr.MaxTokens = reqBody.MaxTokens }</span>
+
+        <span class="cov8" title="1">ctx := r.Context()
+        res, err := s.engine.AssembleContext(ctx, cr)
+        if err != nil </span><span class="cov0" title="0">{
+                s.logger.Error("rank assembly failed", zap.Error(err))
+                s.writeError(w, http.StatusInternalServerError, "assembly failed: "+err.Error())
+                return
+        }</span>
+
+        <span class="cov8" title="1">items := make([]rankItem, 0, len(res.Documents))
+        for _, d := range res.Documents </span><span class="cov0" title="0">{
+                score := d.UtilityScore
+                if score == 0 &amp;&amp; d.RelevanceScore &gt; 0 </span><span class="cov0" title="0">{ score = d.RelevanceScore }</span>
+                <span class="cov0" title="0">items = append(items, rankItem{
+                        File:    d.Path,
+                        Range:   nil,                   // precise line ranges unavailable here; use /snippet for exact slicing
+                        Snippet: d.Content,             // optimization/packing already trimmed content
+                        Score:   score,
+                        Why:     d.InclusionReason,
+                })</span>
+        }
+
+        <span class="cov8" title="1">out := rankResponse{ Items: items, P99Ms: int(res.ProcessingTime.Milliseconds()) }
+        s.writeJSON(w, http.StatusOK, out)</span>
+}
+
+// --- /api/v1/snippet ---
+func (s *Server) handleSnippet(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        var req snippetRequest
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov8" title="1">{
+                s.writeError(w, http.StatusBadRequest, "Invalid request body: "+err.Error())
+                return
+        }</span>
+        <span class="cov8" title="1">if req.File == "" </span><span class="cov8" title="1">{ 
+                s.writeError(w, http.StatusBadRequest, "file required")
+                return 
+        }</span>
+
+        <span class="cov8" title="1">ctx := r.Context()
+        // Fast path: read from storage by path
+        doc, err := s.storage.GetDocumentByPath(ctx, req.File)
+        if err != nil || doc == nil </span><span class="cov8" title="1">{ 
+                s.writeError(w, http.StatusNotFound, "file not indexed: "+req.File)
+                return 
+        }</span>
+
+        <span class="cov8" title="1">lines := strings.Split(doc.Content, "\n")
+        // clamp indices
+        sLine := req.Start.Line; eLine := req.End.Line
+        if sLine &lt; 0 </span><span class="cov0" title="0">{ sLine = 0 }</span>
+        <span class="cov8" title="1">if eLine &lt;= 0 || eLine &gt; len(lines) </span><span class="cov0" title="0">{ eLine = len(lines) }</span>
+        <span class="cov8" title="1">if sLine &gt; eLine </span><span class="cov0" title="0">{ sLine, eLine = eLine, sLine }</span>
+
+        <span class="cov8" title="1">snippet := strings.Join(lines[sLine:eLine], "\n")
+        s.writeJSON(w, http.StatusOK, snippetResponse{ Snippet: snippet })</span>
+}
+
+// simpleBaseline provides a basic baseline for comparison without complex features
+func (s *Server) simpleBaseline(docs []types.Document, query string, maxDocs int) []types.Document <span class="cov8" title="1">{
+        if len(docs) &lt;= maxDocs </span><span class="cov8" title="1">{
+                return docs // Return all if under limit
+        }</span>
+        
+        // Simple scoring: query term frequency + document length preference
+        <span class="cov8" title="1">type scoredDoc struct {
+                doc   types.Document
+                score float64
+        }
+        
+        queryTerms := strings.Fields(strings.ToLower(query))
+        scored := make([]scoredDoc, len(docs))
+        
+        for i, doc := range docs </span><span class="cov8" title="1">{
+                content := strings.ToLower(doc.Content)
+                score := 0.0
+                
+                // Count query term matches
+                for _, term := range queryTerms </span><span class="cov8" title="1">{
+                        score += float64(strings.Count(content, term))
+                }</span>
+                
+                // Slight preference for longer documents (more authoritative)
+                <span class="cov8" title="1">score += float64(len(doc.Content)) / 10000.0
+                
+                scored[i] = scoredDoc{doc: doc, score: score}</span>
+        }
+        
+        // Sort by score descending
+        <span class="cov8" title="1">for i := 0; i &lt; len(scored)-1; i++ </span><span class="cov8" title="1">{
+                for j := i + 1; j &lt; len(scored); j++ </span><span class="cov8" title="1">{
+                        if scored[j].score &gt; scored[i].score </span><span class="cov8" title="1">{
+                                scored[i], scored[j] = scored[j], scored[i]
+                        }</span>
+                }
+        }
+        
+        // Return top maxDocs
+        <span class="cov8" title="1">result := make([]types.Document, maxDocs)
+        for i := 0; i &lt; maxDocs; i++ </span><span class="cov8" title="1">{
+                result[i] = scored[i].doc
+        }</span>
+        
+        <span class="cov8" title="1">return result</span>
+}
+
+// handleLicenseStatus returns current license and trial status
+func (s *Server) handleLicenseStatus(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // Check if we have enhanced feature gate with trial support
+        if enhancedGate, ok := s.featureGate.(interface {
+                GetStatus() map[string]interface{}
+                TrialDaysRemaining() int
+        }); ok </span><span class="cov0" title="0">{
+                status := enhancedGate.GetStatus()
+                status["purchase_url"] = "https://contextlite.com/purchase"
+                status["trial_days_remaining"] = enhancedGate.TrialDaysRemaining()
+                
+                s.writeJSON(w, http.StatusOK, status)
+                return
+        }</span>
+        
+        // Fallback for basic feature gate
+        <span class="cov8" title="1">status := map[string]interface{}{
+                "tier":                s.featureGate.GetTier(),
+                "status":              "basic",
+                "message":             "Basic license system active",
+                "purchase_url":        "https://contextlite.com/purchase",
+                "trial_days_remaining": 0,
+        }
+        
+        s.writeJSON(w, http.StatusOK, status)</span>
+}
+
+// handleTrialInfo returns detailed trial information
+func (s *Server) handleTrialInfo(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        // Check if we have enhanced feature gate with trial support
+        if enhancedGate, ok := s.featureGate.(interface {
+                GetStatus() map[string]interface{}
+        }); ok </span><span class="cov0" title="0">{
+                status := enhancedGate.GetStatus()
+                
+                if trialInfo, ok := status["trial"].(map[string]interface{}); ok </span><span class="cov0" title="0">{
+                        trialInfo["purchase_url"] = "https://contextlite.com/purchase"
+                        trialInfo["features_available"] = []string{
+                                "unlimited_workspaces",
+                                "advanced_optimization", 
+                                "7d_scoring",
+                                "caching",
+                                "rest_api",
+                        }
+                        
+                        s.writeJSON(w, http.StatusOK, trialInfo)
+                        return
+                }</span>
+        }
+        
+        // No trial information available
+        <span class="cov8" title="1">s.writeJSON(w, http.StatusOK, map[string]interface{}{
+                "status":           "no_trial",
+                "message":          "Trial system not available",
+                "purchase_url":     "https://contextlite.com/purchase",
+                "days_remaining":   0,
+        })</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
