@@ -14,7 +14,8 @@
       "Bash(rm:*)",
       "Bash(cat:*)",
       "Bash(git rm:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(go mod:*)"
     ],
     "deny": [],
     "ask": [],
