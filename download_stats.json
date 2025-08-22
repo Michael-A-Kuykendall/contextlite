@@ -1,0 +1,66 @@
+{
+  "timestamp": "2025-08-22T13:58:09Z",
+  "total_downloads": 0,
+  "channels": {
+    "npm": {
+      "downloads": 1876,
+      "url": "https://www.npmjs.com/package/contextlite",
+      "status": "success"
+    }
+,
+    "pypi": {
+      "downloads": null,
+      "url": "https://pypi.org/project/contextlite/",
+      "status": "published_no_stats"
+    }
+,
+    "docker": {
+      "downloads": 290,
+      "url": "https://hub.docker.com/r/makuykendall/contextlite",
+      "status": "success"
+    }
+,
+    "crates": {
+      "downloads": 42,
+      "url": "https://crates.io/crates/contextlite-client",
+      "status": "success"
+    }
+,
+    "github": {
+      "downloads": 0,
+      "url": "https://github.com/Michael-A-Kuykendall/contextlite/releases",
+      "status": "success"
+    }
+,
+    "homebrew": {
+      "downloads": null,
+      "url": "https://formulae.brew.sh/formula/contextlite",
+      "status": "not_available"
+    }
+,
+    "snap": {
+      "downloads": null,
+      "url": "https://snapcraft.io/contextlite",
+      "status": "not_published"
+    }
+,
+    "aur": {
+      "downloads": null,
+      "url": "https://aur.archlinux.org/packages/contextlite",
+      "status": "not_published"
+    }
+,
+    "vscode": {
+      "downloads": null,
+      "url": "https://marketplace.visualstudio.com/items?itemName=contextlite.contextlite",
+      "status": "not_published"
+    }
+,
+    "chocolatey": {
+      "downloads": null,
+      "url": "https://community.chocolatey.org/packages/contextlite",
+      "status": "not_published"
+    }
+  },
+  "total_downloads": 2208
+}
