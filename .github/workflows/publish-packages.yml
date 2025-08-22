@@ -423,6 +423,32 @@ jobs:
           cd adapters/rust/contextlite-client
           sed -i 's/^version = ".*"/version = "${{ steps.version.outputs.version }}"/' Cargo.toml
 
+      - name: Clean and prepare for publishing
+        if: steps.check_crates.outputs.skip == 'false'
+        run: |
+          cd adapters/rust/contextlite-client
+          # Clean any previous builds and artifacts
+          cargo clean
+          rm -f *.exe *.pdb *.rlib test_types.* types.rs
+          
+          # Verify package contents and size
+          echo "📦 Checking package contents..."
+          cargo package --list
+          
+          echo "📊 Checking package size..."
+          cargo package --no-verify
+          ls -lah target/package/*.crate
+          
+          # Verify size is under 10MB limit
+          CRATE_SIZE=$(stat -c%s target/package/*.crate 2>/dev/null || stat -f%z target/package/*.crate)
+          MAX_SIZE=10485760  # 10MB in bytes
+          if [ "$CRATE_SIZE" -gt "$MAX_SIZE" ]; then
+            echo "❌ Error: Package size $CRATE_SIZE bytes exceeds 10MB limit"
+            exit 1
+          else
+            echo "✅ Package size $CRATE_SIZE bytes is within 10MB limit"
+          fi
+
       - name: Build for publishing
         if: steps.check_crates.outputs.skip == 'false'
         run: |
@@ -436,7 +462,8 @@ jobs:
         run: |
           if [ -n "$CARGO_REGISTRY_TOKEN" ]; then
             cd adapters/rust/contextlite-client
-            cargo publish --token $CARGO_REGISTRY_TOKEN --allow-dirty
+            # Publish the already-packaged crate to avoid re-packaging
+            cargo publish --token $CARGO_REGISTRY_TOKEN --no-verify
           else
             echo "CARGO_REGISTRY_TOKEN not set, skipping crates.io publish"
           fi
@@ -495,6 +522,7 @@ jobs:
 
   publish-snap:
     runs-on: ubuntu-latest
+    needs: build-and-release  # Wait for release to be created
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -522,34 +550,13 @@ jobs:
             echo "🚀 Snap Store version not found, proceeding"
           fi
 
-      - name: Create snapcraft.yaml
+      - name: Update snapcraft.yaml version
         if: steps.check_snap.outputs.skip == 'false'
         run: |
-          mkdir -p snap
-          cat > snap/snapcraft.yaml << 'EOF'
-          name: contextlite
-          base: core22
-          version: '${{ steps.version.outputs.version }}'
-          summary: AI-powered context management for developers
-          description: |
-            ContextLite is an AI-powered tool that intelligently manages context for developers,
-            providing smart code completion, documentation, and analysis capabilities.
-          grade: stable
-          confinement: classic
-
-          parts:
-            contextlite:
-              plugin: dump
-              source: https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v${{ steps.version.outputs.version }}/contextlite-${{ steps.version.outputs.version }}-linux-amd64.tar.gz
-              stage:
-                - contextlite
-              prime:
-                - contextlite
-
-          apps:
-            contextlite:
-              command: contextlite
-          EOF
+          # Update the version in our existing snapcraft.yaml 
+          sed -i "s/version: git/version: '${{ steps.version.outputs.version }}'/" snap/snapcraft.yaml
+          echo "Updated snap/snapcraft.yaml version to ${{ steps.version.outputs.version }}"
+          cat snap/snapcraft.yaml
 
       - name: Build snap
         if: steps.check_snap.outputs.skip == 'false'
