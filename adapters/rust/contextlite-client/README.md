@@ -6,7 +6,7 @@
 
 A high-performance, async Rust client for [ContextLite](https://contextlite.com) - the ultra-fast context engine for retrieval and AI applications.
 
-## 🚀 Quick Start
+## Quick Start
 
 Add this to your `Cargo.toml`:
 
@@ -39,25 +39,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-## ✨ Features
+## Features
 
-- **🔥 High Performance**: Built on Tokio for blazing-fast async operations
-- **🛡️ Type Safety**: Comprehensive type definitions with builder patterns  
-- **⚡ Connection Pooling**: HTTP connection pooling for optimal performance
-- **🔧️ Error Handling**: Rich error types with proper error chaining
-- **🔐 Authentication**: Bearer token authentication support
-- **✅ Validation**: Client-side validation for better error messages
-- **🛠️ Flexible API**: Builder patterns for easy configuration
+- **High Performance**: Built on Tokio for blazing-fast async operations
+- **Type Safety**: Comprehensive type definitions with builder patterns  
+- **Connection Pooling**: HTTP connection pooling for optimal performance
+- **Error Handling**: Rich error types with proper error chaining
+- **Authentication**: Bearer token authentication support
+- **Validation**: Client-side validation for better error messages
+- **Flexible API**: Builder patterns for easy configuration
 
-## 📦 Supported Operations
+## Supported Operations
 
-✅ **Health Checks** - Server status and optimization system information  
-✅ **Document Management** - Add, search, and delete documents  
-✅ **Context Assembly** - Advanced context compilation  
-✅ **Authentication** - Bearer token security  
-✅ **Error Handling** - Comprehensive error types and retry logic
+✓ **Health Checks** - Server status and optimization system information  
+✓ **Document Management** - Add, search, and delete documents  
+✓ **Context Assembly** - Advanced context compilation  
+✓ **Authentication** - Bearer token security  
+✓ **Error Handling** - Comprehensive error types and retry logic
 
-## 📋 Example Usage
+## Example Usage
 
 ### Document Operations
 
@@ -129,7 +129,7 @@ println!("Assembled context ({} tokens):", context.token_count.unwrap_or(0));
 println!("{}", context.context);
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### Client Configuration
 
@@ -152,7 +152,7 @@ The client respects these environment variables:
 - `CONTEXTLITE_TOKEN`: Default authentication token
 - `CONTEXTLITE_TIMEOUT`: Default timeout in seconds
 
-## 🚨 Error Handling
+## Error Handling
 
 The client provides comprehensive error handling with detailed error messages:
 
@@ -174,7 +174,7 @@ match client.health().await {
 }
 ```
 
-## 🛠️ Installation
+## Installation
 
 Install ContextLite server:
 
@@ -198,14 +198,14 @@ Then add the client to your project:
 cargo add contextlite-client
 ```
 
-## 📚 Documentation
+## Documentation
 
 - **Website**: [contextlite.com](https://contextlite.com)
 - **API Docs**: [docs.rs/contextlite-client](https://docs.rs/contextlite-client)
 - **GitHub**: [github.com/Michael-A-Kuykendall/contextlite](https://github.com/Michael-A-Kuykendall/contextlite)
 - **Examples**: Check the `examples/` directory in the repository
 
-## 🧪 Testing
+## Testing
 
 Run the tests (requires a running ContextLite server):
 
@@ -217,7 +217,7 @@ contextlite server --port 8083
 cargo test
 ```
 
-## 🚀 Performance
+## Performance
 
 The Rust client is designed for high performance:
 
@@ -226,11 +226,11 @@ The Rust client is designed for high performance:
 - **Zero-Copy**: Minimal data copying where possible
 - **Efficient Serialization**: Fast JSON processing with serde
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -240,4 +240,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ by the ContextLite Team**
+**Built with care by the ContextLite Team**
