@@ -9,9 +9,19 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(./build/contextlite:*)",
+      "Bash(rm:*)",
+      "Bash(cat:*)",
+      "Bash(git rm:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "additionalDirectories": [
+      "C:\\c\\Users\\micha\\repos\\contextlite",
+      "C:\\Users\\micha\\repos",
+      "C:\\c\\Users\\micha\\repos"
+    ]
   }
 }

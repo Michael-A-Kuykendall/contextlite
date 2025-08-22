@@ -1,0 +1,5 @@
+{
+  "server_id": "slack-test-123",
+  "server_name": "Test Slack Server",
+  "timeout": 30
+}
