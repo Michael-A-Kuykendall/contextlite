@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-22T13:51:13Z",
+  "timestamp": "2025-08-22T13:58:09Z",
   "total_downloads": 0,
   "channels": {
     "npm": {
@@ -11,7 +11,7 @@
     "pypi": {
       "downloads": null,
       "url": "https://pypi.org/project/contextlite/",
-      "status": "error"
+      "status": "published_no_stats"
     }
 ,
     "docker": {
@@ -21,9 +21,7 @@
     }
 ,
     "crates": {
-      "downloads": 42
-0
-42,
+      "downloads": 42,
       "url": "https://crates.io/crates/contextlite-client",
       "status": "success"
     }
@@ -64,5 +62,5 @@
       "status": "not_published"
     }
   },
-  "total_downloads": 2166
+  "total_downloads": 2208
 }

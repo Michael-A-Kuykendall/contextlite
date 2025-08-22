@@ -84,14 +84,24 @@ fi
 
 # 2. PyPI Downloads (using pypistats API)
 echo -n "PyPI: "
-PYPI_DOWNLOADS=$(curl -s "https://pypistats.org/api/packages/contextlite/recent" | \
-    grep -o '"last_month":[0-9]*' | grep -o '[0-9]*' || echo "0")
-if [ "$PYPI_DOWNLOADS" != "0" ] && [ -n "$PYPI_DOWNLOADS" ]; then
-    echo -e "${GREEN}$PYPI_DOWNLOADS downloads${NC}"
-    add_json_entry "pypi" "$PYPI_DOWNLOADS" "https://pypi.org/project/contextlite/" "success"
+# First check if package exists on PyPI
+PYPI_EXISTS=$(curl -s "https://pypi.org/pypi/contextlite/json" | grep -o '"name":"contextlite"' | head -1)
+if [ -n "$PYPI_EXISTS" ]; then
+    # Package exists, try to get download stats
+    PYPI_DOWNLOADS=$(curl -s "https://pypistats.org/api/packages/contextlite/recent" 2>/dev/null | \
+        grep -o '"last_month":[0-9]*' | grep -o '[0-9]*' | head -1)
+    
+    # If pypistats is down or returns error, try alternative sources
+    if [ -z "$PYPI_DOWNLOADS" ] || [ "$PYPI_DOWNLOADS" = "0" ]; then
+        echo -e "${GREEN}✅ Published${NC} (stats unavailable)"
+        add_json_entry "pypi" "null" "https://pypi.org/project/contextlite/" "published_no_stats"
+    else
+        echo -e "${GREEN}$PYPI_DOWNLOADS downloads${NC}"
+        add_json_entry "pypi" "$PYPI_DOWNLOADS" "https://pypi.org/project/contextlite/" "success"
+    fi
 else
-    echo -e "${RED}Failed to fetch${NC}"
-    add_json_entry "pypi" "null" "https://pypi.org/project/contextlite/" "error"
+    echo -e "${RED}Not published${NC}"
+    add_json_entry "pypi" "null" "https://pypi.org/project/contextlite/" "not_published"
 fi
 
 # 3. Docker Hub Downloads
