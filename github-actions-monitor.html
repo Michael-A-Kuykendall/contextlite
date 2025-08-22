@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContextLite Actions Monitor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            <!-- Temporary monitor file scrubbed and pending deletion. -->
+        const REPO_OWNER = 'Michael-A-Kuykendall';
+        const REPO_NAME = 'contextlite';
+        
+        function formatDuration(startTime, endTime = null) {
+            const start = new Date(startTime);
+            const end = endTime ? new Date(endTime) : new Date();
+            const diffMs = end - start;
+            const diffSecs = Math.floor(diffMs / 1000);
+            const diffMins = Math.floor(diffSecs / 60);
+            const remainingSecs = diffSecs % 60;
+            
+            if (diffMins > 0) {
+                return `${diffMins}m ${remainingSecs}s`;
+            }
+            return `${diffSecs}s`;
+        }
+        
+        function formatTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffDays > 0) return `${diffDays}d ago`;
+            if (diffHours > 0) return `${diffHours}h ago`;
+            if (diffMins > 0) return `${diffMins}m ago`;
+            return 'just now';
+        }
+        
+        async function fetchWorkflows() {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading">Fetching latest runs...</div>';
+            
+            try {
+                // Get recent workflow runs
+                const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs?per_page=10`, {
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`GitHub API Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                displayWorkflows(data.workflow_runs);
+                
+            } catch (error) {
+                content.innerHTML = `<div class="error">Error: ${error.message}<br><br>Make sure to replace YOUR_TOKEN_HERE with your GitHub token!</div>`;
+            }
+            
+            document.getElementById('lastUpdated').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+        }
+        
+        function displayWorkflows(runs) {
+            const content = document.getElementById('content');
+            
+            if (runs.length === 0) {
+                content.innerHTML = '<div class="workflow"><div class="workflow-name">No recent workflow runs found</div></div>';
+                return;
+            }
+            
+            // Group runs by workflow name
+            const groupedRuns = {};
+            runs.forEach(run => {
+                if (!groupedRuns[run.name]) {
+                    groupedRuns[run.name] = [];
+                }
+                groupedRuns[run.name].push(run);
+            });
+            
+            let html = '';
+            
+            Object.keys(groupedRuns).forEach(workflowName => {
+                const workflowRuns = groupedRuns[workflowName];
+                
+                html += `
+                    <div class="workflow">
+                        <div class="workflow-header">
+                            <div class="workflow-name">${workflowName}</div>
+                        </div>
+                `;
+                
+                workflowRuns.forEach(run => {
+                    const duration = run.conclusion 
+                        ? formatDuration(run.created_at, run.updated_at)
+                        : formatDuration(run.created_at);
+                    
+                    const status = run.status === 'completed' ? run.conclusion : run.status;
+                    
+                    html += `
+                        <div class="run">
+                            <div class="run-info">
+                                <div class="run-title">
+                                    ${run.display_title || run.head_commit?.message || 'Workflow run'}
+                                    <span class="status ${status}">${status.toUpperCase()}</span>
+                                </div>
+                                <div class="run-meta">
+                                    ${run.head_branch} • ${run.actor?.login || 'unknown'} • ${formatTimeAgo(run.created_at)}
+                                </div>
+                            </div>
+                            <div class="run-duration">${duration}</div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            });
+            
+            content.innerHTML = html;
+        }
+        
+        // Auto-refresh every 30 seconds
+        setInterval(fetchWorkflows, 30000);
+        
+        // Initial load
+        fetchWorkflows();
+    </script>
+</body>
+</html>

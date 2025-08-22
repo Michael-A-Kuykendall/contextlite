@@ -4,12 +4,12 @@
       "name": "AnotherComponent",
       "package": "another/package",
       "coverage": 0.85,
-      "tests_passing": 5,
-      "tests_total": 5,
+      "tests_passing": 6,
+      "tests_total": 6,
       "production_ready": true,
       "priority": "",
       "revenue_impact": "",
-      "last_updated": "2025-08-21T22:33:10.5944688-05:00",
+      "last_updated": "2025-08-21T23:24:39.5651303-05:00",
       "functions": [],
       "dependencies": [],
       "performance_metrics": {}
@@ -18,12 +18,12 @@
       "name": "RegistryIntegration",
       "package": "internal/registry",
       "coverage": 0.85,
-      "tests_passing": 5,
-      "tests_total": 5,
+      "tests_passing": 6,
+      "tests_total": 6,
       "production_ready": true,
       "priority": "",
       "revenue_impact": "",
-      "last_updated": "2025-08-21T22:33:10.6400147-05:00",
+      "last_updated": "2025-08-21T23:24:39.5926451-05:00",
       "functions": [],
       "dependencies": [],
       "performance_metrics": {}
@@ -32,12 +32,12 @@
       "name": "TestComponent",
       "package": "test/package",
       "coverage": 0.85,
-      "tests_passing": 10,
-      "tests_total": 10,
+      "tests_passing": 12,
+      "tests_total": 12,
       "production_ready": true,
       "priority": "",
       "revenue_impact": "",
-      "last_updated": "2025-08-21T22:33:10.6560142-05:00",
+      "last_updated": "2025-08-21T23:24:39.6006504-05:00",
       "functions": [],
       "dependencies": [],
       "performance_metrics": {}
@@ -46,12 +46,12 @@
       "name": "TestRegistry",
       "package": "internal/registry",
       "coverage": 0.85,
-      "tests_passing": 5,
-      "tests_total": 5,
+      "tests_passing": 6,
+      "tests_total": 6,
       "production_ready": true,
       "priority": "",
       "revenue_impact": "",
-      "last_updated": "2025-08-21T22:33:10.6080133-05:00",
+      "last_updated": "2025-08-21T23:24:39.5751305-05:00",
       "functions": [],
       "dependencies": [],
       "performance_metrics": {}
@@ -217,7 +217,7 @@
   "production_readiness": 80,
   "critical_alerts": [
     "LOW_COVERAGE: License System below 80% coverage (77.1%)",
-    "LOW_COVERAGE: License Server below 80% coverage (75.9%)",
-    "LOW_COVERAGE: Context Engine below 80% coverage (68.0%)"
+    "LOW_COVERAGE: Context Engine below 80% coverage (68.0%)",
+    "LOW_COVERAGE: License Server below 80% coverage (75.9%)"
   ]
 }

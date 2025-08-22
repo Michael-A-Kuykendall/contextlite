@@ -1,85 +1,21 @@
 # ContextLite Rust Client
 
-A high-performance, async Rust client for the ContextLite context engine.
+[![Crates.io](https://img.shields.io/crates/v/contextlite-client.svg)](https://crates.io/crates/contextlite-client)
+[![Documentation](https://docs.rs/contextlite-client/badge.svg)](https://docs.rs/contextlite-client)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## ✅ Status: PRODUCTION READY
+A high-performance, async Rust client for [ContextLite](https://contextlite.com) - the ultra-fast context engine for retrieval and AI applications.
 
-This Rust client is **fully functional and production ready**, providing complete integration with ContextLite's core functionality.
-
-## Features
-
-- **🔥 High Performance**: Built on Tokio for blazing-fast async operations
-- **🛡️ Type Safety**: Comprehensive type definitions with builder patterns  
-- **⚡ Connection Pooling**: HTTP connection pooling for optimal performance
-- **🔧️ Error Handling**: Rich error types with proper error chaining
-- **🔐 Authentication**: Bearer token authentication support
-- **✅ Validation**: Client-side validation for better error messages
-- **🛠️ Flexible API**: Builder patterns for easy configuration
-
-## Supported Operations
-
-✅ **Health Checks** - Server status and SMT solver information  
-✅ **Document Management** - Add, search, and delete documents  
-✅ **Context Assembly** - SMT-optimized context compilation  
-✅ **Authentication** - Bearer token security  
-✅ **Error Handling** - Comprehensive error types and retry logic
-
-## Integration Test Results
-
-```
-ContextLite Rust Client - Integration Test
-=========================================
-
-1. Checking server health...
-✓ Server is healthy: healthy (v1.0.0)
-  SMT Solver: Z3 v4.15.2
-  Documents indexed: 1
-
-2. Adding test document...
-✓ Added document: rust_test.rs (ID: 59bc19076a092509)
-
-3. Searching for document...
-✓ Found 2 documents
-  1. test.rs (score: 0.000)
-  2. rust_test.rs (score: 0.000)
-
-4. Testing context assembly...
-✓ Assembled context for query: 
-  Documents included: 0
-  Total tokens: 0
-  Coherence score: 1.000
-  Cache hit: false
-
-5. Cleaning up...
-✓ Deleted test document
-
-✓ Integration test completed successfully!
-```
-
-**🎉 VICTORY DECLARED**: This Rust client is complete and production-ready! Rust Client
-
-A high-performance, async Rust client for the ContextLite context engine.
-
-## Features
-
-- **��� High Performance**: Built on Tokio for blazing-fast async operations
-- **��� Type Safety**: Comprehensive type definitions with builder patterns  
-- **⚡ Connection Pooling**: HTTP connection pooling for optimal performance
-- **���️ Error Handling**: Rich error types with proper error chaining
-- **��� Authentication**: Bearer token authentication support
-- **✅ Validation**: Client-side validation for better error messages
-- **���️ Flexible API**: Builder patterns for easy configuration
-
-## Installation
+## 🚀 Quick Start
 
 Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-contextlite-client = "0.1.0"
+contextlite-client = "1.0"
 ```
 
-## Quick Start
+Basic usage:
 
 ```rust
 use contextlite_client::{ContextLiteClient, ClientConfig, Document, SearchQuery};
@@ -88,12 +24,6 @@ use contextlite_client::{ContextLiteClient, ClientConfig, Document, SearchQuery}
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create a client with default configuration
     let client = ContextLiteClient::new()?;
-    
-    // Or with custom configuration
-    let config = ClientConfig::new("http://localhost:8083")
-        .with_auth_token("your-token")
-        .with_timeout(60);
-    let client = ContextLiteClient::with_config(config)?;
     
     // Add a document
     let document = Document::new("example.txt", "This is an example document");
@@ -109,7 +39,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-## Examples
+## ✨ Features
+
+- **🔥 High Performance**: Built on Tokio for blazing-fast async operations
+- **🛡️ Type Safety**: Comprehensive type definitions with builder patterns  
+- **⚡ Connection Pooling**: HTTP connection pooling for optimal performance
+- **🔧️ Error Handling**: Rich error types with proper error chaining
+- **🔐 Authentication**: Bearer token authentication support
+- **✅ Validation**: Client-side validation for better error messages
+- **🛠️ Flexible API**: Builder patterns for easy configuration
+
+## 📦 Supported Operations
+
+✅ **Health Checks** - Server status and SMT solver information  
+✅ **Document Management** - Add, search, and delete documents  
+✅ **Context Assembly** - SMT-optimized context compilation  
+✅ **Authentication** - Bearer token security  
+✅ **Error Handling** - Comprehensive error types and retry logic
+
+## 📋 Example Usage
 
 ### Document Operations
 
@@ -137,24 +85,6 @@ let retrieved = client.get_document(&doc_id).await?;
 
 // Delete the document
 client.delete_document(&doc_id).await?;
-```
-
-### Batch Operations
-
-```rust
-use contextlite_client::{Document, ContextLiteClient};
-
-let client = ContextLiteClient::new()?;
-
-let documents = vec![
-    Document::new("doc1.txt", "First document"),
-    Document::new("doc2.txt", "Second document"),
-    Document::new("doc3.txt", "Third document"),
-];
-
-// Add all documents at once
-let doc_ids = client.add_documents(&documents).await?;
-println!("Added {} documents", doc_ids.len());
 ```
 
 ### Advanced Search
@@ -199,50 +129,7 @@ println!("Assembled context ({} tokens):", context.token_count.unwrap_or(0));
 println!("{}", context.context);
 ```
 
-## Error Handling
-
-The client provides comprehensive error handling with detailed error messages:
-
-```rust
-use contextlite_client::{ContextLiteClient, ContextLiteError};
-
-match client.health().await {
-    Ok(health) => println!("Server is healthy: {}", health.status),
-    Err(ContextLiteError::AuthError { message }) => {
-        eprintln!("Authentication failed: {}", message);
-    },
-    Err(ContextLiteError::ServerError { status, message }) => {
-        eprintln!("Server error {}: {}", status, message);
-    },
-    Err(ContextLiteError::TimeoutError { seconds }) => {
-        eprintln!("Request timed out after {} seconds", seconds);
-    },
-    Err(err) => eprintln!("Error: {}", err),
-}
-```
-
-### Error Types
-
-- `AuthError`: Authentication failures
-- `ServerError`: HTTP server errors (4xx, 5xx)
-- `ValidationError`: Client-side validation failures
-- `TimeoutError`: Request timeouts
-- `ConnectionError`: Network connection issues
-- `JsonError`: JSON serialization/deserialization errors
-- `UrlError`: URL parsing errors
-
-### Retryable Errors
-
-Some errors are automatically marked as retryable:
-
-```rust
-if error.is_retryable() {
-    // Implement retry logic
-    println!("Error is retryable: {}", error);
-}
-```
-
-## Configuration
+## 🔧 Configuration
 
 ### Client Configuration
 
@@ -265,7 +152,60 @@ The client respects these environment variables:
 - `CONTEXTLITE_TOKEN`: Default authentication token
 - `CONTEXTLITE_TIMEOUT`: Default timeout in seconds
 
-## Testing
+## 🚨 Error Handling
+
+The client provides comprehensive error handling with detailed error messages:
+
+```rust
+use contextlite_client::{ContextLiteClient, ContextLiteError};
+
+match client.health().await {
+    Ok(health) => println!("Server is healthy: {}", health.status),
+    Err(ContextLiteError::AuthError { message }) => {
+        eprintln!("Authentication failed: {}", message);
+    },
+    Err(ContextLiteError::ServerError { status, message }) => {
+        eprintln!("Server error {}: {}", status, message);
+    },
+    Err(ContextLiteError::TimeoutError { seconds }) => {
+        eprintln!("Request timed out after {} seconds", seconds);
+    },
+    Err(err) => eprintln!("Error: {}", err),
+}
+```
+
+## 🛠️ Installation
+
+Install ContextLite server:
+
+```bash
+# Via Cargo
+cargo install contextlite
+
+# Via Homebrew (macOS/Linux)
+brew install contextlite
+
+# Via npm
+npm install -g contextlite
+
+# Via Python pip
+pip install contextlite
+```
+
+Then add the client to your project:
+
+```bash
+cargo add contextlite-client
+```
+
+## 📚 Documentation
+
+- **Website**: [contextlite.com](https://contextlite.com)
+- **API Docs**: [docs.rs/contextlite-client](https://docs.rs/contextlite-client)
+- **GitHub**: [github.com/Michael-A-Kuykendall/contextlite](https://github.com/Michael-A-Kuykendall/contextlite)
+- **Examples**: Check the `examples/` directory in the repository
+
+## 🧪 Testing
 
 Run the tests (requires a running ContextLite server):
 
@@ -277,11 +217,7 @@ contextlite server --port 8083
 cargo test
 ```
 
-### Integration Tests
-
-The integration tests require a ContextLite server running at `http://127.0.0.1:8083` with authentication token `test-token-12345`.
-
-## Performance
+## 🚀 Performance
 
 The Rust client is designed for high performance:
 
@@ -290,19 +226,11 @@ The Rust client is designed for high performance:
 - **Zero-Copy**: Minimal data copying where possible
 - **Efficient Serialization**: Fast JSON processing with serde
 
-## Examples
+## 📄 License
 
-Run the included examples:
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-```bash
-# Basic usage example
-cargo run --example basic_usage
-
-# Advanced features example  
-cargo run --example advanced_search
-```
-
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -310,6 +238,6 @@ cargo run --example advanced_search
 4. Ensure all tests pass
 5. Submit a pull request
 
-## License
+---
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+**Built with ❤️ by the ContextLite Team**
