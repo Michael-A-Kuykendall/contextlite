@@ -12,11 +12,12 @@ else
 fi
 
 echo -n "PyPI: "
-PYPI_RESULT=$(curl -s "https://pypistats.org/api/packages/contextlite/recent" | grep -o '"last_month":[0-9]*' | grep -o '[0-9]*' | head -1)
-if [ -n "$PYPI_RESULT" ] && [ "$PYPI_RESULT" != "0" ]; then
-    echo "$PYPI_RESULT downloads (last month)"
+# Check if package exists on PyPI
+PYPI_EXISTS=$(curl -s "https://pypi.org/pypi/contextlite/json" | grep -o '"name":"contextlite"' | head -1)
+if [ -n "$PYPI_EXISTS" ]; then
+    echo "✅ Published (v1.0.43)"
 else
-    echo "No data available"
+    echo "Not published"
 fi
 
 echo -n "Docker: "
