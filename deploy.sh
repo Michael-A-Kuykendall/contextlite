@@ -24,7 +24,7 @@ curl -X POST \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: token $GITHUB_TOKEN" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
-  https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/workflows/deploy-selective.yml/dispatches \
+  https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/workflows/publish-packages.yml/dispatches \
   -d "{\"ref\":\"main\",\"inputs\":{\"platforms\":\"$PLATFORM\",\"version\":\"$VERSION\",\"force_deploy\":\"$FORCE_DEPLOY\"}}"
 
 if [ $? -eq 0 ]; then

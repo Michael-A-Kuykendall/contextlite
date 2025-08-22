@@ -12,6 +12,26 @@ on:
         description: 'Version to publish (e.g., 1.0.0)'
         required: true
         type: string
+      platforms:
+        description: 'Platforms to deploy (comma-separated or "all")'
+        required: false
+        type: choice
+        options:
+          - 'all'
+          - 'chocolatey'
+          - 'npm'
+          - 'pypi'
+          - 'docker'
+          - 'crates'
+          - 'chocolatey,npm'
+          - 'chocolatey,pypi'
+          - 'npm,pypi,docker'
+        default: 'all'
+      force_deploy:
+        description: 'Force deploy even if version exists'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -114,6 +134,7 @@ jobs:
 
   publish-npm:
     runs-on: ubuntu-latest
+    if: inputs.platforms == 'all' || contains(inputs.platforms, 'npm') || github.event_name != 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -178,6 +199,7 @@ jobs:
 
   publish-pypi:
     runs-on: ubuntu-latest
+    if: inputs.platforms == 'all' || contains(inputs.platforms, 'pypi') || github.event_name != 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -242,6 +264,7 @@ jobs:
 
   publish-docker:
     runs-on: ubuntu-latest
+    if: inputs.platforms == 'all' || contains(inputs.platforms, 'docker') || github.event_name != 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -303,6 +326,7 @@ jobs:
     needs: build-and-release
     runs-on: windows-latest
     timeout-minutes: 15
+    if: inputs.platforms == 'all' || contains(inputs.platforms, 'chocolatey') || github.event_name != 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -457,6 +481,7 @@ jobs:
   publish-crates:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    if: inputs.platforms == 'all' || contains(inputs.platforms, 'crates') || github.event_name != 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
