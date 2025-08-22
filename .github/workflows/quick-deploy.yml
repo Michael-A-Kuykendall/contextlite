@@ -70,7 +70,7 @@ jobs:
           
           # Package and check size
           echo "Creating package..."
-          cargo package --no-verify
+          cargo package --no-verify --allow-dirty
           
           # Check package size
           PACKAGE_SIZE=$(ls -la target/package/*.crate | awk '{print $5}')
@@ -85,7 +85,7 @@ jobs:
           
           # Publish to crates.io
           echo "Publishing to crates.io..."
-          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} --no-verify
+          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} --no-verify --allow-dirty
           
           echo "✅ Published contextlite-client v${{ inputs.version }} to crates.io"
 

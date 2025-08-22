@@ -434,10 +434,10 @@ jobs:
           
           # Verify package contents and size
           echo "📦 Checking package contents..."
-          cargo package --list
+          cargo package --list --allow-dirty
           
           echo "📊 Checking package size..."
-          cargo package --no-verify
+          cargo package --no-verify --allow-dirty
           ls -lah target/package/*.crate
           
           # Verify size is under 10MB limit
@@ -464,7 +464,7 @@ jobs:
           if [ -n "$CARGO_REGISTRY_TOKEN" ]; then
             cd adapters/rust/contextlite-client
             # Publish the already-packaged crate to avoid re-packaging
-            cargo publish --token $CARGO_REGISTRY_TOKEN --no-verify
+            cargo publish --token $CARGO_REGISTRY_TOKEN --no-verify --allow-dirty
           else
             echo "CARGO_REGISTRY_TOKEN not set, skipping crates.io publish"
           fi
