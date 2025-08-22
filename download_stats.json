@@ -1,38 +1,68 @@
 {
-  "metadata": {
-    "latest_version": "v1.0.38",
-    "last_updated": "2025-08-22T08:15:00.000000",
-    "total_numeric": 2125,
-    "update_source": "manual_correction"
+  "timestamp": "2025-08-22T13:51:13Z",
+  "total_downloads": 0,
+  "channels": {
+    "npm": {
+      "downloads": 1876,
+      "url": "https://www.npmjs.com/package/contextlite",
+      "status": "success"
+    }
+,
+    "pypi": {
+      "downloads": null,
+      "url": "https://pypi.org/project/contextlite/",
+      "status": "error"
+    }
+,
+    "docker": {
+      "downloads": 290,
+      "url": "https://hub.docker.com/r/makuykendall/contextlite",
+      "status": "success"
+    }
+,
+    "crates": {
+      "downloads": 42
+0
+42,
+      "url": "https://crates.io/crates/contextlite-client",
+      "status": "success"
+    }
+,
+    "github": {
+      "downloads": 0,
+      "url": "https://github.com/Michael-A-Kuykendall/contextlite/releases",
+      "status": "success"
+    }
+,
+    "homebrew": {
+      "downloads": null,
+      "url": "https://formulae.brew.sh/formula/contextlite",
+      "status": "not_available"
+    }
+,
+    "snap": {
+      "downloads": null,
+      "url": "https://snapcraft.io/contextlite",
+      "status": "not_published"
+    }
+,
+    "aur": {
+      "downloads": null,
+      "url": "https://aur.archlinux.org/packages/contextlite",
+      "status": "not_published"
+    }
+,
+    "vscode": {
+      "downloads": null,
+      "url": "https://marketplace.visualstudio.com/items?itemName=contextlite.contextlite",
+      "status": "not_published"
+    }
+,
+    "chocolatey": {
+      "downloads": null,
+      "url": "https://community.chocolatey.org/packages/contextlite",
+      "status": "not_published"
+    }
   },
-  "platform_downloads": {
-    "github_releases": 0,
-    "npm": 1876,
-    "pypi": 0,
-    "docker_hub": 249,
-    "chocolatey": "API_KEY_REQUIRED",
-    "homebrew": "NO_PUBLIC_API",
-    "snap": 0,
-    "aur": 0,
-    "crates_io": 0,
-    "vscode_marketplace": "MANUAL_DEPLOYMENT"
-  },
-  "platform_status": {
-    "github_releases": "working",
-    "npm": "working", 
-    "pypi": "working",
-    "docker_hub": "working",
-    "chocolatey": "version_lag",
-    "homebrew": "working",
-    "snap": "failed",
-    "aur": "failed", 
-    "crates_io": "failed",
-    "vscode_marketplace": "manual"
-  },
-  "success_metrics": {
-    "working_platforms": 6,
-    "total_platforms": 10,
-    "success_rate": "60%",
-    "version_current": "v1.0.38"
-  }
+  "total_downloads": 2166
 }
