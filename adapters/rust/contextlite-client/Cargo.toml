@@ -8,6 +8,22 @@ license = "MIT"
 repository = "https://github.com/Michael-A-Kuykendall/contextlite"
 keywords = ["search", "context", "ai", "indexing", "retrieval"]
 categories = ["api-bindings", "database", "text-processing"]
+include = [
+    "src/**/*",
+    "examples/**/*",
+    "tests/**/*",
+    "Cargo.toml",
+    "README.md",
+    "LICENSE*",
+]
+exclude = [
+    "target/**/*",
+    "*.exe",
+    "*.pdb",
+    "*.rlib",
+    "types.rs",
+    "test_types.*",
+]
 
 [dependencies]
 # Async runtime
