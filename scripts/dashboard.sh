@@ -97,14 +97,14 @@ if [ -f "download_stats.json" ]; then
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     
     # Check deployment status
-    PYPI_STATUS=$(grep -A3 '"pypi"' download_stats.json | grep '"status":' | grep -o '"[^"]*"' | tr -d '"')
-    HOMEBREW_STATUS=$(grep -A3 '"homebrew"' download_stats.json | grep '"status":' | grep -o '"[^"]*"' | tr -d '"')
-    SNAP_STATUS=$(grep -A3 '"snap"' download_stats.json | grep '"status":' | grep -o '"[^"]*"' | tr -d '"')
-    AUR_STATUS=$(grep -A3 '"aur"' download_stats.json | grep '"status":' | grep -o '"[^"]*"' | tr -d '"')
-    VSCODE_STATUS=$(grep -A3 '"vscode"' download_stats.json | grep '"status":' | grep -o '"[^"]*"' | tr -d '"')
-    CHOCO_STATUS=$(grep -A3 '"chocolatey"' download_stats.json | grep '"status":' | grep -o '"[^"]*"' | tr -d '"')
+    PYPI_STATUS=$(grep -A3 '"pypi"' download_stats.json | grep '"status":' | grep -o '"[^"]*"' | tr -d '"' | tail -1)
+    HOMEBREW_STATUS=$(grep -A3 '"homebrew"' download_stats.json | grep '"status":' | grep -o '"[^"]*"' | tr -d '"' | tail -1)
+    SNAP_STATUS=$(grep -A3 '"snap"' download_stats.json | grep '"status":' | grep -o '"[^"]*"' | tr -d '"' | tail -1)
+    AUR_STATUS=$(grep -A3 '"aur"' download_stats.json | grep '"status":' | grep -o '"[^"]*"' | tr -d '"' | tail -1)
+    VSCODE_STATUS=$(grep -A3 '"vscode"' download_stats.json | grep '"status":' | grep -o '"[^"]*"' | tr -d '"' | tail -1)
+    CHOCO_STATUS=$(grep -A3 '"chocolatey"' download_stats.json | grep '"status":' | grep -o '"[^"]*"' | tr -d '"' | tail -1)
     
-    echo -e "PyPI:         $(if [ "$PYPI_STATUS" = "success" ]; then echo -e "${GREEN}✅ Published${NC}"; else echo -e "${RED}❌ Not Published${NC}"; fi)"
+    echo -e "PyPI:         $(if [ "$PYPI_STATUS" = "success" ]; then echo -e "${GREEN}✅ Published${NC}"; elif [ "$PYPI_STATUS" = "published_no_stats" ]; then echo -e "${GREEN}✅ Published (no stats)${NC}"; else echo -e "${RED}❌ Not Published${NC}"; fi)"
     echo -e "Homebrew:     $(if [ "$HOMEBREW_STATUS" = "success" ]; then echo -e "${GREEN}✅ Published${NC}"; else echo -e "${YELLOW}⏳ Pending${NC}"; fi)"
     echo -e "Snap Store:   $(if [ "$SNAP_STATUS" = "success" ]; then echo -e "${GREEN}✅ Published${NC}"; else echo -e "${YELLOW}⏳ Pending${NC}"; fi)"
     echo -e "AUR (Arch):   $(if [ "$AUR_STATUS" = "success" ]; then echo -e "${GREEN}✅ Published${NC}"; else echo -e "${YELLOW}⏳ Pending${NC}"; fi)"
