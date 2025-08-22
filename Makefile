@@ -1,6 +1,6 @@
 # ContextLite Makefile
 
-.PHONY: build test clean run install deps bench coverage help
+.PHONY: build test clean run install deps bench coverage help stats dashboard quick-stats track-downloads
 
 # Variables
 BINARY_NAME=contextlite
@@ -261,6 +261,20 @@ dashboard: ## Show comprehensive system dashboard with latest data
 	@go run scripts/update_coverage_registry.go
 	@echo "🎯 Displaying system dashboard..."
 	@go run ./cmd/dashboard/main.go
+
+# Download Analytics
+stats: ## Show download statistics dashboard
+	@./scripts/dashboard.sh
+
+quick-stats: ## Quick download stats check (one-liner)
+	@./scripts/quick_stats.sh
+
+track-downloads: ## Update download statistics from all channels
+	@./scripts/download_tracker.sh
+
+downloads-commit: track-downloads ## Update downloads and commit changes
+	@git add download_stats.json
+	@git commit -m "Update download statistics - $$(date +%Y-%m-%d)" || true
 
 # Initialize registry system
 init-registry: ## Initialize the system registry and testing framework
