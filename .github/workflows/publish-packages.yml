@@ -299,6 +299,75 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  publish-chocolatey:
+    needs: build-and-release
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check if Chocolatey version exists
+        id: check_chocolatey
+        shell: bash
+        run: |
+          if curl -f "https://community.chocolatey.org/api/v2/Packages?%24filter=Id%20eq%20'contextlite'%20and%20Version%20eq%20'${{ steps.version.outputs.version }}'" >/dev/null 2>&1; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "✅ Chocolatey package already exists, skipping"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "🚀 Chocolatey package not found, will publish"
+          fi
+
+      - name: Install Chocolatey
+        if: steps.check_chocolatey.outputs.skip == 'false'
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+      - name: Prepare package
+        if: steps.check_chocolatey.outputs.skip == 'false'
+        shell: powershell
+        run: |
+          Copy-Item -Path "chocolatey" -Destination "chocolatey-package" -Recurse
+          cd chocolatey-package
+          $version = "${{ steps.version.outputs.version }}"
+          (Get-Content contextlite.nuspec -Raw).Replace('VERSION_PLACEHOLDER', $version).Replace('releases/tag/VERSION_PLACEHOLDER', "releases/tag/v$version") | Set-Content contextlite.nuspec
+          $downloadUrl = "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v$version/contextlite-$version-windows-amd64.zip"
+          Invoke-WebRequest -Uri $downloadUrl -OutFile contextlite-windows.zip
+          $checksum = (Get-FileHash contextlite-windows.zip -Algorithm SHA256).Hash
+          $installScript = (Get-Content tools/chocolateyinstall.ps1 -Raw).Replace('RELEASE_URL_PLACEHOLDER', $downloadUrl).Replace('RELEASE_CHECKSUM_PLACEHOLDER', $checksum)
+          Set-Content tools/chocolateyinstall.ps1 $installScript
+          Write-Host "Prepared Chocolatey package version $version with checksum $checksum"
+
+      - name: Pack
+        if: steps.check_chocolatey.outputs.skip == 'false'
+        shell: powershell
+        run: |
+          cd chocolatey-package
+          choco pack
+
+      - name: Push
+        if: steps.check_chocolatey.outputs.skip == 'false'
+        shell: powershell
+  # (Legacy commented Chocolatey job ended here; orphan env block removed)
+        run: |
+          if (-not $env:CHOCOLATEY_API_KEY) { Write-Error "CHOCOLATEY_API_KEY not set"; exit 1 }
+          cd chocolatey-package
+            choco push contextlite.${{ steps.version.outputs.version }}.nupkg --source "https://push.chocolatey.org/" --key $env:CHOCOLATEY_API_KEY --timeout 270
+          Write-Host "Chocolatey package pushed. Awaiting moderation."
+
   # DISABLED: Chocolatey requires manual moderation - commented out to avoid build failures
   # publish-chocolatey:
   #   #   runs-on: windows-latest

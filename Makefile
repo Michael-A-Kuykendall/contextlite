@@ -74,11 +74,12 @@ test: ## Run all tests with automatic registry update
 # Run tests with coverage
 coverage: ## Run tests with coverage report and registry update
 	@echo "Running tests with coverage..."
-	go test -coverprofile=coverage.out ./...
-	go tool cover -html=coverage.out -o coverage.html
+	@mkdir -p test-results/coverage
+	go test -coverprofile=test-results/coverage/coverage.out ./...
+	go tool cover -html=test-results/coverage/coverage.out -o test-results/coverage/coverage.html
 	@echo "📊 Updating registry with latest coverage data..."
 	@go run scripts/update_coverage_registry.go
-	@echo "Coverage report generated: coverage.html"
+	@echo "Coverage report generated: test-results/coverage/coverage.html"
 	@echo "Registry updated with current coverage data"
 
 # Run benchmarks
@@ -95,10 +96,10 @@ update-registry: ## Update the system registry with current coverage data
 test-package: ## Test specific package and update registry (usage: make test-package PKG=./internal/engine)
 	@if [ -z "$(PKG)" ]; then echo "Usage: make test-package PKG=./path/to/package"; exit 1; fi
 	@echo "Testing package: $(PKG)"
-	@go test -v -coverprofile=temp_coverage.out $(PKG)
+	@go test -v -coverprofile=test-results/coverage/temp_coverage.out $(PKG)
 	@echo "📊 Updating registry..."
 	@go run scripts/update_coverage_registry.go
-	@rm -f temp_coverage.out
+	@rm -f test-results/coverage/temp_coverage.out
 
 # Quick test with registry update for critical components  
 test-critical: ## Run tests for critical components only with registry update
@@ -132,7 +133,7 @@ dev: ## Run in development mode
 clean: ## Clean build artifacts and temporary files
 	@echo "Cleaning build artifacts..."
 	rm -rf $(BUILD_DIR)
-	rm -f coverage.out coverage.html
+	rm -f test-results/coverage/coverage.out test-results/coverage/coverage.html
 	rm -f *.db *.db-shm *.db-wal
 	@echo "Clean complete"
 

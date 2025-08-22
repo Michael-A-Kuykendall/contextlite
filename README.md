@@ -4,6 +4,8 @@
 
 ContextLite is a Go-based context assembly engine that uses **Satisfiability Modulo Theories (optimization)** optimization to select the perfect set of documents for AI context windows. Built for speed, privacy, and local operation.
 
+📚 **[Complete Technical Wiki](./COMPLETE_TECHNICAL_WIKI.md)** - Comprehensive documentation with architecture, API reference, performance benchmarks, and integration patterns.
+
 ## 🚀 Quick Start
 
 ```bash
@@ -37,6 +39,16 @@ The server starts on `http://localhost:8080` by default.
 - **Zero Dependencies**: Pure Go with embedded SQLite, no external services required
 - **Sub-Second Performance**: p50 ≤300ms, p95 ≤600ms uncached; cached ≤30ms
 - **Local Privacy**: All data stays on your machine, no cloud dependencies
+
+## 📖 Documentation
+
+- **[Complete Technical Wiki](./COMPLETE_TECHNICAL_WIKI.md)** - Full documentation including:
+  - Architecture & Design
+  - API Reference with examples
+  - Performance benchmarks & optimization
+  - Integration patterns for VS Code, CLI, web apps
+  - optimization theory and 7-dimensional feature system
+  - HuggingFace deployment and distribution
 
 ## 🏗️ Repository Structure
 

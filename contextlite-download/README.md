@@ -8,7 +8,7 @@ sdk_version: 5.43.1
 app_file: app.py
 pinned: false
 license: cc0-1.0
-short_description: Mathematical precision beats vector databases - Advanced context retrieval in 0.3ms
+short_description: Advanced context retrieval in 0.3ms vs 50ms vectors
 ---
 
 # ContextLite Download Hub

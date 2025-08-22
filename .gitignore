@@ -45,6 +45,10 @@ config.local.yaml
 # Temporary files
 tmp/
 temp/
+temp-files/
+build-artifacts/
+testing-artifacts/
+test-results/
 
 # Archive and temporary development files
 archive/
@@ -104,3 +108,6 @@ contextlite_private.h
 go_mod_private.txt
 railway.*
 *.railway.*
+
+# HuggingFace Space (separate repository)
+contextlite-download/
