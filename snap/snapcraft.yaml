@@ -1,5 +1,5 @@
 name: contextlite
-version: '1.0.0'
+version: git
 summary: Ultra-fast context engine for retrieval and AI applications
 description: |
   ContextLite is an ultra-fast context engine designed for retrieval and AI 
