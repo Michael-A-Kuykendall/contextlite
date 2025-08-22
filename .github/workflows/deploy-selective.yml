@@ -1,0 +1,414 @@
+name: Selective Package Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      platforms:
+        description: 'Platforms to deploy (comma-separated)'
+        required: true
+        type: choice
+        options:
+          - 'chocolatey'
+          - 'npm'
+          - 'pypi'
+          - 'docker'
+          - 'crates'
+          - 'homebrew'
+          - 'github-packages'
+          - 'aur'
+          - 'snap'
+          - 'chocolatey,npm'
+          - 'chocolatey,pypi'
+          - 'npm,pypi,docker'
+          - 'all-major'
+        default: 'chocolatey'
+      version:
+        description: 'Version to deploy (e.g., 1.0.47)'
+        required: true
+        type: string
+      force_deploy:
+        description: 'Force deploy even if version exists'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+jobs:
+  # Build binaries first (needed for binary-dependent platforms)
+  build-binaries:
+    runs-on: ubuntu-latest
+    if: contains(inputs.platforms, 'chocolatey') || contains(inputs.platforms, 'homebrew') || contains(inputs.platforms, 'all-major')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build multi-platform binaries
+        run: |
+          mkdir -p dist
+          
+          # Build binaries
+          GOOS=windows GOARCH=amd64 go build -ldflags="-X main.version=v${{ inputs.version }}" -o dist/contextlite-windows-amd64.exe ./cmd/contextlite/main.go
+          GOOS=linux GOARCH=amd64 go build -ldflags="-X main.version=v${{ inputs.version }}" -o dist/contextlite-linux-amd64 ./cmd/contextlite/main.go
+          GOOS=darwin GOARCH=amd64 go build -ldflags="-X main.version=v${{ inputs.version }}" -o dist/contextlite-darwin-amd64 ./cmd/contextlite/main.go
+          GOOS=darwin GOARCH=arm64 go build -ldflags="-X main.version=v${{ inputs.version }}" -o dist/contextlite-darwin-arm64 ./cmd/contextlite/main.go
+
+      - name: Create archives
+        run: |
+          cd dist
+          
+          # Windows ZIP
+          mkdir contextlite-windows-amd64
+          cp contextlite-windows-amd64.exe contextlite-windows-amd64/
+          cp ../README.md ../LICENSE contextlite-windows-amd64/
+          zip -r contextlite-${{ inputs.version }}-windows-amd64.zip contextlite-windows-amd64
+          
+          # Linux TAR.GZ
+          mkdir contextlite-linux-amd64  
+          cp contextlite-linux-amd64 contextlite-linux-amd64/
+          cp ../README.md ../LICENSE contextlite-linux-amd64/
+          tar -czf contextlite-${{ inputs.version }}-linux-amd64.tar.gz contextlite-linux-amd64
+          
+          # macOS TAR.GZ (AMD64)
+          mkdir contextlite-darwin-amd64
+          cp contextlite-darwin-amd64 contextlite-darwin-amd64/
+          cp ../README.md ../LICENSE contextlite-darwin-amd64/
+          tar -czf contextlite-${{ inputs.version }}-darwin-amd64.tar.gz contextlite-darwin-amd64
+          
+          # macOS TAR.GZ (ARM64)
+          mkdir contextlite-darwin-arm64
+          cp contextlite-darwin-arm64 contextlite-darwin-arm64/
+          cp ../README.md ../LICENSE contextlite-darwin-arm64/
+          tar -czf contextlite-${{ inputs.version }}-darwin-arm64.tar.gz contextlite-darwin-arm64
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: contextlite-binaries-${{ inputs.version }}
+          path: dist/contextlite-${{ inputs.version }}-*
+
+  # Chocolatey deployment
+  deploy-chocolatey:
+    runs-on: windows-latest
+    needs: build-binaries
+    if: contains(inputs.platforms, 'chocolatey') || contains(inputs.platforms, 'all-major')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: contextlite-binaries-${{ inputs.version }}
+          path: dist
+
+      - name: Check if Chocolatey version exists
+        id: check_choco
+        run: |
+          try {
+            $response = Invoke-RestMethod -Uri "https://chocolatey.org/api/v2/Packages?`$filter=Id eq 'contextlite' and Version eq '${{ inputs.version }}'"
+            if ($response.Count -gt 0) {
+              if ('${{ inputs.force_deploy }}' -eq 'true') {
+                Write-Output "⚠️ Version exists but force_deploy=true, proceeding"
+                echo "skip=false" >> $env:GITHUB_OUTPUT
+              } else {
+                Write-Output "✅ Chocolatey already has this version, skipping"
+                echo "skip=true" >> $env:GITHUB_OUTPUT
+              }
+            } else {
+              Write-Output "🚀 Chocolatey version not found, proceeding"
+              echo "skip=false" >> $env:GITHUB_OUTPUT
+            }
+          }
+          catch {
+            Write-Output "🚀 Could not check Chocolatey version, proceeding"
+            echo "skip=false" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Install Chocolatey
+        if: steps.check_choco.outputs.skip == 'false'
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+          iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+      - name: Prepare Chocolatey package
+        if: steps.check_choco.outputs.skip == 'false'
+        run: |
+          # Copy chocolatey directory
+          Copy-Item -Recurse chocolatey chocolatey-package
+          
+          # Get Windows ZIP URL (it should exist from previous build)
+          $zipUrl = "https://github.com/${{ github.repository }}/releases/download/v${{ inputs.version }}/contextlite-${{ inputs.version }}-windows-amd64.zip"
+          
+          # Calculate checksum from local file
+          $checksum = (Get-FileHash "dist/contextlite-${{ inputs.version }}-windows-amd64.zip" -Algorithm SHA256).Hash
+          
+          # Update nuspec with version
+          (Get-Content chocolatey-package/contextlite.nuspec) -replace 'VERSION_PLACEHOLDER', '${{ inputs.version }}' | Set-Content chocolatey-package/contextlite.nuspec
+          
+          # Update install script with URL and checksum
+          $installScript = Get-Content chocolatey-package/tools/chocolateyinstall.ps1
+          $installScript = $installScript -replace 'URL_PLACEHOLDER', $zipUrl
+          $installScript = $installScript -replace 'CHECKSUM_PLACEHOLDER', $checksum
+          $installScript | Set-Content chocolatey-package/tools/chocolateyinstall.ps1
+          
+          Write-Output "✅ Chocolatey package prepared"
+          Write-Output "URL: $zipUrl"
+          Write-Output "Checksum: $checksum"
+
+      - name: Pack Chocolatey package
+        if: steps.check_choco.outputs.skip == 'false'
+        run: |
+          cd chocolatey-package
+          choco pack
+          Write-Output "✅ Chocolatey package packed"
+
+      - name: Push to Chocolatey
+        if: steps.check_choco.outputs.skip == 'false'
+        run: |
+          cd chocolatey-package
+          choco push "contextlite.${{ inputs.version }}.nupkg" --source https://push.chocolatey.org/ --api-key ${{ secrets.CHOCOLATEY_API_KEY }}
+          Write-Output "✅ Pushed to Chocolatey: contextlite v${{ inputs.version }}"
+
+  # NPM deployment
+  deploy-npm:
+    runs-on: ubuntu-latest
+    if: contains(inputs.platforms, 'npm') || contains(inputs.platforms, 'all-major')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Check if npm package exists
+        id: check_npm
+        run: |
+          if npm show contextlite@${{ inputs.version }} >/dev/null 2>&1; then
+            if [ '${{ inputs.force_deploy }}' = 'true' ]; then
+              echo "⚠️ Version exists but force_deploy=true, proceeding"
+              echo "skip=false" >> $GITHUB_OUTPUT
+            else
+              echo "✅ npm already has this version, skipping"
+              echo "skip=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "🚀 npm version not found, proceeding"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create and publish npm package
+        if: steps.check_npm.outputs.skip == 'false'
+        run: |
+          cp -r npm-wrapper npm-package
+          cd npm-package
+          
+          # Update version
+          sed -i 's/"version": ".*"/"version": "${{ inputs.version }}"/' package.json
+          
+          # Install and publish
+          npm install
+          npm run build
+          npm publish
+          
+          echo "✅ Published contextlite v${{ inputs.version }} to npm"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # PyPI deployment
+  deploy-pypi:
+    runs-on: ubuntu-latest
+    if: contains(inputs.platforms, 'pypi') || contains(inputs.platforms, 'all-major')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Check if PyPI package exists
+        id: check_pypi
+        run: |
+          if curl -f "https://pypi.org/pypi/contextlite/${{ inputs.version }}/json" >/dev/null 2>&1; then
+            if [ '${{ inputs.force_deploy }}' = 'true' ]; then
+              echo "⚠️ Version exists but force_deploy=true, proceeding"
+              echo "skip=false" >> $GITHUB_OUTPUT
+            else
+              echo "✅ PyPI already has this version, skipping"
+              echo "skip=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "🚀 PyPI version not found, proceeding"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and publish Python package
+        if: steps.check_pypi.outputs.skip == 'false'
+        run: |
+          cp -r python-wrapper python-package
+          cd python-package
+          
+          # Update version
+          sed -i 's/version = ".*"/version = "${{ inputs.version }}"/' pyproject.toml
+          
+          # Build and publish
+          python -m build
+          python -m twine upload dist/* --verbose
+          
+          echo "✅ Published contextlite v${{ inputs.version }} to PyPI"
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+  # Docker deployment
+  deploy-docker:
+    runs-on: ubuntu-latest
+    if: contains(inputs.platforms, 'docker') || contains(inputs.platforms, 'all-major')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -f docker/Dockerfile \
+            -t makuykendall/contextlite:${{ inputs.version }} \
+            -t makuykendall/contextlite:latest .
+          
+          docker push makuykendall/contextlite:${{ inputs.version }}
+          docker push makuykendall/contextlite:latest
+          
+          echo "✅ Published Docker image v${{ inputs.version }}"
+
+  # Crates deployment
+  deploy-crates:
+    runs-on: ubuntu-latest
+    if: contains(inputs.platforms, 'crates') || contains(inputs.platforms, 'all-major')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Check if Crates version exists
+        id: check_crates
+        run: |
+          if curl -f "https://crates.io/api/v1/crates/contextlite-client/${{ inputs.version }}" >/dev/null 2>&1; then
+            if [ '${{ inputs.force_deploy }}' = 'true' ]; then
+              echo "⚠️ Version exists but force_deploy=true, proceeding"
+              echo "skip=false" >> $GITHUB_OUTPUT
+            else
+              echo "✅ Crates.io already has this version, skipping"
+              echo "skip=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "🚀 Crates.io version not found, proceeding"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update and publish Rust crate
+        if: steps.check_crates.outputs.skip == 'false'
+        run: |
+          cd adapters/rust/contextlite-client
+          
+          # Update version
+          sed -i 's/^version = ".*"/version = "${{ inputs.version }}"/' Cargo.toml
+          
+          # Clean, build and publish
+          cargo clean
+          cargo build
+          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} --no-verify --allow-dirty
+          
+          echo "✅ Published contextlite-client v${{ inputs.version }} to crates.io"
+
+  # Summary job
+  deployment-summary:
+    runs-on: ubuntu-latest
+    needs: [deploy-chocolatey, deploy-npm, deploy-pypi, deploy-docker, deploy-crates]
+    if: always()
+    steps:
+      - name: Deployment Summary
+        run: |
+          echo "## 🚀 Selective Deployment Summary for v${{ inputs.version }}"
+          echo "**Requested platforms:** ${{ inputs.platforms }}"
+          echo "**Force deploy:** ${{ inputs.force_deploy }}"
+          echo ""
+          echo "### Results:"
+          
+          # Check each job result
+          if [ '${{ needs.deploy-chocolatey.result }}' = 'success' ]; then
+            echo "✅ **Chocolatey**: Successfully deployed"
+          elif [ '${{ needs.deploy-chocolatey.result }}' = 'skipped' ]; then
+            echo "⏭️ **Chocolatey**: Skipped (not requested)"
+          else
+            echo "❌ **Chocolatey**: Failed or cancelled"
+          fi
+          
+          if [ '${{ needs.deploy-npm.result }}' = 'success' ]; then
+            echo "✅ **npm**: Successfully deployed"
+          elif [ '${{ needs.deploy-npm.result }}' = 'skipped' ]; then
+            echo "⏭️ **npm**: Skipped (not requested)"
+          else
+            echo "❌ **npm**: Failed or cancelled"
+          fi
+          
+          if [ '${{ needs.deploy-pypi.result }}' = 'success' ]; then
+            echo "✅ **PyPI**: Successfully deployed"
+          elif [ '${{ needs.deploy-pypi.result }}' = 'skipped' ]; then
+            echo "⏭️ **PyPI**: Skipped (not requested)"
+          else
+            echo "❌ **PyPI**: Failed or cancelled"
+          fi
+          
+          if [ '${{ needs.deploy-docker.result }}' = 'success' ]; then
+            echo "✅ **Docker**: Successfully deployed"
+          elif [ '${{ needs.deploy-docker.result }}' = 'skipped' ]; then
+            echo "⏭️ **Docker**: Skipped (not requested)"
+          else
+            echo "❌ **Docker**: Failed or cancelled"
+          fi
+          
+          if [ '${{ needs.deploy-crates.result }}' = 'success' ]; then
+            echo "✅ **Crates**: Successfully deployed"
+          elif [ '${{ needs.deploy-crates.result }}' = 'skipped' ]; then
+            echo "⏭️ **Crates**: Skipped (not requested)"
+          else
+            echo "❌ **Crates**: Failed or cancelled"
+          fi
+          
+          echo ""
+          echo "🎯 **Next steps:**"
+          echo "- Monitor platform-specific approval processes"
+          echo "- Check individual platform dashboards for status"
+          echo "- Use 'force_deploy=true' to override existing versions if needed"
