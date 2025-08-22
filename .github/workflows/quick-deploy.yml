@@ -1,0 +1,214 @@
+name: Quick Deploy Single Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to deploy'
+        required: true
+        type: choice
+        options:
+          - crates
+          - docker
+          - npm
+          - pypi
+      version:
+        description: 'Version to publish (e.g., 1.0.43)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+jobs:
+  publish-crates-only:
+    if: ${{ inputs.package == 'crates' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Check if Crates version exists
+        id: check_crates
+        run: |
+          if curl -f "https://crates.io/api/v1/crates/contextlite-client/${{ inputs.version }}" >/dev/null 2>&1; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "✅ Crates.io already has this version, skipping"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "🚀 Crates.io version not found, proceeding"
+          fi
+
+      - name: Update Rust client version and publish
+        if: steps.check_crates.outputs.skip == 'false'
+        run: |
+          cd adapters/rust/contextlite-client
+          
+          # Update version in Cargo.toml
+          sed -i 's/^version = ".*"/version = "${{ inputs.version }}"/' Cargo.toml
+          
+          # Verify version was updated
+          echo "Updated Cargo.toml version:"
+          grep '^version = ' Cargo.toml
+          
+          # Clean and verify package size before publishing
+          echo "Cleaning previous builds..."
+          cargo clean
+          
+          # Build and check package size
+          echo "Building package..."
+          cargo build
+          
+          # Package and check size
+          echo "Creating package..."
+          cargo package --no-verify
+          
+          # Check package size
+          PACKAGE_SIZE=$(ls -la target/package/*.crate | awk '{print $5}')
+          echo "Package size: $PACKAGE_SIZE bytes"
+          
+          if [ $PACKAGE_SIZE -gt 10485760 ]; then
+            echo "❌ Package size exceeds 10MB limit"
+            exit 1
+          else
+            echo "✅ Package size within limits"
+          fi
+          
+          # Publish to crates.io
+          echo "Publishing to crates.io..."
+          cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }} --no-verify
+          
+          echo "✅ Published contextlite-client v${{ inputs.version }} to crates.io"
+
+  publish-npm-only:
+    if: ${{ inputs.package == 'npm' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Check if npm package exists
+        id: check_npm
+        run: |
+          if npm show contextlite@${{ inputs.version }} >/dev/null 2>&1; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "✅ npm already has this version, skipping"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "🚀 npm version not found, proceeding"
+          fi
+
+      - name: Create and publish npm package
+        if: steps.check_npm.outputs.skip == 'false'
+        run: |
+          # Use existing npm-wrapper
+          cp -r npm-wrapper npm-package
+          cd npm-package
+          
+          # Update version in package.json
+          sed -i 's/"version": ".*"/"version": "${{ inputs.version }}"/' package.json
+          
+          # Verify version
+          echo "Updated package.json:"
+          grep '"version":' package.json
+          
+          # Publish to npm
+          npm publish
+          
+          echo "✅ Published contextlite v${{ inputs.version }} to npm"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-docker-only:
+    if: ${{ inputs.package == 'docker' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          # Build with custom tag
+          docker build -f docker/Dockerfile -t makuykendall/contextlite:${{ inputs.version }} -t makuykendall/contextlite:latest .
+          
+          # Push both tags
+          docker push makuykendall/contextlite:${{ inputs.version }}
+          docker push makuykendall/contextlite:latest
+          
+          echo "✅ Published Docker image v${{ inputs.version }}"
+
+  publish-pypi-only:
+    if: ${{ inputs.package == 'pypi' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Check if PyPI package exists
+        id: check_pypi
+        run: |
+          if curl -f "https://pypi.org/pypi/contextlite/${{ inputs.version }}/json" >/dev/null 2>&1; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "✅ PyPI package already exists, skipping"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "🚀 PyPI package not found, proceeding"
+          fi
+
+      - name: Build and publish Python package
+        if: steps.check_pypi.outputs.skip == 'false'
+        run: |
+          # Use existing python-wrapper
+          cp -r python-wrapper python-package
+          cd python-package
+          
+          # Update version in pyproject.toml
+          sed -i 's/version = ".*"/version = "${{ inputs.version }}"/' pyproject.toml
+          
+          # Verify version
+          echo "Updated pyproject.toml:"
+          grep '^version = ' pyproject.toml
+          
+          # Build and publish
+          python -m build
+          python -m twine upload dist/* --verbose
+          
+          echo "✅ Published contextlite v${{ inputs.version }} to PyPI"
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
