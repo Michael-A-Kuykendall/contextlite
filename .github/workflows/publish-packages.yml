@@ -336,9 +336,15 @@ jobs:
         shell: bash
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+            version_raw="${{ github.event.inputs.version }}"
+            # Strip 'v' prefix if present for clean version
+            clean_version="${version_raw#v}"
+            echo "version=$clean_version" >> $GITHUB_OUTPUT
+            echo "version_with_v=v$clean_version" >> $GITHUB_OUTPUT
           else
-            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+            version_raw="${GITHUB_REF#refs/tags/v}"
+            echo "version=$version_raw" >> $GITHUB_OUTPUT
+            echo "version_with_v=v$version_raw" >> $GITHUB_OUTPUT
           fi
 
       - name: Check if Chocolatey version exists
@@ -368,8 +374,9 @@ jobs:
           Copy-Item -Path "chocolatey" -Destination "chocolatey-package" -Recurse
           cd chocolatey-package
           $version = "${{ steps.version.outputs.version }}"
-          (Get-Content contextlite.nuspec -Raw).Replace('VERSION_PLACEHOLDER', $version).Replace('releases/tag/VERSION_PLACEHOLDER', "releases/tag/v$version") | Set-Content contextlite.nuspec
-          $downloadUrl = "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v$version/contextlite-$version-windows-amd64.zip"
+          $versionWithV = "${{ steps.version.outputs.version_with_v }}"
+          (Get-Content contextlite.nuspec -Raw).Replace('VERSION_PLACEHOLDER', $version).Replace('releases/tag/VERSION_PLACEHOLDER', "releases/tag/$versionWithV") | Set-Content contextlite.nuspec
+          $downloadUrl = "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/$versionWithV/contextlite-$versionWithV-windows-amd64.zip"
           Invoke-WebRequest -Uri $downloadUrl -OutFile contextlite-windows.zip
           $checksum = (Get-FileHash contextlite-windows.zip -Algorithm SHA256).Hash
           $installScript = (Get-Content tools/chocolateyinstall.ps1 -Raw).Replace('RELEASE_URL_PLACEHOLDER', $downloadUrl).Replace('RELEASE_CHECKSUM_PLACEHOLDER', $checksum)
