@@ -618,6 +618,7 @@ jobs:
   publish-snap:
     runs-on: ubuntu-latest
     needs: build-and-release  # Wait for release to be created
+    if: inputs.platforms == 'all' || contains(inputs.platforms, 'snap') || github.event_name != 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -672,6 +673,7 @@ jobs:
 
   publish-homebrew:
     runs-on: macos-latest
+    if: inputs.platforms == 'all' || contains(inputs.platforms, 'homebrew') || github.event_name != 'workflow_dispatch'
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -807,6 +809,7 @@ jobs:
   publish-aur:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    if: inputs.platforms == 'all' || contains(inputs.platforms, 'aur') || github.event_name != 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -911,6 +914,7 @@ jobs:
 
   publish-github-packages:
     runs-on: ubuntu-latest
+    if: inputs.platforms == 'all' || contains(inputs.platforms, 'github-packages') || github.event_name != 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
