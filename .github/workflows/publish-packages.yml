@@ -345,7 +345,8 @@ jobs:
         id: check_chocolatey
         shell: bash
         run: |
-          if curl -f "https://community.chocolatey.org/api/v2/Packages?%24filter=Id%20eq%20'contextlite'%20and%20Version%20eq%20'${{ steps.version.outputs.version }}'" >/dev/null 2>&1; then
+          response=$(curl -s "https://community.chocolatey.org/api/v2/Packages?\$filter=Id%20eq%20'contextlite'%20and%20Version%20eq%20'${{ steps.version.outputs.version }}'")
+          if echo "$response" | grep -q "<entry>"; then
             echo "skip=true" >> $GITHUB_OUTPUT
             echo "✅ Chocolatey package already exists, skipping"
           else
