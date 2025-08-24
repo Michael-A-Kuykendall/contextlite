@@ -620,7 +620,7 @@ func TestEngine_LoaderImprovements(t *testing.T) {
 
 	t.Run("FileExists_ValidPath", func(t *testing.T) {
 		// Test with a file that should exist (this test file)
-		exists := fileExists("engine_100_percent_coverage_test.go")
+		exists := fileExists("json_cli_100_percent_test.go")
 		if !exists {
 			t.Error("Expected test file to exist")
 		}
