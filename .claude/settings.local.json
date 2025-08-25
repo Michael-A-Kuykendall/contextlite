@@ -28,7 +28,9 @@
       "Bash(gh api:*)",
       "Bash(curl:*)",
       "Bash(git checkout:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": [],
