@@ -1,10 +1,10 @@
 # ContextLite
 
-> **SMT-optimized context sidecar for AI systems** - 10,000x faster than vector databases, 100% local, zero dependencies.
+> **High-performance context engine for AI systems** - Ultra-fast document retrieval, 100% local, zero dependencies.
 
-ContextLite is a Go-based context assembly engine that uses **Satisfiability Modulo Theories (SMT)** optimization to select the perfect set of documents for AI context windows. Built for speed, privacy, and local operation.
+ContextLite is a Go-based context assembly engine that uses advanced optimization techniques to select the most relevant documents for AI context windows. Built for speed, privacy, and local operation.
 
-📚 **[Complete Technical Wiki](./COMPLETE_TECHNICAL_WIKI.md)** - Comprehensive documentation with architecture, API reference, performance benchmarks, and integration patterns.
+📚 **[Documentation](./docs/)** - Technical guides and API reference for integration and development.
 
 ## 🚀 Quick Start
 
@@ -42,13 +42,9 @@ The server starts on `http://localhost:8080` by default.
 
 ## 📖 Documentation
 
-- **[Complete Technical Wiki](./COMPLETE_TECHNICAL_WIKI.md)** - Full documentation including:
-  - Architecture & Design
-  - API Reference with examples
-  - Performance benchmarks & optimization
-  - Integration patterns for VS Code, CLI, web apps
-  - SMT theory and 7-dimensional feature system
-  - HuggingFace deployment and distribution
+- **[Documentation](./docs/)** - Architecture guides and API reference
+- **[Contributing Guide](CONTRIBUTING.md)** - Development setup and guidelines  
+- **[License](LICENSE)** - MIT License terms
 
 ## 🏗️ Repository Structure
 
@@ -58,13 +54,13 @@ contextlite/
 │   ├── contextlite/           # HTTP sidecar server
 │   └── sota-eval/             # SOTA comparison CLI tool
 ├── internal/                  # Private implementation
-│   ├── smt/                   # SMT solver integration (Z3)
+│   ├── optimization/          # Advanced optimization engine
 │   ├── storage/               # SQLite + FTS5 storage layer
-│   ├── features/              # 7D feature extraction & scoring
+│   ├── features/              # Multi-dimensional feature extraction & scoring
 │   ├── pipeline/              # Main assembly pipeline
 │   ├── cache/                 # Multi-level caching system
 │   ├── api/                   # HTTP API handlers
-│   └── evaluation/            # SOTA evaluation framework
+│   └── evaluation/            # Performance evaluation framework
 ├── pkg/                       # Public API packages
 │   ├── types/                 # Core data structures
 │   ├── config/                # Configuration management
