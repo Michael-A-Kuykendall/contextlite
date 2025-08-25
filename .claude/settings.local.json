@@ -31,7 +31,8 @@
       "Bash(git merge:*)",
       "Bash(git rebase:*)",
       "Bash(git stash:*)",
-      "Bash(git filter-branch:*)"
+      "Bash(git filter-branch:*)",
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch CHAT.md' --prune-empty --tag-name-filter cat -- --all)"
     ],
     "deny": [],
     "ask": [],
