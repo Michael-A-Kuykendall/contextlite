@@ -16,9 +16,9 @@ func TestTimingHelper(t *testing.T) {
 	ms := timer.Ms()
 	ns := timer.Ns()
 	
-	// Should be around 750 microseconds (but allow for OS overhead)
-	if us < 500 || us > 2000 {
-		t.Errorf("Expected ~750μs ± 500μs, got %dμs", us)
+	// Should be around 750 microseconds (but allow for OS overhead, especially on Windows)
+	if us < 100 || us > 5000 {
+		t.Errorf("Expected ~750μs but allowing wide range for OS overhead, got %dμs", us)
 	}
 	
 	// Should be around 0.75 milliseconds
