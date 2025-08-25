@@ -3,22 +3,23 @@
 
 ## 🚨 CRITICAL ACTIONS (Do First - 30 minutes)
 
-### 1. Fix Build-and-Release Job (BLOCKS 5+ PACKAGES)
-- [ ] **Test build command locally**:
-  ```bash
-  cd /c/Users/micha/repos/contextlite
-  go build ./cmd/contextlite          # Test this vs
-  go build ./cmd/contextlite/main.go  # This (current failing command)
-  ```
-- [ ] **Identify correct build path** and update `.github/workflows/publish-packages.yml`
-- [ ] **Verify go.mod** has all required dependencies
-- [ ] **Test multi-platform build locally**:
-  ```bash
-  GOOS=linux GOARCH=amd64 go build -o test-linux ./cmd/contextlite
-  GOOS=windows GOARCH=amd64 go build -o test-windows.exe ./cmd/contextlite
-  ```
+### 1. Snap Store Account Setup ⏱️ 15 minutes - NEW PRIORITY
+- [ ] Create Ubuntu One account at https://ubuntu.com/
+- [ ] Register developer account at https://snapcraft.io/
+- [ ] Install snapcraft locally: `sudo snap install snapcraft --classic`
+- [ ] Login: `snapcraft login`
+- [ ] Register name: `snapcraft register contextlite`
+- [ ] Export credentials: `snapcraft export-login /tmp/snapcraft-creds`
+- [ ] Base64 encode: `cat /tmp/snapcraft-creds | base64 -w 0`
+- [ ] Add to GitHub Secrets as `SNAPCRAFT_STORE_CREDENTIALS`
 
-### 2. Verify GitHub Secrets
+### 2. Fix Build-and-Release Job (ALREADY FIXED ✅)
+- [x] **Test build command locally** - WORKING
+- [x] **Identify correct build path** - FIXED: changed main.go → contextlite
+- [x] **Verify go.mod** - CONFIRMED working
+- [x] **Test multi-platform build locally** - CONFIRMED working
+
+### 3. Verify GitHub Secrets
 - [ ] **Check CHOCOLATEY_API_KEY** in GitHub repository secrets
 - [ ] **Check CARGO_REGISTRY_TOKEN** in GitHub repository secrets  
 - [ ] **Check DOCKERHUB_USERNAME** and **DOCKERHUB_TOKEN**

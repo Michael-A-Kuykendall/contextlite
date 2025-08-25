@@ -65,11 +65,17 @@ deps: ## Install Go dependencies
 	go mod tidy
 
 # Run tests
-test: ## Run all tests with automatic registry update
-	@echo "Running tests..."
-	go test -v ./...
-	@echo "📊 Updating registry with latest test results..."
-	@go run scripts/update_coverage_registry.go
+test: test-unit ## Run all unit tests
+
+# Run only unit tests
+test-unit: ## Run all unit tests, excluding integration tests
+	@echo "Running unit tests..."
+	@go test -v -tags=unit ./...
+
+# Run only integration tests
+test-integration: ## Build and run all integration tests against a live server
+	@echo "Running integration tests..."
+	@./test/integration_suite/run_all_tests.sh
 
 # Run tests with coverage
 coverage: ## Run tests with coverage report and registry update

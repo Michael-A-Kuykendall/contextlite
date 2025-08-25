@@ -56,6 +56,7 @@ func New(dbPath string) (*Storage, error) {
 
 	for _, pragma := range pragmas {
 		if _, err := db.Exec(pragma); err != nil {
+			db.Close()
 			return nil, fmt.Errorf("failed to apply pragma %s: %w", pragma, err)
 		}
 	}
@@ -64,11 +65,13 @@ func New(dbPath string) (*Storage, error) {
 
 	// Initialize schema
 	if err := storage.initSchema(); err != nil {
+		db.Close()
 		return nil, fmt.Errorf("failed to initialize schema: %w", err)
 	}
 
 	// Apply migrations
 	if err := storage.applyMigrations(); err != nil {
+		db.Close()
 		return nil, fmt.Errorf("failed to apply migrations: %w", err)
 	}
 

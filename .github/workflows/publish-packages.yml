@@ -660,24 +660,41 @@ jobs:
           # Update the version in our existing snapcraft.yaml 
           sed -i "s/version: git/version: '${{ steps.version.outputs.version }}'/" snap/snapcraft.yaml
           echo "Updated snap/snapcraft.yaml version to ${{ steps.version.outputs.version }}"
+          echo "Final snapcraft.yaml:"
           cat snap/snapcraft.yaml
+
+      - name: Validate snapcraft.yaml
+        if: steps.check_snap.outputs.skip == 'false'
+        run: |
+          # Test the snapcraft.yaml syntax
+          snapcraft expand-extensions
+          echo "✅ snapcraft.yaml validation passed"
 
       - name: Build snap
         if: steps.check_snap.outputs.skip == 'false'
-        run: snapcraft --destructive-mode
+        run: |
+          echo "🔨 Building snap package..."
+          snapcraft --destructive-mode
+          echo "✅ Snap build completed"
+          ls -la *.snap
 
       - name: Login to Snap Store
-        if: steps.check_snap.outputs.skip == 'false'
+        if: steps.check_snap.outputs.skip == 'false' && env.SNAPCRAFT_STORE_CREDENTIALS != ''
         run: |
           echo "$SNAPCRAFT_STORE_CREDENTIALS" | base64 -d > /tmp/snapcraft-login
           snapcraft login --with /tmp/snapcraft-login
+          echo "✅ Logged into Snap Store"
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
       - name: Upload and release snap
-        if: steps.check_snap.outputs.skip == 'false'
+        if: steps.check_snap.outputs.skip == 'false' && env.SNAPCRAFT_STORE_CREDENTIALS != ''
         run: |
+          echo "📦 Uploading snap to store..."
           snapcraft upload *.snap --release=stable
+          echo "✅ Snap successfully published to store"
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
   publish-homebrew:
     runs-on: macos-latest
