@@ -6,15 +6,125 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"path/filepath"
+	
+	"contextlite/pkg/types"
+	"contextlite/internal/storage"
+	"contextlite/pkg/config"
+	"contextlite/internal/engine"
+	"go.uber.org/zap"
 )
 
 
+// Enhanced mock feature gate to test enhanced code paths
+type enhancedMockFeatureGate struct {
+	hasEnhancedFeatures bool
+	trialActive         bool
+}
+
+func (e *enhancedMockFeatureGate) GetStatus() map[string]interface{} {
+	status := map[string]interface{}{
+		"tier":                "developer",
+		"max_documents":       1000,
+		"features":            []string{"basic_optimization", "workspaces"},
+		"in_grace_period":     false,
+		"status":              "enhanced",
+		"message":             "Enhanced license system active",
+	}
+	
+	if e.trialActive {
+		status["trial"] = map[string]interface{}{
+			"active":           true,
+			"days_remaining":   7,
+			"tier":            "professional",
+			"expires_at":      "2024-09-01T00:00:00Z",
+		}
+	}
+	
+	return status
+}
+
+func (e *enhancedMockFeatureGate) TrialDaysRemaining() int {
+	if e.trialActive {
+		return 7
+	}
+	return 0
+}
+
+// Implement types.FeatureGate interface
+func (e *enhancedMockFeatureGate) IsEnabled(feature string) bool {
+	return true
+}
+
+func (e *enhancedMockFeatureGate) RequireFeature(feature string) error {
+	return nil
+}
+
+func (e *enhancedMockFeatureGate) RequireProfessional() error {
+	return nil
+}
+
+func (e *enhancedMockFeatureGate) RequireEnterprise() error {
+	return nil
+}
+
+func (e *enhancedMockFeatureGate) GetTier() string {
+	return "developer"
+}
+
+func (e *enhancedMockFeatureGate) ValidateCustomMCP() error {
+	return nil
+}
+
+func (e *enhancedMockFeatureGate) ValidateMultiTenant() error {
+	return nil
+}
+
+// Helper function to create server with custom feature gate
+func setupTestServerWithFeatureGate(t *testing.T, featureGate types.FeatureGate) *Server {
+	// Create temporary database
+	dbPath := filepath.Join(t.TempDir(), "test.db")
+	
+	// Initialize storage
+	store, err := storage.New(dbPath)
+	if err != nil {
+		t.Fatalf("Failed to create test storage: %v", err)
+	}
+	
+	// Create config
+	cfg := &config.Config{
+		Server: config.ServerConfig{
+			Host: "localhost",
+			Port: 8080,
+		},
+		Storage: config.StorageConfig{
+			DatabasePath: dbPath,
+		},
+		Tokenizer: config.TokenizerConfig{
+			ModelID: "test-model",
+		},
+	}
+	
+	// Initialize engine
+	eng := engine.LoadEngine(cfg, store)
+	
+	// Create logger
+	logger := zap.NewNop()
+	
+	// Create server with custom feature gate
+	return New(eng, store, cfg, logger, featureGate)
+}
+
 // Test low-coverage license handlers
 func TestAPI_100Percent_LicenseHandlers(t *testing.T) {
-	server, _, cleanup := setupTestServer(t)
-	defer cleanup()
-
-	t.Run("handleLicenseStatus_AllFields", func(t *testing.T) {
+	t.Run("handleLicenseStatus_EnhancedGate", func(t *testing.T) {
+		// Create server with enhanced feature gate
+		enhancedGate := &enhancedMockFeatureGate{
+			hasEnhancedFeatures: true,
+			trialActive:         false,
+		}
+		server := setupTestServerWithFeatureGate(t, enhancedGate)
+		
 		req := httptest.NewRequest("GET", "/api/v1/license/status", nil)
 		req.Header.Set("Authorization", "Bearer test-token")
 		
@@ -30,30 +140,107 @@ func TestAPI_100Percent_LicenseHandlers(t *testing.T) {
 			t.Errorf("Failed to decode response: %v", err)
 		}
 
-		// Check all expected fields are present
-		expectedFields := []string{"tier", "max_documents", "features", "in_grace_period"}
+		// Check enhanced fields are present
+		expectedFields := []string{"tier", "max_documents", "features", "in_grace_period", "purchase_url", "trial_days_remaining"}
 		for _, field := range expectedFields {
 			if _, ok := response[field]; !ok {
-				t.Errorf("Response should contain %s field", field)
+				t.Errorf("Enhanced response should contain %s field", field)
 			}
 		}
 
-		t.Logf("Full license status response: %+v", response)
+		t.Logf("Enhanced license status response: %+v", response)
 	})
 
-	t.Run("handleTrialInfo_NotFound", func(t *testing.T) {
+	t.Run("handleLicenseStatus_BasicGate", func(t *testing.T) {
+		// Test basic feature gate path (fallback)
+		server, _, cleanup := setupTestServer(t)
+		defer cleanup()
+
+		req := httptest.NewRequest("GET", "/api/v1/license/status", nil)
+		req.Header.Set("Authorization", "Bearer test-token")
+		
+		w := httptest.NewRecorder()
+		server.ServeHTTP(w, req)
+
+		if w.Code != http.StatusOK {
+			t.Errorf("Expected status 200, got %d", w.Code)
+		}
+
+		var response map[string]interface{}
+		if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+			t.Errorf("Failed to decode response: %v", err)
+		}
+
+		// Check basic fallback fields
+		if status, ok := response["status"]; !ok || status != "basic" {
+			t.Error("Basic response should contain status: 'basic'")
+		}
+		if message, ok := response["message"]; !ok || message != "Basic license system active" {
+			t.Error("Basic response should contain basic message")
+		}
+
+		t.Logf("Basic license status response: %+v", response)
+	})
+
+	t.Run("handleTrialInfo_WithTrial", func(t *testing.T) {
+		// Create server with enhanced feature gate that has trial
+		enhancedGate := &enhancedMockFeatureGate{
+			hasEnhancedFeatures: true,
+			trialActive:         true,
+		}
+		server := setupTestServerWithFeatureGate(t, enhancedGate)
+		
 		req := httptest.NewRequest("GET", "/api/v1/trial/info", nil)
 		req.Header.Set("Authorization", "Bearer test-token")
 		
 		w := httptest.NewRecorder()
 		server.ServeHTTP(w, req)
 
-		// Trial endpoint typically returns 404 when no trial is active
-		if w.Code != http.StatusNotFound {
-			t.Logf("Expected 404 (no trial), got %d", w.Code)
+		if w.Code != http.StatusOK {
+			t.Errorf("Expected status 200, got %d", w.Code)
 		}
 
-		t.Logf("Trial info response status: %d", w.Code)
+		var response map[string]interface{}
+		if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+			t.Errorf("Failed to decode response: %v", err)
+		}
+
+		// Check trial fields
+		expectedFields := []string{"active", "days_remaining", "tier", "expires_at", "purchase_url", "features_available"}
+		for _, field := range expectedFields {
+			if _, ok := response[field]; !ok {
+				t.Errorf("Trial response should contain %s field", field)
+			}
+		}
+
+		t.Logf("Trial info response: %+v", response)
+	})
+
+	t.Run("handleTrialInfo_NoTrial", func(t *testing.T) {
+		server, _, cleanup := setupTestServer(t)
+		defer cleanup()
+
+		req := httptest.NewRequest("GET", "/api/v1/trial/info", nil)
+		req.Header.Set("Authorization", "Bearer test-token")
+		
+		w := httptest.NewRecorder()
+		server.ServeHTTP(w, req)
+
+		if w.Code != http.StatusOK {
+			t.Errorf("Expected status 200, got %d", w.Code)
+		}
+
+		var response map[string]interface{}
+		if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+			t.Errorf("Failed to decode response: %v", err)
+		}
+
+		// Check no-trial fields
+		if status, ok := response["status"]; !ok || status != "no_trial" {
+			t.Error("No-trial response should contain status: 'no_trial'")
+		}
+
+		t.Logf("No-trial info response: %+v", response)
 	})
 }
 

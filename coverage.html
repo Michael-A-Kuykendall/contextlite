@@ -1,0 +1,843 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>storage: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">contextlite/internal/storage/sqlite.go (86.1%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package storage
+
+import (
+        "context"
+        "database/sql"
+        "embed"
+        "encoding/hex"
+        "encoding/json"
+        "fmt"
+        "strings"
+        "time"
+
+        "contextlite/pkg/tokens"
+        "contextlite/pkg/types"
+
+        "crypto/sha256"
+        _ "modernc.org/sqlite"
+)
+
+//go:embed schema.sql
+var schemaFS embed.FS
+
+// Storage provides SQLite storage operations
+type Storage struct {
+        db *sql.DB
+        // Cache statistics
+        cacheHits   int64
+        cacheMisses int64
+}
+
+// CacheStats represents cache performance metrics
+// Remove the local CacheStats type since we'll use the one from types
+// type CacheStats struct {
+//         Hits     int64   `json:"hits"`
+//         Misses   int64   `json:"misses"`
+//         HitRate  float64 `json:"hit_rate"`
+//         L1Size   int     `json:"l1_size"`
+//         L2Size   int     `json:"l2_size"`
+// }
+
+// New creates a new Storage instance
+func New(dbPath string) (*Storage, error) <span class="cov8" title="1">{
+        db, err := sql.Open("sqlite", dbPath)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to open database: %w", err)
+        }</span>
+
+        // Apply performance pragmas
+        <span class="cov8" title="1">pragmas := []string{
+                "PRAGMA journal_mode = WAL",
+                "PRAGMA synchronous = NORMAL",
+                "PRAGMA cache_size = -64000",
+                "PRAGMA temp_store = MEMORY",
+                "PRAGMA mmap_size = 268435456",
+        }
+
+        for _, pragma := range pragmas </span><span class="cov8" title="1">{
+                if _, err := db.Exec(pragma); err != nil </span><span class="cov8" title="1">{
+                        return nil, fmt.Errorf("failed to apply pragma %s: %w", pragma, err)
+                }</span>
+        }
+
+        <span class="cov8" title="1">storage := &amp;Storage{db: db}
+
+        // Initialize schema
+        if err := storage.initSchema(); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to initialize schema: %w", err)
+        }</span>
+
+        // Apply migrations
+        <span class="cov8" title="1">if err := storage.applyMigrations(); err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to apply migrations: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">return storage, nil</span>
+}
+
+// Close closes the database connection
+func (s *Storage) Close() error <span class="cov8" title="1">{
+        return s.db.Close()
+}</span>
+
+// GetStorageStats returns real database statistics
+func (s *Storage) GetStorageStats(ctx context.Context) (map[string]interface{}, error) <span class="cov8" title="1">{
+        stats := make(map[string]interface{})
+        
+        // Get document count
+        var docCount int
+        err := s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM documents").Scan(&amp;docCount)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get document count: %w", err)
+        }</span>
+        <span class="cov8" title="1">stats["total_documents"] = docCount
+        
+        // Get database size (in pages * page_size)
+        var pageCount, pageSize int64
+        err = s.db.QueryRowContext(ctx, "PRAGMA page_count").Scan(&amp;pageCount)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get page count: %w", err)
+        }</span>
+        <span class="cov8" title="1">err = s.db.QueryRowContext(ctx, "PRAGMA page_size").Scan(&amp;pageSize)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get page size: %w", err)
+        }</span>
+        
+        <span class="cov8" title="1">dbSizeBytes := pageCount * pageSize
+        stats["database_size"] = fmt.Sprintf("%.2f MB", float64(dbSizeBytes)/(1024*1024))
+        
+        // Get FTS index size (estimate)
+        ftsPages := pageCount / 4 // Estimate FTS as 25% of total
+        ftsSizeBytes := ftsPages * pageSize
+        stats["index_size"] = fmt.Sprintf("%.2f MB", float64(ftsSizeBytes)/(1024*1024))
+        
+        // Get last update time
+        var lastUpdate time.Time
+        err = s.db.QueryRowContext(ctx, `
+                SELECT MAX(created_at) FROM documents
+        `).Scan(&amp;lastUpdate)
+        if err != nil </span><span class="cov8" title="1">{
+                lastUpdate = time.Now()
+        }</span>
+        <span class="cov8" title="1">stats["last_update"] = lastUpdate.Unix()
+        
+        // Additional useful stats
+        var avgDocSize sql.NullFloat64
+        err = s.db.QueryRowContext(ctx, `
+                SELECT AVG(LENGTH(content)) FROM documents
+        `).Scan(&amp;avgDocSize)
+        if err == nil &amp;&amp; avgDocSize.Valid </span><span class="cov8" title="1">{
+                stats["avg_document_size"] = fmt.Sprintf("%.0f chars", avgDocSize.Float64)
+        }</span>
+        
+        <span class="cov8" title="1">return stats, nil</span>
+}
+
+// GetWorkspaceStats returns workspace-specific statistics
+func (s *Storage) GetWorkspaceStats(workspacePath string) (*types.WorkspaceStats, error) <span class="cov8" title="1">{
+        ctx := context.Background()
+        
+        // Count documents in this workspace
+        var docCount int
+        err := s.db.QueryRowContext(ctx, `
+                SELECT COUNT(*) FROM documents WHERE path LIKE ?
+        `, workspacePath+"%").Scan(&amp;docCount)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to count workspace documents: %w", err)
+        }</span>
+        
+        // Get total tokens in workspace
+        <span class="cov8" title="1">var totalTokens sql.NullInt64
+        err = s.db.QueryRowContext(ctx, `
+                SELECT SUM(token_count) FROM documents WHERE path LIKE ?
+        `, workspacePath+"%").Scan(&amp;totalTokens)
+        if err != nil </span><span class="cov0" title="0">{
+                totalTokens.Int64 = 0 // Default if query fails
+        }</span>
+        
+        // Get average file size
+        <span class="cov8" title="1">var avgFileSize sql.NullFloat64
+        err = s.db.QueryRowContext(ctx, `
+                SELECT AVG(LENGTH(content)) FROM documents WHERE path LIKE ?
+        `, workspacePath+"%").Scan(&amp;avgFileSize)
+        if err != nil </span><span class="cov0" title="0">{
+                avgFileSize.Float64 = 0 // Default if query fails
+        }</span>
+        
+        // Get languages (simplified - just take first few)
+        <span class="cov8" title="1">rows, err := s.db.QueryContext(ctx, `
+                SELECT DISTINCT lang FROM documents WHERE path LIKE ? AND lang != '' LIMIT 10
+        `, workspacePath+"%")
+        languages := []string{}
+        if err == nil </span><span class="cov8" title="1">{
+                defer rows.Close()
+                for rows.Next() </span><span class="cov8" title="1">{
+                        var lang string
+                        if err := rows.Scan(&amp;lang); err == nil </span><span class="cov8" title="1">{
+                                languages = append(languages, lang)
+                        }</span>
+                }
+        }
+        
+        // Get last indexed time (most recent document)
+        <span class="cov8" title="1">var lastIndexed time.Time
+        err = s.db.QueryRowContext(ctx, `
+                SELECT MAX(updated_at) FROM documents WHERE path LIKE ?
+        `, workspacePath+"%").Scan(&amp;lastIndexed)
+        if err != nil </span><span class="cov8" title="1">{
+                lastIndexed = time.Now() // Default if query fails
+        }</span>
+        
+        <span class="cov8" title="1">return &amp;types.WorkspaceStats{
+                Path:            workspacePath,
+                DocumentCount:   docCount,
+                TotalTokens:     totalTokens.Int64,
+                LastIndexed:     lastIndexed,
+                Languages:       languages,
+                AverageFileSize: int64(avgFileSize.Float64),
+        }, nil</span>
+}
+
+// GetCacheStats returns cache performance statistics
+func (s *Storage) GetCacheStats(ctx context.Context) (*types.CacheStats, error) <span class="cov8" title="1">{
+        // Get L2 cache size (number of cached results)
+        var l2Size int
+        err := s.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM query_cache").Scan(&amp;l2Size)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to get cache size: %w", err)
+        }</span>
+        
+        <span class="cov8" title="1">total := s.cacheHits + s.cacheMisses
+        hitRate := 0.0
+        if total &gt; 0 </span><span class="cov0" title="0">{
+                hitRate = float64(s.cacheHits) / float64(total)
+        }</span>
+        
+        <span class="cov8" title="1">return &amp;types.CacheStats{
+                Hits:    s.cacheHits,
+                Misses:  s.cacheMisses,
+                HitRate: hitRate,
+                L1Size:  0, // L1 cache not implemented in this version
+                L2Size:  l2Size,
+        }, nil</span>
+}
+
+// initSchema initializes the database schema
+func (s *Storage) initSchema() error <span class="cov8" title="1">{
+        schema, err := schemaFS.ReadFile("schema.sql")
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to read schema: %w", err)
+        }</span>
+
+        // Split and execute each statement
+        <span class="cov8" title="1">statements := strings.Split(string(schema), ";")
+        for _, stmt := range statements </span><span class="cov8" title="1">{
+                stmt = strings.TrimSpace(stmt)
+                if stmt == "" </span><span class="cov8" title="1">{
+                        continue</span>
+                }
+                
+                // Special handling for FTS tables since IF NOT EXISTS doesn't work with them
+                <span class="cov8" title="1">if strings.Contains(stmt, "CREATE VIRTUAL TABLE") &amp;&amp; strings.Contains(stmt, "documents_fts") </span><span class="cov8" title="1">{
+                        // Check if FTS table exists
+                        var count int
+                        err := s.db.QueryRow("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='documents_fts'").Scan(&amp;count)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return fmt.Errorf("failed to check FTS table existence: %w", err)
+                        }</span>
+                        <span class="cov8" title="1">if count &gt; 0 </span><span class="cov8" title="1">{
+                                continue</span> // Skip creating FTS table if it already exists
+                        }
+                        // Remove IF NOT EXISTS from FTS statement
+                        <span class="cov8" title="1">stmt = strings.Replace(stmt, "IF NOT EXISTS ", "", 1)</span>
+                }
+                
+                <span class="cov8" title="1">if _, err := s.db.Exec(stmt); err != nil </span><span class="cov0" title="0">{
+                        return fmt.Errorf("failed to execute schema statement: %w", err)
+                }</span>
+        }
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// AddDocument adds a document to the database
+func (s *Storage) AddDocument(ctx context.Context, doc *types.Document) error <span class="cov8" title="1">{
+        // Generate ID if not provided
+        if doc.ID == "" </span><span class="cov8" title="1">{
+                hash := sha256.Sum256([]byte(doc.Content))
+                doc.ID = hex.EncodeToString(hash[:8])
+        }</span>
+
+        // Generate content hash
+        <span class="cov8" title="1">hash := sha256.Sum256([]byte(doc.Content))
+        doc.ContentHash = hex.EncodeToString(hash[:])
+
+        // Estimate token count if not provided
+        if doc.TokenCount == 0 </span><span class="cov8" title="1">{
+                tokenEstimator := tokens.NewTokenEstimator("gpt-4") // Default model
+                doc.TokenCount = tokenEstimator.EstimateTokens(doc.Content)
+        }</span>
+
+        // Set timestamps
+        <span class="cov8" title="1">now := time.Now()
+        doc.CreatedAt = now
+        doc.UpdatedAt = now
+
+        tx, err := s.db.BeginTx(ctx, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to begin transaction: %w", err)
+        }</span>
+        <span class="cov8" title="1">defer tx.Rollback()
+
+        // Insert document
+        _, err = tx.ExecContext(ctx, `
+                INSERT OR REPLACE INTO documents 
+                (id, content, content_hash, path, lang, mtime, token_count, model_id, 
+                 quantum_score, entanglement_map, coherence_history, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                doc.ID, doc.Content, doc.ContentHash, doc.Path, doc.Language,
+                doc.ModifiedTime, doc.TokenCount, doc.ModelID, doc.QuantumScore,
+                doc.Entanglement, doc.Coherence, doc.CreatedAt, doc.UpdatedAt)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to insert document: %w", err)
+        }</span>
+
+        // Insert into FTS
+        <span class="cov8" title="1">_, err = tx.ExecContext(ctx, `
+                INSERT OR REPLACE INTO documents_fts(rowid, content) 
+                SELECT rowid, content FROM documents WHERE id = ?`, doc.ID)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to insert into FTS: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">return tx.Commit()</span>
+}
+
+// InsertDocument inserts a new document (wrapper around AddDocument for interface compliance)
+func (s *Storage) InsertDocument(doc types.Document) error <span class="cov8" title="1">{
+        return s.AddDocument(context.Background(), &amp;doc)
+}</span>
+
+// UpdateDocument updates an existing document (wrapper around AddDocument for interface compliance)
+func (s *Storage) UpdateDocument(doc types.Document) error <span class="cov8" title="1">{
+        return s.AddDocument(context.Background(), &amp;doc)
+}</span>
+
+// SearchDocuments performs FTS search
+func (s *Storage) SearchDocuments(ctx context.Context, query string, limit int) ([]types.Document, error) <span class="cov8" title="1">{
+        // First try FTS search
+        docs, err := s.searchFTS(ctx, query, limit)
+        if err != nil </span><span class="cov8" title="1">{
+                // Fallback to LIKE search
+                return s.searchLike(ctx, query, limit)
+        }</span>
+        <span class="cov8" title="1">return docs, nil</span>
+}
+
+// searchFTS performs FTS5 search
+func (s *Storage) searchFTS(ctx context.Context, query string, limit int) ([]types.Document, error) <span class="cov8" title="1">{
+        rows, err := s.db.QueryContext(ctx, `
+                SELECT d.id, d.content, d.content_hash, d.path, d.lang, d.mtime,
+                       d.token_count, d.model_id, d.quantum_score, d.entanglement_map,
+                       d.coherence_history, d.created_at, d.updated_at
+                FROM documents_fts fts
+                JOIN documents d ON d.rowid = fts.rowid
+                WHERE documents_fts MATCH ?
+                ORDER BY rank
+                LIMIT ?`, query, limit)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">defer rows.Close()
+
+        return s.scanDocuments(rows)</span>
+}
+
+// searchLike performs LIKE search as fallback
+func (s *Storage) searchLike(ctx context.Context, query string, limit int) ([]types.Document, error) <span class="cov8" title="1">{
+        likeQuery := "%" + strings.ReplaceAll(query, " ", "%") + "%"
+        rows, err := s.db.QueryContext(ctx, `
+                SELECT id, content, content_hash, path, lang, mtime,
+                       token_count, model_id, quantum_score, entanglement_map,
+                       coherence_history, created_at, updated_at
+                FROM documents 
+                WHERE content LIKE ?
+                ORDER BY LENGTH(content)
+                LIMIT ?`, likeQuery, limit)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">defer rows.Close()
+
+        return s.scanDocuments(rows)</span>
+}
+
+// scanDocuments scans rows into Document structs
+func (s *Storage) scanDocuments(rows *sql.Rows) ([]types.Document, error) <span class="cov8" title="1">{
+        var docs []types.Document
+        for rows.Next() </span><span class="cov8" title="1">{
+                var doc types.Document
+                err := rows.Scan(
+                        &amp;doc.ID, &amp;doc.Content, &amp;doc.ContentHash, &amp;doc.Path, &amp;doc.Language,
+                        &amp;doc.ModifiedTime, &amp;doc.TokenCount, &amp;doc.ModelID, &amp;doc.QuantumScore,
+                        &amp;doc.Entanglement, &amp;doc.Coherence, &amp;doc.CreatedAt, &amp;doc.UpdatedAt)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov8" title="1">docs = append(docs, doc)</span>
+        }
+        <span class="cov8" title="1">return docs, rows.Err()</span>
+}
+
+// GetDocument retrieves a document by ID
+func (s *Storage) GetDocument(ctx context.Context, id string) (*types.Document, error) <span class="cov8" title="1">{
+        var doc types.Document
+        err := s.db.QueryRowContext(ctx, `
+                SELECT id, content, content_hash, path, lang, mtime,
+                       token_count, model_id, quantum_score, entanglement_map,
+                       coherence_history, created_at, updated_at
+                FROM documents WHERE id = ?`, id).Scan(
+                &amp;doc.ID, &amp;doc.Content, &amp;doc.ContentHash, &amp;doc.Path, &amp;doc.Language,
+                &amp;doc.ModifiedTime, &amp;doc.TokenCount, &amp;doc.ModelID, &amp;doc.QuantumScore,
+                &amp;doc.Entanglement, &amp;doc.Coherence, &amp;doc.CreatedAt, &amp;doc.UpdatedAt)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return &amp;doc, nil</span>
+}
+
+// GetDocumentByPath retrieves a document by its file path
+func (s *Storage) GetDocumentByPath(ctx context.Context, path string) (*types.Document, error) <span class="cov8" title="1">{
+        var doc types.Document
+        err := s.db.QueryRowContext(ctx, `
+                SELECT id, content, content_hash, path, lang, mtime,
+                       token_count, model_id, quantum_score, entanglement_map,
+                       coherence_history, created_at, updated_at
+                FROM documents WHERE path = ? LIMIT 1`, path).Scan(
+                &amp;doc.ID, &amp;doc.Content, &amp;doc.ContentHash, &amp;doc.Path, &amp;doc.Language,
+                &amp;doc.ModifiedTime, &amp;doc.TokenCount, &amp;doc.ModelID, &amp;doc.QuantumScore,
+                &amp;doc.Entanglement, &amp;doc.Coherence, &amp;doc.CreatedAt, &amp;doc.UpdatedAt)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return &amp;doc, nil</span>
+}
+
+// DeleteDocument removes a document
+func (s *Storage) DeleteDocument(ctx context.Context, id string) error <span class="cov8" title="1">{
+        tx, err := s.db.BeginTx(ctx, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">defer tx.Rollback()
+
+        // Delete from documents_fts first (due to foreign key)
+        _, err = tx.ExecContext(ctx, "DELETE FROM documents_fts WHERE rowid = (SELECT rowid FROM documents WHERE id = ?)", id)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        // Delete from documents
+        <span class="cov8" title="1">_, err = tx.ExecContext(ctx, "DELETE FROM documents WHERE id = ?", id)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">return tx.Commit()</span>
+}
+
+// GetWorkspaceWeights retrieves workspace weights
+func (s *Storage) GetWorkspaceWeights(ctx context.Context, workspacePath string) (*types.WorkspaceWeights, error) <span class="cov8" title="1">{
+        var weights types.WorkspaceWeights
+        err := s.db.QueryRowContext(ctx, `
+                SELECT workspace_path, relevance_weight, recency_weight, diversity_weight,
+                       entanglement_weight, redundancy_penalty, normalization_stats,
+                       update_count, last_updated
+                FROM workspace_weights WHERE workspace_path = ?`, workspacePath).Scan(
+                &amp;weights.WorkspacePath, &amp;weights.RelevanceWeight, &amp;weights.RecencyWeight,
+                &amp;weights.DiversityWeight, &amp;weights.EntanglementWeight, &amp;weights.RedundancyPenalty,
+                &amp;weights.NormalizationStats, &amp;weights.UpdateCount, &amp;weights.LastUpdated)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return &amp;weights, nil</span>
+}
+
+// SaveWorkspaceWeights saves workspace weights (interface-compatible version)
+func (s *Storage) SaveWorkspaceWeights(workspacePath string, weights types.FeatureWeights) error <span class="cov8" title="1">{
+        ctx := context.Background()
+        
+        // Convert FeatureWeights to WorkspaceWeights format for storage
+        workspaceWeights := &amp;types.WorkspaceWeights{
+                WorkspacePath:      workspacePath,
+                RelevanceWeight:    weights.Relevance,
+                RecencyWeight:      weights.Recency,
+                EntanglementWeight: weights.Entanglement,
+                DiversityWeight:    weights.Specificity, // Map Specificity to DiversityWeight
+                RedundancyPenalty:  weights.Uncertainty, // Map Uncertainty to RedundancyPenalty
+                UpdateCount:        1,
+                LastUpdated:        time.Now().Format(time.RFC3339),
+                NormalizationStats: "", // Default empty
+        }
+        
+        return s.saveWorkspaceWeightsInternal(ctx, workspaceWeights)
+}</span>
+
+// saveWorkspaceWeightsInternal saves workspace weights (internal implementation)
+func (s *Storage) saveWorkspaceWeightsInternal(ctx context.Context, weights *types.WorkspaceWeights) error <span class="cov8" title="1">{
+        _, err := s.db.ExecContext(ctx, `
+                INSERT OR REPLACE INTO workspace_weights 
+                (workspace_path, relevance_weight, recency_weight, diversity_weight,
+                 entanglement_weight, redundancy_penalty, normalization_stats,
+                 update_count, last_updated)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                weights.WorkspacePath, weights.RelevanceWeight, weights.RecencyWeight,
+                weights.DiversityWeight, weights.EntanglementWeight, weights.RedundancyPenalty,
+                weights.NormalizationStats, weights.UpdateCount, weights.LastUpdated)
+        return err
+}</span>
+
+// SaveQueryCache saves a query result to cache
+func (s *Storage) SaveQueryCache(ctx context.Context, queryHash, corpusHash, modelID, tokenizerVersion string,
+        result *types.QueryResult, expiresAt time.Time) error <span class="cov8" title="1">{
+        
+        resultJSON, err := json.Marshal(result.Documents)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        
+        <span class="cov8" title="1">metricsJSON, err := json.Marshal(result.optimizationMetrics)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">_, err = s.db.ExecContext(ctx, `
+                INSERT OR REPLACE INTO query_cache 
+                (query_hash, corpus_hash, model_id, tokenizer_version, result_context,
+                 quantum_metrics, document_scores, coherence_score, optimization_gap,
+                 solve_time_ms, fallback_used, expires_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                queryHash, corpusHash, modelID, tokenizerVersion, string(resultJSON),
+                string(metricsJSON), "", result.CoherenceScore, 0.0, // OptimalityGap removed
+                result.optimizationMetrics.SolveTimeMs, result.optimizationMetrics.FallbackReason != "", expiresAt)
+        return err</span>
+}
+
+// GetQueryCache retrieves a cached query result
+func (s *Storage) GetQueryCache(ctx context.Context, queryHash, corpusHash, modelID, tokenizerVersion string) (*types.QueryResult, error) <span class="cov8" title="1">{
+        var resultJSON, metricsJSON string
+        var result types.QueryResult
+        var tempGap float64 // Unused - OptimalityGap field removed
+        
+        err := s.db.QueryRowContext(ctx, `
+                SELECT result_context, quantum_metrics, coherence_score, 
+                       optimization_gap, solve_time_ms, fallback_used
+                FROM query_cache 
+                WHERE query_hash = ? AND corpus_hash = ? AND model_id = ? 
+                      AND tokenizer_version = ? AND expires_at &gt; CURRENT_TIMESTAMP`,
+                queryHash, corpusHash, modelID, tokenizerVersion).Scan(
+                &amp;resultJSON, &amp;metricsJSON, &amp;result.CoherenceScore,
+                &amp;tempGap, &amp;result.optimizationMetrics.SolveTimeMs, // OptimalityGap removed
+                &amp;result.optimizationMetrics.FallbackReason)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">if err := json.Unmarshal([]byte(resultJSON), &amp;result.Documents); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        
+        <span class="cov8" title="1">if err := json.Unmarshal([]byte(metricsJSON), &amp;result.optimizationMetrics); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">result.CacheHit = true
+        
+        // Track cache hit
+        s.cacheHits++
+        
+        return &amp;result, nil</span>
+}
+
+// GetCorpusHash computes a hash of the current document corpus
+func (s *Storage) GetCorpusHash(ctx context.Context) (string, error) <span class="cov8" title="1">{
+        var hash string
+        err := s.db.QueryRowContext(ctx, `
+                SELECT hex(sha256_agg(content_hash ORDER BY id)) 
+                FROM (SELECT id, content_hash FROM documents ORDER BY id)`).Scan(&amp;hash)
+        if err != nil </span><span class="cov8" title="1">{
+                // Fallback calculation if sha256_agg is not available
+                rows, err := s.db.QueryContext(ctx, "SELECT content_hash FROM documents ORDER BY id")
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", err
+                }</span>
+                <span class="cov8" title="1">defer rows.Close()
+
+                h := sha256.New()
+                for rows.Next() </span><span class="cov8" title="1">{
+                        var contentHash string
+                        if err := rows.Scan(&amp;contentHash); err != nil </span><span class="cov0" title="0">{
+                                return "", err
+                        }</span>
+                        <span class="cov8" title="1">h.Write([]byte(contentHash))</span>
+                }
+                <span class="cov8" title="1">hash = hex.EncodeToString(h.Sum(nil))</span>
+        }
+        <span class="cov8" title="1">return hash, nil</span>
+}
+
+// applyMigrations applies database migrations for schema changes
+func (s *Storage) applyMigrations() error <span class="cov8" title="1">{
+        // Check if cache_key column exists in query_cache table
+        rows, err := s.db.Query("PRAGMA table_info(query_cache)")
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to check table info: %w", err)
+        }</span>
+        <span class="cov8" title="1">defer rows.Close()
+
+        hasCacheKey := false
+        for rows.Next() </span><span class="cov8" title="1">{
+                var cid int
+                var name, dataType string
+                var notNull, pk int
+                var defaultValue sql.NullString
+                if err := rows.Scan(&amp;cid, &amp;name, &amp;dataType, &amp;notNull, &amp;defaultValue, &amp;pk); err != nil </span><span class="cov0" title="0">{
+                        return fmt.Errorf("failed to scan table info: %w", err)
+                }</span>
+                <span class="cov8" title="1">if name == "cache_key" </span><span class="cov8" title="1">{
+                        hasCacheKey = true
+                        break</span>
+                }
+        }
+
+        // Add cache_key column if it doesn't exist
+        <span class="cov8" title="1">if !hasCacheKey </span><span class="cov8" title="1">{
+                _, err := s.db.Exec("ALTER TABLE query_cache ADD COLUMN cache_key TEXT")
+                if err != nil </span><span class="cov0" title="0">{
+                        return fmt.Errorf("failed to add cache_key column: %w", err)
+                }</span>
+                
+                // Add index for cache_key
+                <span class="cov8" title="1">_, err = s.db.Exec("CREATE INDEX IF NOT EXISTS idx_query_cache_key ON query_cache(cache_key)")
+                if err != nil </span><span class="cov0" title="0">{
+                        return fmt.Errorf("failed to create cache_key index: %w", err)
+                }</span>
+        }
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// GetCachedResultByKey retrieves cached result by cache key
+func (s *Storage) GetCachedResultByKey(ctx context.Context, cacheKey string) (*types.QueryResult, error) <span class="cov8" title="1">{
+        query := `
+                SELECT result_context, quantum_metrics, document_scores, coherence_score, 
+                       solve_time_ms, fallback_used, created_at
+                FROM query_cache 
+                WHERE cache_key = ? AND expires_at &gt; ?
+        `
+        
+        row := s.db.QueryRowContext(ctx, query, cacheKey, time.Now())
+        
+        var resultContext, quantumMetrics, documentScores string
+        var coherenceScore float64
+        var solveTimeMs sql.NullInt64
+        var fallbackUsed bool
+        var createdAt time.Time
+        
+        err := row.Scan(&amp;resultContext, &amp;quantumMetrics, &amp;documentScores, 
+                &amp;coherenceScore, &amp;solveTimeMs, &amp;fallbackUsed, &amp;createdAt)
+        if err != nil </span><span class="cov8" title="1">{
+                if err == sql.ErrNoRows </span><span class="cov8" title="1">{
+                        // Track cache miss
+                        s.cacheMisses++
+                        return nil, nil // Cache miss
+                }</span>
+                <span class="cov8" title="1">return nil, fmt.Errorf("failed to scan cached result: %w", err)</span>
+        }
+        
+        // Deserialize the cached result
+        <span class="cov8" title="1">var result types.QueryResult
+        if err := json.Unmarshal([]byte(resultContext), &amp;result); err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("failed to unmarshal cached result: %w", err)
+        }</span>
+        
+        <span class="cov0" title="0">return &amp;result, nil</span>
+}
+
+// SaveQueryCacheWithKey saves a query result to cache with cache key
+func (s *Storage) SaveQueryCacheWithKey(ctx context.Context, queryHash, corpusHash, modelID, tokenizerVersion, cacheKey string,
+        result *types.QueryResult, expiresAt time.Time) error <span class="cov8" title="1">{
+        
+        resultJSON, err := json.Marshal(result.Documents)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        
+        <span class="cov8" title="1">metricsJSON, err := json.Marshal(result.optimizationMetrics)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        // Check if cache_key column exists
+        <span class="cov8" title="1">rows, err := s.db.Query("PRAGMA table_info(query_cache)")
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to check table info: %w", err)
+        }</span>
+        <span class="cov8" title="1">defer rows.Close()
+
+        hasCacheKey := false
+        for rows.Next() </span><span class="cov8" title="1">{
+                var cid int
+                var name, dataType string
+                var notNull, pk int
+                var defaultValue sql.NullString
+                if err := rows.Scan(&amp;cid, &amp;name, &amp;dataType, &amp;notNull, &amp;defaultValue, &amp;pk); err != nil </span><span class="cov0" title="0">{
+                        return fmt.Errorf("failed to scan table info: %w", err)
+                }</span>
+                <span class="cov8" title="1">if name == "cache_key" </span><span class="cov8" title="1">{
+                        hasCacheKey = true
+                        break</span>
+                }
+        }
+
+        <span class="cov8" title="1">if hasCacheKey </span><span class="cov8" title="1">{
+                _, err = s.db.ExecContext(ctx, `
+                        INSERT OR REPLACE INTO query_cache 
+                        (query_hash, corpus_hash, model_id, tokenizer_version, result_context,
+                         quantum_metrics, document_scores, coherence_score, optimization_gap,
+                         solve_time_ms, fallback_used, expires_at, cache_key)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                        queryHash, corpusHash, modelID, tokenizerVersion, string(resultJSON),
+                        string(metricsJSON), "", result.CoherenceScore, 0.0, // OptimalityGap removed
+                        result.optimizationMetrics.SolveTimeMs, result.optimizationMetrics.FallbackReason != "", expiresAt, cacheKey)
+        }</span> else<span class="cov0" title="0"> {
+                // Fallback to old method without cache_key
+                _, err = s.db.ExecContext(ctx, `
+                        INSERT OR REPLACE INTO query_cache 
+                        (query_hash, corpus_hash, model_id, tokenizer_version, result_context,
+                         quantum_metrics, document_scores, coherence_score, optimization_gap,
+                         solve_time_ms, fallback_used, expires_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                        queryHash, corpusHash, modelID, tokenizerVersion, string(resultJSON),
+                        string(metricsJSON), "", result.CoherenceScore, 0.0, // OptimalityGap removed
+                        result.optimizationMetrics.SolveTimeMs, result.optimizationMetrics.FallbackReason != "", expiresAt)
+        }</span>
+        <span class="cov8" title="1">return err</span>
+}
+
+// InvalidateCache removes all cached query results
+func (s *Storage) InvalidateCache(ctx context.Context) error <span class="cov8" title="1">{
+        _, err := s.db.ExecContext(ctx, "DELETE FROM query_cache")
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("failed to invalidate cache: %w", err)
+        }</span>
+        
+        // Reset cache statistics
+        <span class="cov8" title="1">s.cacheHits = 0
+        s.cacheMisses = 0
+        
+        return nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

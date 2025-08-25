@@ -16,14 +16,26 @@
       "Bash(git rm:*)",
       "Bash(grep:*)",
       "Bash(go mod:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(cd:*)",
+      "Bash(go doc:*)",
+      "Bash(find:*)",
+      "Bash(../punch-discovery/punch.exe discover . --languages go --verbose --output table)",
+      "Bash(../punch-discovery/punch.exe discover:*)",
+      "Bash(../punch-discovery/punch.exe query:*)",
+      "Bash(../punch-discovery/punch.exe list:*)",
+      "Bash(../punch-discovery/punch.exe stats:*)",
+      "Bash(gh api:*)",
+      "Bash(curl:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": [],
     "additionalDirectories": [
       "C:\\c\\Users\\micha\\repos\\contextlite",
       "C:\\Users\\micha\\repos",
-      "C:\\c\\Users\\micha\\repos"
+      "C:\\c\\Users\\micha\\repos",
+      "C:\\d C:\\Users\\micha\\repos"
     ]
   }
 }

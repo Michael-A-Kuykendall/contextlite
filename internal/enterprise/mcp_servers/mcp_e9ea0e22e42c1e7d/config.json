@@ -1,0 +1,13 @@
+{
+  "created_at": "2025-08-24T11:10:57.764022-05:00",
+  "endpoint": "wss://slack.com",
+  "env": {
+    "MCP_SERVER_ID": "mcp_e9ea0e22e42c1e7d",
+    "MCP_SERVER_NAME": "Slack Server",
+    "NODE_ENV": "production"
+  },
+  "server_id": "mcp_e9ea0e22e42c1e7d",
+  "server_name": "Slack Server",
+  "server_type": "slack",
+  "timeout": 30
+}

@@ -1,0 +1,15 @@
+{
+  "created_at": "2025-08-24T11:09:43.2337328-05:00",
+  "endpoint": "http://localhost:3000",
+  "env": {
+    "MCP_PORT": "3000",
+    "MCP_SERVER_ID": "mcp_768772dff7953b52",
+    "MCP_SERVER_NAME": "Jira Test Server",
+    "NODE_ENV": "production"
+  },
+  "port": "3000",
+  "server_id": "mcp_768772dff7953b52",
+  "server_name": "Jira Test Server",
+  "server_type": "jira",
+  "timeout": 30
+}
