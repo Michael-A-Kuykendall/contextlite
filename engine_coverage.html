@@ -1,0 +1,964 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>engine: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">contextlite/internal/engine/core.go (100.0%)</option>
+				
+				<option value="file1">contextlite/internal/engine/json_cli.go (98.0%)</option>
+				
+				<option value="file2">contextlite/internal/engine/loader.go (88.6%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">/*
+ * ContextLite - SMT-Optimized AI Context Engine
+ * Copyright (c) 2025 Michael A. Kuykendall
+ * 
+ * Patent Pending - Provisional Patent Filed
+ * US Provisional Patent Application No. [PENDING]
+ * 
+ * This software contains proprietary algorithms protected by patent law.
+ * Unauthorized reverse engineering or algorithm extraction is prohibited.
+ * 
+ * Licensed under Dual License:
+ * - MIT License for open source use
+ * - Commercial License for business use
+ * 
+ * See LICENSE-MIT.md and LICENSE-COMMERCIAL.md for terms.
+ */
+
+package engine
+
+import (
+        "context"
+        "fmt"
+        "math"
+        "sort"
+        "strings"
+        "time"
+
+        "contextlite/pkg/config"
+        "contextlite/pkg/types"
+)
+
+// CoreEngine provides essential context assembly using proven open algorithms
+// This is the foundational implementation that ensures reliable operation
+type CoreEngine struct {
+        config  *config.Config
+        storage types.StorageInterface
+}
+
+// NewCoreEngine creates a new core engine instance
+func NewCoreEngine(cfg *config.Config, storage types.StorageInterface) *CoreEngine <span class="cov8" title="1">{
+        return &amp;CoreEngine{
+                config:  cfg,
+                storage: storage,
+        }
+}</span>
+
+// AssembleContext performs context assembly using proven algorithms (BM25 + heuristics)
+func (e *CoreEngine) AssembleContext(ctx context.Context, request types.ContextRequest) (*types.ContextResult, error) <span class="cov8" title="1">{
+        startTime := time.Now()
+        
+        // Step 1: Search for candidate documents using basic text search
+        candidates, err := e.searchCandidates(ctx, request)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("candidate search failed: %w", err)
+        }</span>
+        
+        <span class="cov8" title="1">if len(candidates) == 0 </span><span class="cov8" title="1">{
+                return &amp;types.ContextResult{
+                        Context:        "",
+                        Documents:      []types.DocumentReference{},
+                        TotalTokens:    0,
+                        ProcessingTime: time.Since(startTime),
+                        CacheHit:       false,
+                        Message:        "No relevant documents found",
+                }, nil
+        }</span>
+        
+        // Step 2: Score documents using basic BM25 + simple heuristics
+        <span class="cov8" title="1">scoredDocs := e.scoreDocuments(candidates, request.Query)
+        
+        // Step 3: Select documents using greedy heuristic (no SMT optimization)
+        selected := e.selectDocuments(scoredDocs, request.MaxTokens, request.MaxDocuments)
+        
+        // Step 4: Assemble final context
+        result := e.assembleResult(selected, request, time.Since(startTime))
+        
+        return result, nil</span>
+}
+
+// IndexDocument adds a document to the storage (delegates to storage interface)
+func (e *CoreEngine) IndexDocument(doc types.Document) error <span class="cov8" title="1">{
+        // Basic validation
+        if doc.ID == "" || doc.Content == "" </span><span class="cov8" title="1">{
+                return fmt.Errorf("document ID and content are required")
+        }</span>
+        
+        // Delegate to storage interface
+        <span class="cov8" title="1">return e.storage.InsertDocument(doc)</span>
+}
+
+// RemoveDocument removes a document (delegates to storage interface)
+func (e *CoreEngine) RemoveDocument(docID string) error <span class="cov8" title="1">{
+        return e.storage.DeleteDocument(context.Background(), docID)
+}</span>
+
+// GetStats returns basic engine statistics
+func (e *CoreEngine) GetStats() (*types.EngineStats, error) <span class="cov8" title="1">{
+        // Get actual storage stats
+        storageStats, err := e.storage.GetStorageStats(context.Background())
+        if err != nil </span><span class="cov8" title="1">{
+                // Fallback to defaults if storage unavailable
+                storageStats = map[string]interface{}{
+                        "total_documents": 0,
+                }
+        }</span>
+        
+        <span class="cov8" title="1">docCount, _ := storageStats["total_documents"].(int)
+        
+        return &amp;types.EngineStats{
+                TotalQueries:         int64(docCount), // Use actual document count as query proxy
+                AverageQueryTime:     50 * time.Millisecond,
+                CacheHitRate:        0.0, // Core engine doesn't implement query-level caching
+                TotalDocuments:      int64(docCount),
+                IndexedWorkspaces:   1, // Core engine operates on single workspace
+                FeatureExtractionTime: 5 * time.Millisecond,
+                SolverStats: types.SolverStats{
+                        TotalSolves:      0,
+                        AverageSolveTime: 0,
+                        TimeoutCount:     0,
+                        OptimalityGap:    1.0, // No SMT optimization in core engine
+                },
+                MemoryUsageMB: 15.0,
+                LicenseTier:   "core-engine",
+                LicenseValid:  true,
+        }, nil</span>
+}
+
+// UpdateConfig applies new configuration
+func (e *CoreEngine) UpdateConfig(config types.EngineConfig) error <span class="cov8" title="1">{
+        // Basic stub implementation - just validate
+        if config.SolverTimeout &lt; time.Millisecond </span><span class="cov8" title="1">{
+                return fmt.Errorf("solver timeout too small")
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+
+// Close performs cleanup
+func (e *CoreEngine) Close() error <span class="cov8" title="1">{
+        // No resources to clean up in stub
+        return nil
+}</span>
+
+// Private helper methods
+
+// searchCandidates performs basic text search for candidate documents
+func (e *CoreEngine) searchCandidates(ctx context.Context, request types.ContextRequest) ([]types.Document, error) <span class="cov8" title="1">{
+        // Use storage interface for search
+        maxCandidates := 100
+        if e.config != nil &amp;&amp; e.config.SMT.MaxCandidates &gt; 0 </span><span class="cov8" title="1">{
+                maxCandidates = e.config.SMT.MaxCandidates
+        }</span>
+        
+        <span class="cov8" title="1">return e.storage.SearchDocuments(ctx, request.Query, maxCandidates)</span>
+}
+
+// scoreDocuments applies basic BM25 scoring with simple heuristics
+func (e *CoreEngine) scoreDocuments(docs []types.Document, query string) []types.ScoredDocument <span class="cov8" title="1">{
+        var scored []types.ScoredDocument
+        queryTerms := strings.Fields(strings.ToLower(query))
+        
+        for _, doc := range docs </span><span class="cov8" title="1">{
+                // Basic BM25-style relevance scoring
+                relevance := e.calculateBM25(doc.Content, queryTerms)
+                
+                // Simple recency score (newer = better)
+                recency := e.calculateRecency(doc.ModifiedTime)
+                
+                // Basic authority score (longer documents = more authoritative)
+                authority := math.Log(1.0 + float64(len(doc.Content))/1000.0)
+                
+                // Simple combined score (no 7D features)
+                totalScore := relevance*0.7 + recency*0.2 + authority*0.1
+                
+                scored = append(scored, types.ScoredDocument{
+                        Document: doc,
+                        Features: types.FeatureVector{
+                                Relevance:    relevance,
+                                Recency:      recency,
+                                Entanglement: 0.5, // Default value
+                                Prior:        0.5, // Default value
+                                Authority:    authority,
+                                Specificity:  relevance * 0.8, // Approximation
+                                Uncertainty:  0.1, // Low uncertainty assumption
+                        },
+                        UtilityScore: totalScore,
+                })
+        }</span>
+        
+        // Sort by utility score (highest first)
+        <span class="cov8" title="1">sort.Slice(scored, func(i, j int) bool </span><span class="cov8" title="1">{
+                return scored[i].UtilityScore &gt; scored[j].UtilityScore
+        }</span>)
+        
+        <span class="cov8" title="1">return scored</span>
+}
+
+// selectDocuments uses greedy selection (no SMT optimization)
+func (e *CoreEngine) selectDocuments(scored []types.ScoredDocument, maxTokens, maxDocs int) []types.ScoredDocument <span class="cov8" title="1">{
+        var selected []types.ScoredDocument
+        totalTokens := 0
+        
+        for _, doc := range scored </span><span class="cov8" title="1">{
+                // Check constraints
+                if len(selected) &gt;= maxDocs </span><span class="cov8" title="1">{
+                        break</span>
+                }
+                <span class="cov8" title="1">if totalTokens+doc.Document.TokenCount &gt; maxTokens </span><span class="cov8" title="1">{
+                        continue</span>
+                }
+                
+                // Simple diversity check (avoid very similar documents)
+                <span class="cov8" title="1">if e.isDiverse(doc, selected) </span><span class="cov8" title="1">{
+                        selected = append(selected, doc)
+                        totalTokens += doc.Document.TokenCount
+                }</span>
+        }
+        
+        <span class="cov8" title="1">return selected</span>
+}
+
+// assembleResult creates the final context result
+func (e *CoreEngine) assembleResult(selected []types.ScoredDocument, request types.ContextRequest, processingTime time.Duration) *types.ContextResult <span class="cov8" title="1">{
+        var docRefs []types.DocumentReference
+        var contextParts []string
+        totalTokens := 0
+        
+        for _, doc := range selected </span><span class="cov8" title="1">{
+                docRefs = append(docRefs, types.DocumentReference{
+                        ID:              doc.Document.ID,
+                        Path:            doc.Document.Path,
+                        Content:         doc.Document.Content,
+                        Language:        doc.Document.Language,
+                        UtilityScore:    doc.UtilityScore,
+                        RelevanceScore:  doc.Features.Relevance,
+                        RecencyScore:    doc.Features.Recency,
+                        InclusionReason: "greedy-heuristic",
+                })
+                
+                contextParts = append(contextParts, doc.Document.Content)
+                totalTokens += doc.Document.TokenCount
+        }</span>
+        
+        <span class="cov8" title="1">context := strings.Join(contextParts, "\n\n---\n\n")
+        
+        return &amp;types.ContextResult{
+                Context:        context,
+                Documents:      docRefs,
+                TotalTokens:    totalTokens,
+                ProcessingTime: processingTime,
+                CacheHit:       false,
+                Message:        fmt.Sprintf("Selected %d documents using basic heuristics (upgrade for SMT optimization)", len(selected)),
+        }</span>
+}
+
+// Basic scoring helper functions
+
+// calculateBM25 computes simplified BM25 score
+func (e *CoreEngine) calculateBM25(content string, queryTerms []string) float64 <span class="cov8" title="1">{
+        contentLower := strings.ToLower(content)
+        words := strings.Fields(contentLower)
+        
+        score := 0.0
+        k1 := 1.5
+        b := 0.75
+        avgDocLen := 1000.0 // Rough estimate
+        
+        for _, term := range queryTerms </span><span class="cov8" title="1">{
+                tf := float64(strings.Count(contentLower, term))
+                if tf &gt; 0 </span><span class="cov8" title="1">{
+                        // Simplified BM25 (no IDF calculation)
+                        norm := tf * (k1 + 1) / (tf + k1*(1-b+b*float64(len(words))/avgDocLen))
+                        score += norm
+                }</span>
+        }
+        
+        <span class="cov8" title="1">return score</span>
+}
+
+// calculateRecency computes time-based recency score
+func (e *CoreEngine) calculateRecency(modifiedTime int64) float64 <span class="cov8" title="1">{
+        if modifiedTime &lt;= 0 </span><span class="cov8" title="1">{
+                return 0.5 // Default for unknown timestamps
+        }</span>
+        
+        <span class="cov8" title="1">now := time.Now().Unix()
+        daysSince := float64(now-modifiedTime) / (24 * 3600)
+        
+        // Exponential decay with 7-day half-life
+        return math.Exp(-math.Ln2 * daysSince / 7.0)</span>
+}
+
+// isDiverse checks if document is sufficiently different from already selected
+func (e *CoreEngine) isDiverse(candidate types.ScoredDocument, selected []types.ScoredDocument) bool <span class="cov8" title="1">{
+        if len(selected) == 0 </span><span class="cov8" title="1">{
+                return true
+        }</span>
+        
+        <span class="cov8" title="1">candidateWords := strings.Fields(strings.ToLower(candidate.Document.Content))
+        candidateSet := make(map[string]bool)
+        for _, word := range candidateWords </span><span class="cov8" title="1">{
+                candidateSet[word] = true
+        }</span>
+        
+        <span class="cov8" title="1">for _, doc := range selected </span><span class="cov8" title="1">{
+                selectedWords := strings.Fields(strings.ToLower(doc.Document.Content))
+                selectedSet := make(map[string]bool)
+                for _, word := range selectedWords </span><span class="cov8" title="1">{
+                        selectedSet[word] = true
+                }</span>
+                
+                // Calculate Jaccard similarity
+                <span class="cov8" title="1">intersection := 0
+                union := 0
+                
+                allWords := make(map[string]bool)
+                for word := range candidateSet </span><span class="cov8" title="1">{
+                        allWords[word] = true
+                }</span>
+                <span class="cov8" title="1">for word := range selectedSet </span><span class="cov8" title="1">{
+                        allWords[word] = true
+                }</span>
+                
+                <span class="cov8" title="1">for word := range allWords </span><span class="cov8" title="1">{
+                        if candidateSet[word] &amp;&amp; selectedSet[word] </span><span class="cov8" title="1">{
+                                intersection++
+                        }</span>
+                        <span class="cov8" title="1">union++</span>
+                }
+                
+                <span class="cov8" title="1">similarity := float64(intersection) / float64(union)
+                
+                // Reject if too similar (&gt;70% overlap)
+                if similarity &gt; 0.7 </span><span class="cov8" title="1">{
+                        return false
+                }</span>
+        }
+        
+        <span class="cov8" title="1">return true</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">/*
+ * ContextLite - SMT-Optimized AI Context Engine
+ * Copyright (c) 2025 Michael A. Kuykendall
+ * 
+ * Patent Pending - Provisional Patent Filed
+ * US Provisional Patent Application No. [PENDING]
+ * 
+ * This software contains proprietary algorithms protected by patent law.
+ * Unauthorized reverse engineering or algorithm extraction is prohibited.
+ * 
+ * Licensed under Dual License:
+ * - MIT License for open source use
+ * - Commercial License for business use
+ * 
+ * See LICENSE-MIT.md and LICENSE-COMMERCIAL.md for terms.
+ */
+
+package engine
+
+import (
+        "context"
+        "encoding/json"
+        "fmt"
+        "os/exec"
+        "strings"
+        "time"
+
+        "contextlite/pkg/config"
+        "contextlite/pkg/types"
+)
+
+// JSONCLIEngine provides context assembly via JSON CLI to private binary
+// This approach keeps private algorithms in a separate process
+type JSONCLIEngine struct {
+        config     *config.Config
+        storage    types.StorageInterface
+        binaryPath string
+        timeout    time.Duration
+}
+
+// NewJSONCLIEngine creates a new JSON CLI engine instance
+func NewJSONCLIEngine(cfg *config.Config, storage types.StorageInterface, binaryPath string) *JSONCLIEngine <span class="cov8" title="1">{
+        timeout := 30 * time.Second
+        if cfg != nil &amp;&amp; cfg.SMT.SolverTimeoutMs &gt; 0 </span><span class="cov8" title="1">{
+                timeout = time.Duration(cfg.SMT.SolverTimeoutMs) * time.Millisecond
+        }</span>
+        
+        <span class="cov8" title="1">return &amp;JSONCLIEngine{
+                config:     cfg,
+                storage:    storage,
+                binaryPath: binaryPath,
+                timeout:    timeout,
+        }</span>
+}
+
+// JSONRequest represents the request format for the private binary
+type JSONRequest struct {
+        Action  string                 `json:"action"`
+        Query   string                 `json:"query,omitempty"`
+        Docs    []types.Document       `json:"docs,omitempty"`
+        Options map[string]interface{} `json:"options,omitempty"`
+}
+
+// JSONResponse represents the response format from the private binary
+type JSONResponse struct {
+        Status string      `json:"status"`
+        Data   interface{} `json:"data"`
+        Error  string      `json:"error,omitempty"`
+}
+
+// AssembleContext performs context assembly via JSON CLI
+func (e *JSONCLIEngine) AssembleContext(ctx context.Context, request types.ContextRequest) (*types.ContextResult, error) <span class="cov8" title="1">{
+        startTime := time.Now()
+        
+        // Step 1: Get candidate documents using storage
+        candidates, err := e.getCandidateDocuments(ctx, request)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("failed to get candidates: %w", err)
+        }</span>
+        
+        <span class="cov8" title="1">if len(candidates) == 0 </span><span class="cov8" title="1">{
+                return &amp;types.ContextResult{
+                        Context:        "",
+                        Documents:      []types.DocumentReference{},
+                        TotalTokens:    0,
+                        ProcessingTime: time.Since(startTime),
+                        CacheHit:       false,
+                        Message:        "No relevant documents found",
+                }, nil
+        }</span>
+        
+        // Step 2: Call private binary for optimization
+        <span class="cov8" title="1">result, err := e.callPrivateBinary("optimize", request.Query, candidates, map[string]interface{}{
+                "max_tokens":     request.MaxTokens,
+                "max_documents":  request.MaxDocuments,
+                "workspace_path": request.WorkspacePath,
+        })
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("private binary call failed: %w", err)
+        }</span>
+        
+        // Step 3: Parse response and build ContextResult
+        <span class="cov8" title="1">contextResult, err := e.parseOptimizeResponse(result, request, time.Since(startTime))
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("failed to parse optimization result: %w", err)
+        }</span>
+        
+        <span class="cov8" title="1">return contextResult, nil</span>
+}
+
+// IndexDocument adds a document to the storage
+func (e *JSONCLIEngine) IndexDocument(doc types.Document) error <span class="cov8" title="1">{
+        return e.storage.InsertDocument(doc)
+}</span>
+
+// RemoveDocument removes a document from storage
+func (e *JSONCLIEngine) RemoveDocument(docID string) error <span class="cov8" title="1">{
+        return e.storage.DeleteDocument(context.Background(), docID)
+}</span>
+
+// GetStats returns engine statistics
+func (e *JSONCLIEngine) GetStats() (*types.EngineStats, error) <span class="cov8" title="1">{
+        // Call private binary for stats
+        result, err := e.callPrivateBinary("stats", "", nil, nil)
+        if err != nil </span><span class="cov8" title="1">{
+                // Return basic stats if private binary unavailable
+                return &amp;types.EngineStats{
+                        TotalQueries:         0,
+                        AverageQueryTime:     10 * time.Millisecond,
+                        CacheHitRate:        0.0,
+                        TotalDocuments:      0,
+                        IndexedWorkspaces:   0,
+                        FeatureExtractionTime: 2 * time.Millisecond,
+                        SolverStats: types.SolverStats{
+                                TotalSolves:      0,
+                                AverageSolveTime: 5 * time.Millisecond,
+                                TimeoutCount:     0,
+                                OptimalityGap:    0.1,
+                        },
+                        MemoryUsageMB: 50.0,
+                        LicenseTier:   "professional",
+                        LicenseValid:  true,
+                }, nil
+        }</span>
+        
+        // Parse stats response
+        <span class="cov8" title="1">statsData, ok := result["stats"].(map[string]interface{})
+        if !ok </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("invalid stats response format")
+        }</span>
+        
+        <span class="cov8" title="1">return e.parseStatsResponse(statsData)</span>
+}
+
+// UpdateConfig applies new configuration
+func (e *JSONCLIEngine) UpdateConfig(config types.EngineConfig) error <span class="cov8" title="1">{
+        // Update local config
+        if config.SolverTimeout &gt; 0 </span><span class="cov8" title="1">{
+                e.timeout = config.SolverTimeout
+        }</span>
+        
+        // TODO: Send config update to private binary if needed
+        <span class="cov8" title="1">return nil</span>
+}
+
+// Close performs cleanup
+func (e *JSONCLIEngine) Close() error <span class="cov8" title="1">{
+        // No persistent connections to close
+        return nil
+}</span>
+
+// Private helper methods
+
+// getCandidateDocuments retrieves candidate documents from storage
+func (e *JSONCLIEngine) getCandidateDocuments(ctx context.Context, request types.ContextRequest) ([]types.Document, error) <span class="cov8" title="1">{
+        maxCandidates := 200
+        if e.config != nil &amp;&amp; e.config.SMT.MaxCandidates &gt; 0 </span><span class="cov8" title="1">{
+                maxCandidates = e.config.SMT.MaxCandidates
+        }</span>
+        
+        <span class="cov8" title="1">return e.storage.SearchDocuments(ctx, request.Query, maxCandidates)</span>
+}
+
+// callPrivateBinary executes the private binary with JSON input/output
+func (e *JSONCLIEngine) callPrivateBinary(action, query string, docs []types.Document, options map[string]interface{}) (map[string]interface{}, error) <span class="cov8" title="1">{
+        // Build JSON request
+        request := JSONRequest{
+                Action:  action,
+                Query:   query,
+                Docs:    docs,
+                Options: options,
+        }
+        
+        requestJSON, err := json.Marshal(request)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("failed to marshal request: %w", err)
+        }</span>
+        
+        // Execute command with timeout
+        <span class="cov8" title="1">ctx, cancel := context.WithTimeout(context.Background(), e.timeout)
+        defer cancel()
+        
+        cmd := exec.CommandContext(ctx, e.binaryPath)
+        cmd.Stdin = strings.NewReader(string(requestJSON))
+        
+        output, err := cmd.Output()
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("binary execution failed: %w", err)
+        }</span>
+        
+        // Parse JSON response
+        <span class="cov8" title="1">var response JSONResponse
+        if err := json.Unmarshal(output, &amp;response); err != nil </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("failed to parse response: %w", err)
+        }</span>
+        
+        <span class="cov8" title="1">if response.Status != "success" </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("binary returned error: %s", response.Error)
+        }</span>
+        
+        // Convert response data to map
+        <span class="cov8" title="1">dataMap, ok := response.Data.(map[string]interface{})
+        if !ok </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("invalid response data format")
+        }</span>
+        
+        <span class="cov8" title="1">return dataMap, nil</span>
+}
+
+// parseOptimizeResponse converts the binary response to ContextResult
+func (e *JSONCLIEngine) parseOptimizeResponse(result map[string]interface{}, request types.ContextRequest, processingTime time.Duration) (*types.ContextResult, error) <span class="cov8" title="1">{
+        // Extract selected document indices
+        selectedIndices, ok := result["selected_docs"].([]interface{})
+        if !ok </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("missing selected_docs in response")
+        }</span>
+        
+        // Extract original documents
+        <span class="cov8" title="1">originalDocs, ok := result["docs"].([]interface{})
+        if !ok </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("missing docs in response") 
+        }</span>
+        
+        // Build document references
+        <span class="cov8" title="1">var docRefs []types.DocumentReference
+        var contextParts []string
+        totalTokens := 0
+        
+        for _, idxInterface := range selectedIndices </span><span class="cov8" title="1">{
+                idx, ok := idxInterface.(float64) // JSON numbers are float64
+                if !ok </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                
+                <span class="cov8" title="1">docIdx := int(idx)
+                if docIdx &lt; 0 || docIdx &gt;= len(originalDocs) </span><span class="cov8" title="1">{
+                        continue</span>
+                }
+                
+                // Parse document data
+                <span class="cov8" title="1">docData, ok := originalDocs[docIdx].(map[string]interface{})
+                if !ok </span><span class="cov8" title="1">{
+                        continue</span>
+                }
+                
+                <span class="cov8" title="1">docRef := types.DocumentReference{
+                        ID:              getStringField(docData, "id"),
+                        Path:            getStringField(docData, "path"),
+                        Content:         getStringField(docData, "content"),
+                        Language:        getStringField(docData, "language"),
+                        UtilityScore:    getFloatField(docData, "utility_score"),
+                        RelevanceScore:  getFloatField(docData, "relevance_score"),
+                        RecencyScore:    getFloatField(docData, "recency_score"),
+                        InclusionReason: "smt-optimized",
+                }
+                
+                docRefs = append(docRefs, docRef)
+                contextParts = append(contextParts, docRef.Content)
+                
+                if tokenCount, ok := docData["token_count"].(float64); ok </span><span class="cov8" title="1">{
+                        totalTokens += int(tokenCount)
+                }</span>
+        }
+        
+        // Extract SMT metrics
+        <span class="cov8" title="1">smtMetrics := e.extractSMTMetrics(result)
+        
+        // Build final context
+        context := strings.Join(contextParts, "\n\n---\n\n")
+        
+        return &amp;types.ContextResult{
+                Context:        context,
+                Documents:      docRefs,
+                TotalTokens:    totalTokens,
+                ProcessingTime: processingTime,
+                CacheHit:       false,
+                CoherenceScore: getFloatField(result, "coherence_score"),
+                SMTMetrics:     smtMetrics,
+        }, nil</span>
+}
+
+// extractSMTMetrics extracts SMT solver metrics from response
+func (e *JSONCLIEngine) extractSMTMetrics(result map[string]interface{}) *types.SMTResult <span class="cov8" title="1">{
+        metricsData, ok := result["smt_metrics"].(map[string]interface{})
+        if !ok </span><span class="cov8" title="1">{
+                return nil
+        }</span>
+        
+        <span class="cov8" title="1">return &amp;types.SMTResult{
+                SelectedDocs:    nil, // Already processed above
+                SolverUsed:      getStringField(metricsData, "solver_used"),
+                Z3Status:        getStringField(metricsData, "z3_status"),
+                Objective:       getFloatField(metricsData, "objective"),
+                SolveTimeUs:     int64(getFloatField(metricsData, "solve_time_us")),
+                VariableCount:   int(getFloatField(metricsData, "variable_count")),
+                ConstraintCount: int(getFloatField(metricsData, "constraint_count")),
+                KCandidates:     int(getFloatField(metricsData, "k_candidates")),
+                PairsCount:      int(getFloatField(metricsData, "pairs_count")),
+                BudgetTokens:    int(getFloatField(metricsData, "budget_tokens")),
+                MaxDocs:         int(getFloatField(metricsData, "max_docs")),
+                FallbackReason:  getStringField(metricsData, "fallback_reason"),
+        }</span>
+}
+
+// parseStatsResponse converts stats response to EngineStats
+func (e *JSONCLIEngine) parseStatsResponse(statsData map[string]interface{}) (*types.EngineStats, error) <span class="cov8" title="1">{
+        solverData, ok := statsData["solver"].(map[string]interface{})
+        if !ok </span><span class="cov8" title="1">{
+                solverData = make(map[string]interface{})
+        }</span>
+        
+        <span class="cov8" title="1">return &amp;types.EngineStats{
+                TotalQueries:         int64(getFloatField(statsData, "total_queries")),
+                AverageQueryTime:     time.Duration(getFloatField(statsData, "average_query_time_ms")) * time.Millisecond,
+                CacheHitRate:        getFloatField(statsData, "cache_hit_rate"),
+                TotalDocuments:      int64(getFloatField(statsData, "total_documents")),
+                IndexedWorkspaces:   int(getFloatField(statsData, "indexed_workspaces")),
+                FeatureExtractionTime: time.Duration(getFloatField(statsData, "feature_extraction_time_ms")) * time.Millisecond,
+                SolverStats: types.SolverStats{
+                        TotalSolves:      int64(getFloatField(solverData, "total_solves")),
+                        AverageSolveTime: time.Duration(getFloatField(solverData, "average_solve_time_ms")) * time.Millisecond,
+                        TimeoutCount:     int64(getFloatField(solverData, "timeout_count")),
+                        OptimalityGap:    getFloatField(solverData, "optimality_gap"),
+                },
+                MemoryUsageMB: getFloatField(statsData, "memory_usage_mb"),
+                LicenseTier:   getStringField(statsData, "license_tier"),
+                LicenseValid:  getBoolField(statsData, "license_valid"),
+        }, nil</span>
+}
+
+// Helper functions for safe type conversion
+
+func getStringField(data map[string]interface{}, key string) string <span class="cov8" title="1">{
+        if val, ok := data[key].(string); ok </span><span class="cov8" title="1">{
+                return val
+        }</span>
+        <span class="cov8" title="1">return ""</span>
+}
+
+func getFloatField(data map[string]interface{}, key string) float64 <span class="cov8" title="1">{
+        if val, ok := data[key].(float64); ok </span><span class="cov8" title="1">{
+                return val
+        }</span>
+        <span class="cov8" title="1">return 0.0</span>
+}
+
+func getBoolField(data map[string]interface{}, key string) bool <span class="cov8" title="1">{
+        if val, ok := data[key].(bool); ok </span><span class="cov8" title="1">{
+                return val
+        }</span>
+        <span class="cov8" title="1">return false</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">/*
+ * ContextLite - SMT-Optimized AI Context Engine
+ * Copyright (c) 2025 Michael A. Kuykendall
+ * 
+ * Patent Pending - Provisional Patent Filed
+ * US Provisional Patent Application No. [PENDING]
+ * 
+ * This software contains proprietary algorithms protected by patent law.
+ * Unauthorized reverse engineering or algorithm extraction is prohibited.
+ * 
+ * Licensed under Dual License:
+ * - MIT License for open source use
+ * - Commercial License for business use
+ * 
+ * See LICENSE-MIT.md and LICENSE-COMMERCIAL.md for terms.
+ */
+
+package engine
+
+import (
+        "os"
+        "path/filepath"
+        "runtime"
+
+        "contextlite/pkg/config"
+        "contextlite/pkg/types"
+)
+
+// LoadEngine attempts to load the private JSON CLI engine, falls back to core engine
+func LoadEngine(cfg *config.Config, storage types.StorageInterface) types.ContextEngine <span class="cov8" title="1">{
+        // Try to find private binary first
+        if binaryPath := findPrivateBinary(); binaryPath != "" </span><span class="cov8" title="1">{
+                return NewJSONCLIEngine(cfg, storage, binaryPath)
+        }</span>
+        
+        // Fallback to core engine (proven BM25 + heuristics)
+        <span class="cov8" title="1">return NewCoreEngine(cfg, storage)</span>
+}
+
+// findPrivateBinary searches for the private JSON CLI binary
+func findPrivateBinary() string <span class="cov8" title="1">{
+        // Try both with and without .exe extension for Windows compatibility
+        var binaryNames []string
+        switch runtime.GOOS </span>{
+        case "windows":<span class="cov8" title="1">
+                binaryNames = []string{"contextlite-library.exe", "contextlite-library"}</span>
+        default:<span class="cov0" title="0">
+                binaryNames = []string{"contextlite-library"}</span>
+        }
+        
+        // Try multiple locations for the private binary
+        <span class="cov8" title="1">searchPaths := []string{
+                "./",                                          // Current directory
+                "../contextlite-private/build/",              // Development setup
+                "/usr/local/bin/",                            // System install
+                filepath.Join(getExecutableDir(), "bin/"),    // Relative to executable
+                filepath.Join(getExecutableDir(), "../bin/"), // Parent bin directory
+        }
+        
+        for _, basePath := range searchPaths </span><span class="cov8" title="1">{
+                for _, binaryName := range binaryNames </span><span class="cov8" title="1">{
+                        binaryPath := filepath.Join(basePath, binaryName)
+                        
+                        // Check if binary exists and is executable
+                        if fileExists(binaryPath) &amp;&amp; isExecutable(binaryPath) </span><span class="cov8" title="1">{
+                                return binaryPath
+                        }</span>
+                }
+        }
+        
+        <span class="cov8" title="1">return ""</span> // Private binary not found
+}
+
+// getExecutableDir returns the directory containing the current executable
+func getExecutableDir() string <span class="cov8" title="1">{
+        if execPath, err := os.Executable(); err == nil </span><span class="cov8" title="1">{
+                return filepath.Dir(execPath)
+        }</span>
+        // Fallback to current directory if executable path fails
+        <span class="cov0" title="0">if cwd, err := filepath.Abs("."); err == nil </span><span class="cov0" title="0">{
+                return cwd
+        }</span>
+        <span class="cov0" title="0">return "."</span>
+}
+
+// PrivateEngineAvailable checks if private JSON CLI binary is available
+func PrivateEngineAvailable() bool <span class="cov8" title="1">{
+        return findPrivateBinary() != ""
+}</span>
+
+// fileExists checks if a file exists
+func fileExists(filename string) bool <span class="cov8" title="1">{
+        _, err := os.Stat(filename)
+        return err == nil
+}</span>
+
+// isExecutable checks if a file has execute permissions
+func isExecutable(filename string) bool <span class="cov8" title="1">{
+        info, err := os.Stat(filename)
+        if err != nil </span><span class="cov8" title="1">{
+                return false
+        }</span>
+        
+        // On Windows, check file extension OR assume binary is executable if it exists
+        <span class="cov8" title="1">if runtime.GOOS == "windows" </span><span class="cov8" title="1">{
+                ext := filepath.Ext(filename)
+                return ext == ".exe" || ext == "" // Allow binaries without .exe extension
+        }</span>
+        
+        // On Unix-like systems, check execute permission
+        <span class="cov0" title="0">return info.Mode()&amp;0111 != 0</span>
+}
+
+// GetEngineInfo returns information about the loaded engine
+func GetEngineInfo(engine types.ContextEngine) map[string]interface{} <span class="cov8" title="1">{
+        info := map[string]interface{}{
+                "type": "unknown",
+                "features": []string{},
+        }
+        
+        // Try to determine engine type
+        switch engine.(type) </span>{
+        case *CoreEngine:<span class="cov8" title="1">
+                info["type"] = "core-engine"
+                info["features"] = []string{"bm25-scoring", "heuristic-selection", "production-ready"}
+                info["description"] = "Core engine with proven BM25 and heuristic algorithms"
+                info["communication"] = "direct"</span>
+        case *JSONCLIEngine:<span class="cov8" title="1">
+                info["type"] = "private-optimized"
+                info["features"] = []string{"smt-optimization", "7d-features", "patent-pending"}
+                info["description"] = "Full SMT-optimized engine with proprietary algorithms"
+                info["communication"] = "json-cli"</span>
+        default:<span class="cov8" title="1">
+                // Unknown engine type
+                info["type"] = "unknown"
+                info["features"] = []string{"unknown"}
+                info["description"] = "Unknown engine implementation"
+                info["communication"] = "unknown"</span>
+        }
+        
+        <span class="cov8" title="1">return info</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
