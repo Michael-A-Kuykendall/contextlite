@@ -40,6 +40,11 @@ type Storage struct {
 
 // New creates a new Storage instance
 func New(dbPath string) (*Storage, error) {
+	// Basic path validation
+	if dbPath == "" {
+		return nil, fmt.Errorf("database path cannot be empty")
+	}
+	
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
@@ -326,12 +331,12 @@ func (s *Storage) UpdateDocument(doc types.Document) error {
 	return s.AddDocument(context.Background(), &doc)
 }
 
-// SearchDocuments performs FTS search
+// SearchDocuments performs FTS search with LIKE fallback
 func (s *Storage) SearchDocuments(ctx context.Context, query string, limit int) ([]types.Document, error) {
 	// First try FTS search
 	docs, err := s.searchFTS(ctx, query, limit)
-	if err != nil {
-		// Fallback to LIKE search
+	if err != nil || len(docs) == 0 {
+		// Fallback to LIKE search if FTS fails or returns no results
 		return s.searchLike(ctx, query, limit)
 	}
 	return docs, nil
@@ -358,13 +363,13 @@ func (s *Storage) searchFTS(ctx context.Context, query string, limit int) ([]typ
 
 // searchLike performs LIKE search as fallback
 func (s *Storage) searchLike(ctx context.Context, query string, limit int) ([]types.Document, error) {
-	likeQuery := "%" + strings.ReplaceAll(query, " ", "%") + "%"
+	likeQuery := "%" + strings.ReplaceAll(strings.ToLower(query), " ", "%") + "%"
 	rows, err := s.db.QueryContext(ctx, `
 		SELECT id, content, content_hash, path, lang, mtime,
 		       token_count, model_id, quantum_score, entanglement_map,
 		       coherence_history, created_at, updated_at
 		FROM documents 
-		WHERE content LIKE ?
+		WHERE LOWER(content) LIKE ?
 		ORDER BY LENGTH(content)
 		LIMIT ?`, likeQuery, limit)
 	if err != nil {
@@ -428,6 +433,10 @@ func (s *Storage) GetDocumentByPath(ctx context.Context, path string) (*types.Do
 
 // DeleteDocument removes a document
 func (s *Storage) DeleteDocument(ctx context.Context, id string) error {
+	if id == "" {
+		return fmt.Errorf("document ID cannot be empty")
+	}
+	
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -643,7 +652,7 @@ func (s *Storage) GetCachedResultByKey(ctx context.Context, cacheKey string) (*t
 	
 	var resultContext, quantumMetrics, documentScores string
 	var coherenceScore float64
-	var solveTimeMs sql.NullInt64
+	var solveTimeMs sql.NullFloat64
 	var fallbackUsed bool
 	var createdAt time.Time
 	
@@ -671,7 +680,7 @@ func (s *Storage) GetCachedResultByKey(ctx context.Context, cacheKey string) (*t
 func (s *Storage) SaveQueryCacheWithKey(ctx context.Context, queryHash, corpusHash, modelID, tokenizerVersion, cacheKey string,
 	result *types.QueryResult, expiresAt time.Time) error {
 	
-	resultJSON, err := json.Marshal(result.Documents)
+	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		return err
 	}
