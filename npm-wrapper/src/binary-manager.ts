@@ -91,8 +91,8 @@ export class BinaryManager {
             const fileStream = createWriteStream(destPath);
             response.body?.pipe(fileStream);
 
-            await new Promise<void>((resolve, reject) => {
-                fileStream.on('finish', () => resolve());
+            await new Promise((resolve, reject) => {
+                fileStream.on('finish', resolve);
                 fileStream.on('error', reject);
             });
 

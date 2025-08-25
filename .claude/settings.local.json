@@ -27,7 +27,8 @@
       "Bash(../punch-discovery/punch.exe stats:*)",
       "Bash(gh api:*)",
       "Bash(curl:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)"
     ],
     "deny": [],
     "ask": [],

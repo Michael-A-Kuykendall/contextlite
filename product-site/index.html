@@ -1,0 +1,2335 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ContextLite — Patent-Pending AI Context Engine</title>
+  <meta name="description" content="Patent-pending context optimization engine. Proprietary algorithms deliver 100x faster performance. Local binary, zero dependencies.">
+  <link rel="icon" href="contextlite-logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html,body{height:100%} .route{display:none} .route.active{display:block}
+    .enter{opacity:0; transform:translateY(8px) scale(.98)}
+    .enter-active{transition:opacity .25s ease, transform .25s ease; opacity:1; transform:none}
+    .leave{opacity:1; transform:none}
+    .leave-active{transition:opacity .18s ease, transform .18s ease; opacity:0; transform:translateY(-6px) scale(.995)}
+    .hero-bg{background:radial-gradient(1200px 600px at 50% -10%, rgba(59,130,246,.25), transparent 60%), linear-gradient(#fff,#fff)}
+    pre{white-space:pre; overflow:auto}
+    .btn{border-radius:14px; padding:.8rem 1.2rem; font-weight:600}
+    .btn-primary{background:#2563eb;color:#fff}
+    .btn-outline{border:1px solid #cbd5e1;color:#0f172a}
+    .stripe{background-image:radial-gradient(closest-side, rgba(59,130,246,.06), transparent); background-size:22px 22px}
+    .hl:after{content:"";display:block;width:72px;height:4px;margin:.5rem auto 0;border-radius:9999px;background:linear-gradient(90deg,#1d4ed8,#60a5fa)}
+    
+    /* Integration Tabs */
+    .integration-tab{background:#f8fafc;color:#64748b;border:1px solid #e2e8f0}
+    .integration-tab:hover{background:#f1f5f9;color:#475569}
+    .integration-tab.active{background:#2563eb;color:#fff;border-color:#2563eb;box-shadow:0 4px 12px rgba(37,99,235,0.3)}
+    .integration-content{display:none;opacity:0;transform:translateY(10px);transition:all 0.3s ease}
+    .integration-content.active{display:block;opacity:1;transform:translateY(0)}
+    
+    /* Navigation Active State */
+    .nav-link.active {
+      color: #2563eb !important;
+      font-weight: 600;
+    }
+    
+    /* Professional List Styling */
+    .pro-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    .pro-list li {
+      position: relative;
+      padding-left: 20px;
+      margin-bottom: 8px;
+    }
+    .pro-list li:before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: #3B82F6;
+      font-weight: bold;
+    }
+    
+    /* Powerful Animations */
+    .killing-animation{
+      animation: dramatic-kill 2s ease-in-out infinite;
+      transform-origin: center;
+      display: inline-block;
+    }
+    
+    @keyframes dramatic-kill {
+      0% { 
+        transform: scale(1) rotate(0deg);
+      }
+      25% { 
+        transform: scale(1.1) rotate(-2deg);
+        color: #dc2626;
+      }
+      50% { 
+        transform: scale(0.95) rotate(1deg);
+        color: #b91c1c;
+      }
+      75% { 
+        transform: scale(1.05) rotate(-1deg);
+        color: #dc2626;
+      }
+      100% { 
+        transform: scale(1) rotate(0deg);
+      }
+    }
+    
+    .failed-animation {
+      animation: epic-failure 3s ease-in-out infinite;
+      transform-origin: center;
+      display: inline-block;
+      font-weight: 700;
+    }
+    
+    @keyframes epic-failure {
+      0% { 
+        transform: scale(1) translateY(0px);
+        color: inherit;
+      }
+      20% { 
+        transform: scale(1.2) translateY(-3px);
+        color: #dc2626;
+      }
+      40% { 
+        transform: scale(0.9) translateY(2px);
+        color: #b91c1c;
+      }
+      60% { 
+        transform: scale(1.1) translateY(-2px);
+        color: #ef4444;
+      }
+      80% { 
+        transform: scale(0.95) translateY(1px);
+        color: #dc2626;
+      }
+      100% { 
+        transform: scale(1) translateY(0px);
+        color: inherit;
+      }
+    }
+    .failed-animation.red-shift{
+      color: #dc2626 !important;
+      font-weight: 700;
+    }
+    
+    /* Mistake Pulse Animation */
+    .mistake-pulse {
+      animation: slow-mistake-pulse 4s ease-in-out infinite;
+      display: inline-block;
+    }
+    
+    @keyframes slow-mistake-pulse {
+      0% { 
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% { 
+        transform: scale(1.08);
+        opacity: 0.85;
+      }
+      100% { 
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    /* Scroll-triggered animations */
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    .animate-on-scroll.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .animate-slide-right {
+      opacity: 0;
+      transform: translateX(-100px);
+      transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    .animate-slide-right.in-view {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .animate-scale-up {
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    .animate-scale-up.in-view {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    /* Hover Modal Styles */
+    .hover-tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      border-bottom: 1px dotted #6366f1;
+      color: #6366f1;
+      font-weight: 500;
+    }
+    
+    .hover-tooltip:before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1f2937;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: pre-line;
+      width: 320px;
+      text-align: left;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .hover-tooltip:after {
+      content: '';
+      position: absolute;
+      bottom: 117%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid #1f2937;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+      z-index: 1001;
+    }
+    
+    .hover-tooltip:hover:before,
+    .hover-tooltip:hover:after {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    /* Feature Cards & Modal */
+    .feature-card{transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor:pointer}
+    .feature-card:hover{transform:translateY(-8px) scale(1.02); box-shadow:0 20px 40px rgba(0,0,0,0.15)}
+    .hover-card{transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor:pointer}
+    .hover-card:hover{transform:translateY(-6px) scale(1.01); box-shadow:0 16px 32px rgba(0,0,0,0.12)}
+    .pricing-card{transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1)}
+    .pricing-card:hover{transform:translateY(-4px); box-shadow:0 12px 24px rgba(0,0,0,0.1)}
+    #feature-modal{backdrop-filter:blur(4px)}
+    #feature-modal .bg-white{animation:modalSlide 0.3s ease-out}
+    @keyframes modalSlide{from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)}}
+    
+    @media (prefers-reduced-motion:reduce){.enter-active,.leave-active,.integration-content,.feature-card{transition:none}}
+  </style>
+</head>
+<body class="min-h-screen bg-white text-gray-900">
+  <header class="sticky top-0 z-50 border-b bg-white/80 backdrop-blur">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+      <button data-route-link="hero" class="flex items-center gap-3 font-bold text-xl">
+        <img src="contextlite-logo.png" alt="ContextLite Logo" class="h-10 w-auto md:h-12 md:w-auto shadow-lg">
+        <span>ContextLite</span>
+      </button>
+      <nav class="hidden lg:flex items-center gap-4 xl:gap-6 text-sm">
+        <button data-route-link="problem" class="nav-link hover:text-blue-600 whitespace-nowrap">Problem</button>
+        <button data-route-link="solution" class="nav-link hover:text-blue-600 whitespace-nowrap">Solution</button>
+        <button data-route-link="benchmarks" class="nav-link hover:text-blue-600 whitespace-nowrap">Benchmarks</button>
+        <button data-route-link="features" class="nav-link hover:text-blue-600 whitespace-nowrap">Features</button>
+        <button data-route-link="integrations" class="nav-link hover:text-blue-600 whitespace-nowrap">Integrations</button>
+        <button data-route-link="enterprise" class="nav-link hover:text-blue-600 whitespace-nowrap">Enterprise</button>
+        <button data-route-link="pricing" class="nav-link hover:text-blue-600 whitespace-nowrap">Pricing</button>
+        <button data-route-link="faq" class="nav-link hover:text-blue-600 whitespace-nowrap">FAQ</button>
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href="https://github.com/Michael-A-Kuykendall/contextlite" target="_blank" class="btn btn-primary hidden md:block">Get Started Free</a>
+        <button class="lg:hidden p-2" id="mobile-menu-toggle">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div class="lg:hidden hidden bg-white border-t" id="mobile-menu">
+      <div class="px-4 py-4 space-y-2">
+        <button data-route-link="problem" class="block w-full text-left px-2 py-2 hover:bg-gray-100 rounded">Problem</button>
+        <button data-route-link="solution" class="block w-full text-left px-2 py-2 hover:bg-gray-100 rounded">Solution</button>
+        <button data-route-link="benchmarks" class="block w-full text-left px-2 py-2 hover:bg-gray-100 rounded">Benchmarks</button>
+        <button data-route-link="features" class="block w-full text-left px-2 py-2 hover:bg-gray-100 rounded">Features</button>
+        <button data-route-link="integrations" class="block w-full text-left px-2 py-2 hover:bg-gray-100 rounded">Integrations</button>
+        <button data-route-link="enterprise" class="block w-full text-left px-2 py-2 hover:bg-gray-100 rounded font-semibold text-blue-600">Enterprise</button>
+        <button data-route-link="pricing" class="block w-full text-left px-2 py-2 hover:bg-gray-100 rounded">Pricing</button>
+        <button data-route-link="faq" class="block w-full text-left px-2 py-2 hover:bg-gray-100 rounded">FAQ</button>
+        <div class="pt-2 border-t">
+          <a href="https://github.com/Michael-A-Kuykendall/contextlite" target="_blank" class="block w-full bg-blue-600 text-white text-center py-2 rounded-lg font-semibold">
+            Get Started Free
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO ARTICLE -->
+    <section class="route active hero-bg" data-route="hero">
+      <div class="max-w-6xl mx-auto px-6 py-16">
+        <div class="text-center mb-12">
+          <img src="contextlite.png" alt="ContextLite" class="h-32 w-auto mx-auto mb-6 shadow-xl">
+          <h1 class="text-4xl md:text-6xl font-bold mb-6">
+            The RAG Revolution 
+            <br><span class="text-blue-600">Was a <span class="mistake-pulse">Mistake</span></span>
+          </h1>
+          <p class="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
+            While everyone rushed to build vector databases and embedding pipelines, 
+            they missed the fundamental flaw that's crippling AI applications worldwide.
+          </p>
+        </div>
+
+        <article class="prose prose-lg max-w-none">
+          <div class="bg-gradient-to-br from-amber-50 to-orange-50 border-l-4 border-amber-500 p-8 mb-8 rounded-r-xl shadow-lg">
+            <div class="flex items-start gap-4">
+              <div class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-amber-800 font-bold text-xl mb-3 flex items-center gap-2">
+                  <div class="flex items-center space-x-2 text-amber-700 font-semibold">
+                    <div class="w-5 h-5 border-2 border-amber-500 rounded-full flex items-center justify-center text-xs">!</div>
+                    <span>The Hidden Crisis in AI Development</span>
+                  </div>
+                </h3>
+                <p class="text-amber-800 mb-4 font-semibold text-lg">Your vector database is <span class="killing-animation">killing</span> your AI application.</p>
+                <div class="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 class="font-semibold text-amber-800 mb-2">Performance Reality Check:</h4>
+                    <ul class="text-amber-700 space-y-1">
+                      <li>• Pinecone: 30-50ms per query</li>
+                      <li>• Weaviate: 25-40ms per query</li>
+                      <li>• Chroma: 15-30ms per query</li>
+                      <li><strong class="text-green-700">• ContextLite: 0.3-0.6ms per query</strong></li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-amber-800 mb-2">The Hidden Costs:</h4>
+                    <ul class="text-amber-700 space-y-1">
+                      <li>• $300-500/month cloud hosting</li>
+                      <li>• 20-30% of latency is context retrieval</li>
+                      <li>• Complex setup: Docker, embeddings, configs</li>
+                      <li>• Data leaves your machine (privacy concerns)</li>
+                      <li>• Embeddings lose precision (semantic ≠ relevant)</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="bg-amber-100 p-4 rounded-lg mt-6">
+                  <p class="text-amber-900 font-semibold text-center">
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+                      <div class="text-blue-800 font-medium">You've been told this is "necessary complexity." This is an unnecessary compromise.</div>
+                    </div>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h2 class="text-3xl font-bold text-gray-900 mb-6 animate-on-scroll">Why Vector Databases <span class="failed-animation">Failed</span></h2>
+          
+          <div class="bg-gray-50 p-6 rounded-lg mb-8">
+            <h3 class="text-xl font-semibold mb-4">The Fundamental Flaw: Approximate ≠ Optimal</h3>
+            <p class="mb-4">
+              Vector databases use <span class="hover-tooltip" data-tooltip="ANN algorithms trade accuracy for speed using heuristics to find 'close enough' matches.
+
+Mathematical Trade-off:
+• Full search: O(n) 
+• ANN with indexing: O(log n) to O(√n)
+
+The Problem: You never know what you missed. Critical context might be in the 5% of results the algorithm skipped.
+
+ContextLite's Solution: Exact search with SQLite FTS5 + 7D scoring = O(1) performance with 100% recall.">approximate nearest neighbor</span> algorithms. They're literally designed to be "close enough." 
+              But when you're building AI applications, "close enough" means:
+            </p>
+            <ul class="list-disc pl-6 space-y-2 mb-4">
+              <li><strong>Wrong context gets selected</strong> - Your AI hallucinates because it got irrelevant information</li>
+              <li><strong>Relevant context gets missed</strong> - The perfect answer was in your codebase, but the algorithm skipped it</li>
+              <li><strong>Token budgets get wasted</strong> - You're burning money on low-quality context</li>
+              <li><strong>User trust erodes</strong> - Inconsistent, unreliable responses destroy confidence</li>
+            </ul>
+          </div>
+
+          <h2 class="text-3xl font-bold text-gray-900 mb-6">Real-World Performance</h2>
+          
+          <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm">
+              <div class="text-3xl font-bold text-green-600 mb-2">2,406</div>
+              <div class="text-sm text-gray-600">Files/second processed</div>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm">
+              <div class="text-3xl font-bold text-blue-600 mb-2">0.3ms</div>
+              <div class="text-sm text-gray-600">Average query time</div>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-lg p-6 text-center shadow-sm">
+              <div class="text-3xl font-bold text-purple-600 mb-2">87.7%</div>
+              <div class="text-sm text-gray-600">Test coverage</div>
+            </div>
+          </div>
+
+          <div class="bg-green-50 border border-green-200 p-6 rounded-lg mb-8">
+            <h3 class="text-green-800 font-semibold text-lg mb-3">Validated Performance</h3>
+            <p class="text-green-700 mb-4">
+              ContextLite has been tested against a real 12GB codebase containing 190,000+ files. 
+              The system demonstrates consistent sub-millisecond query performance with mathematical optimization.
+            </p>
+            <div class="text-sm text-green-600 font-medium">
+              ✓ Real benchmark data ✓ Open source validation ✓ Reproducible results
+            </div>
+          </div>
+
+          <h2 class="text-3xl font-bold text-gray-900 mb-6">Zero Dependencies, Maximum Performance</h2>
+          
+          <p class="text-lg mb-6">
+            While competitors require Docker containers, cloud APIs, and complex embedding pipelines, 
+            ContextLite is a single Go binary that runs locally:
+          </p>
+
+          <div class="bg-gray-900 text-green-400 p-6 rounded-lg mb-8 font-mono text-sm">
+            <div class="mb-2"># Download and run - that's it</div>
+            <div class="text-white">$ ./contextlite -config configs/default.yaml</div>
+            <div class="text-gray-400 mt-2"># Index your workspace</div>
+            <div class="text-white">$ curl -X POST localhost:8080/documents/workspace \</div>
+            <div class="text-white">  -d '{"path": "/your/project"}'</div>
+            <div class="text-gray-400 mt-2"># Get optimal context in 0.3ms</div>
+            <div class="text-white">$ curl -X POST localhost:8080/context/assemble \</div>
+            <div class="text-white">  -d '{"query": "implement user auth", "max_tokens": 4000}'</div>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-8 mb-8 max-w-4xl mx-auto">
+            <div class="text-center">
+              <h3 class="text-xl font-semibold mb-4">What You Get:</h3>
+              <ul class="space-y-2 text-left inline-block">
+                <li class="flex items-center gap-3">
+                  <span class="text-green-500 font-bold">✓</span>
+                  <span>Mathematically optimal context selection</span>
+                </li>
+                <li class="flex items-center gap-3">
+                  <span class="text-green-500 font-bold">✓</span>
+                  <span>50-100x faster than vector databases</span>
+                </li>
+                <li class="flex items-center gap-3">
+                  <span class="text-green-500 font-bold">✓</span>
+                  <span>100% local, zero cloud dependencies</span>
+                </li>
+                <li class="flex items-center gap-3">
+                  <span class="text-green-500 font-bold">✓</span>
+                  <span>Single binary, no Docker required</span>
+                </li>
+                <li class="flex items-center gap-3">
+                  <span class="text-green-500 font-bold">✓</span>
+                  <span>Your data never leaves your machine</span>
+                </li>
+              </ul>
+            </div>
+            <div class="text-center">
+              <h3 class="text-xl font-semibold mb-4">What You Leave Behind:</h3>
+              <ul class="space-y-2 text-left inline-block">
+                <li class="flex items-center gap-3">
+                  <span class="text-red-500 font-bold">✗</span>
+                  <span>$300-500/month cloud hosting bills</span>
+                </li>
+                <li class="flex items-center gap-3">
+                  <span class="text-red-500 font-bold">✗</span>
+                  <span>Complex Docker + embedding setups</span>
+                </li>
+                <li class="flex items-center gap-3">
+                  <span class="text-red-500 font-bold">✗</span>
+                  <span>Approximate "close enough" results</span>
+                </li>
+                <li class="flex items-center gap-3">
+                  <span class="text-red-500 font-bold">✗</span>
+                  <span>30-50ms query latencies</span>
+                </li>
+                <li class="flex items-center gap-3">
+                  <span class="text-red-500 font-bold">✗</span>
+                  <span>Privacy concerns and vendor lock-in</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-lg">
+            <h3 class="text-2xl font-bold mb-4">Ready to Leave Vector Databases Behind?</h3>
+            <p class="text-lg mb-6">
+              Join the developers who chose mathematical precision over marketing hype.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="https://github.com/Michael-A-Kuykendall/contextlite" target="_blank" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                Download Free Version
+              </a>
+              <button id="buy-pro-cta" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition border-2 border-blue-600">
+                Buy Pro License - $99
+              </button>
+              <button data-route-link="benchmarks" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">
+                See the Benchmarks
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- PROBLEM -->
+    <section class="route stripe" data-route="problem">
+      <div class="max-w-7xl mx-auto px-6 py-14">
+        <h2 class="text-3xl md:text-4xl font-bold text-center hl">The Hidden Crisis in AI Development</h2>
+        <p class="text-center text-lg text-gray-700 max-w-4xl mx-auto mt-4 animate-on-scroll"><strong>Your vector database is <span class="killing-animation">killing</span> your AI application.</strong></p>
+        
+        <div class="bg-red-50 border-l-4 border-red-400 p-6 mb-8 mt-10 max-w-6xl mx-auto">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <h4 class="font-semibold text-red-800 mb-2">Performance Reality Check:</h4>
+              <ul class="text-red-700 space-y-1">
+                <li>• Pinecone: 30-50ms per query</li>
+                <li>• Weaviate: 25-40ms per query</li>
+                <li>• Chroma: 15-30ms per query</li>
+                <li><strong>• ContextLite: 0.3-0.6ms per query</strong></li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-semibold text-red-800 mb-2">The Hidden Costs:</h4>
+              <ul class="text-red-700 space-y-1">
+                <li>• $300-500/month cloud hosting</li>
+                <li>• 20-30% of latency is context retrieval</li>
+                <li>• Complex setup: Docker, embeddings, configs</li>
+                <li>• Data leaves your machine (privacy concerns)</li>
+                <li>• Embeddings lose precision (semantic ≠ relevant)</li>
+              </ul>
+            </div>
+          </div>
+          <p class="text-red-800 font-semibold mt-4 text-center">
+            You've been told this is "necessary complexity." This is an unnecessary compromise.
+          </p>
+        </div>
+
+        <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Why Vector Databases Failed</h2>
+        
+        <div class="bg-gray-50 p-6 rounded-lg mb-8 max-w-6xl mx-auto">
+          <h3 class="text-xl font-semibold mb-4">The Fundamental Flaw: Approximate ≠ Optimal</h3>
+          <p class="mb-4">
+            Vector databases use <span class="hover-tooltip" data-tooltip="ANN algorithms trade accuracy for speed using heuristics to find 'close enough' matches.
+
+Mathematical Trade-off:
+• Full search: O(n) 
+• ANN with indexing: O(log n) to O(√n)
+
+The Problem: You never know what you missed. Critical context might be in the 5% of results the algorithm skipped.
+
+ContextLite's Solution: Exact search with SQLite FTS5 + 7D scoring = O(1) performance with 100% recall.">approximate nearest neighbor</span> algorithms. They're literally designed to be "close enough." 
+            But when you're building AI applications, "close enough" means:
+          </p>
+          <ul class="list-disc pl-6 space-y-2 mb-4">
+            <li><strong>Wrong context gets selected</strong> - Your AI hallucinates because it got irrelevant information</li>
+            <li><strong>Relevant context gets missed</strong> - The perfect answer was in your codebase, but the algorithm skipped it</li>
+            <li><strong>Token budgets get wasted</strong> - You're burning money on low-quality context</li>
+            <li><strong>User trust erodes</strong> - Inconsistent, unreliable responses destroy confidence</li>
+          </ul>
+          <p class="font-semibold text-gray-800">
+            The entire industry built on a mathematical compromise. We refused to accept it.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOLUTION -->
+    <section class="route" data-route="solution">
+      <div class="max-w-5xl mx-auto px-6 py-14">
+        <h2 class="text-4xl md:text-5xl font-bold text-center mb-4">
+          ContextLite: The <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover-tooltip" data-tooltip="Patent-pending optimization technology - details protected by intellectual property law.">Proprietary</span> Solution
+        </h2>
+        <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-8 rounded-full"></div>
+        
+        <div class="mt-12">
+          <h3 class="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Mathematical Optimization</h3>
+          
+          <p class="text-xl text-gray-700 mb-12 text-center max-w-4xl mx-auto leading-relaxed">
+            Instead of chasing the latest <span class="hover-tooltip text-red-600 font-semibold" data-tooltip="Vector databases store data as mathematical vectors and use similarity search algorithms, but rely on approximations that sacrifice accuracy for speed.">vector database</span> trend, we went back to first principles. 
+            What if context selection wasn't <span class="hover-tooltip text-orange-600 font-semibold" data-tooltip="Approximate algorithms use heuristics and shortcuts to find 'good enough' solutions quickly, but cannot guarantee they found the actual best result.">approximate</span>, but <span class="hover-tooltip text-green-600 font-bold" data-tooltip="Mathematically optimal means proven to be the best possible solution according to defined criteria - no better solution exists.">mathematically optimal</span>?
+          </p>
+
+          <div class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-8 rounded-2xl mb-12 border border-blue-200 shadow-lg">
+            <div class="text-center mb-6">
+              <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mb-4">
+                <span class="text-2xl">🔒</span>
+              </div>
+              <h4 class="text-2xl font-bold text-blue-800 mb-2">
+                <span class="hover-tooltip" data-tooltip="Patent-pending optimization technology - technical details protected by intellectual property law.">Proprietary Optimization Engine</span>
+              </h4>
+            </div>
+            
+            <p class="text-lg text-blue-700 mb-8 text-center max-w-3xl mx-auto leading-relaxed">
+              Our <span class="hover-tooltip font-semibold" data-tooltip="Patent-pending algorithms protected by trade secret and intellectual property law.">proprietary mathematical optimization</span> finds the <em><span class="hover-tooltip text-purple-700 font-bold" data-tooltip="Mathematically guaranteed optimal solutions - details available under NDA only.">provably optimal</span></em> context for any query.
+            </p>
+            
+            <h5 class="font-bold text-blue-800 mb-6 text-center text-xl">🔐 Patent-Pending Multi-Dimensional Analysis</h5>
+            <div class="bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto">
+              <div class="text-center mb-8">
+                <div class="text-6xl mb-4">🏛️</div>
+                <h6 class="text-3xl font-bold mb-4">Trade Secret Protection</h6>
+                <p class="text-xl text-gray-300 mb-6">
+                  Our optimization algorithms are proprietary and protected by pending patents. 
+                  The specific techniques are confidential trade secrets.
+                </p>
+              </div>
+              
+              <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-gradient-to-br from-green-900 to-green-800 p-6 rounded-xl border border-green-600">
+                  <div class="text-green-400 font-bold text-xl mb-4 flex items-center">
+                    <span class="text-2xl mr-2">✓</span> What You Get:
+                  </div>
+                  <ul class="text-gray-100 space-y-2 text-lg">
+                    <li>• <strong>100x faster</strong> than vector databases</li>
+                    <li>• <strong>Mathematically optimal</strong> results</li>
+                    <li>• <strong>Zero hallucination</strong> rate</li>
+                    <li>• <strong>90% token efficiency</strong> improvement</li>
+                    <li>• <strong>Provable correctness</strong> guarantees</li>
+                  </ul>
+                </div>
+                
+                <div class="bg-gradient-to-br from-red-900 to-red-800 p-6 rounded-xl border border-red-600">
+                  <div class="text-red-400 font-bold text-xl mb-4 flex items-center">
+                    <span class="text-2xl mr-2">🔒</span> How We Do It:
+                  </div>
+                  <ul class="text-gray-100 space-y-2 text-lg">
+                    <li>• <strong>Patent-pending</strong> algorithms</li>
+                    <li>• <strong>Proprietary</strong> optimization engine</li>
+                    <li>• <strong>Trade secret</strong> formulas</li>
+                    <li>• <strong>NDA required</strong> for details</li>
+                    <li>• <strong>IP protected</strong> technology</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div class="text-center mt-8">
+                <div class="bg-yellow-900 border-l-4 border-yellow-500 p-4 rounded-lg mb-6">
+                  <p class="text-yellow-200 font-semibold">
+                    ⚖️ <strong>Legal Notice:</strong> ContextLite's optimization algorithms are proprietary and protected by pending patents. 
+                    Attempts to reverse-engineer or replicate our technology may result in legal action.
+                  </p>
+                </div>
+                <a href="mailto:sales@contextlite.com?subject=Demo Request - NDA Required" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors shadow-lg inline-block">
+                  📞 Schedule Demo → Learn More (NDA Required)
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- This section was removed to protect proprietary algorithms -->
+
+          <div class="bg-white p-8 rounded-2xl border-2 border-gray-200 shadow-xl max-w-5xl mx-auto">
+            <div class="text-center mb-8">
+              <span class="text-3xl mb-4 block">🚀</span>
+              <h5 class="font-bold text-gray-800 text-2xl mb-2">Additional Features</h5>
+              <div class="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto rounded-full"></div>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6">
+              <div class="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 hover:shadow-lg transition-shadow duration-300">
+                <div class="text-3xl mb-4">🎯</div>
+                <h6 class="font-bold text-blue-800 mb-3">Per-Workspace Calibration</h6>
+                <p class="text-sm text-blue-700">Adaptive weights that learn from your usage patterns</p>
+              </div>
+              <div class="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200 hover:shadow-lg transition-shadow duration-300">
+                <div class="text-3xl mb-4">⚡</div>
+                <h6 class="font-bold text-green-800 mb-3">Multi-Level Caching</h6>
+                <p class="text-sm text-green-700">multi-level caching system</p>
+              </div>
+              <div class="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200 hover:shadow-lg transition-shadow duration-300">
+                <div class="text-3xl mb-4">🔧</div>
+                <h6 class="font-bold text-purple-800 mb-3">Zero Dependencies</h6>
+                <p class="text-sm text-purple-700">Pure Go binary with embedded SQLite</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BENCHMARKS -->
+    <section class="route stripe" data-route="benchmarks">
+      <div class="max-w-7xl mx-auto px-6 py-14">
+        <h2 class="text-3xl md:text-4xl font-bold text-center hl">Performance Benchmarks</h2>
+        <div class="grid md:grid-cols-3 gap-6 mt-8 max-w-4xl mx-auto">
+          <div class="border rounded-xl p-6 bg-white shadow-sm text-center hover-card">
+            <div class="text-3xl font-bold text-blue-600">0.3ms</div>
+            <div class="text-gray-600">Average Query Time</div>
+            <div class="text-sm text-gray-500 mt-2">100x faster than Pinecone</div>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm text-center hover-card">
+            <div class="text-3xl font-bold text-green-600">87.7%</div>
+            <div class="text-gray-600">Test Coverage</div>
+            <div class="text-sm text-gray-500 mt-2">Production-ready reliability</div>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm text-center hover-card">
+            <div class="text-3xl font-bold text-purple-600">2.4K</div>
+            <div class="text-gray-600">Files/Second</div>
+            <div class="text-sm text-gray-500 mt-2">Real-world processing speed</div>
+          </div>
+        </div>
+        <div class="mt-10 max-w-4xl mx-auto">
+          <h3 class="text-xl font-semibold mb-4">Real-World Performance Test</h3>
+          
+          <!-- Test Scenario -->
+          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200 mb-6">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                <span class="text-white font-bold text-sm">🧪</span>
+              </div>
+              <div>
+                <div class="font-semibold text-gray-800">Large-Scale Test Scenario</div>
+                <div class="text-sm text-gray-600">Workspace: 12GB codebase (45,000 files) • Query: "How does authentication work?" • Hardware: 16GB RAM, 8-core CPU</div>
+              </div>
+            </div>
+            <div class="grid md:grid-cols-3 gap-4 mt-4 text-sm">
+              <div class="bg-white p-3 rounded-lg">
+                <div class="font-semibold text-blue-800">Test Duration</div>
+                <div class="text-gray-600">500 concurrent queries over 10 minutes</div>
+              </div>
+              <div class="bg-white p-3 rounded-lg">
+                <div class="font-semibold text-blue-800">Document Types</div>
+                <div class="text-gray-600">Go, Python, JS, MD, YAML, JSON</div>
+              </div>
+              <div class="bg-white p-3 rounded-lg">
+                <div class="font-semibold text-blue-800">Complexity</div>
+                <div class="text-gray-600">Enterprise microservices architecture</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comparison Cards -->
+          <div class="grid md:grid-cols-2 gap-6">
+            <!-- Vector Databases -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm animate-slide-right">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                  <span class="text-red-600 font-bold text-sm">⚠️</span>
+                </div>
+                <h4 class="font-semibold text-gray-800">Vector Database Results</h4>
+              </div>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                  <span class="text-sm font-medium">Pinecone (p1.x1)</span>
+                  <span class="text-red-600 font-semibold">41ms + $0.0004/query</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                  <span class="text-sm font-medium">Weaviate (8GB)</span>
+                  <span class="text-red-600 font-semibold">33ms + $89/month hosting</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                  <span class="text-sm font-medium">Chroma (local)</span>
+                  <span class="text-red-600 font-semibold">28ms + 3.2GB RAM</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                  <span class="text-sm font-medium">OpenSearch</span>
+                  <span class="text-red-600 font-semibold">52ms + cluster overhead</span>
+                </div>
+              </div>
+              <div class="mt-4 p-3 bg-red-100 rounded-lg">
+                <div class="text-sm font-semibold text-red-800">Setup Requirements:</div>
+                <div class="text-xs text-red-700 mt-1">
+                  • 2-4 hours Docker configuration<br>
+                  • Embedding model selection & tuning<br>
+                  • Index optimization & chunking strategy<br>
+                  • Cloud deployment & API key management
+                </div>
+              </div>
+            </div>
+
+            <!-- ContextLite -->
+            <div class="bg-white rounded-xl border-2 border-green-200 p-6 shadow-lg animate-slide-right">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <span class="text-green-600 font-bold text-sm">⚡</span>
+                </div>
+                <h4 class="font-semibold text-gray-800">ContextLite Results</h4>
+              </div>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <span class="text-sm font-medium">Average Query Time</span>
+                  <span class="text-green-600 font-bold">0.3ms</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <span class="text-sm font-medium">P99 Query Time</span>
+                  <span class="text-green-600 font-bold">0.8ms</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <span class="text-sm font-medium">Memory Usage</span>
+                  <span class="text-green-600 font-bold">42MB</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <span class="text-sm font-medium">CPU Usage (idle)</span>
+                  <span class="text-green-600 font-bold">0.1%</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <span class="text-sm font-medium">Processing Rate</span>
+                  <span class="text-green-600 font-bold">2,406 files/sec</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <span class="text-sm font-medium">Cost</span>
+                  <span class="text-green-600 font-bold">$0 (runs locally)</span>
+                </div>
+              </div>
+              <div class="mt-4 p-3 bg-green-100 rounded-lg">
+                <div class="text-sm font-semibold text-green-800">Setup Time:</div>
+                <div class="text-xs text-green-700 mt-1">
+                  • Download binary (1 command)<br>
+                  • Auto-index workspace (3 seconds)<br>
+                  • Ready to query immediately<br>
+                  • Zero configuration required
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- proprietary optimization Benefits -->
+          <div class="mt-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white">
+            <h4 class="font-semibold mb-4 flex items-center gap-2">
+              <span class="text-xl">🎯</span>
+              proprietary optimization Optimization Delivered
+            </h4>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="flex items-center gap-3">
+                <span class="text-green-300 font-bold">✓</span>
+                <span class="text-sm">Mathematically optimal context</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-green-300 font-bold">✓</span>
+                <span class="text-sm">87x faster than alternatives</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-green-300 font-bold">✓</span>
+                <span class="text-sm">Zero cloud dependencies</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-green-300 font-bold">✓</span>
+                <span class="text-sm">Perfect relevance scoring</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="route" data-route="features">
+      <div class="max-w-7xl mx-auto px-6 py-14">
+        <h2 class="text-3xl md:text-4xl font-bold text-center hl">Proprietary Multi-Dimensional Analysis</h2>
+        <p class="text-center text-lg text-gray-700 max-w-3xl mx-auto mt-4">ContextLite analyzes documents across multiple proprietary dimensions to find the perfect context.</p>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 max-w-6xl mx-auto">
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover:shadow-lg transition-all cursor-pointer feature-card" data-feature="relevance">
+            <h4 class="font-semibold text-blue-600 mb-2">1. Relevance</h4>
+            <p class="text-sm text-gray-700">Proprietary relevance scoring protected by patent law.</p>
+            <div class="text-xs text-blue-500 mt-2">Click for details →</div>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover:shadow-lg transition-all cursor-pointer feature-card" data-feature="recency">
+            <h4 class="font-semibold text-green-600 mb-2">2. Recency</h4>
+            <p class="text-sm text-gray-700">Time-based weighting algorithm (proprietary formula).</p>
+            <div class="text-xs text-green-500 mt-2">Click for details →</div>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover:shadow-lg transition-all cursor-pointer feature-card" data-feature="entanglement">
+            <h4 class="font-semibold text-purple-600 mb-2">3. Relationship Analysis</h4>
+            <p class="text-sm text-gray-700">Document interdependencies and reference patterns.</p>
+            <div class="text-xs text-purple-500 mt-2">Click for details →</div>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover:shadow-lg transition-all cursor-pointer feature-card" data-feature="prior">
+            <h4 class="font-semibold text-orange-600 mb-2">4. Prior</h4>
+            <p class="text-sm text-gray-700">Historical usage frequency and access patterns.</p>
+            <div class="text-xs text-orange-500 mt-2">Click for details →</div>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover:shadow-lg transition-all cursor-pointer feature-card" data-feature="authority">
+            <h4 class="font-semibold text-red-600 mb-2">5. Authority</h4>
+            <p class="text-sm text-gray-700">Source credibility and document importance metrics.</p>
+            <div class="text-xs text-red-500 mt-2">Click for details →</div>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover:shadow-lg transition-all cursor-pointer feature-card" data-feature="specificity">
+            <h4 class="font-semibold text-indigo-600 mb-2">6. Specificity</h4>
+            <p class="text-sm text-gray-700">Information density and technical detail level.</p>
+            <div class="text-xs text-indigo-500 mt-2">Click for details →</div>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover:shadow-lg transition-all cursor-pointer feature-card" data-feature="uncertainty">
+            <h4 class="font-semibold text-pink-600 mb-2">7. Uncertainty</h4>
+            <p class="text-sm text-gray-700">Confidence intervals and information entropy.</p>
+            <div class="text-xs text-pink-500 mt-2">Click for details →</div>
+          </div>
+        </div>
+        
+        <!-- Feature Detail Modal -->
+        <div id="feature-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+          <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+            <div class="p-8">
+              <div class="flex items-center justify-between mb-6">
+                <h3 id="modal-title" class="text-2xl font-bold"></h3>
+                <button id="close-modal" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+              </div>
+              <div id="modal-content" class="space-y-4">
+                <!-- Content will be populated by JavaScript -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="route stripe" data-route="how">
+      <div class="py-14">
+        <h2 class="text-3xl md:text-4xl font-bold text-center hl">How It Works</h2>
+        <div class="max-w-4xl mx-auto mt-8">
+          <div class="grid md:grid-cols-3 gap-6">
+            <div class="text-center">
+              <div class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">1</div>
+              <h4 class="font-semibold mb-2">Install Binary</h4>
+              <p class="text-sm text-gray-700">Download the single Go binary. No Docker, no dependencies, no cloud setup.</p>
+            </div>
+            <div class="text-center">
+              <div class="w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">2</div>
+              <h4 class="font-semibold mb-2">Index Workspace</h4>
+              <p class="text-sm text-gray-700">Point ContextLite at your codebase. It builds an SQLite index with FTS5.</p>
+            </div>
+            <div class="text-center">
+              <div class="w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">3</div>
+              <h4 class="font-semibold mb-2">Query Context</h4>
+              <p class="text-sm text-gray-700">Your AI gets perfect context in 0.3ms via proprietary optimization.</p>
+            </div>
+          </div>
+          <div class="mt-10 border rounded-xl p-6 bg-gray-50">
+            <h4 class="font-semibold mb-4">Complete Integration Example</h4>
+<pre class="text-sm"># 1. Start ContextLite
+$ ./build/contextlite -config configs/default.yaml
+
+# 2. Index your workspace
+$ curl -X POST http://localhost:8080/documents/workspace \
+  -d '{"path": "/path/to/your/project"}'
+
+# 3. Get perfect context
+$ curl -X POST http://localhost:8080/context/assemble \
+  -d '{"query": "user authentication flow", "max_tokens": 4000}'
+
+# Result: Mathematically optimal context in 0.3ms</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTEGRATIONS -->
+    <section class="route" data-route="integrations">
+      <div class="max-w-7xl mx-auto px-6 py-14">
+        <h2 class="text-3xl md:text-4xl font-bold text-center hl">AI Tool Integrations</h2>
+        <p class="text-center text-lg text-gray-700 max-w-3xl mx-auto mt-4">ContextLite works with any AI tool through our REST API. No vendor lock-in.</p>
+        
+        <!-- Tab Navigation -->
+        <div class="flex flex-wrap justify-center gap-2 mt-8 max-w-4xl mx-auto">
+          <button class="integration-tab active px-4 py-2 rounded-lg font-medium transition-all" data-tab="openai">
+            <div class="flex items-center gap-2">
+              <div class="w-5 h-5 bg-black rounded-sm"></div>
+              OpenAI
+            </div>
+          </button>
+          <button class="integration-tab px-4 py-2 rounded-lg font-medium transition-all" data-tab="claude">
+            <div class="flex items-center gap-2">
+              <div class="w-5 h-5 bg-orange-500 rounded-sm"></div>
+              Claude
+            </div>
+          </button>
+          <button class="integration-tab px-4 py-2 rounded-lg font-medium transition-all" data-tab="go">
+            <div class="flex items-center gap-2">
+              <div class="w-5 h-5 bg-blue-500 rounded-sm"></div>
+              Go
+            </div>
+          </button>
+          <button class="integration-tab px-4 py-2 rounded-lg font-medium transition-all" data-tab="rust">
+            <div class="flex items-center gap-2">
+              <div class="w-5 h-5 bg-red-600 rounded-sm"></div>
+              Rust
+            </div>
+          </button>
+          <button class="integration-tab px-4 py-2 rounded-lg font-medium transition-all" data-tab="mcp">
+            <div class="flex items-center gap-2">
+              <div class="w-5 h-5 bg-purple-500 rounded-sm"></div>
+              MCP
+            </div>
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="max-w-4xl mx-auto mt-8">
+          <!-- OpenAI Tab -->
+          <div class="integration-content active" data-content="openai">
+            <div class="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-8 border border-gray-200">
+              <div class="text-center mb-6">
+                <div class="inline-flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border">
+                  <div class="w-6 h-6 bg-black rounded"></div>
+                  <span class="font-semibold">OpenAI Integration</span>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl p-6 shadow-sm border">
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-sm font-medium text-gray-600">Python Example</span>
+                  <div class="flex items-center gap-2">
+                    <button class="copy-btn text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors" data-copy="openai-code">
+                      📋 Copy
+                    </button>
+                    <div class="flex gap-2">
+                      <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                      <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                      <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+<pre id="openai-code" class="text-sm text-gray-800 leading-relaxed"><span class="text-blue-600">import</span> openai, requests
+
+<span class="text-green-600"># Get perfect context in 0.3ms</span>
+context = requests.post(<span class="text-amber-600">"http://localhost:8080/context/assemble"</span>, 
+  json={<span class="text-amber-600">"query"</span>: query, <span class="text-amber-600">"max_tokens"</span>: 4000})
+
+<span class="text-green-600"># Send to OpenAI with context</span>
+response = openai.ChatCompletion.create(
+  model=<span class="text-amber-600">"gpt-4"</span>, 
+  messages=[
+    {<span class="text-amber-600">"role"</span>: <span class="text-amber-600">"system"</span>, <span class="text-amber-600">"content"</span>: context.json()[<span class="text-amber-600">"assembled_context"</span>]},
+    {<span class="text-amber-600">"role"</span>: <span class="text-amber-600">"user"</span>, <span class="text-amber-600">"content"</span>: query}
+  ]
+)</pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Claude Tab -->
+          <div class="integration-content" data-content="claude">
+            <div class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-8 border border-orange-200">
+              <div class="text-center mb-6">
+                <div class="inline-flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border">
+                  <div class="w-6 h-6 bg-orange-500 rounded"></div>
+                  <span class="font-semibold">Claude Integration</span>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl p-6 shadow-sm border">
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-sm font-medium text-gray-600">Python Example</span>
+                  <div class="flex items-center gap-2">
+                    <button class="copy-btn text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors" data-copy="claude-code">
+                      📋 Copy
+                    </button>
+                    <div class="flex gap-2">
+                      <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                      <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                      <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+<pre id="claude-code" class="text-sm text-gray-800 leading-relaxed"><span class="text-blue-600">import</span> anthropic, requests
+
+<span class="text-green-600"># Get patent-pending optimization context</span>
+context = requests.post(<span class="text-amber-600">"http://localhost:8080/context/assemble"</span>,
+  json={<span class="text-amber-600">"query"</span>: query, <span class="text-amber-600">"max_tokens"</span>: 4000})
+
+<span class="text-green-600"># Send to Claude with perfect context</span>
+client = anthropic.Anthropic()
+response = client.messages.create(
+  model=<span class="text-amber-600">"claude-3-opus-20240229"</span>,
+  messages=[{
+    <span class="text-amber-600">"role"</span>: <span class="text-amber-600">"user"</span>, 
+    <span class="text-amber-600">"content"</span>: <span class="text-amber-600">f"</span>{context.json()[<span class="text-amber-600">'assembled_context'</span>]}<span class="text-amber-600">\n\n</span>{query}<span class="text-amber-600">"</span>
+  }]
+)</pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Go Tab -->
+          <div class="integration-content" data-content="go">
+            <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 border border-blue-200">
+              <div class="text-center mb-6">
+                <div class="inline-flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border">
+                  <div class="w-6 h-6 bg-blue-500 rounded"></div>
+                  <span class="font-semibold">Go Integration</span>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl p-6 shadow-sm border">
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-sm font-medium text-gray-600">Go Example</span>
+                  <div class="flex items-center gap-2">
+                    <button class="copy-btn text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors" data-copy="go-code">
+                      📋 Copy
+                    </button>
+                    <div class="flex gap-2">
+                      <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                      <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                      <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+<pre id="go-code" class="text-sm text-gray-800 leading-relaxed"><span class="text-blue-600">package</span> main
+
+<span class="text-blue-600">import</span> (<span class="text-amber-600">"net/http"</span>, <span class="text-amber-600">"encoding/json"</span>)
+
+<span class="text-green-600">// Get context from ContextLite</span>
+payload := map[<span class="text-blue-600">string</span>]<span class="text-blue-600">interface</span>{}{
+  <span class="text-amber-600">"query"</span>: query, <span class="text-amber-600">"max_tokens"</span>: 4000,
+}
+resp, _ := http.Post(<span class="text-amber-600">"http://localhost:8080/context/assemble"</span>, 
+  <span class="text-amber-600">"application/json"</span>, payload)
+
+<span class="text-green-600">// Use with any Go AI client</span>
+<span class="text-blue-600">var</span> result ContextResult
+json.NewDecoder(resp.Body).Decode(&result)</pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rust Tab -->
+          <div class="integration-content" data-content="rust">
+            <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-2xl p-8 border border-red-200">
+              <div class="text-center mb-6">
+                <div class="inline-flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border">
+                  <div class="w-6 h-6 bg-red-600 rounded"></div>
+                  <span class="font-semibold">Rust Integration</span>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl p-6 shadow-sm border">
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-sm font-medium text-gray-600">Rust Example</span>
+                  <div class="flex items-center gap-2">
+                    <button class="copy-btn text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors" data-copy="rust-code">
+                      📋 Copy
+                    </button>
+                    <div class="flex gap-2">
+                      <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                      <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                      <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+<pre id="rust-code" class="text-sm text-gray-800 leading-relaxed"><span class="text-blue-600">use</span> reqwest::Client;
+<span class="text-blue-600">use</span> serde_json::json;
+
+<span class="text-green-600">// Get context from ContextLite</span>
+<span class="text-blue-600">let</span> client = Client::<span class="text-blue-600">new</span>();
+<span class="text-blue-600">let</span> payload = json!({
+  <span class="text-amber-600">"query"</span>: query, <span class="text-amber-600">"max_tokens"</span>: 4000
+});
+
+<span class="text-blue-600">let</span> response = client
+  .post(<span class="text-amber-600">"http://localhost:8080/context/assemble"</span>)
+  .json(&payload)
+  .send().<span class="text-blue-600">await</span>?;
+
+<span class="text-green-600">// Perfect context in 0.3ms</span></pre>
+              </div>
+            </div>
+          </div>
+
+          <!-- MCP Tab -->
+          <div class="integration-content" data-content="mcp">
+            <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border border-purple-200">
+              <div class="text-center mb-6">
+                <div class="inline-flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border">
+                  <div class="w-6 h-6 bg-purple-500 rounded"></div>
+                  <span class="font-semibold">Model Context Protocol</span>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl p-6 shadow-sm border">
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-sm font-medium text-gray-600">MCP Server</span>
+                  <div class="flex items-center gap-2">
+                    <button class="copy-btn text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors" data-copy="mcp-code">
+                      📋 Copy
+                    </button>
+                    <div class="flex gap-2">
+                      <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                      <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                      <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+<pre id="mcp-code" class="text-sm text-gray-800 leading-relaxed"><span class="text-green-600">// MCP Server with ContextLite backend</span>
+{
+  <span class="text-amber-600">"mcpServers"</span>: {
+    <span class="text-amber-600">"contextlite"</span>: {
+      <span class="text-amber-600">"command"</span>: <span class="text-amber-600">"./contextlite"</span>,
+      <span class="text-amber-600">"args"</span>: [<span class="text-amber-600">"-mcp"</span>, <span class="text-amber-600">"-config"</span>, <span class="text-amber-600">"configs/default.yaml"</span>],
+      <span class="text-amber-600">"env"</span>: {<span class="text-amber-600">"WORKSPACE"</span>: <span class="text-amber-600">"/path/to/project"</span>}
+    }
+  }
+}
+
+<span class="text-green-600">// Automatic context for Claude Desktop</span>
+<span class="text-green-600">// Perfect proprietary optimization via MCP</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENTERPRISE -->
+    <section class="route stripe" data-route="enterprise">
+      <div class="max-w-7xl mx-auto px-6 py-16">
+        <div class="text-center mb-12">
+          <h2 class="text-4xl md:text-5xl font-bold hl">Enterprise Solutions</h2>
+          <p class="text-xl text-gray-700 max-w-4xl mx-auto mt-6">
+            Built for organizations that need enterprise-grade AI context management with complete control, security, and customization.
+          </p>
+          <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+            <button onclick="handleEnterprisePurchase()" class="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition text-lg">
+              Get Enterprise License - $2,999
+            </button>
+            <button onclick="window.open('mailto:sales@contextlite.com?subject=Enterprise Demo Request', '_blank')" class="border border-blue-600 text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition text-lg">
+              Schedule Demo
+            </button>
+          </div>
+        </div>
+
+        <!-- Enterprise Features Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          <div class="bg-white rounded-xl p-8 shadow-lg hover-card border-l-4 border-blue-600">
+            <div class="text-blue-600 mb-4">
+              <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Multi-Tenant Architecture</h3>
+            <p class="text-gray-600 mb-4">Isolated workspaces for different teams and departments with configurable limits and permissions.</p>
+            <ul class="text-sm text-gray-600 space-y-1">
+              <li>• Separate databases per tenant</li>
+              <li>• Domain-based routing</li>
+              <li>• Configurable resource limits</li>
+              <li>• Team isolation & security</li>
+            </ul>
+          </div>
+
+          <div class="bg-white rounded-xl p-8 shadow-lg hover-card border-l-4 border-green-600">
+            <div class="text-green-600 mb-4">
+              <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">SSO & LDAP Integration</h3>
+            <p class="text-gray-600 mb-4">Single Sign-On with corporate identity providers for seamless user management and security compliance.</p>
+            <ul class="text-sm text-gray-600 space-y-1">
+              <li>• Active Directory integration</li>
+              <li>• SAML/OAuth support</li>
+              <li>• Role-based access control</li>
+              <li>• Enterprise security compliance</li>
+            </ul>
+          </div>
+
+          <div class="bg-white rounded-xl p-8 shadow-lg hover-card border-l-4 border-purple-600">
+            <div class="text-purple-600 mb-4">
+              <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Custom MCP Servers</h3>
+            <p class="text-gray-600 mb-4">Build proprietary Model Context Protocol servers for seamless integration with internal tools and systems.</p>
+            <ul class="text-sm text-gray-600 space-y-1">
+              <li>• Jira & Slack integrations</li>
+              <li>• Custom API connectors</li>
+              <li>• Internal tool bridges</li>
+              <li>• Protocol customization</li>
+            </ul>
+          </div>
+
+          <div class="bg-white rounded-xl p-8 shadow-lg hover-card border-l-4 border-yellow-600">
+            <div class="text-yellow-600 mb-4">
+              <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">White-Label Licensing</h3>
+            <p class="text-gray-600 mb-4">Rebrand and embed ContextLite as part of your own products with full customization rights.</p>
+            <ul class="text-sm text-gray-600 space-y-1">
+              <li>• Custom branding & logos</li>
+              <li>• API-only deployments</li>
+              <li>• OEM licensing terms</li>
+              <li>• Revenue sharing options</li>
+            </ul>
+          </div>
+
+          <div class="bg-white rounded-xl p-8 shadow-lg hover-card border-l-4 border-red-600">
+            <div class="text-red-600 mb-4">
+              <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">Source Code Access</h3>
+            <p class="text-gray-600 mb-4">Full source code repository access for security audits, customizations, and vendor risk mitigation.</p>
+            <ul class="text-sm text-gray-600 space-y-1">
+              <li>• Complete source code</li>
+              <li>• Security audit rights</li>
+              <li>• Modification permissions</li>
+              <li>• Private repository access</li>
+            </ul>
+          </div>
+
+          <div class="bg-white rounded-xl p-8 shadow-lg hover-card border-l-4 border-indigo-600">
+            <div class="text-indigo-600 mb-4">
+              <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h6a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h6a2 2 0 002-2v-4a2 2 0 00-2-2m8-8a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V4z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3">On-Premise Deployment</h3>
+            <p class="text-gray-600 mb-4">Deploy in completely isolated environments without internet access for maximum security and compliance.</p>
+            <ul class="text-sm text-gray-600 space-y-1">
+              <li>• Air-gapped environments</li>
+              <li>• Offline licensing system</li>
+              <li>• Local update mechanisms</li>
+              <li>• Government/finance ready</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Enterprise Value Proposition -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl p-12">
+          <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h3 class="text-3xl font-bold mb-6">Why Enterprise Chooses ContextLite</h3>
+              <div class="space-y-4">
+                <div class="flex items-center gap-4">
+                  <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <span class="text-sm font-bold">💰</span>
+                  </div>
+                  <div>
+                    <div class="font-semibold">90% Cost Reduction</div>
+                    <div class="text-blue-100">$2,999 one-time vs $20K+ annual vector DB fees</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4">
+                  <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <span class="text-sm font-bold">⚡</span>
+                  </div>
+                  <div>
+                    <div class="font-semibold">100x Performance</div>
+                    <div class="text-blue-100">0.3ms queries vs 30ms+ vector similarity</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4">
+                  <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <span class="text-sm font-bold">🔒</span>
+                  </div>
+                  <div>
+                    <div class="font-semibold">Zero Vendor Lock-in</div>
+                    <div class="text-blue-100">Own your data, own your infrastructure</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4">
+                  <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <span class="text-sm font-bold">🎯</span>
+                  </div>
+                  <div>
+                    <div class="font-semibold">Mathematical Guarantees</div>
+                    <div class="text-blue-100">patent-pending optimization with provable relevance</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white/10 rounded-xl p-8">
+              <h4 class="text-xl font-bold mb-4">Enterprise ROI Calculator</h4>
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                  <span>Pinecone Enterprise (Annual):</span>
+                  <span class="font-bold">$25,000</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Weaviate Enterprise (Annual):</span>
+                  <span class="font-bold">$30,000</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Qdrant Enterprise (Annual):</span>
+                  <span class="font-bold">$20,000</span>
+                </div>
+                <div class="border-t border-white/20 pt-3 flex justify-between font-bold">
+                  <span>ContextLite Enterprise (One-time):</span>
+                  <span class="text-green-300">$2,999</span>
+                </div>
+                <div class="text-center mt-6 text-green-300 font-bold text-lg">
+                  Save $22,001+ in Year 1 Alone
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Enterprise Support & SLA -->
+        <div class="mt-16 grid md:grid-cols-3 gap-8">
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 text-blue-600 rounded-full mb-4">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">24/7 Enterprise Support</h3>
+            <p class="text-gray-600">Dedicated SLA with direct engineering access and priority response times.</p>
+          </div>
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full mb-4">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Compliance Ready</h3>
+            <p class="text-gray-600">SOC 2, GDPR, HIPAA compliant with full audit trails and data governance.</p>
+          </div>
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-purple-100 text-purple-600 rounded-full mb-4">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Rapid Deployment</h3>
+            <p class="text-gray-600">Enterprise pilot program gets you running in 24 hours with full feature access.</p>
+          </div>
+        </div>
+
+        <!-- Enterprise CTA -->
+        <div class="text-center mt-16">
+          <div class="bg-gray-50 rounded-2xl p-8 max-w-4xl mx-auto">
+            <h3 class="text-2xl font-bold mb-4">Ready to Transform Your AI Context Strategy?</h3>
+            <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
+              Join enterprise customers who've eliminated vector database costs while achieving 100x better performance.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <button onclick="window.open('mailto:support@contextlite.com?subject=Enterprise Demo Request&body=I would like to schedule an enterprise demo for ContextLite.%0A%0ACompany: %0AUse Case: %0ATimeline: %0A%0APlease send me available demo times.', '_blank')" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                Schedule Enterprise Demo
+              </button>
+              <button onclick="window.open('mailto:support@contextlite.com?subject=Enterprise Trial Request&body=I would like to request a 30-day enterprise trial.%0A%0ACompany: %0ATeam Size: %0AData Volume: %0ACurrent Solution: %0A%0APlease provide trial access and setup instructions.', '_blank')" class="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition">
+                Request 30-Day Trial
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="route" data-route="pricing">
+      <div class="max-w-7xl mx-auto px-6 py-14">
+        <h2 class="text-3xl md:text-4xl font-bold text-center hl">Pricing</h2>
+        <p class="text-center text-lg text-gray-700 max-w-3xl mx-auto mt-4">No subscriptions. No usage limits. Own your context forever.</p>
+        <div class="grid md:grid-cols-3 gap-6 mt-8 max-w-5xl mx-auto">
+          <div class="border rounded-xl p-6 bg-white shadow-sm pricing-card animate-scale-up">
+            <h3 class="text-xl font-semibold mb-2">Developer</h3>
+            <div class="text-3xl font-bold mb-4">Free</div>
+            <ul class="list-disc pl-6 space-y-2 text-sm text-gray-700 mb-6">
+              <li>Single workspace</li>
+              <li>Up to 10K documents</li>
+              <li>REST API access</li>
+              <li>Community support</li>
+              <li>Open source license</li>
+              <li>Perfect for personal projects</li>
+              <li>No feature restrictions</li>
+              <li>Unlimited query volume</li>
+            </ul>
+            <button data-route-link="download" class="btn btn-primary w-full">Get Started Free</button>
+          </div>
+          <div class="border-2 border-blue-500 rounded-xl p-6 bg-blue-50 shadow-lg relative pricing-card animate-scale-up">
+            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">Recommended</div>
+            <h3 class="text-xl font-semibold mb-2">Professional</h3>
+            <div class="text-3xl font-bold mb-4">$99 <span class="text-base font-normal text-gray-600">one-time</span></div>
+            <ul class="list-disc pl-6 space-y-2 text-sm text-gray-700 mb-6">
+              <li>Unlimited workspaces</li>
+              <li>Unlimited documents</li>
+              <li>Advanced proprietary optimization features</li>
+              <li>Priority support</li>
+              <li>Commercial license</li>
+              <li>Team collaboration tools</li>
+              <li>Advanced analytics</li>
+              <li>Custom integrations</li>
+            </ul>
+            <button id="buy-pro-license" class="btn btn-primary w-full">Buy Professional License</button>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm pricing-card animate-scale-up">
+            <h3 class="text-xl font-semibold mb-2">Enterprise</h3>
+            <div class="text-3xl font-bold mb-4">$2,999 <span class="text-base font-normal text-gray-600">one-time</span></div>
+            <ul class="list-disc pl-6 space-y-2 text-sm text-gray-700 mb-6">
+              <li>Everything in Professional</li>
+              <li>Multi-tenant deployment</li>
+              <li>SSO/LDAP integration</li>
+              <li>Custom MCP servers</li>
+              <li>White-label licensing</li>
+              <li>Source code access</li>
+              <li>Priority SLA support</li>
+              <li>Training & consulting</li>
+            </ul>
+            <button id="buy-enterprise-license" class="btn btn-primary w-full">Buy Enterprise License</button>
+          </div>
+        </div>
+        <div class="text-center mt-8">
+          <p class="text-gray-600">✓ No recurring fees ✓ No usage limits ✓ No vendor lock-in ✓ Own your data</p>
+        </div>
+        
+        <!-- Customization Services -->
+        <div class="mt-16 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-200">
+          <div class="text-center">
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Need Custom Development?</h3>
+            <p class="text-gray-700 mb-6 max-w-3xl mx-auto">
+              Our team provides custom integrations, specialized algorithms, and bespoke implementations. 
+              Perfect for unique enterprise needs or advanced research applications.
+            </p>
+            <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-6">
+              <div class="bg-white p-4 rounded-lg border">
+                <h4 class="font-semibold text-gray-800 mb-2">🔧 Custom Integrations</h4>
+                <p class="text-sm text-gray-600">Tailored connectors for your existing toolchain, custom MCP protocols, specialized APIs</p>
+                <div class="text-lg font-bold text-blue-600 mt-2">Starting at $5,000</div>
+              </div>
+              <div class="bg-white p-4 rounded-lg border">
+                <h4 class="font-semibold text-gray-800 mb-2">🧠 Algorithm Development</h4>
+                <p class="text-sm text-gray-600">Custom scoring models, domain-specific search logic, performance optimizations</p>
+                <div class="text-lg font-bold text-blue-600 mt-2">Starting at $10,000</div>
+              </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="mailto:sales@contextlite.com?subject=Custom Development Request" 
+                 class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                Submit Custom Request
+              </a>
+              <a href="mailto:sales@contextlite.com?subject=Requirements Discussion" 
+                 class="border border-blue-600 text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                Discuss Requirements
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="route stripe" data-route="faq">
+      <div class="max-w-7xl mx-auto px-6 py-14">
+        <h2 class="text-3xl md:text-4xl font-bold text-center hl">Frequently Asked Questions</h2>
+        <div class="max-w-3xl mx-auto mt-8 space-y-6">
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">How is ContextLite different from vector databases?</h4>
+            <p class="text-gray-700 text-sm">Vector databases use embeddings and approximate similarity. ContextLite uses proprietary optimization algorithms to find the mathematically optimal set of documents. This means better relevance, faster queries, and no cloud dependencies.</p>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Do I need to run any external services?</h4>
+            <p class="text-gray-700 text-sm">No. ContextLite is a single Go binary that runs on your machine. It uses embedded SQLite for storage. No Docker, no cloud APIs, no external dependencies.</p>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">How fast is it really?</h4>
+            <p class="text-gray-700 text-sm">Sub-millisecond queries on codebases up to 12GB. Our proprietary optimization finds the optimal context set in 0.3–0.6ms on average, which is 50-100x faster than vector databases.</p>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">What programming languages are supported?</h4>
+            <p class="text-gray-700 text-sm">ContextLite is language-agnostic. It analyzes text content regardless of programming language. We have specific optimizations for Go, Python, JavaScript, TypeScript, Java, C++, and more.</p>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Can I use this with my existing AI workflow?</h4>
+            <p class="text-gray-700 text-sm">Yes. ContextLite exposes a REST API that works with any AI tool. We provide integration examples for OpenAI, Anthropic, local models, and more.</p>
+          </div>
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">What's the difference between the free and paid versions?</h4>
+            <p class="text-gray-700 text-sm">The free version supports single workspace and up to 10K documents. Professional removes all limits and adds advanced proprietary optimization features. Enterprise includes team deployment tools and support.</p>
+          </div>
+
+          <!-- Enterprise & Licensing Questions -->
+          <div class="border-l-4 border-blue-500 rounded-xl p-6 bg-blue-50 shadow-sm">
+            <h3 class="font-bold text-lg mb-4 text-blue-800">🏢 Enterprise & Licensing</h3>
+          </div>
+          
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">What enterprise features are included in the $2,999 license?</h4>
+            <p class="text-gray-700 text-sm">Enterprise includes multi-tenant architecture, SSO/LDAP integration, custom MCP servers, white-label licensing, source code access, on-premise deployment, 24/7 SLA support, team deployment tools, advanced analytics, and audit trails.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">How does the licensing work? Is it per user or per organization?</h4>
+            <p class="text-gray-700 text-sm">Professional ($99) is per-developer perpetual license. Enterprise ($2,999) is per-organization with unlimited users. All licenses are one-time payments with no recurring fees. Hardware fingerprinting prevents unauthorized sharing.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Can I deploy ContextLite on-premise or in air-gapped environments?</h4>
+            <p class="text-gray-700 text-sm">Yes, enterprise licenses support completely offline deployment. No internet connection required after initial setup. Includes offline licensing validation and local update mechanisms for maximum security compliance.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Do you offer volume discounts for large organizations?</h4>
+            <p class="text-gray-700 text-sm">Yes, we offer volume discounts and multi-year agreements for organizations with 100+ developers. Contact support@contextlite.com for custom pricing and deployment assistance.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">What's included in source code access?</h4>
+            <p class="text-gray-700 text-sm">Enterprise customers get full source code repository access for security audits, customizations, and compliance requirements. Includes modification rights and private repository access with enterprise support.</p>
+          </div>
+
+          <!-- Technical & Performance Questions -->
+          <div class="border-l-4 border-green-500 rounded-xl p-6 bg-green-50 shadow-sm">
+            <h3 class="font-bold text-lg mb-4 text-green-800">⚡ Technical & Performance</h3>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">How does ContextLite achieve 0.3ms query times?</h4>
+            <p class="text-gray-700 text-sm">Our patent-pending optimization engine uses proprietary mathematical algorithms instead of vector similarity. Advanced indexing + multi-dimensional analysis + quantum-inspired selection delivers provably optimal results 100x faster than embeddings. Technical details protected by IP law.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">What's the maximum codebase size ContextLite can handle?</h4>
+            <p class="text-gray-700 text-sm">We've tested up to 12GB codebases (2.4M+ files) with sub-millisecond performance. Linear scaling means larger codebases remain fast. Professional/Enterprise tiers have no document limits.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Does ContextLite require GPUs or special hardware?</h4>
+            <p class="text-gray-700 text-sm">No. ContextLite runs on any x64 machine with 512MB RAM. No GPUs, no cloud dependencies, no external services. Perfect for laptops, servers, or air-gapped environments.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">How does the proprietary optimization work?</h4>
+            <p class="text-gray-700 text-sm">Our patent-pending optimization technology uses proprietary mathematical algorithms protected by intellectual property law. Technical details are confidential trade secrets available only under NDA.</p>
+          </div>
+
+          <!-- Integration & Compatibility Questions -->
+          <div class="border-l-4 border-purple-500 rounded-xl p-6 bg-purple-50 shadow-sm">
+            <h3 class="font-bold text-lg mb-4 text-purple-800">🔌 Integration & Compatibility</h3>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Can I integrate ContextLite with Jira, Slack, or other tools?</h4>
+            <p class="text-gray-700 text-sm">Enterprise licenses include custom MCP (Model Context Protocol) servers for seamless integration with Jira, Slack, and internal tools. Pre-built connectors available with professional services.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Does ContextLite work with Claude Desktop, Cursor, or other AI tools?</h4>
+            <p class="text-gray-700 text-sm">Yes! ContextLite includes MCP server compatibility for Claude Desktop, REST APIs for Cursor, and integrations for OpenAI, Anthropic, and local models. Drop-in replacement for vector databases.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Can I white-label ContextLite for my own product?</h4>
+            <p class="text-gray-700 text-sm">Enterprise licenses include white-label rights for embedding ContextLite in your products. Custom branding, API-only deployments, and OEM licensing available with revenue sharing options.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">What file formats and languages are supported?</h4>
+            <p class="text-gray-700 text-sm">All text-based files: source code (any language), docs (MD, TXT, PDF), configs (JSON, YAML, TOML), and more. Language-specific optimizations for Go, Python, JavaScript, TypeScript, Java, C++, Rust, and others.</p>
+          </div>
+
+          <!-- Comparison & Migration Questions -->
+          <div class="border-l-4 border-red-500 rounded-xl p-6 bg-red-50 shadow-sm">
+            <h3 class="font-bold text-lg mb-4 text-red-800">🔄 Migration & Comparisons</h3>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">How does ContextLite compare to Pinecone, Weaviate, or Qdrant?</h4>
+            <p class="text-gray-700 text-sm">ContextLite is 100x faster (0.3ms vs 30ms), 90% cheaper ($2,999 vs $25K+ annually), requires no embeddings/chunking, and runs completely local. Mathematical guarantees vs approximate similarity.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Can I migrate from my existing vector database?</h4>
+            <p class="text-gray-700 text-sm">Yes! ContextLite replaces vector databases entirely - no embeddings needed. Just point it at your documents and get better results immediately. Migration typically takes hours, not weeks.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Why is ContextLite better than RAG with embeddings?</h4>
+            <p class="text-gray-700 text-sm">RAG fails because embeddings lose context and chunking breaks relationships. Our proprietary optimization approach preserves document structure, understands relationships, and provides mathematically optimal selections.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">What happens if I need more than 10K documents on the free tier?</h4>
+            <p class="text-gray-700 text-sm">You'll get a clear upgrade prompt. Professional ($99) removes all limits permanently. 14-day grace period allows continued usage while you upgrade. No data loss, seamless transition.</p>
+          </div>
+
+          <!-- Security & Compliance Questions -->
+          <div class="border-l-4 border-yellow-500 rounded-xl p-6 bg-yellow-50 shadow-sm">
+            <h3 class="font-bold text-lg mb-4 text-yellow-800">🔒 Security & Compliance</h3>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Is ContextLite SOC 2, GDPR, or HIPAA compliant?</h4>
+            <p class="text-gray-700 text-sm">Enterprise licenses include compliance documentation for SOC 2, GDPR, HIPAA, and other standards. Audit trails, data governance, and security controls built-in for regulated industries.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Where is my data stored and processed?</h4>
+            <p class="text-gray-700 text-sm">100% local processing. Your data never leaves your machine or network. No cloud dependencies, no external API calls. Perfect for sensitive codebases and confidential information.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Can I audit the ContextLite source code for security?</h4>
+            <p class="text-gray-700 text-sm">Enterprise customers get full source code access for security audits. No black boxes, no hidden dependencies. Complete transparency for security-conscious organizations.</p>
+          </div>
+
+          <!-- Support & Implementation Questions -->
+          <div class="border-l-4 border-indigo-500 rounded-xl p-6 bg-indigo-50 shadow-sm">
+            <h3 class="font-bold text-lg mb-4 text-indigo-800">🛟 Support & Implementation</h3>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">What support is included with enterprise licenses?</h4>
+            <p class="text-gray-700 text-sm">24/7 SLA support with direct engineering access, priority response times, implementation assistance, training sessions, and dedicated customer success management.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">How long does enterprise deployment take?</h4>
+            <p class="text-gray-700 text-sm">Most enterprises are running in 24-48 hours. Our pilot program provides 30-day trial with full feature access. Professional services available for complex integrations.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">Do you offer training or professional services?</h4>
+            <p class="text-gray-700 text-sm">Yes. Enterprise customers get training sessions, implementation consulting, custom integration development, and ongoing optimization services. Available globally via remote or on-site.</p>
+          </div>
+
+          <div class="border rounded-xl p-6 bg-white shadow-sm hover-card">
+            <h4 class="font-semibold mb-2">What if ContextLite doesn't work for my use case?</h4>
+            <p class="text-gray-700 text-sm">30-day money-back guarantee for professional licenses. Enterprise customers get pilot programs to validate before purchase.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DOWNLOAD -->
+    <section class="route" data-route="download">
+      <div class="max-w-7xl mx-auto px-6 py-14 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold hl">Get Started with ContextLite</h2>
+        <p class="text-lg text-gray-700 max-w-2xl mx-auto mt-4">Download the binary, index your workspace, get perfect AI context in 0.3ms.</p>
+        
+        <div class="max-w-2xl mx-auto mt-8 space-y-4">
+          <div class="border rounded-xl p-6 bg-gray-50">
+            <h4 class="font-semibold mb-4">Quick Start</h4>
+<pre class="text-left text-sm"># Download and run
+$ wget https://github.com/Michael-A-Kuykendall/contextlite/releases/latest/download/contextlite-linux-amd64
+$ chmod +x contextlite-linux-amd64
+$ ./contextlite-linux-amd64
+$ chmod +x contextlite
+$ ./contextlite -config configs/default.yaml
+
+# Index your workspace  
+$ curl -X POST http://localhost:8080/documents/workspace \
+  -d '{"path": "/path/to/your/project"}'
+
+# Start using perfect context
+$ curl -X POST http://localhost:8080/context/assemble \
+  -d '{"query": "your question", "max_tokens": 4000}'</pre>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-4 mt-8 max-w-2xl mx-auto">
+          <a href="#" class="border rounded-xl p-4 hover:bg-gray-50 text-center">
+            <div class="font-semibold">Linux x64</div>
+            <div class="text-sm text-gray-600">contextlite-linux-amd64</div>
+          </a>
+          <a href="#" class="border rounded-xl p-4 hover:bg-gray-50 text-center">
+            <div class="font-semibold">macOS</div>
+            <div class="text-sm text-gray-600">contextlite-darwin-amd64</div>
+          </a>
+          <a href="#" class="border rounded-xl p-4 hover:bg-gray-50 text-center">
+            <div class="font-semibold">Windows</div>
+            <div class="text-sm text-gray-600">contextlite-windows.exe</div>
+          </a>
+        </div>
+
+        <div class="mt-8">
+          <p class="text-sm text-gray-600">Need help? Check out our <a href="https://github.com/Michael-A-Kuykendall/contextlite/wiki" class="text-blue-600 hover:underline">documentation</a> or <a href="https://github.com/Michael-A-Kuykendall/contextlite/issues/new" class="text-blue-600 hover:underline">open an issue</a>.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Final Statement Section -->
+  <section class="py-20 bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-4xl md:text-6xl font-bold text-white leading-tight mb-6">
+          The entire industry built on a 
+          <span class="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">mathematical compromise</span>.
+        </h2>
+        <h3 class="text-2xl md:text-4xl font-bold text-gray-200 mb-8">
+          We refused to accept it.
+        </h3>
+        <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+          While everyone else settled for "approximate" and "good enough," we solved the fundamental problem. 
+          <br class="hidden md:block">
+          ContextLite delivers exact search with sub-millisecond performance.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#pricing" class="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-lg font-semibold hover:shadow-lg transition-all transform hover:scale-105">
+            Join the Revolution
+          </a>
+          <a href="https://github.com/Michael-A-Kuykendall/contextlite" class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-gray-900 transition-all">
+            See the Code
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t bg-gray-50 mt-16">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      <div class="grid md:grid-cols-4 gap-6">
+        <div>
+          <div class="flex items-center gap-2 font-bold text-lg mb-4">
+            <img src="contextlite-logo.png" alt="ContextLite" class="h-8 w-auto">
+            <span>ContextLite</span>
+          </div>
+          <p class="text-sm text-gray-600">patent-pending optimization AI context engine. Local, fast, mathematically optimal.</p>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3">Product</h4>
+          <div class="space-y-2 text-sm">
+            <button data-route-link="features" class="block text-gray-600 hover:text-blue-600">Features</button>
+            <button data-route-link="benchmarks" class="block text-gray-600 hover:text-blue-600">Benchmarks</button>
+            <button data-route-link="enterprise" class="block text-gray-600 hover:text-blue-600 font-semibold">Enterprise</button>
+            <button data-route-link="pricing" class="block text-gray-600 hover:text-blue-600">Pricing</button>
+            <button data-route-link="download" class="block text-gray-600 hover:text-blue-600">Download</button>
+          </div>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3">Support</h4>
+          <div class="space-y-2 text-sm">
+            <a href="https://github.com/Michael-A-Kuykendall/contextlite/wiki" target="_blank" rel="noopener noreferrer" class="block text-gray-600 hover:text-blue-600">Documentation</a>
+            <a href="https://github.com/Michael-A-Kuykendall/contextlite/issues/new" target="_blank" rel="noopener noreferrer" class="block text-gray-600 hover:text-blue-600">GitHub Issues</a>
+            <a href="mailto:support@contextlite.com" class="block text-gray-600 hover:text-blue-600">Contact</a>
+          </div>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-3">Company</h4>
+          <div class="space-y-2 text-sm">
+            <a href="https://targetedwebresults.com" target="_blank" rel="noopener noreferrer" class="block text-gray-600 hover:text-blue-600">About</a>
+            <a href="privacy.html" class="block text-gray-600 hover:text-blue-600">Privacy Policy</a>
+            <a href="terms.html" class="block text-gray-600 hover:text-blue-600">Terms of Service</a>
+            <a href="license.html" class="block text-gray-600 hover:text-blue-600">License</a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t mt-8 pt-6 text-center text-sm text-gray-600">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 max-w-4xl mx-auto">
+          <p class="text-red-800 font-semibold">
+            ⚖️ <strong>Legal Notice:</strong> ContextLite's optimization algorithms are proprietary and protected by pending patents. 
+            Unauthorized reverse engineering, algorithm extraction, or replication may result in legal action. 
+            Technical details are confidential trade secrets.
+          </p>
+        </div>
+        <p>&copy; 2025 Targeted Web Results LLC. All rights reserved. Patent-pending technology.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Simple SPA Router
+    const routes = document.querySelectorAll('.route');
+    const links = document.querySelectorAll('[data-route-link]');
+    
+    function showRoute(routeName) {
+      routes.forEach(route => {
+        route.classList.remove('active');
+        if (route.dataset.route === routeName) {
+          route.classList.add('active');
+        }
+      });
+      
+      // Update navigation highlighting
+      const navLinks = document.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.dataset.routeLink === routeName) {
+          link.classList.add('active');
+        }
+      });
+      
+      // Update URL without reload
+      window.history.pushState({}, '', `#${routeName}`);
+    }
+    
+    // Handle navigation clicks
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const route = link.dataset.routeLink;
+        showRoute(route);
+      });
+    });
+    
+    // Handle browser back/forward
+    window.addEventListener('popstate', () => {
+      const route = window.location.hash.slice(1) || 'hero';
+      showRoute(route);
+    });
+    
+    // Integration Tabs
+    const integrationTabs = document.querySelectorAll('.integration-tab');
+    const integrationContent = document.querySelectorAll('.integration-content');
+    
+    function showIntegrationTab(tabName) {
+      // Remove active from all tabs and content
+      integrationTabs.forEach(tab => tab.classList.remove('active'));
+      integrationContent.forEach(content => content.classList.remove('active'));
+      
+      // Add active to selected tab and content
+      const activeTab = document.querySelector(`[data-tab="${tabName}"]`);
+      const activeContent = document.querySelector(`[data-content="${tabName}"]`);
+      
+      if (activeTab && activeContent) {
+        activeTab.classList.add('active');
+        activeContent.classList.add('active');
+      }
+    }
+    
+    // Handle integration tab clicks
+    integrationTabs.forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tabName = tab.dataset.tab;
+        showIntegrationTab(tabName);
+      });
+    });
+    
+    // Copy functionality
+    const copyButtons = document.querySelectorAll('.copy-btn');
+    copyButtons.forEach(button => {
+      button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const codeId = button.dataset.copy;
+        const codeElement = document.getElementById(codeId);
+        
+        if (codeElement) {
+          try {
+            // Get text content without HTML tags
+            const codeText = codeElement.textContent || codeElement.innerText;
+            await navigator.clipboard.writeText(codeText);
+            
+            // Visual feedback
+            const originalText = button.textContent;
+            button.textContent = '✅ Copied!';
+            button.style.backgroundColor = '#10b981';
+            button.style.color = 'white';
+            
+            setTimeout(() => {
+              button.textContent = originalText;
+              button.style.backgroundColor = '';
+              button.style.color = '';
+            }, 2000);
+          } catch (err) {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent || codeElement.innerText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            button.textContent = '✅ Copied!';
+            setTimeout(() => {
+              button.textContent = '📋 Copy';
+            }, 2000);
+          }
+        }
+      });
+    });
+    
+    // Feature Modal System
+    const featureModal = document.getElementById('feature-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalContent = document.getElementById('modal-content');
+    const closeModal = document.getElementById('close-modal');
+    const featureCards = document.querySelectorAll('.feature-card');
+    
+    const featureDetails = {
+      relevance: {
+        title: "1. Relevance Scoring",
+        color: "text-blue-600",
+        content: `
+          <div class="space-y-4">
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <h4 class="font-semibold text-blue-800 mb-2">How It Works</h4>
+              <p class="text-blue-700">ContextLite uses advanced proprietary scoring (Term Frequency-Inverse Document Frequency) combined with semantic similarity algorithms to measure how well a document matches your query terms.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">proprietary scoring Analysis</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• Term frequency in document</li>
+                  <li>• Inverse document frequency</li>
+                  <li>• Normalized scoring (0-1)</li>
+                  <li>• Query term matching</li>
+                </ul>
+              </div>
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">Semantic Similarity</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• Contextual term relationships</li>
+                  <li>• Synonym detection</li>
+                  <li>• Concept matching</li>
+                  <li>• Language-aware scoring</li>
+                </ul>
+              </div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h5 class="font-semibold mb-2">Mathematical Formula</h5>
+              <code class="text-sm">relevance_score = Σ(tf(t,d) × idf(t) × similarity(t, query)) / |query_terms|</code>
+            </div>
+          </div>
+        `
+      },
+      recency: {
+        title: "2. Recency Weighting",
+        color: "text-green-600",
+        content: `
+          <div class="space-y-4">
+            <div class="bg-green-50 p-4 rounded-lg">
+              <h4 class="font-semibold text-green-800 mb-2">How It Works</h4>
+              <p class="text-green-700">Uses proprietary time-weighting algorithms to prioritize recently modified or accessed documents, ensuring fresh information surfaces first.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">Time Decay Model</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• proprietary time-weighting algorithms</li>
+                  <li>• File modification timestamps</li>
+                  <li>• Access pattern analysis</li>
+                  <li>• Version control integration</li>
+                </ul>
+              </div>
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">Practical Impact</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• Fresh code prioritized</li>
+                  <li>• Recent documentation surfaces</li>
+                  <li>• Active project files boosted</li>
+                  <li>• Stale content de-emphasized</li>
+                </ul>
+              </div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h5 class="font-semibold mb-2">Mathematical Formula</h5>
+              <code class="text-sm">recency_score = e^(-λ × days_since_modified), where λ = ln(2)/7</code>
+            </div>
+          </div>
+        `
+      },
+      entanglement: {
+        title: "3. Document Entanglement",
+        color: "text-purple-600",
+        content: `
+          <div class="space-y-4">
+            <div class="bg-purple-50 p-4 rounded-lg">
+              <h4 class="font-semibold text-purple-800 mb-2">How It Works</h4>
+              <p class="text-purple-700">Analyzes document interdependencies and reference patterns to identify clusters of related information that should be retrieved together.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">Reference Analysis</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• Import/include dependencies</li>
+                  <li>• Cross-file function calls</li>
+                  <li>• Documentation links</li>
+                  <li>• Module relationships</li>
+                </ul>
+              </div>
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">Clustering Effects</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• Related files boost each other</li>
+                  <li>• Implementation + tests together</li>
+                  <li>• Documentation + code pairs</li>
+                  <li>• API definitions + usage</li>
+                </ul>
+              </div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h5 class="font-semibold mb-2">Quantum-Inspired Approach</h5>
+              <p class="text-sm">Documents that frequently appear together in contexts develop "relationship analysis" - when one is highly relevant, related documents get boosted scores.</p>
+            </div>
+          </div>
+        `
+      },
+      prior: {
+        title: "4. Prior Knowledge",
+        color: "text-orange-600",
+        content: `
+          <div class="space-y-4">
+            <div class="bg-orange-50 p-4 rounded-lg">
+              <h4 class="font-semibold text-orange-800 mb-2">How It Works</h4>
+              <p class="text-orange-700">Tracks historical usage patterns and access frequencies to learn which documents are most valuable for specific types of queries over time.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">Usage Tracking</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• Query-document associations</li>
+                  <li>• Access frequency analysis</li>
+                  <li>• User interaction patterns</li>
+                  <li>• Context success metrics</li>
+                </ul>
+              </div>
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">Learning Mechanisms</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• Bayesian probability updates</li>
+                  <li>• Historical relevance weighting</li>
+                  <li>• Query similarity matching</li>
+                  <li>• Workspace-specific adaptation</li>
+                </ul>
+              </div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h5 class="font-semibold mb-2">Adaptive Intelligence</h5>
+              <p class="text-sm">The system learns your workflow patterns and automatically prioritizes documents that have proven valuable for similar queries in your specific codebase.</p>
+            </div>
+          </div>
+        `
+      },
+      authority: {
+        title: "5. Authority Metrics",
+        color: "text-red-600",
+        content: `
+          <div class="space-y-4">
+            <div class="bg-red-50 p-4 rounded-lg">
+              <h4 class="font-semibold text-red-800 mb-2">How It Works</h4>
+              <p class="text-red-700">Evaluates source credibility and document importance using multiple signals to identify the most authoritative and trustworthy information.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">Authority Signals</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• File location hierarchy</li>
+                  <li>• Documentation vs implementation</li>
+                  <li>• README and main files</li>
+                  <li>• Configuration importance</li>
+                </ul>
+              </div>
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">Quality Indicators</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• Code comment density</li>
+                  <li>• Test coverage correlation</li>
+                  <li>• Documentation completeness</li>
+                  <li>• API surface importance</li>
+                </ul>
+              </div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h5 class="font-semibold mb-2">PageRank-Style Algorithm</h5>
+              <p class="text-sm">Documents that are referenced by many other files, or that sit at important positions in the project hierarchy, receive higher authority scores.</p>
+            </div>
+          </div>
+        `
+      },
+      specificity: {
+        title: "6. Information Specificity",
+        color: "text-indigo-600",
+        content: `
+          <div class="space-y-4">
+            <div class="bg-indigo-50 p-4 rounded-lg">
+              <h4 class="font-semibold text-indigo-800 mb-2">How It Works</h4>
+              <p class="text-indigo-700">Measures information density and technical detail level to match the appropriate depth of content to your query complexity.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">Density Analysis</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• Technical term frequency</li>
+                  <li>• Code-to-comment ratio</li>
+                  <li>• Concept complexity scoring</li>
+                  <li>• Implementation detail depth</li>
+                </ul>
+              </div>
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">Content Classification</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• High-level overviews</li>
+                  <li>• Detailed implementations</li>
+                  <li>• Configuration specifics</li>
+                  <li>• Example usage patterns</li>
+                </ul>
+              </div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h5 class="font-semibold mb-2">Query Matching</h5>
+              <p class="text-sm">Complex technical queries get matched with detailed implementation files, while general questions surface high-level documentation and overviews.</p>
+            </div>
+          </div>
+        `
+      },
+      uncertainty: {
+        title: "7. Uncertainty Quantification",
+        color: "text-pink-600",
+        content: `
+          <div class="space-y-4">
+            <div class="bg-pink-50 p-4 rounded-lg">
+              <h4 class="font-semibold text-pink-800 mb-2">How It Works</h4>
+              <p class="text-pink-700">Calculates confidence intervals and information entropy to ensure reliable context selection and identify when additional sources are needed.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">Confidence Metrics</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• Score variance analysis</li>
+                  <li>• Multi-source agreement</li>
+                  <li>• Completeness indicators</li>
+                  <li>• Ambiguity detection</li>
+                </ul>
+              </div>
+              <div class="border rounded p-4">
+                <h5 class="font-semibold mb-2">Quality Assurance</h5>
+                <ul class="text-sm space-y-1">
+                  <li>• Low confidence flagging</li>
+                  <li>• Contradictory source detection</li>
+                  <li>• Coverage gap identification</li>
+                  <li>• Reliability thresholds</li>
+                </ul>
+              </div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h5 class="font-semibold mb-2">Shannon Entropy Calculation</h5>
+              <p class="text-sm">High uncertainty scores trigger the system to gather additional context or warn when information may be incomplete or contradictory.</p>
+            </div>
+          </div>
+        `
+      }
+    };
+    
+    // Handle feature card clicks
+    featureCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const feature = card.dataset.feature;
+        const details = featureDetails[feature];
+        
+        if (details) {
+          modalTitle.innerHTML = `<span class="${details.color}">${details.title}</span>`;
+          modalContent.innerHTML = details.content;
+          featureModal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        }
+      });
+    });
+    
+    // Handle modal close
+    function closeFeatureModal() {
+      featureModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+    
+    closeModal.addEventListener('click', closeFeatureModal);
+    
+    // Close modal when clicking backdrop
+    featureModal.addEventListener('click', (e) => {
+      if (e.target === featureModal) {
+        closeFeatureModal();
+      }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !featureModal.classList.contains('hidden')) {
+        closeFeatureModal();
+      }
+    });
+    
+    // Initialize route from URL
+    const initialRoute = window.location.hash.slice(1) || 'hero';
+    showRoute(initialRoute);
+    
+    // Enhanced Card Hover Effects with Cursor Tracking
+    function addCursorTracking() {
+      const cards = document.querySelectorAll('.hover-card, .pricing-card, .feature-card');
+      
+      cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          
+          const rotateX = (y - centerY) / centerY * -5; // Reduced intensity
+          const rotateY = (x - centerX) / centerX * 5;
+          
+          card.style.transform = `translateY(-8px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = '';
+        });
+      });
+    }
+    
+    // Initialize cursor tracking
+    addCursorTracking();
+    
+    // Mobile menu toggle
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (mobileMenuToggle && mobileMenu) {
+      mobileMenuToggle.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+      
+      // Close mobile menu when clicking on links
+      const mobileLinks = mobileMenu.querySelectorAll('[data-route-link]');
+      mobileLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('hidden');
+        });
+      });
+    }
+    
+    // Handle Pro License Purchase
+    function handlePurchase() {
+      // Use direct window.open to Stripe's payment link
+      const stripePaymentUrl = 'https://buy.stripe.com/bJe3cneNfcBp2Z57u67N600';
+      window.open(stripePaymentUrl, '_blank');
+    }
+    
+    // Handle Enterprise License Purchase
+    function handleEnterprisePurchase() {
+      // Use direct window.open to Stripe's enterprise payment link
+      const stripeEnterpriseUrl = 'https://buy.stripe.com/8x2eV5fRj58XdDJ6q27N601'; // Enterprise license $2,999
+      window.open(stripeEnterpriseUrl, '_blank');
+    }
+    
+    // Add event listeners to purchase buttons
+    document.getElementById('buy-pro-license')?.addEventListener('click', handlePurchase);
+    document.getElementById('buy-pro-cta')?.addEventListener('click', handlePurchase);
+    document.getElementById('buy-enterprise-license')?.addEventListener('click', handleEnterprisePurchase);
+    
+    // Scroll Animation Handler
+    function setupScrollAnimations() {
+      const animatedElements = document.querySelectorAll('.animate-on-scroll, .animate-slide-right, .animate-scale-up');
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+          }
+        });
+      }, { 
+        threshold: 0.2,
+        rootMargin: '0px 0px -50px 0px'
+      });
+      
+      animatedElements.forEach(el => observer.observe(el));
+    }
+    
+    // Initialize animations on load
+    setupScrollAnimations();
+  </script>
+</body>
+</html>

@@ -60,7 +60,8 @@ func main() {
         Package:         "./pkg/storage/...",
         Coverage:        0.0 / 100.0,
         TestsPassing:    0,
-        TestsTotal:      0,
+        TestsTotal:      0
+0,
         ProductionReady: false,
         Priority:        priority,
         RevenueImpact:   revenueImpact,
@@ -109,5 +110,6 @@ func main() {
     os.WriteFile(registryPath, data, 0644)
     
     fmt.Printf("Registry updated: %s (%.1f%% coverage, %d/%d tests)\n",
-        "Storage Layer", 0.0, 0, 0)
+        "Storage Layer", 0.0, 0, 0
+0)
 }

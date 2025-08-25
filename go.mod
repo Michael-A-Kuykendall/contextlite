@@ -1,18 +1,14 @@
 module contextlite
 
-go 1.23.0
-
-toolchain go1.24.6
+go 1.21
 
 require (
 	github.com/denisbrodbeck/machineid v1.0.1
-	github.com/go-chi/chi/v5 v5.2.2
+	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-chi/cors v1.2.1
-	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/stretchr/testify v1.8.1
 	github.com/stripe/stripe-go/v74 v74.30.0
 	go.uber.org/zap v1.25.0
-	golang.org/x/time v0.12.0
 	gopkg.in/yaml.v3 v3.0.1
 	modernc.org/sqlite v1.27.0
 )

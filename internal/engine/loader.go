@@ -73,14 +73,16 @@ func findPrivateBinary() string {
 
 // getExecutableDir returns the directory containing the current executable
 func getExecutableDir() string {
-	if execPath, err := os.Executable(); err == nil {
+	if execPath, err := getExecutablePath(); err == nil {
 		return filepath.Dir(execPath)
 	}
-	// Fallback to current directory if executable path fails
-	if cwd, err := filepath.Abs("."); err == nil {
-		return cwd
-	}
 	return "."
+}
+
+// getExecutablePath returns the path to the current executable
+func getExecutablePath() (string, error) {
+	// This is a simplified version - could be enhanced with more robust detection
+	return filepath.Abs(".")
 }
 
 // PrivateEngineAvailable checks if private JSON CLI binary is available
