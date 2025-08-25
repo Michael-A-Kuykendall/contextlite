@@ -15,7 +15,7 @@ description: |
   - Enterprise features: multi-tenancy, licensing, advanced analytics
 
 grade: stable
-confinement: strict
+confinement: classic
 base: core22
 
 architectures:
@@ -24,17 +24,6 @@ architectures:
 
 apps:
   contextlite:
-    command: bin/contextlite
-    daemon: simple
-    restart-condition: always
-    plugs:
-      - network
-      - network-bind
-      - home
-    environment:
-      PATH: $SNAP/bin:$PATH
-
-  contextlite-cli:
     command: bin/contextlite
     plugs:
       - network
@@ -50,11 +39,18 @@ parts:
     source-type: git
     build-snaps: [go/1.21/stable]
     override-build: |
-      # Build the binary
-      cd $SNAPCRAFT_PART_SRC
-      CGO_ENABLED=0 go build -ldflags="-s -w" -o $SNAPCRAFT_PART_INSTALL/bin/contextlite ./cmd/contextlite
+      # Ensure CGO is disabled for static binary
+      export CGO_ENABLED=0
+      export GOOS=linux
       
-      # Copy any additional files
+      # Build the main binary
+      cd $SNAPCRAFT_PART_SRC
+      go build -ldflags="-s -w" -o $SNAPCRAFT_PART_INSTALL/bin/contextlite ./cmd/contextlite
+      
+      # Verify the binary was created
+      ls -la $SNAPCRAFT_PART_INSTALL/bin/
+      
+      # Copy any additional files if they exist
       if [ -f configs/default.yaml ]; then
         mkdir -p $SNAPCRAFT_PART_INSTALL/etc/contextlite
         cp configs/default.yaml $SNAPCRAFT_PART_INSTALL/etc/contextlite/
@@ -62,18 +58,3 @@ parts:
     
     stage-packages:
       - ca-certificates
-
-plugs:
-  home:
-    interface: home
-  network:
-    interface: network
-  network-bind:
-    interface: network-bind
-
-slots:
-  contextlite-api:
-    interface: content
-    content: contextlite-api
-    read:
-      - $SNAP_DATA
