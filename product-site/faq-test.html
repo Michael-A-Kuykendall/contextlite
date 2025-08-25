@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FAQ Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .route{display:none} 
+    .route.active{display:block}
+  </style>
+</head>
+<body>
+  <nav class="p-4 bg-gray-100">
+    <button onclick="showRoute('faq')" class="bg-blue-500 text-white px-4 py-2 rounded">Go to FAQ</button>
+    <button onclick="showRoute('test')" class="bg-green-500 text-white px-4 py-2 rounded ml-2">Go to Test</button>
+  </nav>
+
+  <section class="route active" data-route="test">
+    <div class="p-8">
+      <h1 class="text-2xl font-bold">Test Section</h1>
+      <p>This is the test section that should be visible by default.</p>
+    </div>
+  </section>
+
+  <section class="route" data-route="faq">
+    <div class="p-8">
+      <h1 class="text-2xl font-bold">FAQ Section</h1>
+      <div class="space-y-4">
+        <div class="border p-4 rounded">
+          <h3 class="font-semibold">Test Question 1</h3>
+          <p>This is a test answer to see if the FAQ displays properly.</p>
+        </div>
+        <div class="border p-4 rounded">
+          <h3 class="font-semibold">Test Question 2</h3>
+          <p>Another test answer to verify functionality.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    function showRoute(routeName) {
+      console.log('Showing route:', routeName);
+      const routes = document.querySelectorAll('.route');
+      routes.forEach(route => {
+        route.classList.remove('active');
+        console.log('Removed active from:', route.dataset.route);
+        if (route.dataset.route === routeName) {
+          route.classList.add('active');
+          console.log('Added active to:', route.dataset.route);
+        }
+      });
+    }
+
+    // Test hash navigation
+    if (window.location.hash === '#faq') {
+      showRoute('faq');
+    }
+  </script>
+</body>
+</html>

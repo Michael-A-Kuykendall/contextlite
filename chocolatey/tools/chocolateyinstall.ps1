@@ -2,41 +2,34 @@ $ErrorActionPreference = 'Stop'
 
 $packageName = 'contextlite'
 $toolsDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$url64 = 'RELEASE_URL_PLACEHOLDER'
+$url64 = 'https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v1.0.0/contextlite_1.0.0_windows_amd64.exe'
 
 # Package parameters
 $packageArgs = @{
-  packageName    = $packageName
-  unzipLocation  = $toolsDir
-  fileType       = 'zip'
-  url64bit       = $url64
-  softwareName   = 'ContextLite*'
+  packageName   = $packageName
+  unzipLocation = $toolsDir
+  fileType      = 'exe'
+  url64bit      = $url64
+  softwareName  = 'ContextLite*'
   
-  # Checksums - Dynamic replacement by CI
-  checksum64     = 'RELEASE_CHECKSUM_PLACEHOLDER'
-  checksumType64 = 'sha256'
+  # Checksums
+  checksum64    = 'YOUR_CHECKSUM_HERE'
+  checksumType64= 'sha256'
   
-  validExitCodes = @(0)
+  # Silent install arguments (not needed for single exe)
+  silentArgs    = ""
+  validExitCodes= @(0)
 }
 
-Install-ChocolateyZipPackage @packageArgs
+# Download and install
+Install-ChocolateyPackage @packageArgs
 
-# After extraction, the Windows archive contains contextlite.exe
-# Support potential future naming (contextlite-windows-*.exe) by probing.
-$candidateNames = @('contextlite.exe','contextlite-windows-amd64.exe','contextlite-windows-arm64.exe')
-$exePath = $null
-foreach ($name in $candidateNames) {
-  $p = Join-Path $toolsDir $name
-  if (Test-Path $p) { $exePath = $p; break }
+# Create a shim for the executable
+$exePath = Join-Path $toolsDir 'contextlite.exe'
+if (Test-Path $exePath) {
+    Install-ChocolateyShim -Name 'contextlite' -Path $exePath
+    Write-Host "ContextLite installed successfully!" -ForegroundColor Green
+    Write-Host "Use 'contextlite --help' to get started." -ForegroundColor Yellow
+} else {
+    Write-Error "Installation failed - executable not found at $exePath"
 }
-
-if (-not $exePath) {
-  Write-Error "Installation failed - no executable found in $toolsDir"
-  exit 1
-}
-
-# Create shim named 'contextlite'
-Install-ChocolateyShim -Name 'contextlite' -Path $exePath
-Write-Host "ContextLite installed successfully!" -ForegroundColor Green
-Write-Host "Binary: $exePath" -ForegroundColor DarkGray
-Write-Host "Use 'contextlite --help' to get started." -ForegroundColor Yellow

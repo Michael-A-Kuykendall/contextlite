@@ -1,0 +1,67 @@
+{
+  "components": {
+    "client": {
+      "name": "Client Library",
+      "package": "./pkg/contextlite/...",
+      "coverage": 0,
+      "tests_passing": 0,
+      "tests_total": 0,
+      "production_ready": false,
+      "priority": "HIGH",
+      "revenue_impact": "MEDIUM",
+      "last_updated": "2025-08-18T15:24:11.0677005-05:00"
+    },
+    "core_engine": {
+      "name": "Core Engine",
+      "package": "./internal/engine/...",
+      "coverage": 0.113,
+      "tests_passing": 4,
+      "tests_total": 4,
+      "production_ready": false,
+      "priority": "HIGH",
+      "revenue_impact": "MEDIUM",
+      "last_updated": "2025-08-18T15:24:11.0131236-05:00"
+    },
+    "license_management": {
+      "name": "License Management",
+      "package": "./internal/license/...",
+      "coverage": 0.183,
+      "tests_passing": 39,
+      "tests_total": 39,
+      "production_ready": false,
+      "priority": "CRITICAL",
+      "revenue_impact": "CRITICAL",
+      "last_updated": "2025-08-18T15:23:44.0757188-05:00"
+    },
+    "license_server": {
+      "name": "License Server",
+      "package": "./cmd/license-server/...",
+      "coverage": 0,
+      "tests_passing": 62,
+      "tests_total": 64,
+      "production_ready": false,
+      "priority": "CRITICAL",
+      "revenue_impact": "CRITICAL",
+      "last_updated": "2025-08-18T15:24:09.8891649-05:00"
+    },
+    "rest_api": {
+      "name": "REST API",
+      "package": "./cmd/contextlite/...",
+      "coverage": 0.13,
+      "tests_passing": 16,
+      "tests_total": 16,
+      "production_ready": false,
+      "priority": "HIGH",
+      "revenue_impact": "MEDIUM",
+      "last_updated": "2025-08-18T15:24:12.8820702-05:00"
+    }
+  },
+  "last_update": "2025-08-18T15:24:12.8820702-05:00",
+  "overall_coverage": 0.0852,
+  "system_health": "TESTING_REQUIRED",
+  "production_readiness": 0,
+  "critical_alerts": [
+    "CRITICAL: License Management not production ready (18.3% coverage)",
+    "CRITICAL: License Server not production ready (0.0% coverage)"
+  ]
+}

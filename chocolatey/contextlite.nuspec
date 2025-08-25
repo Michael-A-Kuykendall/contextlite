@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>contextlite</id>
-    <version>VERSION_PLACEHOLDER</version>
+    <version>1.0.0</version>
     <packageSourceUrl>https://github.com/Michael-A-Kuykendall/contextlite/tree/main/chocolatey</packageSourceUrl>
     <owners>ContextLite Team</owners>
     <title>ContextLite</title>
@@ -13,7 +13,7 @@
     <licenseUrl>https://github.com/Michael-A-Kuykendall/contextlite/blob/main/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/Michael-A-Kuykendall/contextlite</projectSourceUrl>
-    <docsUrl>https://github.com/Michael-A-Kuykendall/contextlite#readme</docsUrl>
+    <docsUrl>https://docs.contextlite.com</docsUrl>
     <bugTrackerUrl>https://github.com/Michael-A-Kuykendall/contextlite/issues</bugTrackerUrl>
     <tags>contextlite context ai retrieval search database sqlite cli</tags>
     <summary>Ultra-fast context engine for retrieval and AI applications</summary>
@@ -47,13 +47,13 @@ contextlite --port 8080
 3. Query for relevant content
 4. Get lightning-fast results
 
-Visit https://github.com/Michael-A-Kuykendall/contextlite#readme for complete documentation.
+Visit https://docs.contextlite.com for complete documentation.
 
 ## Package Notes
 
 This Chocolatey package installs the ContextLite binary and makes it available system-wide via PATH.
     ]]></description>
-    <releaseNotes>https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/VERSION_PLACEHOLDER</releaseNotes>
+    <releaseNotes>https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/v1.0.0</releaseNotes>
     <dependencies>
       <!-- No dependencies - single binary -->
     </dependencies>
