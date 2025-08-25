@@ -1,0 +1,162 @@
+# Production Deployment Configuration
+name: Demo Site Deployment
+type: Full-Stack Web Application
+status: Ready for Production
+
+# Frontend Configuration (Vercel)
+frontend:
+  platform: Vercel
+  domain: demo.contextlite.com
+  build_command: npm run build
+  output_directory: .next
+  node_version: 18.x
+  
+  environment_variables:
+    NEXT_PUBLIC_API_URL: https://demo-api.contextlite.com
+    NEXT_PUBLIC_SITE_URL: https://demo.contextlite.com
+    
+  vercel_config: |
+    {
+      "framework": "nextjs",
+      "buildCommand": "npm run build",
+      "devCommand": "npm run dev",
+      "installCommand": "npm install",
+      "outputDirectory": ".next"
+    }
+
+# Backend Configuration (Railway)
+backend:
+  platform: Railway
+  domain: demo-api.contextlite.com
+  build_command: npm run build
+  start_command: npm start
+  node_version: 18.x
+  
+  environment_variables:
+    PORT: 3001
+    NODE_ENV: production
+    FRONTEND_URL: https://demo.contextlite.com
+    CORS_ORIGIN: https://demo.contextlite.com
+    
+  railway_config: |
+    {
+      "deploy": {
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      }
+    }
+
+# Domain Configuration
+domains:
+  primary: demo.contextlite.com
+  api: demo-api.contextlite.com
+  cdn: cdn.contextlite.com
+  
+  dns_records:
+    - type: CNAME
+      name: demo
+      value: cname.vercel-dns.com
+    - type: CNAME  
+      name: demo-api
+      value: railway.app
+
+# Performance Optimizations
+optimizations:
+  frontend:
+    - Next.js static generation
+    - Image optimization
+    - Component code splitting
+    - CDN delivery via Vercel Edge Network
+    
+  backend:
+    - Express.js with clustering
+    - Response compression
+    - Rate limiting (100 req/min per IP)
+    - WebSocket connection pooling
+
+# Security Configuration
+security:
+  cors:
+    origin: https://demo.contextlite.com
+    credentials: true
+    methods: ["GET", "POST", "OPTIONS"]
+    
+  rate_limiting:
+    window: 900000  # 15 minutes
+    max_requests: 100
+    
+  headers:
+    helmet: true
+    csp: |
+      default-src 'self';
+      script-src 'self' 'unsafe-eval' 'unsafe-inline';
+      style-src 'self' 'unsafe-inline';
+      connect-src 'self' wss://demo-api.contextlite.com;
+
+# Monitoring & Analytics
+monitoring:
+  uptime:
+    - Vercel: Built-in monitoring
+    - Railway: Built-in health checks
+    
+  analytics:
+    - Google Analytics 4
+    - Vercel Analytics (speed insights)
+    - Custom conversion tracking
+    
+  alerts:
+    - Error rate > 1%
+    - Response time > 2000ms
+    - Downtime > 30 seconds
+
+# Deployment Workflow
+deployment:
+  trigger: git push to main branch
+  
+  frontend_steps:
+    1. Vercel auto-deploys from GitHub
+    2. Build optimization and static generation
+    3. Edge network distribution
+    4. Domain assignment
+    
+  backend_steps:
+    1. Railway auto-deploys from GitHub  
+    2. TypeScript compilation
+    3. Health check validation
+    4. Load balancer update
+
+# Rollback Strategy
+rollback:
+  automatic:
+    - Health check failures
+    - Error rate > 5%
+    - Build failures
+    
+  manual:
+    - Vercel: Previous deployment restore
+    - Railway: Previous container rollback
+    - DNS: Cloudflare quick switch
+
+# Cost Estimation
+costs:
+  vercel:
+    plan: Pro ($20/month)
+    bandwidth: Included up to 1TB
+    build_minutes: 6000/month included
+    
+  railway:
+    plan: Hobby ($5/month)  
+    resources: 1GB RAM, 1 vCPU
+    uptime: 99.9% SLA
+
+# Integration Points
+integrations:
+  main_site:
+    - Cross-domain session sharing
+    - Unified analytics tracking
+    - Conversion funnel integration
+    
+  github:
+    - Auto-deployment on push
+    - PR preview deployments
+    - Status checks integration

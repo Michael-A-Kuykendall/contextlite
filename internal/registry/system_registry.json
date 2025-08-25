@@ -1,15 +1,29 @@
 {
   "components": {
+    "": {
+      "name": "",
+      "package": "test/package",
+      "coverage": 0.85,
+      "tests_passing": 8,
+      "tests_total": 8,
+      "production_ready": true,
+      "priority": "",
+      "revenue_impact": "",
+      "last_updated": "2025-08-24T21:26:49.5063912-05:00",
+      "functions": [],
+      "dependencies": [],
+      "performance_metrics": {}
+    },
     "AnotherComponent": {
       "name": "AnotherComponent",
       "package": "another/package",
       "coverage": 0.85,
-      "tests_passing": 7,
-      "tests_total": 7,
+      "tests_passing": 15,
+      "tests_total": 15,
       "production_ready": true,
       "priority": "",
       "revenue_impact": "",
-      "last_updated": "2025-08-22T17:35:14.4904983-05:00",
+      "last_updated": "2025-08-24T21:26:49.602456-05:00",
       "functions": [],
       "dependencies": [],
       "performance_metrics": {}
@@ -18,12 +32,12 @@
       "name": "RegistryIntegration",
       "package": "internal/registry",
       "coverage": 0.85,
-      "tests_passing": 7,
-      "tests_total": 7,
+      "tests_passing": 15,
+      "tests_total": 15,
       "production_ready": true,
       "priority": "",
       "revenue_impact": "",
-      "last_updated": "2025-08-22T17:35:14.5329971-05:00",
+      "last_updated": "2025-08-24T21:26:49.6504558-05:00",
       "functions": [],
       "dependencies": [],
       "performance_metrics": {}
@@ -32,12 +46,12 @@
       "name": "TestComponent",
       "package": "test/package",
       "coverage": 0.85,
-      "tests_passing": 14,
-      "tests_total": 14,
+      "tests_passing": 38,
+      "tests_total": 38,
       "production_ready": true,
       "priority": "",
       "revenue_impact": "",
-      "last_updated": "2025-08-22T17:35:14.5459976-05:00",
+      "last_updated": "2025-08-24T21:26:49.661955-05:00",
       "functions": [],
       "dependencies": [],
       "performance_metrics": {}
@@ -46,12 +60,26 @@
       "name": "TestRegistry",
       "package": "internal/registry",
       "coverage": 0.85,
-      "tests_passing": 7,
-      "tests_total": 7,
+      "tests_passing": 15,
+      "tests_total": 15,
       "production_ready": true,
       "priority": "",
       "revenue_impact": "",
-      "last_updated": "2025-08-22T17:35:14.5045007-05:00",
+      "last_updated": "2025-08-24T21:26:49.6189562-05:00",
+      "functions": [],
+      "dependencies": [],
+      "performance_metrics": {}
+    },
+    "ValidComponent": {
+      "name": "ValidComponent",
+      "package": "test/package",
+      "coverage": 0.85,
+      "tests_passing": 4,
+      "tests_total": 4,
+      "production_ready": true,
+      "priority": "",
+      "revenue_impact": "",
+      "last_updated": "2025-08-24T21:26:49.4928929-05:00",
       "functions": [],
       "dependencies": [],
       "performance_metrics": {}
@@ -212,12 +240,12 @@
     }
   },
   "last_update": "0001-01-01T00:00:00Z",
-  "overall_coverage": 0.8272666666666667,
+  "overall_coverage": 0.8299411764705881,
   "system_health": "TESTING_COMPLETE",
-  "production_readiness": 80,
+  "production_readiness": 82.35294117647058,
   "critical_alerts": [
-    "LOW_COVERAGE: Context Engine below 80% coverage (68.0%)",
     "LOW_COVERAGE: License System below 80% coverage (77.1%)",
-    "LOW_COVERAGE: License Server below 80% coverage (75.9%)"
+    "LOW_COVERAGE: License Server below 80% coverage (75.9%)",
+    "LOW_COVERAGE: Context Engine below 80% coverage (68.0%)"
   ]
 }

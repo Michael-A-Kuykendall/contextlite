@@ -1,0 +1,69 @@
+{
+  "timestamp": "2025-08-24T21:26:49.3126561-05:00",
+  "config": {
+    "output_path": "test_edge_case.json",
+    "systems_to_test": [
+      "bm25_baseline"
+    ],
+    "query_types": [
+      "factual",
+      "analytical",
+      "creative"
+    ],
+    "max_documents": 5,
+    "budget_tokens": 4000,
+    "run_iterations": 1,
+    "significance_test": true
+  },
+  "system_results": {
+    "bm25_baseline": {
+      "system_type": "bm25_baseline",
+      "query_count": 6,
+      "mean_recall_at_1": 0.023809523809523808,
+      "mean_recall_at_3": 0.047619047619047616,
+      "mean_recall_at_5": 0.09523809523809523,
+      "mean_recall_at_10": 0.09523809523809523,
+      "mean_ndcg_at_1": 0.16666666666666666,
+      "mean_ndcg_at_3": 0.13065359161791476,
+      "mean_ndcg_at_5": 0.13775472211053696,
+      "mean_ndcg_at_10": 0.13775472211053696,
+      "mean_map": 0.07658730158730159,
+      "mean_mrr": 0.16666666666666666,
+      "mean_precision": 0.13333333333333333,
+      "mean_f1_score": 0.1111111111111111,
+      "mean_latency_ms": 15.166666666666666,
+      "mean_memory_mb": 22,
+      "mean_context_length": 4350,
+      "std_recall_at_5": 0.21295885499997996,
+      "std_ndcg_at_5": 0.308028922860754,
+      "std_latency_ms": 0.3726779962499649
+    }
+  },
+  "summary": {
+    "ranking_by_recall_5": [
+      {
+        "system": "bm25_baseline",
+        "score": 0.09523809523809523,
+        "rank": 1
+      }
+    ],
+    "ranking_by_ndcg_5": [
+      {
+        "system": "bm25_baseline",
+        "score": 0.13775472211053696,
+        "rank": 1
+      }
+    ],
+    "ranking_by_latency": [
+      {
+        "system": "bm25_baseline",
+        "score": 15.166666666666666,
+        "rank": 1
+      }
+    ],
+    "significance_tests": {},
+    "best_overall_system": "bm25_baseline",
+    "best_efficiency_system": "bm25_baseline",
+    "sota_advantage_percent": 0
+  }
+}

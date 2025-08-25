@@ -1,0 +1,29 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev", 
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://demo-api.contextlite.com",
+    "NEXT_PUBLIC_SITE_URL": "https://demo.contextlite.com"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_API_URL": "https://demo-api.contextlite.com",
+      "NEXT_PUBLIC_SITE_URL": "https://demo.contextlite.com"
+    }
+  },
+  "functions": {
+    "app/page.tsx": {
+      "maxDuration": 10
+    }
+  },
+  "regions": ["iad1"],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://demo-api.contextlite.com/api/$1"
+    }
+  ]
+}
