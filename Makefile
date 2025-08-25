@@ -71,6 +71,11 @@ test: ## Run all tests with automatic registry update
 	@echo "📊 Updating registry with latest test results..."
 	@go run scripts/update_coverage_registry.go
 
+# Run unit tests only (excludes integration tests)
+test-unit: ## Run only unit tests (fast, no integration tests)
+	@echo "Running unit tests only..."
+	go test -v ./internal/storage ./internal/timing ./pkg/config ./pkg/tokens ./pkg/types ./cmd/dashboard ./cmd/production-check ./cmd/registry-runner ./cmd/sota-eval ./test/license
+
 # Run tests with coverage
 coverage: ## Run tests with coverage report and registry update
 	@echo "Running tests with coverage..."

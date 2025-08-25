@@ -40,6 +40,10 @@ type Storage struct {
 
 // New creates a new Storage instance
 func New(dbPath string) (*Storage, error) {
+	if dbPath == "" {
+		return nil, fmt.Errorf("database path cannot be empty")
+	}
+	
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
@@ -355,13 +359,13 @@ func (s *Storage) searchFTS(ctx context.Context, query string, limit int) ([]typ
 
 // searchLike performs LIKE search as fallback
 func (s *Storage) searchLike(ctx context.Context, query string, limit int) ([]types.Document, error) {
-	likeQuery := "%" + strings.ReplaceAll(query, " ", "%") + "%"
+	likeQuery := "%" + strings.ReplaceAll(strings.ToLower(query), " ", "%") + "%"
 	rows, err := s.db.QueryContext(ctx, `
 		SELECT id, content, content_hash, path, lang, mtime,
 		       token_count, model_id, quantum_score, entanglement_map,
 		       coherence_history, created_at, updated_at
 		FROM documents 
-		WHERE content LIKE ?
+		WHERE LOWER(content) LIKE ?
 		ORDER BY LENGTH(content)
 		LIMIT ?`, likeQuery, limit)
 	if err != nil {
@@ -425,6 +429,10 @@ func (s *Storage) GetDocumentByPath(ctx context.Context, path string) (*types.Do
 
 // DeleteDocument removes a document
 func (s *Storage) DeleteDocument(ctx context.Context, id string) error {
+	if id == "" {
+		return fmt.Errorf("document ID cannot be empty")
+	}
+	
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
