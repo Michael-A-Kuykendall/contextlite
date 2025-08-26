@@ -18,11 +18,14 @@ on:
         type: choice
         options:
           - 'all'
+          - 'snap'
           - 'chocolatey'
           - 'npm'
           - 'pypi'
           - 'docker'
           - 'crates'
+          - 'snap,chocolatey'
+          - 'snap,npm'
           - 'chocolatey,npm'
           - 'chocolatey,pypi'
           - 'npm,pypi,docker'
@@ -115,7 +118,7 @@ jobs:
             
             **Package Managers:** Available on npm, PyPI, Docker Hub, and more.
           draft: false
-          prerelease: true
+          prerelease: false
           files: |
             release/*.tar.gz
             release/*.zip
@@ -376,7 +379,7 @@ jobs:
           $version = "${{ steps.version.outputs.version }}"
           $versionWithV = "${{ steps.version.outputs.version_with_v }}"
           (Get-Content contextlite.nuspec -Raw).Replace('VERSION_PLACEHOLDER', $version).Replace('releases/tag/VERSION_PLACEHOLDER', "releases/tag/$versionWithV") | Set-Content contextlite.nuspec
-          $downloadUrl = "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/$versionWithV/contextlite-$versionWithV-windows-amd64.zip"
+          $downloadUrl = "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/$versionWithV/contextlite-$version-windows-amd64.zip"
           Invoke-WebRequest -Uri $downloadUrl -OutFile contextlite-windows.zip
           $checksum = (Get-FileHash contextlite-windows.zip -Algorithm SHA256).Hash
           $installScript = (Get-Content tools/chocolateyinstall.ps1 -Raw).Replace('RELEASE_URL_PLACEHOLDER', $downloadUrl).Replace('RELEASE_CHECKSUM_PLACEHOLDER', $checksum)
