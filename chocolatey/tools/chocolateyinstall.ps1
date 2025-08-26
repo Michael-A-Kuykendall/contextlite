@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 
 $packageName = 'contextlite'
 $toolsDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$url64 = "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v$env:ChocolateyPackageVersion/contextlite-$env:ChocolateyPackageVersion-windows-amd64.zip"
+$url64 = "RELEASE_URL_PLACEHOLDER"
 
 # Package parameters
 $packageArgs = @{
@@ -13,7 +13,7 @@ $packageArgs = @{
   softwareName  = 'ContextLite*'
   
   # Checksums will be updated by workflow
-  checksum64    = $env:ChocolateyChecksum64
+  checksum64    = "RELEASE_CHECKSUM_PLACEHOLDER"
   checksumType64= 'sha256'
   
   # Silent install arguments (not needed for single exe)
