@@ -65,8 +65,9 @@ jobs:
         run: |
           cd dist
           
-          # Clean up any existing directories
-          rm -rf contextlite-*-temp contextlite-linux-amd64 contextlite-darwin-amd64 contextlite-darwin-arm64
+          # Clean up any existing directories (safely)
+          rm -rf contextlite-*-temp 2>/dev/null || true
+          rm -f contextlite-linux-amd64 contextlite-darwin-amd64 contextlite-darwin-arm64 2>/dev/null || true
           
           # Windows ZIP (flat structure for Chocolatey)
           cp contextlite-windows-amd64.exe contextlite.exe
