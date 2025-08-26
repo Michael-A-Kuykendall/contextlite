@@ -2,19 +2,19 @@ class Contextlite < Formula
   desc "Ultra-fast context engine for retrieval and AI applications"
   homepage "https://contextlite.com"
   url "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v1.0.0/contextlite_1.0.0_darwin_amd64.tar.gz"
-  sha256 "YOUR_SHA256_CHECKSUM_HERE"
+  sha256 ""
   license "MIT"
 
   depends_on "git"
 
   on_intel do
     url "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v1.0.0/contextlite_1.0.0_darwin_amd64.tar.gz"
-    sha256 "YOUR_SHA256_AMD64_HERE"
+    sha256 ""
   end
 
   on_arm do
     url "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v1.0.0/contextlite_1.0.0_darwin_arm64.tar.gz"
-    sha256 "YOUR_SHA256_ARM64_HERE"
+    sha256 ""
   end
 
   def install
