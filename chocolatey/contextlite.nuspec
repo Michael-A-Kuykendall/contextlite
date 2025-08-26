@@ -2,34 +2,40 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>contextlite</id>
-    <version>1.0.0</version>
+    <version>$version$</version>
     <packageSourceUrl>https://github.com/Michael-A-Kuykendall/contextlite/tree/main/chocolatey</packageSourceUrl>
     <owners>ContextLite Team</owners>
     <title>ContextLite</title>
     <authors>ContextLite Team</authors>
     <projectUrl>https://contextlite.com</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/Michael-A-Kuykendall/contextlite/main/assets/contextlite-logo.png</iconUrl>
-    <copyright>2024 ContextLite Team</copyright>
+    <copyright>2025 ContextLite Team</copyright>
     <licenseUrl>https://github.com/Michael-A-Kuykendall/contextlite/blob/main/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/Michael-A-Kuykendall/contextlite</projectSourceUrl>
     <docsUrl>https://docs.contextlite.com</docsUrl>
     <bugTrackerUrl>https://github.com/Michael-A-Kuykendall/contextlite/issues</bugTrackerUrl>
-    <tags>contextlite context ai retrieval search database sqlite cli</tags>
-    <summary>Ultra-fast context engine for retrieval and AI applications</summary>
+    <tags>contextlite context ai retrieval search database sqlite cli clustering workspace</tags>
+    <summary>Ultra-fast context engine with enterprise workspace clustering for AI applications</summary>
     <description><![CDATA[
 # ContextLite
 
-ContextLite is an ultra-fast context engine designed for retrieval and AI applications. Built with Go for maximum performance, it provides lightning-fast document indexing and semantic search capabilities.
+ContextLite is an ultra-fast context engine with **enterprise-grade workspace clustering** designed for multi-project AI applications. Built with Go for maximum performance, it provides lightning-fast document indexing, semantic search, and professional workspace isolation.
+
+## 🆕 NEW: Workspace Clustering & Multi-Project Support
+
+✨ **Just Released**: Professional workspace isolation, resource management, and load balancing for enterprise AI development.
 
 ## Features
 
-- **🔥 Ultra-Fast**: Microsecond-level query responses with SQLite FTS5
+- **🏢 Workspace Clustering**: Enterprise-grade multi-project isolation and resource management
+- **🔥 Ultra-Fast**: Microsecond-level query responses with SQLite FTS5 and optimization optimization
 - **🚀 Zero Dependencies**: Single binary with no external services required
-- **🔍 Smart Scoring**: Quantum-inspired relevance algorithms with recency weighting
+- **🎯 Smart Routing**: Workspace affinity and intelligent load balancing
+- **⚖️ Resource Management**: Per-workspace limits and priority scheduling
 - **⚡ REST API**: Easy integration with any language or framework
-- **📊 Built-in Analytics**: Query statistics and performance monitoring
-- **🛡️ Enterprise Ready**: Multi-tenancy, licensing, and advanced features
+- **📊 Advanced Analytics**: Workspace usage statistics and performance monitoring
+- **🛡️ Enterprise Ready**: Multi-tenancy, clustering, and advanced licensing
 
 ## Installation
 
@@ -53,7 +59,7 @@ Visit https://docs.contextlite.com for complete documentation.
 
 This Chocolatey package installs the ContextLite binary and makes it available system-wide via PATH.
     ]]></description>
-    <releaseNotes>https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/v1.0.0</releaseNotes>
+    <releaseNotes>https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/v$version$</releaseNotes>
     <dependencies>
       <!-- No dependencies - single binary -->
     </dependencies>

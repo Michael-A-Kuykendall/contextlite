@@ -1,0 +1,141 @@
+# ContextLite Cluster Configuration
+# Sample configuration for multi-project clustering support
+
+cluster:
+  enabled: true
+  node_id: "contextlite-node-1"  # Auto-generated if not specified
+  
+  discovery:
+    method: "static"              # "static", "consul", "etcd", "k8s"
+    endpoints:
+      - "localhost:8080"
+      - "localhost:8081"
+      - "localhost:8082"
+    service_name: "contextlite"
+    ttl_seconds: 30
+    tags:
+      - "optimization-enabled"
+      - "local-cluster"
+
+  affinity:
+    workspace_routing: true       # Enable workspace-specific routing
+    sticky_sessions: true         # Pin user sessions to same node
+    default_tier: "medium"        # Default resource tier for new workspaces
+    rules:
+      "mission-architect":
+        preferred_nodes: ["contextlite-node-1"]
+        resource_tier: "high"
+        sticky_session: true
+        locality: "same-rack"
+      "development":
+        resource_tier: "medium"
+        sticky_session: false
+        locality: "any"
+      "archive":
+        resource_tier: "low"
+        avoid_nodes: ["contextlite-node-1"]
+        locality: "any"
+
+  load_balancing:
+    strategy: "workspace_hash"    # "round_robin", "least_connections", "resource_based", "workspace_hash"
+    health_check_interval: 30     # seconds
+    unhealthy_threshold: 3        # failed checks before unhealthy
+    healthy_threshold: 2          # successful checks before healthy
+    max_load_factor: 0.85         # 0.0 - 1.0
+    enable_circuit_breaker: true
+
+  resource_limits:
+    "mission-architect":
+      max_concurrent_requests: 10
+      max_tokens_per_minute: 50000
+      max_documents_per_query: 20
+      max_memory_mb: 512
+      max_storage_mb: 2048
+      priority: 8
+    "development":
+      max_concurrent_requests: 5
+      max_tokens_per_minute: 20000
+      max_documents_per_query: 10
+      max_memory_mb: 256
+      max_storage_mb: 1024
+      priority: 5
+    "archive":
+      max_concurrent_requests: 2
+      max_tokens_per_minute: 5000
+      max_documents_per_query: 5
+      max_memory_mb: 128
+      max_storage_mb: 5120
+      priority: 2
+
+  health_check:
+    interval: 15                  # seconds between health checks
+    timeout: 5                    # health check timeout
+    unhealthy_threshold: 3        # failed checks before unhealthy
+    healthy_threshold: 2          # successful checks before healthy
+    endpoint: "/health/cluster"   # health check endpoint path
+
+# Server configuration
+server:
+  port: 8080
+  host: "0.0.0.0"
+  cors_enabled: true
+  auth_token: ""                  # Set via CONTEXTLITE_AUTH_TOKEN env var
+
+# Storage configuration  
+storage:
+  database_path: "./data/contextlite.db"
+  cache_size_mb: 64
+
+# optimization system configuration
+optimization:
+  solver_timeout_ms: 5000
+  max_opt_gap: 0.1
+  max_candidates: 100
+  max_pairs_per_doc: 10
+  integer_scaling: 1000
+  objective_style: "weighted-sum"
+  z3:
+    binary_path: ""               # Auto-detect if empty
+    enable_verification: false
+    max_verification_docs: 5
+
+# 7D feature weights
+weights:
+  relevance: 0.25
+  recency: 0.15
+  entanglement: 0.20
+  prior: 0.10
+  authority: 0.10
+  specificity: 0.15
+  uncertainty: 0.05
+  redundancy_penalty: 2.0
+  coherence_bonus: 1.5
+  weight_update_rate: 0.1
+  weight_caps: [0.01, 1.0]
+
+# Lexicographic ordering
+lexicographic:
+  compute_at_runtime: false
+
+# Epsilon budgets
+epsilon_budget:
+  max_redundancy: 0.3
+  min_coherence: 0.7
+  min_recency: 0.1
+
+# Tokenizer
+tokenizer:
+  model_id: "gpt-4"
+  max_tokens_default: 4000
+
+# Cache settings
+cache:
+  l1_size: 100
+  l2_ttl_minutes: 30
+  l3_enabled: false
+
+# Logging
+logging:
+  level: "info"
+  include_timings: true
+  include_optimization_metrics: true
