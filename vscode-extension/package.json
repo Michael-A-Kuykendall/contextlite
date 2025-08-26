@@ -1,7 +1,7 @@
 {
   "name": "contextlite",
-  "displayName": "ContextLite - Intelligent Context Engine",
-  "description": "Lightning-fast context retrieval for AI coding assistants. Zero-dependency local search with quantum-inspired scoring.",
+  "displayName": "ContextLite - Enterprise Context Engine with Clustering",
+  "description": "Lightning-fast context retrieval with workspace clustering for AI coding assistants. Multi-project isolation and advanced resource management.",
   "version": "1.0.42",
   "publisher": "ContextLite",
   "engines": {
@@ -19,7 +19,11 @@
     "copilot",
     "assistant",
     "rag",
-    "retrieval"
+    "retrieval",
+    "clustering",
+    "workspace",
+    "enterprise",
+    "multi-project"
   ],
   "activationEvents": [
     "onStartupFinished"

@@ -19,6 +19,7 @@ type Config struct {
 	Tokenizer TokenizerConfig `yaml:"tokenizer"`
 	Cache     CacheConfig    `yaml:"cache"`
 	Logging   LoggingConfig  `yaml:"logging"`
+	Cluster   ClusterConfig  `yaml:"cluster"`
 }
 
 type ServerConfig struct {
@@ -96,6 +97,72 @@ type LoggingConfig struct {
 	Level             string `yaml:"level"`
 	IncludeTimings    bool   `yaml:"include_timings"`
 	IncludeSMTMetrics bool   `yaml:"include_smt_metrics"`
+}
+
+// ClusterConfig defines clustering and multi-project support settings
+type ClusterConfig struct {
+	Enabled         bool                              `yaml:"enabled"`
+	NodeID          string                            `yaml:"node_id"`
+	Discovery       DiscoveryConfig                   `yaml:"discovery"`
+	Affinity        AffinityConfig                    `yaml:"affinity"`
+	LoadBalancing   LoadBalancingConfig               `yaml:"load_balancing"`
+	ResourceLimits  map[string]WorkspaceResourceLimits `yaml:"resource_limits"`
+	HealthCheck     HealthCheckConfig                 `yaml:"health_check"`
+}
+
+// DiscoveryConfig defines how nodes discover each other
+type DiscoveryConfig struct {
+	Method      string   `yaml:"method"`       // "static", "consul", "etcd", "k8s"
+	Endpoints   []string `yaml:"endpoints"`    // Discovery service endpoints
+	ServiceName string   `yaml:"service_name"` // Service name for discovery
+	TTLSeconds  int      `yaml:"ttl_seconds"`  // Registration TTL
+	Tags        []string `yaml:"tags"`         // Service tags for discovery
+}
+
+// AffinityConfig defines project affinity and routing rules
+type AffinityConfig struct {
+	WorkspaceRouting bool                           `yaml:"workspace_routing"`
+	StickySessions   bool                           `yaml:"sticky_sessions"`
+	Rules            map[string]WorkspaceAffinityRule `yaml:"rules"`
+	DefaultTier      string                         `yaml:"default_tier"` // "low", "medium", "high"
+}
+
+// WorkspaceAffinityRule defines routing rules for a specific workspace
+type WorkspaceAffinityRule struct {
+	PreferredNodes []string `yaml:"preferred_nodes"`
+	AvoidNodes     []string `yaml:"avoid_nodes"`
+	ResourceTier   string   `yaml:"resource_tier"`
+	StickySession  bool     `yaml:"sticky_session"`
+	Locality       string   `yaml:"locality"`
+}
+
+// LoadBalancingConfig defines load balancing strategy
+type LoadBalancingConfig struct {
+	Strategy              string  `yaml:"strategy"`                // "round_robin", "least_connections", "resource_based", "workspace_hash"
+	HealthCheckInterval   int     `yaml:"health_check_interval"`   // Seconds
+	UnhealthyThreshold    int     `yaml:"unhealthy_threshold"`     // Failed checks before marking unhealthy
+	HealthyThreshold      int     `yaml:"healthy_threshold"`       // Successful checks before marking healthy
+	MaxLoadFactor         float64 `yaml:"max_load_factor"`         // 0.0 - 1.0
+	EnableCircuitBreaker  bool    `yaml:"enable_circuit_breaker"`
+}
+
+// WorkspaceResourceLimits defines resource constraints for a workspace
+type WorkspaceResourceLimits struct {
+	MaxConcurrentRequests int   `yaml:"max_concurrent_requests"`
+	MaxTokensPerMinute   int   `yaml:"max_tokens_per_minute"`
+	MaxDocumentsPerQuery int   `yaml:"max_documents_per_query"`
+	MaxMemoryMB         int64 `yaml:"max_memory_mb"`
+	MaxStorageMB        int64 `yaml:"max_storage_mb"`
+	Priority            int   `yaml:"priority"` // 1-10, higher = more priority
+}
+
+// HealthCheckConfig defines cluster health checking behavior
+type HealthCheckConfig struct {
+	Interval           int    `yaml:"interval"`            // Seconds between health checks
+	Timeout            int    `yaml:"timeout"`             // Health check timeout in seconds
+	UnhealthyThreshold int    `yaml:"unhealthy_threshold"` // Failed checks before unhealthy
+	HealthyThreshold   int    `yaml:"healthy_threshold"`   // Successful checks before healthy
+	Endpoint           string `yaml:"endpoint"`            // Health check endpoint path
 }
 
 // Load loads configuration from file with environment variable overrides

@@ -1,7 +1,7 @@
 {
   "name": "contextlite",
   "version": "1.0.0",
-  "description": "Ultra-fast context engine for retrieval and AI applications",
+  "description": "Ultra-fast context engine with enterprise workspace clustering for AI applications",
   "keywords": [
     "context",
     "ai",
@@ -12,7 +12,11 @@
     "sqlite",
     "fast",
     "cli",
-    "binary"
+    "binary",
+    "clustering",
+    "workspace",
+    "enterprise",
+    "multi-project"
   ],
   "author": {
     "name": "ContextLite Team",

@@ -65,3 +65,38 @@ logging:
   level: "debug"
   include_timings: true
   include_smt_metrics: true
+
+# Clustering and multi-workspace configuration
+cluster:
+  enabled: false              # Set to true to enable clustering features
+  node_id: ""                 # Auto-generated if not specified
+  
+  discovery:
+    method: "static"          # "static", "consul", "etcd", "k8s"
+    endpoints: []             # Discovery service endpoints
+    service_name: "contextlite"
+    ttl_seconds: 30
+    tags: ["local-dev"]
+    
+  affinity:
+    workspace_routing: false  # Enable workspace-specific routing
+    sticky_sessions: false    # Pin sessions to same node
+    default_tier: "medium"    # Default resource tier
+    rules: {}                 # Workspace-specific affinity rules
+    
+  load_balancing:
+    strategy: "round_robin"   # "round_robin", "least_connections", "resource_based", "workspace_hash"
+    health_check_interval: 30 # seconds
+    unhealthy_threshold: 3
+    healthy_threshold: 2
+    max_load_factor: 0.85
+    enable_circuit_breaker: false
+    
+  resource_limits: {}         # Per-workspace resource limits
+  
+  health_check:
+    interval: 15              # seconds between health checks
+    timeout: 5                # health check timeout
+    unhealthy_threshold: 3
+    healthy_threshold: 2
+    endpoint: "/health/cluster"

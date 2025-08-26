@@ -1,10 +1,10 @@
 # ContextLite
 
-> **SMT-optimized context sidecar for AI systems** - 10,000x faster than vector databases, 100% local, zero dependencies.
+> **High-performance context engine for AI systems** - Ultra-fast document retrieval, 100% local, zero dependencies.
 
-ContextLite is a Go-based context assembly engine that uses **Satisfiability Modulo Theories (SMT)** optimization to select the perfect set of documents for AI context windows. Built for speed, privacy, and local operation.
+ContextLite is a Go-based context assembly engine that uses advanced optimization techniques to select the most relevant documents for AI context windows. Built for speed, privacy, and local operation.
 
-📚 **[Complete Technical Wiki](./COMPLETE_TECHNICAL_WIKI.md)** - Comprehensive documentation with architecture, API reference, performance benchmarks, and integration patterns.
+📚 **[Documentation](./docs/)** - Technical guides and API reference for integration and development.
 
 ## 🚀 Quick Start
 
@@ -30,10 +30,46 @@ make dev
 
 The server starts on `http://localhost:8080` by default.
 
+## 🔄 Automatic Port Management
+
+ContextLite now supports **automatic port discovery** for applications that need to connect to running instances without hardcoded port numbers:
+
+```go
+// No more port configuration drift!
+client := NewAutoDiscoveryClient()
+if err := client.AutoDiscover(); err != nil {
+    log.Fatal("No ContextLite instances found")
+}
+
+// Automatically connects to healthy instance
+result, err := client.Query("your query here", 10)
+```
+
+**Key Benefits:**
+- ✅ **Zero Configuration**: Automatically discovers running instances
+- ✅ **Port Conflict Resolution**: Works with multiple concurrent instances  
+- ✅ **Automatic Failover**: Switches between healthy instances seamlessly
+- ✅ **Development Friendly**: No more "port already in use" errors
+- ✅ **Production Ready**: Built-in health monitoring and redundancy
+
+**Example Usage:**
+```bash
+# Start multiple instances on different ports
+./contextlite --config configs/workspace1.yaml &  # Starts on 8080
+./contextlite --config configs/workspace2.yaml &  # Auto-finds 8081
+./contextlite --config configs/workspace3.yaml &  # Auto-finds 8082
+
+# Your application automatically discovers and connects to all instances
+go run examples/automatic_port_management.go
+```
+
+See [`examples/automatic_port_management.go`](examples/automatic_port_management.go) for a complete integration example.
+
 ## ✨ Key Features
 
 - **SMT-Optimized Selection**: Uses constraint satisfaction for mathematically optimal document selection
 - **7D Feature Scoring**: Multi-dimensional relevance, recency, entanglement, prior, authority, specificity, uncertainty
+- **Workspace Clustering**: Multi-project support with resource isolation and affinity routing
 - **Per-Workspace Calibration**: Adaptive weights that learn from your usage patterns  
 - **Multi-Level Caching**: L1 memory, L2 SQLite, L3 quantum snapshots with intelligent invalidation
 - **Zero Dependencies**: Pure Go with embedded SQLite, no external services required
@@ -42,13 +78,10 @@ The server starts on `http://localhost:8080` by default.
 
 ## 📖 Documentation
 
-- **[Complete Technical Wiki](./COMPLETE_TECHNICAL_WIKI.md)** - Full documentation including:
-  - Architecture & Design
-  - API Reference with examples
-  - Performance benchmarks & optimization
-  - Integration patterns for VS Code, CLI, web apps
-  - SMT theory and 7-dimensional feature system
-  - HuggingFace deployment and distribution
+- **[Documentation](./docs/)** - Architecture guides and API reference
+- **[Clustering Guide](./docs/CLUSTERING_GUIDE.md)** - Multi-project and workspace management
+- **[Contributing Guide](CONTRIBUTING.md)** - Development setup and guidelines  
+- **[License](LICENSE)** - MIT License terms
 
 ## 🏗️ Repository Structure
 
@@ -58,13 +91,13 @@ contextlite/
 │   ├── contextlite/           # HTTP sidecar server
 │   └── sota-eval/             # SOTA comparison CLI tool
 ├── internal/                  # Private implementation
-│   ├── smt/                   # SMT solver integration (Z3)
+│   ├── optimization/          # Advanced optimization engine
 │   ├── storage/               # SQLite + FTS5 storage layer
-│   ├── features/              # 7D feature extraction & scoring
+│   ├── features/              # Multi-dimensional feature extraction & scoring
 │   ├── pipeline/              # Main assembly pipeline
 │   ├── cache/                 # Multi-level caching system
 │   ├── api/                   # HTTP API handlers
-│   └── evaluation/            # SOTA evaluation framework
+│   └── evaluation/            # Performance evaluation framework
 ├── pkg/                       # Public API packages
 │   ├── types/                 # Core data structures
 │   ├── config/                # Configuration management
@@ -97,6 +130,40 @@ weights:
   specificity: 0.05            # Query-document topic alignment
   uncertainty: 0.05            # Score variance (subtracted)
 ```
+
+## 🏘️ Workspace Clustering
+
+ContextLite supports clustering for managing multiple projects and workspaces:
+
+```yaml
+# Enable clustering in configs/cluster.yaml
+cluster:
+  enabled: true
+  node_id: "contextlite-node-1"
+  
+  affinity:
+    workspace_routing: true
+    sticky_sessions: true
+    rules:
+      "mission-architect":
+        preferred_nodes: ["node-1"]
+        resource_tier: "high"
+        
+  resource_limits:
+    "mission-architect":
+      max_concurrent_requests: 10
+      max_tokens_per_minute: 50000
+      max_memory_mb: 512
+```
+
+**Workspace-aware requests:**
+```bash
+curl -H "X-Workspace-ID: mission-architect" \
+     -X POST http://localhost:8080/api/v1/assemble \
+     -d '{"query": "AI enforcement patterns"}'
+```
+
+See the [Clustering Guide](./docs/CLUSTERING_GUIDE.md) for complete setup instructions.
 
 ## 📡 HTTP API
 

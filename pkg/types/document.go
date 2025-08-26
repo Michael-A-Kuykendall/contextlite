@@ -20,6 +20,12 @@ type Document struct {
 	CreatedAt      time.Time         `json:"created_at" db:"created_at"`
 	UpdatedAt      time.Time         `json:"updated_at" db:"updated_at"`
 	Metadata       map[string]string `json:"metadata,omitempty"`
+	
+	// Clustering and Project Affinity Fields
+	ProjectTags    []string         `json:"project_tags,omitempty"`
+	WorkspaceID    string           `json:"workspace_id,omitempty" db:"workspace_id"`
+	ResourceTier   string           `json:"resource_tier,omitempty" db:"resource_tier"` // "low", "medium", "high"
+	Affinity       *ProjectAffinity `json:"affinity,omitempty"`
 }
 
 // DocumentReference represents a document in query results
@@ -61,4 +67,67 @@ type Concept struct {
 	Term  string `json:"term" db:"term"`
 	TF    int    `json:"tf" db:"tf"`
 	DF    int    `json:"df" db:"df"`
+}
+
+// ProjectAffinity defines cluster routing preferences for documents
+type ProjectAffinity struct {
+	PreferredNode  string   `json:"preferred_node,omitempty"`   // Node ID to prefer for this document
+	RequiredNodes  []string `json:"required_nodes,omitempty"`   // Nodes that MUST handle this document
+	AvoidNodes     []string `json:"avoid_nodes,omitempty"`      // Nodes to avoid for this document
+	Locality       string   `json:"locality,omitempty"`         // "same-rack", "same-zone", "any"
+	StickySession  bool     `json:"sticky_session,omitempty"`   // Pin queries to same node
+}
+
+// WorkspaceInfo provides workspace-level clustering metadata
+type WorkspaceInfo struct {
+	ID              string                 `json:"id"`
+	Name            string                 `json:"name"`
+	DocumentCount   int                    `json:"document_count"`
+	ResourceUsage   ResourceUsage          `json:"resource_usage"`
+	AffinityRules   map[string]interface{} `json:"affinity_rules"`
+	LastAccessTime  time.Time              `json:"last_access_time"`
+	AccessPattern   string                 `json:"access_pattern"` // "high-frequency", "normal", "archive"
+}
+
+// ResourceUsage tracks resource consumption per workspace
+type ResourceUsage struct {
+	MemoryMB        int64     `json:"memory_mb"`
+	QueryCount      int64     `json:"query_count"`
+	DocumentCount   int       `json:"document_count"`
+	AvgResponseTime float64   `json:"avg_response_time_ms"`
+	LastUpdated     time.Time `json:"last_updated"`
+}
+
+// ClusterNodeInfo represents a ContextLite node in the cluster
+type ClusterNodeInfo struct {
+	ID               string                    `json:"id"`
+	Address          string                    `json:"address"`
+	Port             int                       `json:"port"`
+	Status           NodeStatus                `json:"status"`
+	Workspaces       []WorkspaceInfo           `json:"workspaces"`
+	ResourceLimits   ResourceLimits            `json:"resource_limits"`
+	LoadFactor       float64                   `json:"load_factor"`       // 0.0 - 1.0
+	LastHeartbeat    time.Time                 `json:"last_heartbeat"`
+	Version          string                    `json:"version"`
+	Features         []string                  `json:"features"`          // Supported features
+}
+
+// NodeStatus represents the health state of a cluster node
+type NodeStatus string
+
+const (
+	NodeStatusHealthy     NodeStatus = "healthy"
+	NodeStatusDegraded    NodeStatus = "degraded"
+	NodeStatusUnhealthy   NodeStatus = "unhealthy"
+	NodeStatusMaintenance NodeStatus = "maintenance"
+	NodeStatusOffline     NodeStatus = "offline"
+)
+
+// ResourceLimits defines resource constraints for a workspace or node
+type ResourceLimits struct {
+	MaxConcurrentRequests int   `json:"max_concurrent_requests"`
+	MaxTokensPerMinute   int   `json:"max_tokens_per_minute"`
+	MaxDocumentsPerQuery int   `json:"max_documents_per_query"`
+	MaxMemoryMB         int64 `json:"max_memory_mb"`
+	MaxStorageMB        int64 `json:"max_storage_mb"`
 }
