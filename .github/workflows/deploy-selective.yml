@@ -183,6 +183,47 @@ jobs:
           asset_name: contextlite-${{ inputs.version }}-darwin-arm64.tar.gz
           asset_content_type: application/gzip
 
+      # Upload individual binaries for direct download/legacy architecture
+      - name: Upload Windows Binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/contextlite-windows-amd64.exe
+          asset_name: contextlite-windows-amd64.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux Binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/contextlite-linux-amd64
+          asset_name: contextlite-linux-amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS Binary (AMD64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/contextlite-darwin-amd64
+          asset_name: contextlite-darwin-amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS Binary (ARM64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/contextlite-darwin-arm64
+          asset_name: contextlite-darwin-arm64
+          asset_content_type: application/octet-stream
+
   # Chocolatey deployment
   deploy-chocolatey:
     runs-on: windows-latest
