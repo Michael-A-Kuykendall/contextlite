@@ -170,6 +170,10 @@ try {
 
 ## 🌐 Examples
 
+## ⚙️ Dependency Note
+
+We currently pin `node-fetch` to version 2.x to keep the distributed wrapper CommonJS-compatible. Version 3 of `node-fetch` is pure ESM and causes runtime errors (`ERR_REQUIRE_ESM`) when required from the transpiled `lib/` output that uses CommonJS. A future update will provide dual ESM/CJS builds; at that point this pin can be lifted.
+
 ### Document Management
 
 ```typescript
