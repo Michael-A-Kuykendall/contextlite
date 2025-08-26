@@ -65,15 +65,15 @@ jobs:
         run: |
           cd dist
           
-          # Clean up any existing directories (safely)
+          # Clean up any existing directories (safely) 
           rm -rf contextlite-*-temp 2>/dev/null || true
-          rm -f contextlite-linux-amd64 contextlite-darwin-amd64 contextlite-darwin-arm64 2>/dev/null || true
+          # NOTE: Don't remove the binaries we just built!
           
           # Windows ZIP (flat structure for Chocolatey)
           cp contextlite-windows-amd64.exe contextlite.exe
           cp ../README.md ../LICENSE .
           zip contextlite-${{ inputs.version }}-windows-amd64.zip contextlite.exe README.md LICENSE
-          rm contextlite.exe README.md LICENSE  # Clean up temp files
+          rm -f contextlite.exe README.md LICENSE  # Clean up temp files
           
           # Linux TAR.GZ
           mkdir contextlite-linux-amd64-temp
