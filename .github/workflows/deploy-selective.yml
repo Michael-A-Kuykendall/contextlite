@@ -65,28 +65,35 @@ jobs:
         run: |
           cd dist
           
+          # Clean up any existing directories
+          rm -rf contextlite-*-temp contextlite-linux-amd64 contextlite-darwin-amd64 contextlite-darwin-arm64
+          
           # Windows ZIP (flat structure for Chocolatey)
           cp contextlite-windows-amd64.exe contextlite.exe
           cp ../README.md ../LICENSE .
           zip contextlite-${{ inputs.version }}-windows-amd64.zip contextlite.exe README.md LICENSE
+          rm contextlite.exe README.md LICENSE  # Clean up temp files
           
           # Linux TAR.GZ
-          mkdir contextlite-linux-amd64  
-          cp contextlite-linux-amd64 contextlite-linux-amd64/
-          cp ../README.md ../LICENSE contextlite-linux-amd64/
-          tar -czf contextlite-${{ inputs.version }}-linux-amd64.tar.gz contextlite-linux-amd64
+          mkdir contextlite-linux-amd64-temp
+          cp contextlite-linux-amd64 contextlite-linux-amd64-temp/contextlite
+          cp ../README.md ../LICENSE contextlite-linux-amd64-temp/
+          tar -czf contextlite-${{ inputs.version }}-linux-amd64.tar.gz -C contextlite-linux-amd64-temp .
+          rm -rf contextlite-linux-amd64-temp
           
           # macOS TAR.GZ (AMD64)
-          mkdir contextlite-darwin-amd64
-          cp contextlite-darwin-amd64 contextlite-darwin-amd64/
-          cp ../README.md ../LICENSE contextlite-darwin-amd64/
-          tar -czf contextlite-${{ inputs.version }}-darwin-amd64.tar.gz contextlite-darwin-amd64
+          mkdir contextlite-darwin-amd64-temp
+          cp contextlite-darwin-amd64 contextlite-darwin-amd64-temp/contextlite
+          cp ../README.md ../LICENSE contextlite-darwin-amd64-temp/
+          tar -czf contextlite-${{ inputs.version }}-darwin-amd64.tar.gz -C contextlite-darwin-amd64-temp .
+          rm -rf contextlite-darwin-amd64-temp
           
           # macOS TAR.GZ (ARM64)
-          mkdir contextlite-darwin-arm64
-          cp contextlite-darwin-arm64 contextlite-darwin-arm64/
-          cp ../README.md ../LICENSE contextlite-darwin-arm64/
-          tar -czf contextlite-${{ inputs.version }}-darwin-arm64.tar.gz contextlite-darwin-arm64
+          mkdir contextlite-darwin-arm64-temp
+          cp contextlite-darwin-arm64 contextlite-darwin-arm64-temp/contextlite
+          cp ../README.md ../LICENSE contextlite-darwin-arm64-temp/
+          tar -czf contextlite-${{ inputs.version }}-darwin-arm64.tar.gz -C contextlite-darwin-arm64-temp .
+          rm -rf contextlite-darwin-arm64-temp
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
