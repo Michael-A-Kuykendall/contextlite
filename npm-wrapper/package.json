@@ -52,7 +52,7 @@
     "node": ">=14.0.0"
   },
   "dependencies": {
-    "node-fetch": "^3.3.0",
+    "node-fetch": "^2.6.7",
     "tar": "^6.1.0"
   },
   "devDependencies": {
