@@ -1,24 +1,24 @@
 # ContextLite
 
-> **High-performance context engine with workspace clustering** - Multi-project AI context management, 100% local, zero dependencies.
+> **High-performance context engine with workspace management** - Multi-project AI context management, 100% local, zero dependencies.
 
-ContextLite is a Go-based context assembly engine with advanced optimization optimization and **enterprise-grade workspace clustering**. Perfect for managing multiple AI projects with isolated resource management and intelligent load balancing.
+ContextLite is a Go-based context assembly engine with advanced optimization and **enterprise-grade workspace management**. Perfect for managing multiple AI projects with isolated resource management and intelligent load balancing.
 
-## 🆕 **NEW: Workspace Clustering & Multi-Project Support**
+## 🆕 **NEW: Workspace Management & Multi-Project Support**
 
 ✨ **Just Released**: Professional workspace isolation, resource management, and load balancing for multi-project AI development.
 
-📚 **[Documentation](./docs/)** | 🏘️ **[Clustering Guide](./docs/CLUSTERING_GUIDE.md)** | 📡 **[API Reference](./docs/API_REFERENCE.md)**
+📚 **[Documentation](./docs/)** | 🏘️ **[Management Guide](./docs/CLUSTERING_GUIDE.md)** | 📡 **[API Reference](./docs/API_REFERENCE.md)**
 
-## 🏢 **Enterprise Workspace Clustering**
+## 🏢 **Enterprise Workspace Management**
 
 Manage multiple AI projects with professional-grade isolation and resource management:
 
 ```bash
-# Enable clustering in your config
-cluster:
+# Enable workspace management in your config
+workspace:
   enabled: true
-  workspace_routing: true
+  isolation: true
   resource_limits:
     "mission-architect":
       max_concurrent_requests: 10
@@ -33,8 +33,8 @@ curl -H "X-Workspace-ID: mission-architect" \
 
 **Key Benefits:**
 - 🏘️ **Workspace Isolation**: Complete separation of projects and resources
-- ⚖️ **Resource Management**: Per-workspace limits and priority scheduling  
-- 🎯 **Affinity Routing**: Smart request routing and session management
+- ⚖️ **Resource Management**: Per-workspace limits and priority settings  
+- 🎯 **Smart Routing**: Intelligent request routing and session management
 - 📊 **Usage Analytics**: Detailed monitoring and access pattern detection
 - 🔄 **Load Balancing**: Distribute requests across multiple instances
 
@@ -67,7 +67,7 @@ The server starts on `http://localhost:8080` by default.
 ContextLite now supports **automatic port discovery** for applications that need to connect to running instances without hardcoded port numbers:
 
 ```go
-// No more port configuration drift!
+// No more port configuration issues!
 client := NewAutoDiscoveryClient()
 if err := client.AutoDiscover(); err != nil {
     log.Fatal("No ContextLite instances found")
@@ -99,13 +99,13 @@ See [`examples/automatic_port_management.go`](examples/automatic_port_management
 
 ## ✨ Key Features
 
-- **Advanced Document Selection**: Uses budget management for mathematically optimal document selection
-- **Advanced Feature Scoring**: Multi-dimensional relevance analysis with machine learning optimization
-- **Workspace Clustering**: Multi-project support with resource isolation and intelligent routing
-- **Per-Workspace Calibration**: Adaptive weights that learn from your usage patterns  
-- **Multi-Level Caching**: multi-level caching system with intelligent invalidation
+- **Advanced Document Selection**: Uses sophisticated algorithms for optimal document selection
+- **Multi-dimensional Scoring**: Advanced relevance analysis with intelligent optimization
+- **Workspace Management**: Multi-project support with resource isolation and routing
+- **Adaptive Learning**: Smart weights that learn from your usage patterns  
+- **Multi-Level Caching**: Advanced caching system with intelligent invalidation
 - **Zero Dependencies**: Pure Go with embedded SQLite, no external services required
-- **Sub-Second Performance**: p50 ≤300ms, p95 ≤600ms uncached; cached ≤30ms
+- **High Performance**: Fast response times with efficient processing
 - **Local Privacy**: All data stays on your machine, no cloud dependencies
 
 ## 📖 Documentation
@@ -146,11 +146,11 @@ contextlite/
 See `configs/default.yaml` for full configuration options:
 
 ```yaml
-# Core optimization optimization settings
+# Core optimization settings
 optimization:
-  solver_timeout_ms: 250        # Hard timeout for optimization system
-  max_opt_gap: 0.05            # 5% optimality gap acceptable
-  objective_style: "weighted-sum"  # weighted-sum | lexicographic | epsilon-budget
+  timeout_ms: 250              # Response timeout
+  precision: 0.05              # Precision threshold
+  style: "weighted-sum"        # Optimization approach
 
 # Feature weights (adaptive per workspace)
 weights:
@@ -158,19 +158,19 @@ weights:
   # See documentation for configuration options
 ```
 
-## 🏘️ Workspace Clustering
+## 🏘️ Workspace Management
 
-ContextLite supports clustering for managing multiple projects and workspaces:
+ContextLite supports workspace management for managing multiple projects:
 
 ```yaml
-# Enable clustering in configs/cluster.yaml
-cluster:
+# Enable workspace management in configs/workspace.yaml
+workspace:
   enabled: true
   node_id: "contextlite-node-1"
   
-  affinity:
-    workspace_routing: true
-    sticky_sessions: true
+  routing:
+    workspace_isolation: true
+    session_management: true
     rules:
       "mission-architect":
         preferred_nodes: ["node-1"]
@@ -190,7 +190,7 @@ curl -H "X-Workspace-ID: mission-architect" \
      -d '{"query": "AI enforcement patterns"}'
 ```
 
-See the [Clustering Guide](./docs/CLUSTERING_GUIDE.md) for complete setup instructions.
+See the [Management Guide](./docs/CLUSTERING_GUIDE.md) for complete setup instructions.
 
 ## 📡 HTTP API
 
@@ -240,10 +240,10 @@ curl -X POST http://localhost:8080/api/v1/weights/update \
 ## 📈 Development Status
 
 ### ✅ Completed Features
-- **Advanced Optimization**: optimization engine integration with multiple optimization strategies
+- **Advanced Optimization**: Sophisticated solver integration with multiple strategies
 - **7D Feature System**: Complete implementation of all feature dimensions
-- **SOTA Evaluation Framework**: Comprehensive evaluation harness with Recall@k, nDCG@k, MAP, MRR
-- **Multi-level Caching**: L1 memory, L2 SQLite with intelligent invalidation
+- **Evaluation Framework**: Comprehensive evaluation harness with Recall@k, nDCG@k, MAP, MRR
+- **Multi-level Caching**: Advanced caching system with intelligent invalidation
 - **HTTP API**: Complete REST API for context assembly and document management
 - **Configuration System**: Flexible YAML-based configuration with workspace-specific weights
 
@@ -296,7 +296,7 @@ Benchmarked on NVMe SSD, 100k documents, K=200 candidates:
 |-----------|-----|-----|-----|
 | Cached Query | 15ms | 30ms | 45ms |
 | Cold Query | 180ms | 350ms | 500ms |
-| optimization Solve | 50ms | 150ms | 250ms |
+| Optimization | 50ms | 150ms | 250ms |
 | Feature Extract | 25ms | 80ms | 120ms |
 
 ## 📊 Development

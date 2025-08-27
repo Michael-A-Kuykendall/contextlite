@@ -4,7 +4,7 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/makuykendall/contextlite)](https://hub.docker.com/r/makuykendall/contextlite)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Ultra-fast context engine for retrieval and AI applications with optimization-powered optimization. Professional-grade solution for intelligent document retrieval, semantic search, and AI context assembly.
+Ultra-fast context engine for retrieval and AI applications. Professional-grade solution for intelligent document retrieval, semantic search, and AI context assembly.
 
 ## 🚀 Quick Start
 
@@ -22,9 +22,9 @@ docker run -p 8080:8080 -v $(pwd)/data:/app/data makuykendall/contextlite
 ## ✨ Features
 
 - **🔥 Ultra-Fast Performance**: Native Go binary optimized for speed
-- **🧠 AI-Optimized**: Uses advanced mathematical optimization for intelligent document selection
+- **🧠 AI-Optimized**: Advanced document selection algorithms
 - **🔍 Semantic Search**: Advanced document retrieval with relevance scoring
-- **⚡ Real-time Processing**: Sub-millisecond response times
+- **⚡ Real-time Processing**: Fast response times
 - **🛡️ Production Ready**: Battle-tested with enterprise security
 - **📦 Zero Dependencies**: Self-contained Docker image
 
@@ -136,9 +136,9 @@ console.log(`Found ${results.documents.length} documents`);
 
 ## 🚀 Performance
 
-- **Response Time**: < 0.5ms average
-- **Throughput**: > 10,000 requests/second
-- **Memory Usage**: < 50MB base footprint
+- **Response Time**: Fast response times
+- **Throughput**: High-performance processing
+- **Memory Usage**: Efficient resource usage
 - **Storage**: Efficient SQLite backend
 - **Scalability**: Horizontal scaling ready
 

@@ -81,12 +81,12 @@ await withContextLiteClient({ port: 8080 }, async (client) => {
 
 ## 🏗️ Architecture
 
-This npm package is a "shim" that provides Node.js bindings for the high-performance ContextLite binary:
+This npm package provides Node.js bindings for the high-performance ContextLite engine:
 
-1. **Binary Detection**: Automatically finds ContextLite binary in PATH or common install locations
-2. **Auto-Download**: Downloads appropriate binary for your platform during installation
-3. **Server Management**: Optionally manages ContextLite server lifecycle
-4. **TypeScript API**: Provides fully-typed Node.js interface over REST API
+1. **Binary Management**: Automatically manages ContextLite binary
+2. **Easy Integration**: Downloads and configures ContextLite for your platform
+3. **Server Management**: Handles ContextLite server lifecycle
+4. **TypeScript API**: Provides fully-typed Node.js interface
 
 ## 📖 API Reference
 
@@ -362,23 +362,13 @@ npm publish
 
 ## 🔧 Binary Management
 
-The package handles ContextLite binary management automatically:
+The package handles ContextLite setup automatically:
 
-### Detection Strategy
+### Installation Process
 
-1. **PATH**: Checks if `contextlite` is in system PATH
-2. **System Locations**: Common install directories
-3. **User Data**: User-specific data directory
-4. **Package Data**: Bundled with package (if available)
-
-### Auto-Download
-
-During `npm install`, the package will:
-
-1. Detect your platform and architecture
-2. Download the appropriate binary from GitHub releases
-3. Store it in user data directory
-4. Make it executable and ready to use
+1. **Platform Detection**: Detects your system and architecture
+2. **Binary Setup**: Downloads and configures ContextLite
+3. **Ready to Use**: Makes ContextLite available for your application
 
 ### Manual Installation
 
