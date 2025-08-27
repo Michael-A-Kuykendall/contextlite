@@ -187,8 +187,8 @@ jobs:
           cd npm-package
           # Backup original package.json
           cp package.json package.json.backup
-          # Remove postinstall script using jq
-          jq 'del(.scripts.postinstall)' package.json > package.json.tmp && mv package.json.tmp package.json
+          # Remove postinstall script using sed
+          sed '/"postinstall":/d' package.json > package.json.tmp && mv package.json.tmp package.json
           npm install
 
       - name: Build npm package
