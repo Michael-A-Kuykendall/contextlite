@@ -189,7 +189,7 @@ jobs:
         run: |
           cd npm-package
           # Install only production dependencies, skip all scripts
-          npm ci --only=production --ignore-scripts
+          npm install --only=production --ignore-scripts
 
       - name: Publish to npm
         if: steps.check_npm.outputs.skip == 'false'
