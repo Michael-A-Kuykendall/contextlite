@@ -1,16 +1,18 @@
-FROM gcr.io/distroless/static:nonroot
+# Multi-stage build for ContextLite License Server
+FROM golang:1.21-alpine AS builder
 
-# Copy the binary from the build context
-COPY contextlite /usr/local/bin/contextlite
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
 
-# Use nonroot user for security
-USER nonroot
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o license-server ./cmd/license-server
 
-# Expose the default port
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+
+COPY --from=builder /app/license-server .
+
 EXPOSE 8080
-
-# Set the entrypoint
-ENTRYPOINT ["/usr/local/bin/contextlite"]
-
-# Default command
-CMD ["--help"]
+CMD ["./license-server"]

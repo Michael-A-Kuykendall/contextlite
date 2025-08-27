@@ -7,7 +7,7 @@ import (
 	"net/smtp"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 // AbandonedCart represents an abandoned checkout session
