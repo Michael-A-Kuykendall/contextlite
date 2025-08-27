@@ -91,8 +91,8 @@ export class BinaryManager {
             const fileStream = createWriteStream(destPath);
             response.body?.pipe(fileStream);
 
-            await new Promise((resolve, reject) => {
-                fileStream.on('finish', resolve);
+            await new Promise<void>((resolve, reject) => {
+                fileStream.on('finish', () => resolve());
                 fileStream.on('error', reject);
             });
 
@@ -254,9 +254,9 @@ export class BinaryManager {
         // Construct binary filename based on platform and architecture
         let filename: string;
         if (this.platform === 'windows') {
-            filename = `contextlite_${version}_windows_${this.arch}.exe`;
+            filename = `contextlite-${version}-windows-${this.arch}.zip`;
         } else {
-            filename = `contextlite_${version}_${this.platform}_${this.arch}`;
+            filename = `contextlite-${version}-${this.platform}-${this.arch}.tar.gz`;
         }
 
         return `https://github.com/${this.githubRepo}/releases/download/v${version}/${filename}`;
