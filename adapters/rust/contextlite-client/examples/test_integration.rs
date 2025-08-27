@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match client.health().await {
         Ok(health) => {
             println!("✓ Server is healthy: {} (v{})", health.status, health.version);
-            println!("  optimization Solver: {} v{}", health.optimization.solver, health.optimization.version);
+            println!("  SMT Solver: {} v{}", health.smt.solver, health.smt.version);
             println!("  Documents indexed: {}", health.database.documents_indexed);
         }
         Err(e) => {

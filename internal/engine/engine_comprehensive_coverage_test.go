@@ -50,13 +50,13 @@ func TestJSONCLIEngine_ParseOptimizeResponse_ZeroToPerfect(t *testing.T) {
 				},
 			},
 			"coherence_score": 0.88,
-			"optimization_metrics": map[string]interface{}{
-				"solver_used":      "optimizer",
+			"smt_metrics": map[string]interface{}{
+				"solver_used":      "Z3",
 				"z3_status":        "SAT",
 				"objective":        45.5,
 				"solve_time_us":    1200.0,
 				"variable_count":   25.0,
-				"budget_count": 30.0,
+				"constraint_count": 30.0,
 				"k_candidates":     5.0,
 				"pairs_count":      10.0,
 				"budget_tokens":    8000.0,
@@ -96,8 +96,8 @@ func TestJSONCLIEngine_ParseOptimizeResponse_ZeroToPerfect(t *testing.T) {
 		if doc1.UtilityScore != 0.95 {
 			t.Errorf("Expected utility score 0.95, got %f", doc1.UtilityScore)
 		}
-		if doc1.InclusionReason != "optimization-optimized" {
-			t.Errorf("Expected 'optimization-optimized' reason, got %s", doc1.InclusionReason)
+		if doc1.InclusionReason != "smt-optimized" {
+			t.Errorf("Expected 'smt-optimized' reason, got %s", doc1.InclusionReason)
 		}
 
 		// Verify total tokens
@@ -115,15 +115,15 @@ func TestJSONCLIEngine_ParseOptimizeResponse_ZeroToPerfect(t *testing.T) {
 			t.Error("Expected non-empty context")
 		}
 
-		// Verify optimization metrics
-		if result.optimizationMetrics == nil {
-			t.Error("Expected optimization metrics")
+		// Verify SMT metrics
+		if result.SMTMetrics == nil {
+			t.Error("Expected SMT metrics")
 		} else {
-			if result.optimizationMetrics.SolverUsed != "optimizer" {
-				t.Errorf("Expected optimization engine, got %s", result.optimizationMetrics.SolverUsed)
+			if result.SMTMetrics.SolverUsed != "Z3" {
+				t.Errorf("Expected Z3 solver, got %s", result.SMTMetrics.SolverUsed)
 			}
-			if result.optimizationMetrics.VariableCount != 25 {
-				t.Errorf("Expected 25 variables, got %d", result.optimizationMetrics.VariableCount)
+			if result.SMTMetrics.VariableCount != 25 {
+				t.Errorf("Expected 25 variables, got %d", result.SMTMetrics.VariableCount)
 			}
 		}
 
@@ -211,7 +211,7 @@ func TestJSONCLIEngine_ParseOptimizeResponse_ZeroToPerfect(t *testing.T) {
 		}
 	})
 
-	t.Run("ParseOptimizeResponse_NooptimizationMetrics", func(t *testing.T) {
+	t.Run("ParseOptimizeResponse_NoSMTMetrics", func(t *testing.T) {
 		response := map[string]interface{}{
 			"selected_docs": []interface{}{0.0},
 			"docs": []interface{}{
@@ -221,7 +221,7 @@ func TestJSONCLIEngine_ParseOptimizeResponse_ZeroToPerfect(t *testing.T) {
 					"content": "test content",
 				},
 			},
-			// No optimization_metrics
+			// No smt_metrics
 		}
 
 		request := types.ContextRequest{}
@@ -231,26 +231,26 @@ func TestJSONCLIEngine_ParseOptimizeResponse_ZeroToPerfect(t *testing.T) {
 			t.Fatalf("Unexpected error: %v", err)
 		}
 
-		// Should handle missing optimization metrics gracefully
-		if result.optimizationMetrics != nil {
-			t.Error("Expected nil optimization metrics when not provided")
+		// Should handle missing SMT metrics gracefully
+		if result.SMTMetrics != nil {
+			t.Error("Expected nil SMT metrics when not provided")
 		}
 	})
 }
 
-// Test extractoptimizationMetrics - currently at 0.0% coverage
-func TestJSONCLIEngine_ExtractoptimizationMetrics_ZeroToPerfect(t *testing.T) {
+// Test extractSMTMetrics - currently at 0.0% coverage
+func TestJSONCLIEngine_ExtractSMTMetrics_ZeroToPerfect(t *testing.T) {
 	engine := &JSONCLIEngine{}
 
-	t.Run("ExtractoptimizationMetrics_ValidMetrics", func(t *testing.T) {
+	t.Run("ExtractSMTMetrics_ValidMetrics", func(t *testing.T) {
 		response := map[string]interface{}{
-			"optimization_metrics": map[string]interface{}{
-				"solver_used":      "optimizer",
+			"smt_metrics": map[string]interface{}{
+				"solver_used":      "Z3",
 				"z3_status":        "SAT",
 				"objective":        42.5,
 				"solve_time_us":    1500.0,
 				"variable_count":   30.0,
-				"budget_count": 45.0,
+				"constraint_count": 45.0,
 				"k_candidates":     8.0,
 				"pairs_count":      15.0,
 				"budget_tokens":    4000.0,
@@ -259,16 +259,16 @@ func TestJSONCLIEngine_ExtractoptimizationMetrics_ZeroToPerfect(t *testing.T) {
 			},
 		}
 
-		metrics := engine.extractoptimizationMetrics(response)
+		metrics := engine.extractSMTMetrics(response)
 		if metrics == nil {
-			t.Fatal("Expected non-nil optimization metrics")
+			t.Fatal("Expected non-nil SMT metrics")
 		}
 
-		if metrics.SolverUsed != "optimizer" {
-			t.Errorf("Expected solver optimizer, got %s", metrics.SolverUsed)
+		if metrics.SolverUsed != "Z3" {
+			t.Errorf("Expected solver Z3, got %s", metrics.SolverUsed)
 		}
-		if metrics.optimizerStatus != "SAT" {
-			t.Errorf("Expected status SAT, got %s", metrics.optimizerStatus)
+		if metrics.Z3Status != "SAT" {
+			t.Errorf("Expected status SAT, got %s", metrics.Z3Status)
 		}
 		if metrics.Objective != 42.5 {
 			t.Errorf("Expected objective 42.5, got %f", metrics.Objective)
@@ -280,7 +280,7 @@ func TestJSONCLIEngine_ExtractoptimizationMetrics_ZeroToPerfect(t *testing.T) {
 			t.Errorf("Expected 30 variables, got %d", metrics.VariableCount)
 		}
 		if metrics.ConstraintCount != 45 {
-			t.Errorf("Expected 45 budgets, got %d", metrics.ConstraintCount)
+			t.Errorf("Expected 45 constraints, got %d", metrics.ConstraintCount)
 		}
 		if metrics.KCandidates != 8 {
 			t.Errorf("Expected 8 k_candidates, got %d", metrics.KCandidates)
@@ -299,43 +299,43 @@ func TestJSONCLIEngine_ExtractoptimizationMetrics_ZeroToPerfect(t *testing.T) {
 		}
 	})
 
-	t.Run("ExtractoptimizationMetrics_MissingMetrics", func(t *testing.T) {
+	t.Run("ExtractSMTMetrics_MissingMetrics", func(t *testing.T) {
 		response := map[string]interface{}{
 			"other_data": "value",
 		}
 
-		metrics := engine.extractoptimizationMetrics(response)
+		metrics := engine.extractSMTMetrics(response)
 		if metrics != nil {
-			t.Error("Expected nil metrics when optimization_metrics missing")
+			t.Error("Expected nil metrics when smt_metrics missing")
 		}
 	})
 
-	t.Run("ExtractoptimizationMetrics_InvalidMetricsType", func(t *testing.T) {
+	t.Run("ExtractSMTMetrics_InvalidMetricsType", func(t *testing.T) {
 		response := map[string]interface{}{
-			"optimization_metrics": "not_a_map",
+			"smt_metrics": "not_a_map",
 		}
 
-		metrics := engine.extractoptimizationMetrics(response)
+		metrics := engine.extractSMTMetrics(response)
 		if metrics != nil {
-			t.Error("Expected nil metrics when optimization_metrics is not a map")
+			t.Error("Expected nil metrics when smt_metrics is not a map")
 		}
 	})
 
-	t.Run("ExtractoptimizationMetrics_PartialMetrics", func(t *testing.T) {
+	t.Run("ExtractSMTMetrics_PartialMetrics", func(t *testing.T) {
 		response := map[string]interface{}{
-			"optimization_metrics": map[string]interface{}{
-				"solver_used": "optimizer",
+			"smt_metrics": map[string]interface{}{
+				"solver_used": "Z3",
 				// Missing other fields - should use defaults
 			},
 		}
 
-		metrics := engine.extractoptimizationMetrics(response)
+		metrics := engine.extractSMTMetrics(response)
 		if metrics == nil {
 			t.Fatal("Expected non-nil metrics")
 		}
 
-		if metrics.SolverUsed != "optimizer" {
-			t.Errorf("Expected solver optimizer, got %s", metrics.SolverUsed)
+		if metrics.SolverUsed != "Z3" {
+			t.Errorf("Expected solver Z3, got %s", metrics.SolverUsed)
 		}
 		if metrics.VariableCount != 0 {
 			t.Errorf("Expected default 0 variable count, got %d", metrics.VariableCount)

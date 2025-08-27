@@ -54,7 +54,7 @@ Stop wasting time with slow, expensive vector databases. Get mathematically opti
 
 ## ContextLite Solution
 - ⚡ **0.3ms response time** - 100x faster
-- 🎯 **Mathematically optimal** via optimization solving
+- 🎯 **Mathematically optimal** via SMT solving
 - 💰 **Zero ongoing costs** - pure Go binary
 - 🔒 **Complete privacy** - data never leaves your machine
 
@@ -75,7 +75,7 @@ Target high-value keywords across all platforms:
 - "replace pinecone with local solution"
 - "faster than vector database"
 - "mathematical context optimization"
-- "optimization context selection"
+- "SMT context selection"
 
 ### **Phase 3: Traffic Funnel Optimization**
 

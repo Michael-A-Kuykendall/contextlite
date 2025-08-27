@@ -11,8 +11,8 @@ func TestRequireFeature100Percent(t *testing.T) {
 		fg := NewEnhancedFeatureGate()
 		
 		// TARGET: Line 333-335 - trial expired path
-		err := fg.RequireFeature("advanced_optimization")
-		if err != nil && err.Error() == "feature 'advanced_optimization' requires active license (trial expired)" {
+		err := fg.RequireFeature("advanced_smt")
+		if err != nil && err.Error() == "feature 'advanced_smt' requires active license (trial expired)" {
 			t.Logf("✅ Hit trial expired path: %v", err)
 		} else if err != nil {
 			t.Logf("✅ Hit error path (might be different condition): %v", err)  
@@ -55,7 +55,7 @@ func TestRequireFeature100Percent(t *testing.T) {
 		// Test various feature names to exercise different paths
 		features := []string{
 			"basic_search",           // Should be available
-			"advanced_optimization",          // Might require higher tier
+			"advanced_smt",          // Might require higher tier
 			"unlimited_workspaces",  // Professional feature
 			"enterprise_sso",        // Enterprise feature  
 			"nonexistent_feature",   // Should fail

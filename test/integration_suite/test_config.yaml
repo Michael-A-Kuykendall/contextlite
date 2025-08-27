@@ -9,7 +9,7 @@ storage:
   database_path: "./test_integration.db"
   cache_size_mb: 32
 
-optimization:
+smt:
   solver_timeout_ms: 100
   max_opt_gap: 0.1
   max_candidates: 50

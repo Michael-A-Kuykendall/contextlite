@@ -22,7 +22,7 @@ func TestFlagDefaults(t *testing.T) {
 	budgetTokens := flag.Int("budget", 4000, "Token budget for context")
 	iterations := flag.Int("iterations", 3, "Number of iterations per query")
 	verbose := flag.Bool("verbose", false, "Enable verbose logging")
-	systemsFlag := flag.String("systems", "contextlite_optimization,bm25_baseline,embedding_retrieval,llm_reranking", "Comma-separated list of systems to test")
+	systemsFlag := flag.String("systems", "contextlite_smt,bm25_baseline,embedding_retrieval,llm_reranking", "Comma-separated list of systems to test")
 	
 	// Parse with no arguments (should use defaults)
 	if err := flag.CommandLine.Parse([]string{}); err != nil {
@@ -50,7 +50,7 @@ func TestFlagDefaults(t *testing.T) {
 		t.Errorf("Expected default verbose false, got %t", *verbose)
 	}
 	
-	expectedSystems := "contextlite_optimization,bm25_baseline,embedding_retrieval,llm_reranking"
+	expectedSystems := "contextlite_smt,bm25_baseline,embedding_retrieval,llm_reranking"
 	if *systemsFlag != expectedSystems {
 		t.Errorf("Expected default systems '%s', got '%s'", expectedSystems, *systemsFlag)
 	}
@@ -66,7 +66,7 @@ func TestFlagParsing(t *testing.T) {
 	budgetTokens := flag.Int("budget", 4000, "Token budget for context")
 	iterations := flag.Int("iterations", 3, "Number of iterations per query")
 	verbose := flag.Bool("verbose", false, "Enable verbose logging")
-	systemsFlag := flag.String("systems", "contextlite_optimization,bm25_baseline,embedding_retrieval,llm_reranking", "Comma-separated list of systems to test")
+	systemsFlag := flag.String("systems", "contextlite_smt,bm25_baseline,embedding_retrieval,llm_reranking", "Comma-separated list of systems to test")
 	
 	// Test parsing custom arguments
 	args := []string{
@@ -75,7 +75,7 @@ func TestFlagParsing(t *testing.T) {
 		"-budget", "8000",
 		"-iterations", "5",
 		"-verbose",
-		"-systems", "contextlite_optimization,bm25_baseline",
+		"-systems", "contextlite_smt,bm25_baseline",
 	}
 	
 	if err := flag.CommandLine.Parse(args); err != nil {
@@ -103,7 +103,7 @@ func TestFlagParsing(t *testing.T) {
 		t.Errorf("Expected verbose true, got %t", *verbose)
 	}
 	
-	expectedSystems := "contextlite_optimization,bm25_baseline"
+	expectedSystems := "contextlite_smt,bm25_baseline"
 	if *systemsFlag != expectedSystems {
 		t.Errorf("Expected systems '%s', got '%s'", expectedSystems, *systemsFlag)
 	}
@@ -143,12 +143,12 @@ func TestValidationLogic(t *testing.T) {
 
 func TestSystemsList(t *testing.T) {
 	// Test parsing systems list
-	systemsStr := "contextlite_optimization,bm25_baseline,embedding_retrieval,llm_reranking"
+	systemsStr := "contextlite_smt,bm25_baseline,embedding_retrieval,llm_reranking"
 	
 	// This would be the logic to parse systems in main
 	// For now, just test that the string contains expected systems
 	expectedSystems := []string{
-		"contextlite_optimization",
+		"contextlite_smt",
 		"bm25_baseline", 
 		"embedding_retrieval",
 		"llm_reranking",
@@ -188,11 +188,11 @@ func TestConfigurationValidation(t *testing.T) {
 		systems string
 		valid   bool
 	}{
-		{"valid_json_output", "results.json", "contextlite_optimization", true},
+		{"valid_json_output", "results.json", "contextlite_smt", true},
 		{"valid_csv_output", "results.csv", "bm25_baseline", true},
-		{"empty_output", "", "contextlite_optimization", false},
+		{"empty_output", "", "contextlite_smt", false},
 		{"empty_systems", "results.json", "", false},
-		{"valid_multiple_systems", "results.json", "contextlite_optimization,bm25_baseline", true},
+		{"valid_multiple_systems", "results.json", "contextlite_smt,bm25_baseline", true},
 	}
 	
 	for _, scenario := range scenarios {

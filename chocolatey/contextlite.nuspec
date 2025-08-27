@@ -29,7 +29,7 @@ ContextLite is an ultra-fast context engine with **enterprise-grade workspace cl
 ## Features
 
 - **🏢 Workspace Clustering**: Enterprise-grade multi-project isolation and resource management
-- **🔥 Ultra-Fast**: Microsecond-level query responses with SQLite FTS5 and optimization optimization
+- **🔥 Ultra-Fast**: Microsecond-level query responses with SQLite FTS5 and SMT optimization
 - **🚀 Zero Dependencies**: Single binary with no external services required
 - **🎯 Smart Routing**: Workspace affinity and intelligent load balancing
 - **⚖️ Resource Management**: Per-workspace limits and priority scheduling

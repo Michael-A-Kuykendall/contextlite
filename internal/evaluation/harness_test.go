@@ -172,7 +172,7 @@ func TestEvaluateQuery(t *testing.T) {
 	evalResult, err := harness.EvaluateQuery(
 		"machine learning algorithms",
 		results,
-		"contextlite_optimization",
+		"contextlite_smt",
 		50, // latency
 		25.5, // memory
 	)
@@ -182,8 +182,8 @@ func TestEvaluateQuery(t *testing.T) {
 	}
 	
 	// Verify basic fields
-	if evalResult.SystemType != "contextlite_optimization" {
-		t.Errorf("Expected system type contextlite_optimization, got %s", evalResult.SystemType)
+	if evalResult.SystemType != "contextlite_smt" {
+		t.Errorf("Expected system type contextlite_smt, got %s", evalResult.SystemType)
 	}
 	
 	if evalResult.QueryType != "factual" {
@@ -238,7 +238,7 @@ func TestBatchEvaluate(t *testing.T) {
 		},
 	}
 	
-	aggResults, err := harness.BatchEvaluate(queryResults, "contextlite_optimization")
+	aggResults, err := harness.BatchEvaluate(queryResults, "contextlite_smt")
 	if err != nil {
 		t.Fatalf("BatchEvaluate failed: %v", err)
 	}
@@ -247,8 +247,8 @@ func TestBatchEvaluate(t *testing.T) {
 		t.Errorf("Expected 2 queries, got %d", aggResults.QueryCount)
 	}
 	
-	if aggResults.SystemType != "contextlite_optimization" {
-		t.Errorf("Expected system type contextlite_optimization, got %s", aggResults.SystemType)
+	if aggResults.SystemType != "contextlite_smt" {
+		t.Errorf("Expected system type contextlite_smt, got %s", aggResults.SystemType)
 	}
 	
 	// Mean latency should be (45+55)/2 = 50

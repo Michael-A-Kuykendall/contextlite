@@ -154,7 +154,7 @@ def create_download_page():
             <h3 style="color: #1e40af; margin-bottom: 10px;">⚡ Performance Highlights</h3>
             <p style="color: #1e40af; margin: 5px 0;"><strong>0.3ms</strong> average response time</p>
             <p style="color: #1e40af; margin: 5px 0;"><strong>100x faster</strong> than vector databases</p>
-            <p style="color: #1e40af; margin: 5px 0;"><strong>Smart Multi-Token (optimization)</strong> optimization technology</p>
+            <p style="color: #1e40af; margin: 5px 0;"><strong>Smart Multi-Token (SMT)</strong> optimization technology</p>
         </div>
     </div>
     """

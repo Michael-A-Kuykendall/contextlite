@@ -1,6 +1,6 @@
 # ContextLite LangChain Adapter
 
-Drop-in LangChain retriever for ContextLite's Advanced context selection.
+Drop-in LangChain retriever for ContextLite's SMT-optimized context selection.
 
 ## Installation
 

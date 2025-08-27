@@ -48,7 +48,7 @@ Move from "features" to "enterprise capabilities" - focus on what large organiza
 ## Professional Features (Keep at $99)
 - Unlimited workspaces (personal use)
 - Unlimited documents
-- Advanced optimization features
+- Advanced SMT features
 - 7D scoring
 - Commercial license
 - Priority support
@@ -56,7 +56,7 @@ Move from "features" to "enterprise capabilities" - focus on what large organiza
 ## Developer Features (Free)
 - Single workspace
 - Up to 10K documents
-- Basic optimization optimization
+- Basic SMT optimization
 - REST API
 - Community support
 

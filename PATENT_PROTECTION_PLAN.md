@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-ContextLite represents a breakthrough Advanced context engine with significant intellectual property value. This plan outlines the strategy for protecting core innovations while transitioning to a successful open source + commercial dual-license model.
+ContextLite represents a breakthrough SMT-optimized context engine with significant intellectual property value. This plan outlines the strategy for protecting core innovations while transitioning to a successful open source + commercial dual-license model.
 
 **Key Objectives:**
 - Protect provisional patent claims through strategic code organization
@@ -30,7 +30,7 @@ ContextLite represents a breakthrough Advanced context engine with significant i
 #### Website & Marketing Materials
 ```markdown
 # Add to all public-facing materials:
-"Patent Pending - optimization-Optimized Context Selection Technology"
+"Patent Pending - SMT-Optimized Context Selection Technology"
 "Provisional Patent Filed - Novel 7-Dimensional Feature Optimization"
 ```
 
@@ -44,7 +44,7 @@ ContextLite represents a breakthrough Advanced context engine with significant i
 #### Implementation Tasks:
 ```bash
 # Footer addition
-echo 'Patent Pending | optimization-Optimized Technology' >> product-site/index.html
+echo 'Patent Pending | SMT-Optimized Technology' >> product-site/index.html
 
 # README badge
 ![Patent Pending](https://img.shields.io/badge/Patent-Pending-orange)
@@ -53,7 +53,7 @@ echo 'Patent Pending | optimization-Optimized Technology' >> product-site/index.
 ### 1.3 Algorithm Protection Strategy
 
 #### Keep Private (Core IP):
-1. **optimization Formulation Logic** (`internal/optimization/formulation.go`)
+1. **SMT Formulation Logic** (`internal/smt/formulation.go`)
 2. **7D Feature Weight Optimization** (`internal/features/optimizer.go`)
 3. **Quantum-Inspired Scoring** (`internal/engine/quantum.go`)
 4. **Advanced Cache Coherence** (`internal/cache/quantum_cache.go`)
@@ -89,7 +89,7 @@ contextlite/ (PUBLIC REPO)
 
 contextlite-core/ (PRIVATE REPO)
 ├── internal/
-│   ├── optimization/              # optimization system integration (PRIVATE)
+│   ├── smt/              # SMT solver integration (PRIVATE)
 │   ├── features/         # 7D feature extraction (PRIVATE)
 │   ├── engine/           # Quantum scoring (PRIVATE)
 │   ├── ml/               # Learning algorithms (PRIVATE)
@@ -129,7 +129,7 @@ type Client struct {
 #### Standard Header Template:
 ```go
 /*
- * ContextLite - optimization-Optimized AI Context Engine
+ * ContextLite - SMT-Optimized AI Context Engine
  * Copyright (c) 2025 Michael A. Kuykendall
  * 
  * Patent Pending - Provisional Patent Filed
@@ -204,7 +204,7 @@ See [LICENSE-COMMERCIAL.md](LICENSE-COMMERCIAL.md) for full terms.
 
 ## Patent Notice
 Patent Pending - US Provisional Patent Application
-optimization-Optimized Context Selection Technology
+SMT-Optimized Context Selection Technology
 
 ## Contact
 For commercial licensing: licensing@contextlite.com
@@ -215,15 +215,15 @@ For technical support: support@contextlite.com
 
 ## 4. Core Algorithm Obfuscation
 
-### 4.1 optimization Solver Integration Protection
+### 4.1 SMT Solver Integration Protection
 
 #### Current Implementation (Make Private):
 ```go
-// internal/optimization/solver.go - MOVE TO PRIVATE REPO
-func (s *optimizerSolver) OptimizeSelection(docs []Document, budgets Constraints) ([]int, error) {
-    // PROPRIETARY: 7-dimensional optimization formulation
+// internal/smt/solver.go - MOVE TO PRIVATE REPO
+func (s *Z3Solver) OptimizeSelection(docs []Document, constraints Constraints) ([]int, error) {
+    // PROPRIETARY: 7-dimensional SMT formulation
     // Patent Pending Algorithm
-    return s.solveMultiObjective(docs, budgets)
+    return s.solveMultiObjective(docs, constraints)
 }
 ```
 
@@ -368,13 +368,13 @@ func init() {
 <!-- Add to product-site/index.html -->
 <div class="patent-notice">
     <strong>Patent Pending Technology</strong>
-    <p>ContextLite's Advanced context selection is protected by provisional patent.</p>
+    <p>ContextLite's SMT-optimized context selection is protected by provisional patent.</p>
 </div>
 ```
 
 #### Press Release Template:
 ```markdown
-"ContextLite Announces Patent-Pending optimization Technology for AI Context Optimization"
+"ContextLite Announces Patent-Pending SMT Technology for AI Context Optimization"
 
 - Revolutionary 7-dimensional feature optimization
 - 10,000x performance improvement over vector databases
@@ -414,7 +414,7 @@ func init() {
 - [ ] Create new private repo directory structure
 - [ ] Initialize private Git repository  
 - [ ] Identify and move proprietary algorithms to private repo
-  - [ ] `internal/optimization/` (optimization system integration)
+  - [ ] `internal/smt/` (SMT solver integration)
   - [ ] `internal/features/` (7D feature extraction) 
   - [ ] `internal/engine/` (quantum scoring)
   - [ ] `internal/ml/` (learning algorithms)
@@ -488,7 +488,7 @@ func init() {
 ### 10.1 Competitive Protection
 
 #### Algorithm Obfuscation:
-- Core optimization formulations in compiled libraries only
+- Core SMT formulations in compiled libraries only
 - Distributed as binary packages
 - No source code for optimization logic
 - Anti-debugging measures in production builds

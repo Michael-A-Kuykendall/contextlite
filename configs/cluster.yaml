@@ -14,7 +14,7 @@ cluster:
     service_name: "contextlite"
     ttl_seconds: 30
     tags:
-      - "optimization-enabled"
+      - "smt-enabled"
       - "local-cluster"
 
   affinity:
@@ -86,8 +86,8 @@ storage:
   database_path: "./data/contextlite.db"
   cache_size_mb: 64
 
-# optimization system configuration
-optimization:
+# SMT solver configuration
+smt:
   solver_timeout_ms: 5000
   max_opt_gap: 0.1
   max_candidates: 100
@@ -117,8 +117,8 @@ weights:
 lexicographic:
   compute_at_runtime: false
 
-# Epsilon budgets
-epsilon_budget:
+# Epsilon constraints
+epsilon_constraint:
   max_redundancy: 0.3
   min_coherence: 0.7
   min_recency: 0.1
@@ -138,4 +138,4 @@ cache:
 logging:
   level: "info"
   include_timings: true
-  include_optimization_metrics: true
+  include_smt_metrics: true

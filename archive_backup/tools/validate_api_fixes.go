@@ -88,8 +88,8 @@ func main() {
 		}
 	}
 	
-	// Test 3: Health Check with Real optimizer Version
-	fmt.Println("\n--- Test 3: Health Check (optimizer Version) ---")
+	// Test 3: Health Check with Real Z3 Version
+	fmt.Println("\n--- Test 3: Health Check (Z3 Version) ---")
 	resp, err = http.Get("http://localhost:8082/health")
 	if err != nil {
 		log.Printf("❌ Health check failed: %v", err)
@@ -103,12 +103,12 @@ func main() {
 			
 			if solver, ok := result["solver"].(map[string]interface{}); ok {
 				version := solver["version"].(string)
-				fmt.Printf("✅ optimizer Version: %s\n", version)
+				fmt.Printf("✅ Z3 Version: %s\n", version)
 				
-				if strings.Contains(version, "optimizer not available") {
-					fmt.Println("⚠️  optimizer not available (fallback working - real detection)")
+				if strings.Contains(version, "Z3 not available") {
+					fmt.Println("⚠️  Z3 not available (fallback working - real detection)")
 				} else if version != "4.15.2" {
-					fmt.Println("✅ Real optimizer version detection (not hardcoded)")
+					fmt.Println("✅ Real Z3 version detection (not hardcoded)")
 				} else {
 					fmt.Println("⚠️  Might be hardcoded or coincidental version")
 				}

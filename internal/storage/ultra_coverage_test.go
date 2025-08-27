@@ -57,8 +57,8 @@ func TestStorage_UltraCoverage_SpecificLines(t *testing.T) {
 			Documents: []types.DocumentReference{
 				{ID: "json-test", UtilityScore: 0.9},
 			},
-			optimizationMetrics: types.optimizationMetrics{
-				SolverUsed:  "optimizer\x00\x01\x02", // Null bytes might cause JSON issues
+			SMTMetrics: types.SMTMetrics{
+				SolverUsed:  "Z3\x00\x01\x02", // Null bytes might cause JSON issues
 				SolveTimeMs: 100.0,
 			},
 		}
@@ -187,8 +187,8 @@ func TestStorage_UltraCoverage_SpecificLines(t *testing.T) {
 
 		result := &types.QueryResult{
 			Documents: docs,
-			optimizationMetrics: types.optimizationMetrics{
-				SolverUsed:  "optimizer-EXTREME",
+			SMTMetrics: types.SMTMetrics{
+				SolverUsed:  "Z3-EXTREME",
 				SolveTimeMs: 99999.99,
 			},
 		}
@@ -211,7 +211,7 @@ func TestStorage_UltraCoverage_SpecificLines(t *testing.T) {
 	})
 }
 
-// Test that specifically targets database budget errors
+// Test that specifically targets database constraint errors
 func TestStorage_DatabaseConstraints(t *testing.T) {
 	storage, cleanup := setupTestStorage(t)
 	defer cleanup()
@@ -244,7 +244,7 @@ func TestStorage_DatabaseConstraints(t *testing.T) {
 			t.Fatalf("Failed to add first document: %v", err)
 		}
 
-		// Try to add second document with same ID (should cause budget error)
+		// Try to add second document with same ID (should cause constraint error)
 		err = storage.AddDocument(ctx, doc2)
 		if err != nil {
 			t.Logf("Constraint violation error (expected): %v", err)

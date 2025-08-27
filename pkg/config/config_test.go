@@ -17,7 +17,7 @@ server:
 storage:
   database_path: ":memory:"
 
-optimization:
+smt:
   z3_binary_path: ""  # Empty path should not cause validation error
   solver_timeout_ms: 1000
   max_candidates: 50
@@ -78,7 +78,7 @@ server:
 storage:
   database_path: "%s"
 
-optimization:
+smt:
   solver_timeout_ms: 10000
   max_candidates: 100
   max_pairs_per_doc: 8000
@@ -103,7 +103,7 @@ weights:
 lexicographic:
   compute_at_runtime: true
 
-epsilon_budget:
+epsilon_constraint:
   max_redundancy: 0.8
   min_coherence: 0.6
   min_recency: 0.3
@@ -142,12 +142,12 @@ cache:
 		t.Errorf("Expected database path '%s', got '%s'", tempDbPath, cfg.Storage.DatabasePath)
 	}
 	
-	if cfg.optimization.SolverTimeoutMs != 10000 {
-		t.Errorf("Expected optimization timeout 10000ms, got %d", cfg.optimization.SolverTimeoutMs)
+	if cfg.SMT.SolverTimeoutMs != 10000 {
+		t.Errorf("Expected SMT timeout 10000ms, got %d", cfg.SMT.SolverTimeoutMs)
 	}
 	
-	if cfg.optimization.optimizer.BinaryPath != "" {
-		t.Errorf("Expected empty optimizer path, got '%s'", cfg.optimization.optimizer.BinaryPath)
+	if cfg.SMT.Z3.BinaryPath != "" {
+		t.Errorf("Expected empty Z3 path, got '%s'", cfg.SMT.Z3.BinaryPath)
 	}
 	
 	if cfg.Weights.Relevance != 0.4 {
@@ -212,28 +212,28 @@ func TestConfig_ServerDefaults(t *testing.T) {
 	}
 }
 
-func TestConfig_optimizationDefaults(t *testing.T) {
+func TestConfig_SMTDefaults(t *testing.T) {
 	cfg := &Config{}
 	
 	// Apply defaults
-	if cfg.optimization.SolverTimeoutMs == 0 {
-		cfg.optimization.SolverTimeoutMs = 5000
+	if cfg.SMT.SolverTimeoutMs == 0 {
+		cfg.SMT.SolverTimeoutMs = 5000
 	}
-	if cfg.optimization.MaxCandidates == 0 {
-		cfg.optimization.MaxCandidates = 50
+	if cfg.SMT.MaxCandidates == 0 {
+		cfg.SMT.MaxCandidates = 50
 	}
-	if cfg.optimization.MaxPairsPerDoc == 0 {
-		cfg.optimization.MaxPairsPerDoc = 4000
+	if cfg.SMT.MaxPairsPerDoc == 0 {
+		cfg.SMT.MaxPairsPerDoc = 4000
 	}
 	
-	if cfg.optimization.SolverTimeoutMs != 5000 {
-		t.Errorf("Default optimization timeout should be 5000ms")
+	if cfg.SMT.SolverTimeoutMs != 5000 {
+		t.Errorf("Default SMT timeout should be 5000ms")
 	}
-	if cfg.optimization.MaxCandidates != 50 {
-		t.Errorf("Default optimization max candidates should be 50")
+	if cfg.SMT.MaxCandidates != 50 {
+		t.Errorf("Default SMT max candidates should be 50")
 	}
-	if cfg.optimization.MaxPairsPerDoc != 4000 {
-		t.Errorf("Default optimization max pairs per doc should be 4000")
+	if cfg.SMT.MaxPairsPerDoc != 4000 {
+		t.Errorf("Default SMT max pairs per doc should be 4000")
 	}
 }
 
@@ -371,7 +371,7 @@ func TestConfig_PartialFile(t *testing.T) {
 server:
   port: 9000
 
-optimization:
+smt:
   solver_timeout_ms: 1000
   max_candidates: 25
   objective_style: "weighted-sum"
@@ -395,8 +395,8 @@ weights:
 		t.Errorf("Expected port 9000, got %d", cfg.Server.Port)
 	}
 	
-	if cfg.optimization.SolverTimeoutMs != 1000 {
-		t.Errorf("Expected solver timeout 1000ms, got %d", cfg.optimization.SolverTimeoutMs)
+	if cfg.SMT.SolverTimeoutMs != 1000 {
+		t.Errorf("Expected solver timeout 1000ms, got %d", cfg.SMT.SolverTimeoutMs)
 	}
 	
 	if cfg.Weights.Relevance != 0.5 {
@@ -415,7 +415,7 @@ func TestConfig_EmptyFile(t *testing.T) {
 	minimalConfig := `
 server:
   port: 8080
-optimization:
+smt:
   solver_timeout_ms: 1000
   max_candidates: 10
   objective_style: "weighted-sum"
@@ -447,7 +447,7 @@ server:
 storage:
   database_path: ":memory:"
 
-optimization:
+smt:
   z3_binary_path: ""
   solver_timeout_ms: 1000
   max_candidates: 50
@@ -510,7 +510,7 @@ server:
   port: 8080
 storage:
   database_path: ":memory:"
-optimization:
+smt:
   solver_timeout_ms: 1000
   max_candidates: 50
   objective_style: "weighted-sum"
@@ -557,7 +557,7 @@ server:
   port: 8080
 storage:
   database_path: ":memory:"
-optimization:
+smt:
   solver_timeout_ms: 1000
   max_candidates: 50
   objective_style: "weighted-sum"
@@ -595,7 +595,7 @@ func TestConfig_ValidationErrors(t *testing.T) {
 			configContent: `
 server:
   port: 0
-optimization:
+smt:
   solver_timeout_ms: 1000
   max_candidates: 50
 `,
@@ -607,7 +607,7 @@ optimization:
 			configContent: `
 server:
   port: 99999
-optimization:
+smt:
   solver_timeout_ms: 1000
   max_candidates: 50
 `,
@@ -619,19 +619,19 @@ optimization:
 			configContent: `
 server:
   port: 8080
-optimization:
+smt:
   solver_timeout_ms: 0
   max_candidates: 50
 `,
 			expectError:   true,
-			errorContains: "optimization system timeout must be positive",
+			errorContains: "SMT solver timeout must be positive",
 		},
 		{
 			name: "invalid_max_candidates_zero",
 			configContent: `
 server:
   port: 8080
-optimization:
+smt:
   solver_timeout_ms: 1000
   max_candidates: 0
 `,
@@ -643,7 +643,7 @@ optimization:
 			configContent: `
 server:
   port: 8080
-optimization:
+smt:
   solver_timeout_ms: 1000
   max_candidates: 50
   objective_style: "weighted-sum"
@@ -712,7 +712,7 @@ func TestConfig_Validation(t *testing.T) {
 					Host: "localhost",
 					Port: 8080,
 				},
-				optimization: optimizationConfig{
+				SMT: SMTConfig{
 					SolverTimeoutMs: 5000,
 					MaxCandidates:   50,
 					MaxPairsPerDoc:  4000,
@@ -733,7 +733,7 @@ func TestConfig_Validation(t *testing.T) {
 		{
 			name: "invalid_timeout",
 			config: Config{
-				optimization: optimizationConfig{
+				SMT: SMTConfig{
 					SolverTimeoutMs: -1000, // Invalid timeout
 				},
 			},
@@ -756,13 +756,13 @@ func validateConfig(cfg *Config) bool {
 	if cfg.Server.Port < 0 || cfg.Server.Port > 65535 {
 		return false
 	}
-	if cfg.optimization.SolverTimeoutMs < 0 {
+	if cfg.SMT.SolverTimeoutMs < 0 {
 		return false
 	}
-	if cfg.optimization.MaxCandidates < 0 {
+	if cfg.SMT.MaxCandidates < 0 {
 		return false
 	}
-	if cfg.optimization.MaxPairsPerDoc < 0 {
+	if cfg.SMT.MaxPairsPerDoc < 0 {
 		return false
 	}
 	return true
@@ -775,11 +775,11 @@ func TestConfig_ValidateComprehensive(t *testing.T) {
 			Host: "localhost",
 			Port: 8080,
 		},
-		optimization: optimizationConfig{
+		SMT: SMTConfig{
 			SolverTimeoutMs: 5000,
 			MaxCandidates:   50,
 			ObjectiveStyle:  "weighted-sum",
-			optimizer: optimizerConfig{
+			Z3: Z3Config{
 				MaxVerificationDocs: 10,
 			},
 		},
@@ -815,15 +815,15 @@ func TestConfig_ValidateComprehensive(t *testing.T) {
 		t.Error("Expected error for port 0")
 	}
 	
-	// Test invalid optimization timeout
+	// Test invalid SMT timeout
 	invalidTimeoutConfig := *validConfig
-	invalidTimeoutConfig.optimization.SolverTimeoutMs = 0
+	invalidTimeoutConfig.SMT.SolverTimeoutMs = 0
 	err = validate(&invalidTimeoutConfig)
 	if err == nil {
 		t.Error("Expected error for zero timeout")
 	}
 	
-	invalidTimeoutConfig.optimization.SolverTimeoutMs = -1000
+	invalidTimeoutConfig.SMT.SolverTimeoutMs = -1000
 	err = validate(&invalidTimeoutConfig)
 	if err == nil {
 		t.Error("Expected error for negative timeout")
@@ -831,13 +831,13 @@ func TestConfig_ValidateComprehensive(t *testing.T) {
 	
 	// Test invalid max candidates
 	invalidCandidatesConfig := *validConfig
-	invalidCandidatesConfig.optimization.MaxCandidates = 0
+	invalidCandidatesConfig.SMT.MaxCandidates = 0
 	err = validate(&invalidCandidatesConfig)
 	if err == nil {
 		t.Error("Expected error for zero max candidates")
 	}
 	
-	invalidCandidatesConfig.optimization.MaxCandidates = -5
+	invalidCandidatesConfig.SMT.MaxCandidates = -5
 	err = validate(&invalidCandidatesConfig)
 	if err == nil {
 		t.Error("Expected error for negative max candidates")
@@ -845,42 +845,42 @@ func TestConfig_ValidateComprehensive(t *testing.T) {
 	
 	// Test invalid objective style
 	invalidObjectiveConfig := *validConfig
-	invalidObjectiveConfig.optimization.ObjectiveStyle = "invalid-style"
+	invalidObjectiveConfig.SMT.ObjectiveStyle = "invalid-style"
 	err = validate(&invalidObjectiveConfig)
 	if err == nil {
 		t.Error("Expected error for invalid objective style")
 	}
 	
 	// Test all valid objective styles
-	validObjectiveStyles := []string{"weighted-sum", "lexicographic", "epsilon-budget"}
+	validObjectiveStyles := []string{"weighted-sum", "lexicographic", "epsilon-constraint"}
 	for _, style := range validObjectiveStyles {
 		testConfig := *validConfig
-		testConfig.optimization.ObjectiveStyle = style
+		testConfig.SMT.ObjectiveStyle = style
 		err = validate(&testConfig)
 		if err != nil {
 			t.Errorf("Valid objective style '%s' should not return error: %v", style, err)
 		}
 	}
 	
-	// Test optimizer binary path validation with non-existent file
-	invalidoptimizerConfig := *validConfig
-	invalidoptimizerConfig.optimization.optimizer.BinaryPath = "/non/existent/z3/binary"
-	err = validate(&invalidoptimizerConfig)
+	// Test Z3 binary path validation with non-existent file
+	invalidZ3Config := *validConfig
+	invalidZ3Config.SMT.Z3.BinaryPath = "/non/existent/z3/binary"
+	err = validate(&invalidZ3Config)
 	if err == nil {
-		t.Error("Expected error for non-existent optimizer binary path")
+		t.Error("Expected error for non-existent Z3 binary path")
 	}
 	
-	// Test optimizer binary path validation with empty path (should be valid)
-	validoptimizerConfig := *validConfig
-	validoptimizerConfig.optimization.optimizer.BinaryPath = ""
-	err = validate(&validoptimizerConfig)
+	// Test Z3 binary path validation with empty path (should be valid)
+	validZ3Config := *validConfig
+	validZ3Config.SMT.Z3.BinaryPath = ""
+	err = validate(&validZ3Config)
 	if err != nil {
-		t.Errorf("Empty optimizer binary path should be valid: %v", err)
+		t.Errorf("Empty Z3 binary path should be valid: %v", err)
 	}
 	
 	// Test negative max verification docs
 	invalidVerificationConfig := *validConfig
-	invalidVerificationConfig.optimization.optimizer.MaxVerificationDocs = -1
+	invalidVerificationConfig.SMT.Z3.MaxVerificationDocs = -1
 	err = validate(&invalidVerificationConfig)
 	if err == nil {
 		t.Error("Expected error for negative max verification docs")
@@ -897,11 +897,11 @@ func TestConfig_ValidateDatabasePath(t *testing.T) {
 			Host: "localhost",
 			Port: 8080,
 		},
-		optimization: optimizationConfig{
+		SMT: SMTConfig{
 			SolverTimeoutMs: 5000,
 			MaxCandidates:   50,
 			ObjectiveStyle:  "weighted-sum",
-			optimizer: optimizerConfig{
+			Z3: Z3Config{
 				MaxVerificationDocs: 10,
 			},
 		},
@@ -956,7 +956,7 @@ server:
   port: 8080
 storage:
   database_path: ":memory:"
-optimization:
+smt:
   solver_timeout_ms: 1000
   max_candidates: 50
   objective_style: "weighted-sum"
@@ -989,7 +989,7 @@ server:
   auth_token: "default-token"
 storage:
   database_path: ":memory:"
-optimization:
+smt:
   solver_timeout_ms: 1000
   max_candidates: 50
   objective_style: "weighted-sum"
@@ -1059,7 +1059,7 @@ server:
   auth_token: "default-token"
 storage:
   database_path: ":memory:"
-optimization:
+smt:
   solver_timeout_ms: 1000
   max_candidates: 50
   objective_style: "weighted-sum"

@@ -36,7 +36,7 @@ func DefaultComparisonConfig() *ComparisonConfig {
 	return &ComparisonConfig{
 		OutputPath: "sota_comparison_results.json",
 		SystemsToTest: []string{
-			"contextlite_optimization",
+			"contextlite_smt",
 			"bm25_baseline",
 			"embedding_retrieval",
 			"llm_reranking",
@@ -311,8 +311,8 @@ func (s *SOTAComparison) executeSystemQuery(
 	
 	// System-specific execution logic
 	switch systemType {
-	case "contextlite_optimization":
-		return s.executeContextLiteoptimization(ctx, query, queryType)
+	case "contextlite_smt":
+		return s.executeContextLiteSMT(ctx, query, queryType)
 		
 	case "bm25_baseline":
 		return s.executeBM25Baseline(ctx, query, queryType)
@@ -342,15 +342,15 @@ func generateTestContent(approxTokens int) string {
 	return content[:approxChars]
 }
 
-// executeContextLiteoptimization simulates ContextLite optimization optimization
-func (s *SOTAComparison) executeContextLiteoptimization(
+// executeContextLiteSMT simulates ContextLite SMT optimization
+func (s *SOTAComparison) executeContextLiteSMT(
 	ctx context.Context,
 	query, queryType string,
 ) ([]types.DocumentReference, int64, float64, error) {
 	
 	start := time.Now()
 	
-	// Simulate Advanced document selection
+	// Simulate SMT-optimized document selection
 	// This would integrate with actual ContextLite system
 	results := []types.DocumentReference{
 		{ID: "ml_algorithms_overview", UtilityScore: 0.95, Content: generateTestContent(850)},
@@ -374,7 +374,7 @@ func (s *SOTAComparison) executeBM25Baseline(
 	
 	start := time.Now()
 	
-	// Simulate BM25 scoring (less optimal than optimization)
+	// Simulate BM25 scoring (less optimal than SMT)
 	results := []types.DocumentReference{
 		{ID: "ml_algorithms_overview", UtilityScore: 0.87, Content: generateTestContent(850)},
 		{ID: "programming_tutorial", UtilityScore: 0.76, Content: generateTestContent(1200)},  // Less relevant
@@ -458,7 +458,7 @@ func (s *SOTAComparison) generateSummary(
 	}
 	
 	// Calculate SOTA advantage if ContextLite is best
-	if summary.BestOverall == "contextlite_optimization" && len(summary.RankingByRecall5) > 1 {
+	if summary.BestOverall == "contextlite_smt" && len(summary.RankingByRecall5) > 1 {
 		bestScore := summary.RankingByRecall5[0].Score
 		secondScore := summary.RankingByRecall5[1].Score
 		if secondScore > 0 {

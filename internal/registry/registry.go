@@ -109,7 +109,7 @@ func (sr *SystemRegistry) initializeComponents() {
 			{Name: "determineLicenseTier", Purpose: "Payment → tier mapping", Performance: "<1ms"},
 			{Name: "sendLicenseEmail", Purpose: "Email delivery", Performance: "230ms"},
 		},
-		Dependencies: []string{"github.com/stripe/stripe-go/v74", "internal/license", "net/optimizationp"},
+		Dependencies: []string{"github.com/stripe/stripe-go/v74", "internal/license", "net/smtp"},
 		PerformanceMetrics: map[string]string{
 			"api_response_time": "150ms",
 			"webhook_processing": "100ms",

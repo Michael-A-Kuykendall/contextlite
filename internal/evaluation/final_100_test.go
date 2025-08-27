@@ -16,24 +16,24 @@ func TestPrintSummary_WithSOTAAdvantage(t *testing.T) {
 	results := &ComparisonResults{
 		Config: config,
 		SystemResults: map[string]*AggregateResults{
-			"contextlite_optimization": {
-				SystemType:    "contextlite_optimization",
+			"contextlite_smt": {
+				SystemType:    "contextlite_smt",
 				MeanRecallAt5: 0.9,
 				QueryCount:    10,
 			},
 		},
 		Summary: &ComparisonSummary{
-			BestOverall:    "contextlite_optimization",
-			BestEfficiency: "contextlite_optimization", 
+			BestOverall:    "contextlite_smt",
+			BestEfficiency: "contextlite_smt", 
 			SOTAAdvantage:  15.5, // > 0, should trigger the advantage print
 			RankingByRecall5: []SystemRanking{
-				{System: "contextlite_optimization", Score: 0.9, Rank: 1},
+				{System: "contextlite_smt", Score: 0.9, Rank: 1},
 			},
 			RankingByNDCG5: []SystemRanking{
-				{System: "contextlite_optimization", Score: 0.85, Rank: 1},
+				{System: "contextlite_smt", Score: 0.85, Rank: 1},
 			},
 			RankingByLatency: []SystemRanking{
-				{System: "contextlite_optimization", Score: 45.0, Rank: 1},
+				{System: "contextlite_smt", Score: 45.0, Rank: 1},
 			},
 			SignificanceTests: make(map[string]SignificanceResult),
 		},

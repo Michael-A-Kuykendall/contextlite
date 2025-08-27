@@ -122,7 +122,7 @@ func (s *Server) setupRoutes() {
 		
 		// System info (Basic for all, detailed for Professional+)
 		r.Get("/storage/info", s.handleStorageInfo)
-		r.With(s.requireProfessional).Get("/optimization/stats", s.handleoptimizationStats)
+		r.With(s.requireProfessional).Get("/smt/stats", s.handleSMTStats)
 		
 		// Enterprise-only endpoints
 		r.Route("/enterprise", func(r chi.Router) {
@@ -213,8 +213,8 @@ func (s *Server) Start() error {
 
 // Health check endpoint
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
-	// Get optimizer version info
-	z3Version := s.getoptimizerVersion()
+	// Get Z3 version info
+	z3Version := s.getZ3Version()
 	
 	// Get database stats
 	dbStats := s.getDatabaseStats()
@@ -230,11 +230,11 @@ func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 		"timestamp": time.Now().Unix(),
 		"version":   "1.0.0",
 		"node_id":   s.getNodeID(),
-		"optimization": map[string]interface{}{
-			"solver":   "optimizer",
+		"smt": map[string]interface{}{
+			"solver":   "Z3",
 			"version":  z3Version,
 			"enabled":  true,
-			"policy":   "optimization optimization selects document subsets to maximize utility while minimizing redundancy using budget management",
+			"policy":   "SMT optimization selects document subsets to maximize utility while minimizing redundancy using constraint satisfaction",
 		},
 		"database": dbStats,
 		"cluster":  clusterInfo,
@@ -243,7 +243,7 @@ func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 			"cache_enabled":     true,
 			"fts_search":       true, 
 			"quantum_scoring":  true,
-			"optimization_optimization": true,
+			"smt_optimization": true,
 			"clustering":       s.config.Cluster.Enabled,
 			"workspace_isolation": true,
 			"project_affinity": s.config.Cluster.Affinity.WorkspaceRouting,
@@ -271,8 +271,8 @@ func (s *Server) handleAssembleContext(w http.ResponseWriter, r *http.Request) {
 	if req.ModelID == "" {
 		req.ModelID = s.config.Tokenizer.ModelID
 	}
-	if !req.Useoptimization {
-		req.Useoptimization = true // Default to optimization optimization
+	if !req.UseSMT {
+		req.UseSMT = true // Default to SMT optimization
 	}
 	if req.UseCache {
 		req.UseCache = true // Default to using cache
@@ -320,8 +320,8 @@ func (s *Server) handleBaselineComparison(w http.ResponseWriter, r *http.Request
 	
 	ctx := r.Context()
 	
-	// Get Advanced results
-	req.Useoptimization = true
+	// Get SMT-optimized results
+	req.UseSMT = true
 	req.UseCache = false // Force fresh computation for comparison
 	
 	contextReq := types.ContextRequest{
@@ -331,10 +331,10 @@ func (s *Server) handleBaselineComparison(w http.ResponseWriter, r *http.Request
 		WorkspacePath: req.WorkspacePath,
 	}
 	
-	optimizationResult, err := s.engine.AssembleContext(ctx, contextReq)
+	smtResult, err := s.engine.AssembleContext(ctx, contextReq)
 	if err != nil {
-		s.logger.Error("Failed to get optimization results", zap.Error(err))
-		s.writeError(w, http.StatusInternalServerError, "Failed to get optimization results: "+err.Error())
+		s.logger.Error("Failed to get SMT results", zap.Error(err))
+		s.writeError(w, http.StatusInternalServerError, "Failed to get SMT results: "+err.Error())
 		return
 	}
 	
@@ -368,32 +368,32 @@ func (s *Server) handleBaselineComparison(w http.ResponseWriter, r *http.Request
 		Query:          req.Query,
 		Documents:      baselineDocRefs,
 		CoherenceScore: 1.0, // Assume baseline is coherent
-		optimizationMetrics: types.optimizationMetrics{
-			Objective:       0, // No optimization optimization
+		SMTMetrics: types.SMTMetrics{
+			Objective:       0, // No SMT optimization
 			VariableCount:   0,
 			ConstraintCount: 0,
-			optimizationWallMs:       0,
+			SMTWallMs:       0,
 			FallbackReason:  "baseline_method",
 		},
 		CacheKey: "", // No cache for baseline
 	}
 	
 	// Compare results  
-	optimizationMetrics := types.optimizationResult{}
-	if optimizationResult.optimizationMetrics != nil {
-		optimizationMetrics = *optimizationResult.optimizationMetrics
+	smtMetrics := types.SMTResult{}
+	if smtResult.SMTMetrics != nil {
+		smtMetrics = *smtResult.SMTMetrics
 	}
 	
 	comparison := map[string]interface{}{
 		"query": req.Query,
-		"optimization_optimized": map[string]interface{}{
-			"documents":        optimizationResult.Documents,
-			"coherence_score":  optimizationResult.CoherenceScore,
-			"optimization_objective":    optimizationMetrics.Objective,
-			"solve_time_ms":    float64(optimizationMetrics.SolveTimeUs) / 1000,
-			"variables":        optimizationMetrics.VariableCount,
-			"budgets":      optimizationMetrics.ConstraintCount,
-			"method":           "optimization_optimization",
+		"smt_optimized": map[string]interface{}{
+			"documents":        smtResult.Documents,
+			"coherence_score":  smtResult.CoherenceScore,
+			"smt_objective":    smtMetrics.Objective,
+			"solve_time_ms":    float64(smtMetrics.SolveTimeUs) / 1000,
+			"variables":        smtMetrics.VariableCount,
+			"constraints":      smtMetrics.ConstraintCount,
+			"method":           "SMT_optimization",
 		},
 		"baseline": map[string]interface{}{
 			"documents":        baselineResponse.Documents,
@@ -401,9 +401,9 @@ func (s *Server) handleBaselineComparison(w http.ResponseWriter, r *http.Request
 			"method":           "BM25_MMR",
 		},
 		"comparison": map[string]interface{}{
-			"document_overlap": s.calculateDocumentOverlap(optimizationResult.Documents, baselineResponse.Documents),
-			"optimization_speedup":      "N/A", // optimization is optimization, not speed improvement
-			"diversity_diff":   s.calculateDiversityDifference(optimizationResult.Documents, baselineResponse.Documents),
+			"document_overlap": s.calculateDocumentOverlap(smtResult.Documents, baselineResponse.Documents),
+			"smt_speedup":      "N/A", // SMT is optimization, not speed improvement
+			"diversity_diff":   s.calculateDiversityDifference(smtResult.Documents, baselineResponse.Documents),
 		},
 	}
 	
@@ -734,9 +734,9 @@ func (s *Server) handleStorageInfo(w http.ResponseWriter, r *http.Request) {
 	s.writeJSON(w, http.StatusOK, info)
 }
 
-// optimization stats
-func (s *Server) handleoptimizationStats(w http.ResponseWriter, r *http.Request) {
-	// TODO: Get actual optimization system statistics
+// SMT stats
+func (s *Server) handleSMTStats(w http.ResponseWriter, r *http.Request) {
+	// TODO: Get actual SMT solver statistics
 	stats := map[string]interface{}{
 		"total_solves":        0,
 		"average_solve_time":  "0ms",
@@ -861,19 +861,19 @@ func (s *Server) handleCreateMCPServer(w http.ResponseWriter, r *http.Request) {
 
 // Helper methods
 
-// getoptimizerVersion returns the optimization engine version information
-func (s *Server) getoptimizerVersion() string {
-	// Try to get optimizer version by running z3 --version
+// getZ3Version returns the Z3 solver version information
+func (s *Server) getZ3Version() string {
+	// Try to get Z3 version by running z3 --version
 	cmd := exec.Command("z3", "--version")
 	output, err := cmd.Output()
 	if err != nil {
 		// Fallback if z3 not available
-		return "optimizer not available"
+		return "Z3 not available"
 	}
 	
-	// Parse version from output like "optimizer version 4.15.2 - 64 bit"
+	// Parse version from output like "Z3 version 4.15.2 - 64 bit"
 	version := strings.TrimSpace(string(output))
-	if strings.Contains(version, "optimizer version") {
+	if strings.Contains(version, "Z3 version") {
 		parts := strings.Fields(version)
 		if len(parts) >= 3 {
 			return parts[2] // Extract version number
@@ -1103,25 +1103,25 @@ func (s *Server) getNodeLoadFactor() float64 {
 }
 
 // calculateDocumentOverlap computes the percentage of documents that appear in both result sets
-func (s *Server) calculateDocumentOverlap(optimizationDocs, baselineDocs []types.DocumentReference) float64 {
-	if len(optimizationDocs) == 0 || len(baselineDocs) == 0 {
+func (s *Server) calculateDocumentOverlap(smtDocs, baselineDocs []types.DocumentReference) float64 {
+	if len(smtDocs) == 0 || len(baselineDocs) == 0 {
 		return 0.0
 	}
 	
-	optimizationIDs := make(map[string]bool)
-	for _, doc := range optimizationDocs {
-		optimizationIDs[doc.ID] = true
+	smtIDs := make(map[string]bool)
+	for _, doc := range smtDocs {
+		smtIDs[doc.ID] = true
 	}
 	
 	overlap := 0
 	for _, doc := range baselineDocs {
-		if optimizationIDs[doc.ID] {
+		if smtIDs[doc.ID] {
 			overlap++
 		}
 	}
 	
 	// Calculate overlap as percentage of smaller set
-	smaller := len(optimizationDocs)
+	smaller := len(smtDocs)
 	if len(baselineDocs) < smaller {
 		smaller = len(baselineDocs)
 	}
@@ -1130,8 +1130,8 @@ func (s *Server) calculateDocumentOverlap(optimizationDocs, baselineDocs []types
 }
 
 // calculateDiversityDifference computes the difference in diversity scores between methods
-func (s *Server) calculateDiversityDifference(optimizationDocs, baselineDocs []types.DocumentReference) float64 {
-	if len(optimizationDocs) == 0 || len(baselineDocs) == 0 {
+func (s *Server) calculateDiversityDifference(smtDocs, baselineDocs []types.DocumentReference) float64 {
+	if len(smtDocs) == 0 || len(baselineDocs) == 0 {
 		return 0.0
 	}
 	
@@ -1223,7 +1223,7 @@ func (s *Server) handleRank(w http.ResponseWriter, r *http.Request) {
 		items = append(items, rankItem{
 			File:    d.Path,
 			Range:   nil,                   // precise line ranges unavailable here; use /snippet for exact slicing
-			Snippet: d.Content,             // optimization/packing already trimmed content
+			Snippet: d.Content,             // SMT/packing already trimmed content
 			Score:   score,
 			Why:     d.InclusionReason,
 		})
@@ -1351,7 +1351,7 @@ func (s *Server) handleTrialInfo(w http.ResponseWriter, r *http.Request) {
 			trialInfo["purchase_url"] = "https://contextlite.com/purchase"
 			trialInfo["features_available"] = []string{
 				"unlimited_workspaces",
-				"advanced_optimization", 
+				"advanced_smt", 
 				"7d_scoring",
 				"caching",
 				"rest_api",

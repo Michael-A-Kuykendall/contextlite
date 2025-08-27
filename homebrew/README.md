@@ -38,7 +38,7 @@ brew upgrade contextlite
 ## About
 
 ContextLite is an ultra-fast context engine for retrieval and AI applications with:
-- 14-day trial system with full optimization optimization
+- 14-day trial system with full SMT optimization
 - Multi-platform support (Linux, macOS, Windows)  
 - Hardware-bound licensing with graceful expiration
 - Real-time statistics and performance metrics

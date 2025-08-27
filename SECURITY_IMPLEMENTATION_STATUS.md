@@ -106,7 +106,7 @@ FREE (Developer):
 
 PROFESSIONAL ($99):
 - ✅ API access (requires Professional middleware)
-- ✅ Advanced optimization optimization  
+- ✅ Advanced SMT optimization  
 - ✅ Context assembly endpoints
 - ✅ Cache management
 - ✅ Workspace weights
@@ -181,7 +181,7 @@ HTTP 403 Forbidden: "Professional license required: API access"
 
 #### **Professional Feature Theft Prevention**:
 - **API Middleware Protection**: All paid endpoints require Professional+ validation
-- **optimization Optimization Gating**: Advanced algorithms locked behind license check
+- **SMT Optimization Gating**: Advanced algorithms locked behind license check
 - **Cache Management Restriction**: Performance features require payment
 
 #### **Enterprise Feature Security**:
@@ -207,8 +207,8 @@ HTTP 403 Forbidden: "Professional license required: API access"
 export STRIPE_SECRET_KEY="sk_live_..." 
 export STRIPE_WEBHOOK_SECRET="whsec_..."
 export PRIVATE_KEY_PATH="./private_key.pem"
-export optimizationP_HOST="optimizationp.domain.com"
-export optimizationP_USER="licenses@contextlite.com"
+export SMTP_HOST="smtp.domain.com"
+export SMTP_USER="licenses@contextlite.com"
 
 # Start License Server
 ./build/license-server.exe

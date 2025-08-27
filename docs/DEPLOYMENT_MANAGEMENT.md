@@ -107,7 +107,7 @@ Update all package descriptions with:
 
 Replace slow, approximate vector databases with mathematically optimal context selection.
 - ⚡ **0.3ms** response time (vs 30-50ms for vector DBs)
-- 🎯 **Provably optimal** results via optimization solving  
+- 🎯 **Provably optimal** results via SMT solving  
 - 💰 **$0** ongoing costs (vs $300-500/month for cloud vector DBs)
 - 🔒 **100% local** - your data never leaves your machine
 

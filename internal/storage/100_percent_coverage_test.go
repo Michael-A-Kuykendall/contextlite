@@ -116,7 +116,7 @@ func TestStorage_QueryCache_CoverageBoost(t *testing.T) {
 			{ID: "doc1", UtilityScore: 0.9, Content: "content1"},
 			{ID: "doc2", UtilityScore: 0.8, Content: "content2"},
 		},
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolverUsed:  "test-solver",
 			SolveTimeMs: 100.0,
 		},
@@ -139,7 +139,7 @@ func TestStorage_QueryCache_CoverageBoost(t *testing.T) {
 	// Test with empty query result
 	emptyResult := &types.QueryResult{
 		Documents: []types.DocumentReference{},
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolverUsed:  "empty-solver",
 			SolveTimeMs: 50.0,
 		},
@@ -176,7 +176,7 @@ func TestStorage_QueryCacheWithKey_CoverageBoost(t *testing.T) {
 		},
 		TotalTokens:    200,
 		CoherenceScore: 0.85,
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolverUsed:  "test-solver",
 			SolveTimeMs: 50.0,
 		},
@@ -220,7 +220,7 @@ func TestStorage_QueryCacheWithKey_CoverageBoost(t *testing.T) {
 		Documents: []types.DocumentReference{},
 		TotalTokens: 0,
 		CoherenceScore: 0,
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolverUsed:  "empty",
 			SolveTimeMs: 0,
 		},
@@ -252,7 +252,7 @@ func TestStorage_InvalidateCache_CoverageBoost(t *testing.T) {
 		Documents: []types.DocumentReference{
 			{ID: "invalidate-doc-1", UtilityScore: 0.9, Content: "content to invalidate"},
 		},
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolverUsed:  "invalidate-solver",
 			SolveTimeMs: 100.0,
 		},

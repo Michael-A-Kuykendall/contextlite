@@ -31,16 +31,16 @@ jobs:
         # This will be triggered by the private repo's workflow
         # For now, create a placeholder that shows the system is working
         echo "#!/bin/bash" > build/contextlite-library
-        echo "# Advanced private binary placeholder" >> build/contextlite-library
+        echo "# SMT-optimized private binary placeholder" >> build/contextlite-library
         echo "# This will be replaced by actual private binary" >> build/contextlite-library
-        echo 'echo "Private optimization engine not available - using core engine"' >> build/contextlite-library
+        echo 'echo "Private SMT engine not available - using core engine"' >> build/contextlite-library
         chmod +x build/contextlite-library
         
     - name: Download Private Binary (Windows)  
       run: |
-        echo "REM Advanced private binary placeholder" > build/contextlite-library.exe
+        echo "REM SMT-optimized private binary placeholder" > build/contextlite-library.exe
         echo "REM This will be replaced by actual private binary" >> build/contextlite-library.exe
-        echo "echo Private optimization engine not available - using core engine" >> build/contextlite-library.exe
+        echo "echo Private SMT engine not available - using core engine" >> build/contextlite-library.exe
         
     - name: Update Binary Version Info
       run: |
@@ -79,7 +79,7 @@ jobs:
           
           ### Features
           - 14-day full-featured trial
-          - Complete optimization optimization (with private binary)
+          - Complete SMT optimization (with private binary)
           - BM25 fallback engine (always available)
           - Cross-platform support
           

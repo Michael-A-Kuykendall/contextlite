@@ -13,7 +13,7 @@ Copyright (c) 2025 Michael A. Kuykendall. All rights reserved.
 **Patent Pending - Provisional Patent Filed**
 - US Provisional Patent Application No. [PENDING]
 - Filed: 2025
-- Subject Matter: Advanced context assembly algorithms
+- Subject Matter: SMT-optimized context assembly algorithms
 
 ## COMMERCIAL LICENSE REQUIRED
 

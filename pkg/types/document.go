@@ -37,7 +37,7 @@ type DocumentReference struct {
 	UtilityScore    float64 `json:"utility_score"`
 	RelevanceScore  float64 `json:"relevance_score"`
 	RecencyScore    float64 `json:"recency_score"`
-	// DiversityScore removed - diversity handled via pairwise terms in optimization objective
+	// DiversityScore removed - diversity handled via pairwise terms in SMT objective
 	InclusionReason string  `json:"inclusion_reason"`
 }
 
@@ -123,7 +123,7 @@ const (
 	NodeStatusOffline     NodeStatus = "offline"
 )
 
-// ResourceLimits defines resource budgets for a workspace or node
+// ResourceLimits defines resource constraints for a workspace or node
 type ResourceLimits struct {
 	MaxConcurrentRequests int   `json:"max_concurrent_requests"`
 	MaxTokensPerMinute   int   `json:"max_tokens_per_minute"`

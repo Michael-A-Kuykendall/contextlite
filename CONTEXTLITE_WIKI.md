@@ -1,13 +1,13 @@
 # ContextLite Complete Technical Wiki
 
-> **The Complete Reference Guide to ContextLite: optimization-Optimized AI Context Engine**
+> **The Complete Reference Guide to ContextLite: SMT-Optimized AI Context Engine**
 
 ---
 
 ## Table of Contents
 
 1. [Overview & Core Concepts](#overview--core-concepts)
-2. [optimization Optimization Theory](#optimization-optimization-theory)
+2. [SMT Optimization Theory](#smt-optimization-theory)
 3. [7-Dimensional Feature System](#7-dimensional-feature-system)
 4. [Architecture & Implementation](#architecture--implementation)
 5. [API Reference](#api-reference)
@@ -25,7 +25,7 @@
 
 ### What is ContextLite?
 
-ContextLite is a **Satisfiability Modulo Theories (optimization) optimized context engine** designed to solve the fundamental problem with RAG (Retrieval-Augmented Generation) systems: **approximate, suboptimal context selection**.
+ContextLite is a **Satisfiability Modulo Theories (SMT) optimized context engine** designed to solve the fundamental problem with RAG (Retrieval-Augmented Generation) systems: **approximate, suboptimal context selection**.
 
 ### The Problem with Vector Databases
 
@@ -38,10 +38,10 @@ Traditional RAG systems use vector databases (Pinecone, Weaviate, Chroma) that r
 ### ContextLite's Solution
 
 Instead of approximations, ContextLite uses:
-- **Mathematical optimization** via optimization systems
+- **Mathematical optimization** via SMT solvers
 - **7-dimensional feature scoring** (not just similarity)
-- **Provably optimal selection** (within defined budgets)
-- **100% local operation** (embedded SQLite + optimizer)
+- **Provably optimal selection** (within defined constraints)
+- **100% local operation** (embedded SQLite + Z3)
 
 ### Key Benefits
 
@@ -53,21 +53,21 @@ Instead of approximations, ContextLite uses:
 
 ---
 
-## optimization Optimization Theory
+## SMT Optimization Theory
 
-### What is optimization?
+### What is SMT?
 
-**Satisfiability Modulo Theories (optimization)** is a mathematical framework for solving budget management problems with provable optimality guarantees. optimization systems like optimizer, CVC4, and Yices are used in:
+**Satisfiability Modulo Theories (SMT)** is a mathematical framework for solving constraint satisfaction problems with provable optimality guarantees. SMT solvers like Z3, CVC4, and Yices are used in:
 - Formal verification
 - AI planning
 - Theorem proving
 - Resource allocation
 
-### ContextLite's optimization Formulation
+### ContextLite's SMT Formulation
 
 Context selection is modeled as a **multi-objective optimization problem**:
 
-```optimization2
+```smt2
 ; Variables: binary selection indicators
 (declare-fun select_doc_i () Bool)
 
@@ -83,7 +83,7 @@ Context selection is modeled as a **multi-objective optimization problem**:
 
 (assert (<= (+ select_doc_1 select_doc_2 ... select_doc_N) max_documents))
 
-; Diversity budgets (pairwise similarity penalties)
+; Diversity constraints (pairwise similarity penalties)
 (assert (=> (and select_doc_i select_doc_j) 
             (<= similarity_ij diversity_threshold)))
 ```
@@ -93,7 +93,7 @@ Context selection is modeled as a **multi-objective optimization problem**:
 #### 1. Weighted-Sum Scalarization (Default)
 ```
 maximize: Σ(αᵢ × FeatureScore(docᵢ))
-subject to: token_budget, max_documents, diversity_budgets
+subject to: token_budget, max_documents, diversity_constraints
 ```
 
 #### 2. Lexicographic Optimization
@@ -104,7 +104,7 @@ Strict priority ordering:
 4. etc.
 
 #### 3. ε-Constraint Method
-Optimize primary objective with secondary objectives as budgets:
+Optimize primary objective with secondary objectives as constraints:
 ```
 maximize: relevance_score
 subject to: recency_score ≥ ε₁, authority_score ≥ ε₂, ...
@@ -114,7 +114,7 @@ subject to: recency_score ≥ ε₁, authority_score ≥ ε₂, ...
 
 ## 7-Dimensional Feature System
 
-ContextLite evaluates documents across **7 independent dimensions**. Each feature is **set-independent** to ensure mathematical correctness in optimization optimization.
+ContextLite evaluates documents across **7 independent dimensions**. Each feature is **set-independent** to ensure mathematical correctness in SMT optimization.
 
 ### 1. Relevance (Query Matching)
 
@@ -260,7 +260,7 @@ contextlite/
 │   ├── demo/                  # Demo applications
 │   └── license-server/        # Enterprise licensing
 ├── internal/                  # Private implementation
-│   ├── optimization/                   # optimizer optimization system integration
+│   ├── smt/                   # Z3 SMT solver integration
 │   ├── storage/               # SQLite + FTS5 storage
 │   ├── features/              # 7D feature extraction
 │   ├── pipeline/              # Context assembly pipeline
@@ -294,15 +294,15 @@ contextlite/
 - **Statistics**: Document and corpus-level statistics
 - **Caching**: Feature vector caching for performance
 
-#### 3. Advanced Optimization (`internal/optimization/`)
-- **optimizer Solver**: Direct integration with optimizer optimization system
-- **Constraint Generation**: Convert context selection to optimization problem
-- **Multiple Strategies**: Weighted-sum, lexicographic, ε-budget
-- **Timeout Handling**: Graceful degradation for time budgets
+#### 3. SMT Integration (`internal/smt/`)
+- **Z3 Solver**: Direct integration with Z3 SMT solver
+- **Constraint Generation**: Convert context selection to SMT problem
+- **Multiple Strategies**: Weighted-sum, lexicographic, ε-constraint
+- **Timeout Handling**: Graceful degradation for time constraints
 
 #### 4. Pipeline (`internal/pipeline/`)
 - **Context Assembly**: Main orchestration logic
-- **Multi-Stage Processing**: Candidate selection → feature scoring → optimization optimization
+- **Multi-Stage Processing**: Candidate selection → feature scoring → SMT optimization
 - **Error Handling**: Robust error handling and recovery
 - **Metrics**: Performance and quality metrics collection
 
@@ -327,9 +327,9 @@ contextlite/
    ↓
 3. Feature Extraction (7D vectors)
    ↓
-4. optimization Problem Formulation
+4. SMT Problem Formulation
    ↓
-5. optimizer Solver Optimization
+5. Z3 Solver Optimization
    ↓
 6. Result Assembly
    ↓
@@ -372,8 +372,8 @@ type ContextRequest struct {
     MaxTokens     int    `json:"max_tokens"`
     MaxDocuments  int    `json:"max_documents"`
     WorkspacePath string `json:"workspace_path"`
-    Useoptimization        bool   `json:"use_optimization"`
-    Strategy      string `json:"strategy"` // weighted-sum, lexicographic, epsilon-budget
+    UseSMT        bool   `json:"use_smt"`
+    Strategy      string `json:"strategy"` // weighted-sum, lexicographic, epsilon-constraint
 }
 ```
 
@@ -405,7 +405,7 @@ curl -X POST http://localhost:8080/api/v1/context/assemble \
     "max_tokens": 4000,
     "max_documents": 10,
     "workspace_path": "/path/to/project",
-    "use_optimization": true,
+    "use_smt": true,
     "strategy": "weighted-sum"
   }'
 ```
@@ -421,13 +421,13 @@ curl -X POST http://localhost:8080/api/v1/context/assemble \
       "utility_score": 0.95,
       "relevance_score": 0.89,
       "recency_score": 0.76,
-      "inclusion_reason": "optimization optimal selection"
+      "inclusion_reason": "SMT optimal selection"
     }
   ],
   "total_tokens": 3847,
   "processing_time_ms": 127,
   "cache_hit": false,
-  "optimization_solve_time_ms": 45
+  "smt_solve_time_ms": 45
 }
 ```
 
@@ -539,12 +539,12 @@ server:
   cors_enabled: true
   log_level: "info"
 
-# optimization system configuration
-optimization:
+# SMT solver configuration
+smt:
   solver: "z3"                    # z3, cvc4, yices
   timeout_ms: 250                 # Hard timeout for solver
   max_opt_gap: 0.05              # 5% optimality gap acceptable
-  objective_style: "weighted-sum" # weighted-sum, lexicographic, epsilon-budget
+  objective_style: "weighted-sum" # weighted-sum, lexicographic, epsilon-constraint
   fallback_enabled: true         # Fall back to heuristics on timeout
 
 # Feature weights (per-workspace adaptive)
@@ -609,9 +609,9 @@ Override configuration with environment variables:
 export CONTEXTLITE_PORT=9090
 export CONTEXTLITE_HOST=0.0.0.0
 
-# optimization settings
-export CONTEXTLITE_optimization_TIMEOUT=500
-export CONTEXTLITE_optimization_STRATEGY=lexicographic
+# SMT settings
+export CONTEXTLITE_SMT_TIMEOUT=500
+export CONTEXTLITE_SMT_STRATEGY=lexicographic
 
 # Storage settings
 export CONTEXTLITE_DB_PATH=/custom/path/contextlite.db
@@ -628,7 +628,7 @@ export CONTEXTLITE_WORKERS=8
   --config=custom.yaml \
   --port=9090 \
   --db-path=/tmp/contextlite.db \
-  --optimization-timeout=500 \
+  --smt-timeout=500 \
   --log-level=debug \
   --workers=8
 ```
@@ -670,7 +670,7 @@ languages:
 | Cold Query | <500ms | 180ms (p50) | First query on workspace |
 | Warm Query | <100ms | 45ms (p50) | With L1 cache hit |
 | Hot Query | <30ms | 15ms (p50) | With L2 cache hit |
-| optimization Solve | <250ms | 50ms (p50) | Optimization step only |
+| SMT Solve | <250ms | 50ms (p50) | Optimization step only |
 | Index Document | <10ms | 5ms (p50) | Per document |
 | Workspace Scan | <5s | 2.1s | 10k documents |
 
@@ -687,7 +687,7 @@ languages:
 - **Throughput**: Queries per second
 - **Resource Usage**: CPU, memory, disk I/O
 - **Cache Performance**: Hit rates, invalidation frequency
-- **optimization Performance**: Solve times, optimization gaps
+- **SMT Performance**: Solve times, optimization gaps
 
 #### Benchmark Results
 
@@ -697,7 +697,7 @@ Operation           p50     p95     p99     QPS
 Cold Query         180ms   350ms   500ms   25/s
 Warm Query          45ms    80ms   120ms   150/s
 Hot Query           15ms    30ms    45ms   500/s
-optimization Optimization    50ms   150ms   250ms   N/A
+SMT Optimization    50ms   150ms   250ms   N/A
 ```
 
 **Resource Usage:**
@@ -774,7 +774,7 @@ cache:
   l1_size: 5000               # Larger L1 cache
   l2_ttl: "48h"               # Longer L2 cache
   
-optimization:
+smt:
   timeout_ms: 100             # Shorter timeout
   max_opt_gap: 0.10          # Relaxed optimality
 ```
@@ -810,7 +810,7 @@ optimization:
 # Go 1.21+
 go version
 
-# optimizer optimization Solver
+# Z3 SMT Solver
 # Ubuntu/Debian:
 sudo apt-get install z3
 
@@ -818,7 +818,7 @@ sudo apt-get install z3
 brew install z3
 
 # Windows:
-# Download from: https://github.com/optimizerProver/z3/releases
+# Download from: https://github.com/Z3Prover/z3/releases
 ```
 
 #### Clone and Build
@@ -848,7 +848,7 @@ make coverage
 make dev
 
 # Run specific tests
-go test ./internal/optimization/... -v
+go test ./internal/smt/... -v
 
 # Run benchmarks
 make bench
@@ -878,7 +878,7 @@ func main() {
 type Pipeline struct {
     storage  storage.Interface
     features features.Extractor
-    optimization      optimization.Solver
+    smt      smt.Solver
     cache    cache.Manager
 }
 
@@ -889,26 +889,26 @@ func (p *Pipeline) AssembleContext(req ContextRequest) (*ContextResult, error) {
     // 2. Extract features
     features := p.features.Extract(candidates, req.Query)
     
-    // 3. optimization optimization
-    optimal := p.optimization.Optimize(features, req.Constraints)
+    // 3. SMT optimization
+    optimal := p.smt.Optimize(features, req.Constraints)
     
     // 4. Assemble result
     return p.assembleResult(optimal), nil
 }
 ```
 
-**`internal/optimization/`** - optimization system integration
+**`internal/smt/`** - SMT solver integration
 ```go
-type optimizerSolver struct {
+type Z3Solver struct {
     timeout time.Duration
     strategy OptimizationStrategy
 }
 
-func (z *optimizerSolver) Optimize(docs []ScoredDocument, budgets Constraints) ([]int, error) {
-    // Generate optimization problem
-    problem := z.generateoptimizationProblem(docs, budgets)
+func (z *Z3Solver) Optimize(docs []ScoredDocument, constraints Constraints) ([]int, error) {
+    // Generate SMT problem
+    problem := z.generateSMTProblem(docs, constraints)
     
-    // Solve with optimizer
+    // Solve with Z3
     result := z.solve(problem)
     
     return result.SelectedIndices, nil
@@ -973,14 +973,14 @@ func TestEndToEndContextAssembly(t *testing.T) {
 
 #### Benchmark Tests
 ```go
-func BenchmarkoptimizationSolver(b *testing.B) {
-    solver := NewoptimizerSolver()
+func BenchmarkSMTSolver(b *testing.B) {
+    solver := NewZ3Solver()
     docs := generateTestDocs(100)
-    budgets := Constraints{MaxTokens: 4000}
+    constraints := Constraints{MaxTokens: 4000}
     
     b.ResetTimer()
     for i := 0; i < b.N; i++ {
-        _, err := solver.Optimize(docs, budgets)
+        _, err := solver.Optimize(docs, constraints)
         if err != nil {
             b.Fatal(err)
         }
@@ -1023,16 +1023,16 @@ func (e *Extractor) Extract(doc Document, query string) FeatureVector {
 }
 ```
 
-#### 2. Adding a New optimization Strategy
+#### 2. Adding a New SMT Strategy
 
-Implement in `internal/optimization/`:
+Implement in `internal/smt/`:
 ```go
 type CustomStrategy struct {
     // parameters
 }
 
-func (s *CustomStrategy) GenerateProblem(docs []ScoredDocument, budgets Constraints) optimizationProblem {
-    // Generate custom optimization formulation
+func (s *CustomStrategy) GenerateProblem(docs []ScoredDocument, constraints Constraints) SMTProblem {
+    // Generate custom SMT formulation
     return problem
 }
 ```
@@ -1089,17 +1089,17 @@ func (h *Handler) RegisterRoutes(router chi.Router) {
 
 ### Common Issues
 
-#### 1. optimization Solver Timeout
+#### 1. SMT Solver Timeout
 
 **Symptoms:**
 - Context assembly takes >1s
-- "optimization system timeout" errors
+- "SMT solver timeout" errors
 - Fallback to heuristic selection
 
 **Solutions:**
 ```yaml
 # Increase timeout
-optimization:
+smt:
   timeout_ms: 500
 
 # Reduce candidate pool
@@ -1107,7 +1107,7 @@ performance:
   max_candidates: 100
 
 # Relax optimality
-optimization:
+smt:
   max_opt_gap: 0.10
 ```
 
@@ -1182,24 +1182,24 @@ rm contextlite.db
 ./contextlite --rebuild-index
 ```
 
-#### 5. optimizer Solver Issues
+#### 5. Z3 Solver Issues
 
 **Symptoms:**
-- "optimizer not found" errors
-- optimization formulation errors
+- "Z3 not found" errors
+- SMT formulation errors
 - Solver crashes
 
 **Solutions:**
 ```bash
-# Verify optimizer installation
+# Verify Z3 installation
 z3 --version
 
-# Install/update optimizer
+# Install/update Z3
 # Ubuntu: sudo apt-get install z3
 # macOS: brew install z3
 
 # Use alternative solver
-optimization:
+smt:
   solver: "cvc4"  # or "yices"
 ```
 
@@ -1216,8 +1216,8 @@ export CONTEXTLITE_LOG_LEVEL=debug
 
 Debug specific components:
 ```bash
-# optimization system debugging
-export CONTEXTLITE_optimization_DEBUG=true
+# SMT solver debugging
+export CONTEXTLITE_SMT_DEBUG=true
 
 # Feature extraction debugging
 export CONTEXTLITE_FEATURES_DEBUG=true
@@ -1266,8 +1266,8 @@ Common log patterns:
 # High latency queries
 grep "slow_query" contextlite.log | tail -20
 
-# optimization system timeouts
-grep "optimization_timeout" contextlite.log
+# SMT solver timeouts
+grep "smt_timeout" contextlite.log
 
 # Cache misses
 grep "cache_miss" contextlite.log | wc -l
@@ -1306,7 +1306,7 @@ Where:
 **1. Weighted Sum Method:**
 ```
 maximize: Σᵢ wᵢ × fᵢ(x)
-subject to: token budget, document budget
+subject to: token constraint, document constraint
 ```
 
 **2. Lexicographic Method:**
@@ -1417,10 +1417,10 @@ C(Tᵢ) = number of outbound links from Tᵢ
 
 ### Constraint Satisfaction
 
-#### optimization Formulation
+#### SMT Formulation
 
-The complete optimization formulation:
-```optimization2
+The complete SMT formulation:
+```smt2
 ; Decision variables
 (declare-fun select_0 () Bool)
 (declare-fun select_1 () Bool)
@@ -1434,19 +1434,19 @@ The complete optimization formulation:
              (* w1 (ite select_n relevance_n 0.0))
              (* w2 (ite select_n recency_n 0.0))))
 
-; Token budget budget
+; Token budget constraint
 (assert (<= (+ (ite select_0 tokens_0 0)
                (ite select_1 tokens_1 0)
                ...
                (ite select_n tokens_n 0)) max_tokens))
 
-; Maximum documents budget
+; Maximum documents constraint
 (assert (<= (+ (ite select_0 1 0)
                (ite select_1 1 0)
                ...
                (ite select_n 1 0)) max_documents))
 
-; Diversity budgets (pairwise)
+; Diversity constraints (pairwise)
 (assert (=> (and select_i select_j) 
             (<= similarity_ij diversity_threshold)))
 ```
@@ -1459,16 +1459,16 @@ The complete optimization formulation:
 - n = number of documents
 - m = average document length
 
-**optimization Solving**: O(2^k) worst case, O(k log k) typical
+**SMT Solving**: O(2^k) worst case, O(k log k) typical
 - k = number of candidate documents
-- Practical: Linear due to timeout budgets
+- Practical: Linear due to timeout constraints
 
 **Total Pipeline**: O(n × m + k log k)
 
 #### Space Complexity
 
 **Feature Vectors**: O(n × 7) = O(n)
-**optimization Problem**: O(k²) for pairwise budgets
+**SMT Problem**: O(k²) for pairwise constraints
 **Cache Storage**: O(c) where c = cache size
 
 ### Statistical Significance
@@ -1501,7 +1501,7 @@ Where:
 
 | Feature | ContextLite | Pinecone | Weaviate | Chroma | OpenSearch |
 |---------|-------------|----------|----------|--------|------------|
-| **Optimization** | optimization (optimal) | ANN (approx) | ANN (approx) | ANN (approx) | Lexical + ANN |
+| **Optimization** | SMT (optimal) | ANN (approx) | ANN (approx) | ANN (approx) | Lexical + ANN |
 | **Latency** | 0.3ms | 40-60ms | 30-50ms | 25-40ms | 50-80ms |
 | **Accuracy** | Provably optimal | ~85% | ~82% | ~78% | ~80% |
 | **Setup Time** | 5 minutes | 2-4 hours | 2-3 hours | 1 hour | 3-4 hours |
@@ -1514,27 +1514,27 @@ Where:
 
 | Feature | ContextLite | Elasticsearch | Solr | Sphinx | Tantivy |
 |---------|-------------|---------------|------|--------|---------|
-| **Algorithm** | optimization + 7D features | BM25 + custom | BM25 + custom | Custom ranking | BM25 + TF-IDF |
+| **Algorithm** | SMT + 7D features | BM25 + custom | BM25 + custom | Custom ranking | BM25 + TF-IDF |
 | **Optimization** | Mathematical | Heuristic | Heuristic | Heuristic | Heuristic |
 | **Context Aware** | Yes (7 dimensions) | Limited | Limited | No | Limited |
 | **Learning** | Adaptive weights | Manual tuning | Manual tuning | Manual tuning | Manual tuning |
 | **Local First** | Yes | Server required | Server required | Server required | Library only |
 
-### optimization Solver Comparison
+### SMT Solver Comparison
 
 | Solver | Performance | Features | License | Integration |
 |--------|-------------|----------|---------|-------------|
-| **optimizer** | Excellent | Full optimization-LIB | MIT | Go bindings |
-| **CVC4** | Good | Full optimization-LIB | BSD | C++ API |
+| **Z3** | Excellent | Full SMT-LIB | MIT | Go bindings |
+| **CVC4** | Good | Full SMT-LIB | BSD | C++ API |
 | **Yices** | Excellent | Subset | GPL/Commercial | C API |
-| **MathSAT** | Good | Full optimization-LIB | Custom | Limited |
+| **MathSAT** | Good | Full SMT-LIB | Custom | Limited |
 | **Boolector** | Fast (SAT focus) | Limited | MIT | C API |
 
 ### AI Context Systems Comparison
 
 | System | Approach | Optimization | Local | Learning |
 |--------|----------|--------------|-------|----------|
-| **ContextLite** | optimization + 7D features | Mathematical | Yes | Adaptive |
+| **ContextLite** | SMT + 7D features | Mathematical | Yes | Adaptive |
 | **GitHub Copilot** | Embedding similarity | Heuristic | No | Limited |
 | **Codeium** | Hybrid retrieval | Heuristic | No | Some |
 | **Tabnine** | Local + cloud | Heuristic | Hybrid | Some |
@@ -2039,7 +2039,7 @@ result = requests.post("http://localhost:8080/api/v1/context/assemble", json={
   "query": "user authentication",
   "max_documents": 10,
   "max_tokens": 4000,
-  "use_optimization": true
+  "use_smt": true
 }
 ```
 

@@ -45,10 +45,10 @@ func getTestConfig() *Config {
 		StripeSecretKey:     "sk_test_fake_key_for_testing",
 		StripeWebhookSecret: "whsec_test_fake_webhook_secret",
 		PrivateKeyPath:      keyPath,
-		optimizationPHost:           "",  // Disable email for testing
-		optimizationPPort:           587,
-		optimizationPUser:           "",
-		optimizationPPassword:       "",
+		SMTPHost:           "",  // Disable email for testing
+		SMTPPort:           587,
+		SMTPUser:           "",
+		SMTPPassword:       "",
 		FromEmail:          "test@contextlite.com",
 	}
 }
@@ -346,7 +346,7 @@ func TestLicenseServer_DetermineLicenseTier(t *testing.T) {
 	}
 }
 
-// Test email sending (without actual optimizationP)
+// Test email sending (without actual SMTP)
 func TestLicenseServer_SendLicenseEmail(t *testing.T) {
 	config := getTestConfig()
 	server, err := NewLicenseServer(config)
@@ -388,7 +388,7 @@ func TestLicenseServer_SendLicenseEmail(t *testing.T) {
 			if tt.wantError {
 				assert.Error(t, err)
 			} else {
-				// In development mode (no optimizationP configured), should not error
+				// In development mode (no SMTP configured), should not error
 				assert.NoError(t, err)
 			}
 		})
@@ -626,10 +626,10 @@ func TestLoadConfig(t *testing.T) {
 		"STRIPE_SECRET_KEY":     os.Getenv("STRIPE_SECRET_KEY"),
 		"STRIPE_WEBHOOK_SECRET": os.Getenv("STRIPE_WEBHOOK_SECRET"),
 		"PORT":                  os.Getenv("PORT"),
-		"optimizationP_HOST":             os.Getenv("optimizationP_HOST"),
-		"optimizationP_PORT":             os.Getenv("optimizationP_PORT"),
-		"optimizationP_USER":             os.Getenv("optimizationP_USER"),
-		"optimizationP_PASSWORD":         os.Getenv("optimizationP_PASSWORD"),
+		"SMTP_HOST":             os.Getenv("SMTP_HOST"),
+		"SMTP_PORT":             os.Getenv("SMTP_PORT"),
+		"SMTP_USER":             os.Getenv("SMTP_USER"),
+		"SMTP_PASSWORD":         os.Getenv("SMTP_PASSWORD"),
 		"FROM_EMAIL":            os.Getenv("FROM_EMAIL"),
 		"PRIVATE_KEY_PATH":      os.Getenv("PRIVATE_KEY_PATH"),
 	}
@@ -659,7 +659,7 @@ func TestLoadConfig(t *testing.T) {
 		os.Setenv("STRIPE_SECRET_KEY", "sk_test_fake")
 		os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test_fake")
 		os.Setenv("PORT", "8081")
-		os.Setenv("optimizationP_PORT", "587")
+		os.Setenv("SMTP_PORT", "587")
 		os.Setenv("PRIVATE_KEY_PATH", "./test_key.pem")
 
 		config, err := loadConfig()
@@ -668,7 +668,7 @@ func TestLoadConfig(t *testing.T) {
 		assert.Equal(t, 8081, config.Port)
 		assert.Equal(t, "sk_test_fake", config.StripeSecretKey)
 		assert.Equal(t, "whsec_test_fake", config.StripeWebhookSecret)
-		assert.Equal(t, 587, config.optimizationPPort)
+		assert.Equal(t, 587, config.SMTPPort)
 		assert.Equal(t, "./test_key.pem", config.PrivateKeyPath)
 	})
 }
@@ -913,10 +913,10 @@ func TestLicenseServer_Start_InvalidPort(t *testing.T) {
 }
 
 // Test sendLicenseEmail method directly
-func TestLicenseServer_SendLicenseEmail_optimizationPDisabled(t *testing.T) {
+func TestLicenseServer_SendLicenseEmail_SMTPDisabled(t *testing.T) {
 	config := getTestConfig()
-	// Ensure optimizationP is disabled for testing
-	config.optimizationPHost = ""
+	// Ensure SMTP is disabled for testing
+	config.SMTPHost = ""
 	server, err := NewLicenseServer(config)
 	require.NoError(t, err)
 
@@ -928,7 +928,7 @@ func TestLicenseServer_SendLicenseEmail_optimizationPDisabled(t *testing.T) {
 		expectError bool
 	}{
 		{
-			name:        "valid_email_no_optimizationp",
+			name:        "valid_email_no_smtp",
 			email:       "test@example.com",
 			license:     "test-license-key",
 			tier:        license.TierDeveloper,
@@ -1002,27 +1002,27 @@ func TestLicenseServer_StripeWebhookHandlers_Subscriptions(t *testing.T) {
 	}
 }
 
-// Test sendLicenseEmail with optimizationP configuration
-func TestLicenseServer_SendLicenseEmail_WithoptimizationP(t *testing.T) {
+// Test sendLicenseEmail with SMTP configuration
+func TestLicenseServer_SendLicenseEmail_WithSMTP(t *testing.T) {
 	config := getTestConfig()
-	// Configure optimizationP (will still fail but will test more code paths)
-	config.optimizationPHost = "optimizationp.test.com"
-	config.optimizationPPort = 587
-	config.optimizationPUser = "test@test.com"
-	config.optimizationPPassword = "password"
+	// Configure SMTP (will still fail but will test more code paths)
+	config.SMTPHost = "smtp.test.com"
+	config.SMTPPort = 587
+	config.SMTPUser = "test@test.com"
+	config.SMTPPassword = "password"
 	server, err := NewLicenseServer(config)
 	require.NoError(t, err)
 
-	// This will fail to send but will exercise the optimizationP code path
+	// This will fail to send but will exercise the SMTP code path
 	err = server.sendLicenseEmail("test@example.com", "test-license", license.TierDeveloper)
 	
-	// In real environment this would fail due to invalid optimizationP config
+	// In real environment this would fail due to invalid SMTP config
 	// But we're testing code coverage, not actual email sending
 	// The function should handle the error gracefully
 	
-	// Since we can't test actual optimizationP without a real server,
+	// Since we can't test actual SMTP without a real server,
 	// let's just verify the function doesn't panic
-	assert.NotNil(t, err) // Should error due to invalid optimizationP config
+	assert.NotNil(t, err) // Should error due to invalid SMTP config
 }
 
 // Test main function indirectly by testing config loading with env vars
@@ -1033,10 +1033,10 @@ func TestLoadConfig_EnvironmentVariables(t *testing.T) {
 		"STRIPE_SECRET_KEY":      "sk_test_env_key",
 		"STRIPE_WEBHOOK_SECRET":  "whsec_test_env_secret",
 		"PRIVATE_KEY_PATH":       "/tmp/test_key.pem",
-		"optimizationP_HOST":              "optimizationp.env.com",
-		"optimizationP_PORT":              "587",
-		"optimizationP_USER":              "env@test.com",
-		"optimizationP_PASSWORD":          "env_password",
+		"SMTP_HOST":              "smtp.env.com",
+		"SMTP_PORT":              "587",
+		"SMTP_USER":              "env@test.com",
+		"SMTP_PASSWORD":          "env_password",
 		"FROM_EMAIL":             "env_from@test.com",
 	}
 
@@ -1060,10 +1060,10 @@ func TestLoadConfig_EnvironmentVariables(t *testing.T) {
 	assert.Equal(t, "sk_test_env_key", config.StripeSecretKey)
 	assert.Equal(t, "whsec_test_env_secret", config.StripeWebhookSecret)
 	assert.Equal(t, "/tmp/test_key.pem", config.PrivateKeyPath)
-	assert.Equal(t, "optimizationp.env.com", config.optimizationPHost)
-	assert.Equal(t, 587, config.optimizationPPort)
-	assert.Equal(t, "env@test.com", config.optimizationPUser)
-	assert.Equal(t, "env_password", config.optimizationPPassword)
+	assert.Equal(t, "smtp.env.com", config.SMTPHost)
+	assert.Equal(t, 587, config.SMTPPort)
+	assert.Equal(t, "env@test.com", config.SMTPUser)
+	assert.Equal(t, "env_password", config.SMTPPassword)
 	assert.Equal(t, "env_from@test.com", config.FromEmail)
 }
 
@@ -1311,17 +1311,17 @@ func TestLicenseServer_SendLicenseEmail_EmptyEmail(t *testing.T) {
 	assert.NoError(t, err) // Should succeed in development mode
 }
 
-// Test optimizationP configuration edge cases in loadConfig
-func TestLoadConfig_optimizationPConfiguration(t *testing.T) {
+// Test SMTP configuration edge cases in loadConfig
+func TestLoadConfig_SMTPConfiguration(t *testing.T) {
 	// Save original env
-	originaloptimizationPPort := os.Getenv("optimizationP_PORT")
+	originalSMTPPort := os.Getenv("SMTP_PORT")
 	originalFromEmail := os.Getenv("FROM_EMAIL")
 	originalPrivateKeyPath := os.Getenv("PRIVATE_KEY_PATH")
 	originalStripeKey := os.Getenv("STRIPE_SECRET_KEY")
 	originalWebhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
 	
 	defer func() {
-		os.Setenv("optimizationP_PORT", originaloptimizationPPort)
+		os.Setenv("SMTP_PORT", originalSMTPPort)
 		os.Setenv("FROM_EMAIL", originalFromEmail)
 		os.Setenv("PRIVATE_KEY_PATH", originalPrivateKeyPath)
 		os.Setenv("STRIPE_SECRET_KEY", originalStripeKey)
@@ -1331,13 +1331,13 @@ func TestLoadConfig_optimizationPConfiguration(t *testing.T) {
 	// Set required env vars
 	os.Setenv("STRIPE_SECRET_KEY", "sk_test_123")
 	os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test_123")
-	os.Setenv("optimizationP_PORT", "2525")
+	os.Setenv("SMTP_PORT", "2525")
 	os.Setenv("FROM_EMAIL", "custom@example.com")
 	os.Setenv("PRIVATE_KEY_PATH", "./private_key.pem")
 	
 	config, err := loadConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, 2525, config.optimizationPPort)
+	assert.Equal(t, 2525, config.SMTPPort)
 	assert.Equal(t, "custom@example.com", config.FromEmail)
 	assert.Equal(t, "./private_key.pem", config.PrivateKeyPath)
 }
@@ -1348,18 +1348,18 @@ func TestLoadConfig_AdditionalScenarios(t *testing.T) {
 	originalStripeKey := os.Getenv("STRIPE_SECRET_KEY")
 	originalWebhookSecret := os.Getenv("STRIPE_WEBHOOK_SECRET")
 	originalPrivateKeyPath := os.Getenv("PRIVATE_KEY_PATH")
-	originaloptimizationPHost := os.Getenv("optimizationP_HOST")
-	originaloptimizationPUser := os.Getenv("optimizationP_USER")
-	originaloptimizationPPass := os.Getenv("optimizationP_PASS")
+	originalSMTPHost := os.Getenv("SMTP_HOST")
+	originalSMTPUser := os.Getenv("SMTP_USER")
+	originalSMTPPass := os.Getenv("SMTP_PASS")
 	originalPort := os.Getenv("PORT")
 	
 	defer func() {
 		os.Setenv("STRIPE_SECRET_KEY", originalStripeKey)
 		os.Setenv("STRIPE_WEBHOOK_SECRET", originalWebhookSecret)
 		os.Setenv("PRIVATE_KEY_PATH", originalPrivateKeyPath)
-		os.Setenv("optimizationP_HOST", originaloptimizationPHost)
-		os.Setenv("optimizationP_USER", originaloptimizationPUser)
-		os.Setenv("optimizationP_PASS", originaloptimizationPPass)
+		os.Setenv("SMTP_HOST", originalSMTPHost)
+		os.Setenv("SMTP_USER", originalSMTPUser)
+		os.Setenv("SMTP_PASS", originalSMTPPass)
 		os.Setenv("PORT", originalPort)
 	}()
 	
@@ -1399,14 +1399,14 @@ func TestLoadConfig_AdditionalScenarios(t *testing.T) {
 			expectError: false, // loadConfig provides default value
 		},
 		{
-			name: "all_optimizationp_env_vars_set",
+			name: "all_smtp_env_vars_set",
 			setupEnv: func() {
 				os.Setenv("STRIPE_SECRET_KEY", "sk_test_123")
 				os.Setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
 				os.Setenv("PRIVATE_KEY_PATH", "./test.pem")
-				os.Setenv("optimizationP_HOST", "optimizationp.gmail.com")
-				os.Setenv("optimizationP_USER", "test@gmail.com")
-				os.Setenv("optimizationP_PASS", "password123")
+				os.Setenv("SMTP_HOST", "smtp.gmail.com")
+				os.Setenv("SMTP_USER", "test@gmail.com")
+				os.Setenv("SMTP_PASS", "password123")
 				os.Setenv("PORT", "9000")
 			},
 			expectError: false,

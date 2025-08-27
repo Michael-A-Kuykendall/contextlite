@@ -40,7 +40,7 @@ func TestFeatureGate_EdgeCases(t *testing.T) {
 	
 	// Test basic features that should be available in developer tier
 	basicFeatures := []string{"basic_search", "rest_api", "sqlite_storage", "single_workspace"}
-	advancedFeatures := []string{"unlimited_workspaces", "advanced_optimization", "7d_scoring", "caching"}
+	advancedFeatures := []string{"unlimited_workspaces", "advanced_smt", "7d_scoring", "caching"}
 	
 	for _, feature := range basicFeatures {
 		t.Run("developer_basic_"+feature, func(t *testing.T) {
@@ -132,7 +132,7 @@ func TestTrackedFeatureGate_ErrorCases(t *testing.T) {
 	assert.NoError(t, err) // Basic feature should be available
 	
 	// Advanced features might be denied or allowed depending on trial state
-	err = featureGate.RequireFeature("advanced_optimization")
+	err = featureGate.RequireFeature("advanced_smt")
 	_ = err // Suppress unused variable warning - Don't assert error since trial might allow advanced features
 }
 

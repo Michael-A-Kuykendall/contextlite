@@ -4,15 +4,15 @@ import (
 	"testing"
 )
 
-func TestoptimizationMetrics_Fields(t *testing.T) {
-	metrics := optimizationMetrics{
+func TestSMTMetrics_Fields(t *testing.T) {
+	metrics := SMTMetrics{
 		SolverUsed:      "z3",
-		optimizerStatus:        "sat",
+		Z3Status:        "sat",
 		Objective:       12345,
 		SolveTimeUs:     1000,
 		SolveTimeMs:     1.0,
-		optimizationWallUs:       1500,
-		optimizationWallMs:       1.5,
+		SMTWallUs:       1500,
+		SMTWallMs:       1.5,
 		VariableCount:   10,
 		ConstraintCount: 5,
 		KCandidates:     20,
@@ -25,8 +25,8 @@ func TestoptimizationMetrics_Fields(t *testing.T) {
 	if metrics.SolverUsed != "z3" {
 		t.Errorf("Expected SolverUsed to be 'z3', got %s", metrics.SolverUsed)
 	}
-	if metrics.optimizerStatus != "sat" {
-		t.Errorf("Expected optimizerStatus to be 'sat', got %s", metrics.optimizerStatus)
+	if metrics.Z3Status != "sat" {
+		t.Errorf("Expected Z3Status to be 'sat', got %s", metrics.Z3Status)
 	}
 	if metrics.Objective != 12345 {
 		t.Errorf("Expected Objective to be 12345, got %d", metrics.Objective)
@@ -49,13 +49,13 @@ func TestStageTimings_Fields(t *testing.T) {
 	timings := StageTimings{
 		FTSHarvestUs:   1000,
 		FeatureBuildUs: 2000,
-		optimizationSolverUs:    3000,
-		optimizationWallUs:      3500,
+		SMTSolverUs:    3000,
+		SMTWallUs:      3500,
 		TotalUs:        6500,
 		FTSHarvestMs:   1.0,
 		FeatureBuildMs: 2.0,
-		optimizationSolverMs:    3.0,
-		optimizationWallMs:      3.5,
+		SMTSolverMs:    3.0,
+		SMTWallMs:      3.5,
 		TotalMs:        6.5,
 	}
 
@@ -65,8 +65,8 @@ func TestStageTimings_Fields(t *testing.T) {
 	if timings.FeatureBuildUs != 2000 {
 		t.Errorf("Expected FeatureBuildUs to be 2000, got %d", timings.FeatureBuildUs)
 	}
-	if timings.optimizationSolverUs != 3000 {
-		t.Errorf("Expected optimizationSolverUs to be 3000, got %d", timings.optimizationSolverUs)
+	if timings.SMTSolverUs != 3000 {
+		t.Errorf("Expected SMTSolverUs to be 3000, got %d", timings.SMTSolverUs)
 	}
 	if timings.TotalMs != 6.5 {
 		t.Errorf("Expected TotalMs to be 6.5, got %f", timings.TotalMs)
@@ -82,8 +82,8 @@ func TestAssembleRequest_Fields(t *testing.T) {
 		IncludePatterns: []string{"*.go", "*.md"},
 		ExcludePatterns: []string{"*.tmp"},
 		ModelID:         "gpt-4",
-		Useoptimization:          true,
-		optimizationTimeoutMs:    500,
+		UseSMT:          true,
+		SMTTimeoutMs:    500,
 		MaxOptGap:       0.05,
 		ObjectiveStyle:  "weighted-sum",
 		EnableSampling:  false,
@@ -108,11 +108,11 @@ func TestAssembleRequest_Fields(t *testing.T) {
 	if len(req.IncludePatterns) != 2 {
 		t.Errorf("Expected IncludePatterns length to be 2, got %d", len(req.IncludePatterns))
 	}
-	if req.Useoptimization != true {
-		t.Errorf("Expected Useoptimization to be true, got %t", req.Useoptimization)
+	if req.UseSMT != true {
+		t.Errorf("Expected UseSMT to be true, got %t", req.UseSMT)
 	}
-	if req.optimizationTimeoutMs != 500 {
-		t.Errorf("Expected optimizationTimeoutMs to be 500, got %d", req.optimizationTimeoutMs)
+	if req.SMTTimeoutMs != 500 {
+		t.Errorf("Expected SMTTimeoutMs to be 500, got %d", req.SMTTimeoutMs)
 	}
 	if req.MaxOptGap != 0.05 {
 		t.Errorf("Expected MaxOptGap to be 0.05, got %f", req.MaxOptGap)
@@ -127,7 +127,7 @@ func TestAssembledContext_Fields(t *testing.T) {
 		{ID: "doc1", Path: "/path1"},
 		{ID: "doc2", Path: "/path2"},
 	}
-	metrics := optimizationMetrics{SolverUsed: "z3", SolveTimeMs: 1.5}
+	metrics := SMTMetrics{SolverUsed: "z3", SolveTimeMs: 1.5}
 	timings := StageTimings{TotalMs: 5.0}
 
 	ctx := AssembledContext{
@@ -135,7 +135,7 @@ func TestAssembledContext_Fields(t *testing.T) {
 		Documents:      docs,
 		TotalTokens:    2500,
 		CoherenceScore: 0.85,
-		optimizationMetrics:     metrics,
+		SMTMetrics:     metrics,
 		Timings:        timings,
 	}
 
@@ -151,14 +151,14 @@ func TestAssembledContext_Fields(t *testing.T) {
 	if ctx.CoherenceScore != 0.85 {
 		t.Errorf("Expected CoherenceScore to be 0.85, got %f", ctx.CoherenceScore)
 	}
-	if ctx.optimizationMetrics.SolverUsed != "z3" {
-		t.Errorf("Expected optimizationMetrics.SolverUsed to be 'z3', got %s", ctx.optimizationMetrics.SolverUsed)
+	if ctx.SMTMetrics.SolverUsed != "z3" {
+		t.Errorf("Expected SMTMetrics.SolverUsed to be 'z3', got %s", ctx.SMTMetrics.SolverUsed)
 	}
 }
 
 func TestQueryResult_Fields(t *testing.T) {
 	docs := []DocumentReference{{ID: "doc1"}}
-	metrics := optimizationMetrics{SolverUsed: "z3"}
+	metrics := SMTMetrics{SolverUsed: "z3"}
 	timings := StageTimings{TotalMs: 3.0}
 
 	result := QueryResult{
@@ -167,7 +167,7 @@ func TestQueryResult_Fields(t *testing.T) {
 		TotalDocuments: 5,
 		TotalTokens:    1500,
 		CoherenceScore: 0.75,
-		optimizationMetrics:     metrics,
+		SMTMetrics:     metrics,
 		Timings:        timings,
 		CacheHit:       true,
 		CacheKey:       "cache123",

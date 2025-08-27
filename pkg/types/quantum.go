@@ -20,8 +20,8 @@ type NormalizationStats struct {
 	Count  int                `json:"count"`
 }
 
-// optimizationConstraint represents a user-defined optimization budget
-type optimizationConstraint struct {
+// SMTConstraint represents a user-defined SMT constraint
+type SMTConstraint struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name"`
 	Description string  `json:"description"`

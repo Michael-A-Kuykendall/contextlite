@@ -258,7 +258,7 @@ echo fake binary response`
 			// Test LoadEngine with mock storage
 			mockStorage := &MockStorage{}
 			cfg := &config.Config{
-				optimization: config.optimizationConfig{
+				SMT: config.SMTConfig{
 					SolverTimeoutMs: 1000,
 					MaxCandidates:   100,
 				},
@@ -282,7 +282,7 @@ echo fake binary response`
 			// Test LoadEngine when no private binary is available
 			mockStorage := &MockStorage{}
 			cfg := &config.Config{
-				optimization: config.optimizationConfig{
+				SMT: config.SMTConfig{
 					SolverTimeoutMs: 1000,
 					MaxCandidates:   50,
 				},

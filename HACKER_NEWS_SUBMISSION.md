@@ -23,8 +23,8 @@
 
 ### **Best Headlines** (HN-optimized):
 
-**Option A: optimization Highlight**
-**"Show HN: ContextLite – optimization system beats vector databases by 847x for code context"**
+**Option A: SMT Highlight**
+**"Show HN: ContextLite – SMT solver beats vector databases by 847x for code context"**
 
 **Option B: Direct Challenge** 
 **"RAG is solving the wrong problem"**
@@ -32,8 +32,8 @@
 **Option C: Performance Focus**
 **"Show HN: ContextLite – 847x faster than vector databases for code context"**
 
-**Option D: optimization Explanation**
-**"Show HN: ContextLite – optimization-powered context engine (847x faster than vector DBs)"**
+**Option D: SMT Explanation**
+**"Show HN: ContextLite – SMT-powered context engine (847x faster than vector DBs)"**
 
 ### **Landing Page Strategy**:
 **RECOMMENDED**: Send to **contextlite.com** (front page)
@@ -90,28 +90,28 @@
 
 ## **Alternative Versions**
 
-### **optimization-Enhanced Text** (for your website/comments):
+### **SMT-Enhanced Text** (for your website/comments):
 
 ```
-After watching developers struggle with 200ms+ vector database queries for context retrieval, we realized RAG was fundamentally backwards. Why compute expensive embeddings when you can find context in 0.3ms with optimization-powered reasoning?
+After watching developers struggle with 200ms+ vector database queries for context retrieval, we realized RAG was fundamentally backwards. Why compute expensive embeddings when you can find context in 0.3ms with SMT-powered reasoning?
 
-ContextLite uses optimization (Satisfiability Modulo Theories) solvers + BM25 heuristics to mathematically prove optimal context matches instead of guessing with similarity scores. We process 2,406 files/second with formal verification - understanding imports, dependencies, and code relationships that vector embeddings completely miss.
+ContextLite uses SMT (Satisfiability Modulo Theories) solvers + BM25 heuristics to mathematically prove optimal context matches instead of guessing with similarity scores. We process 2,406 files/second with formal verification - understanding imports, dependencies, and code relationships that vector embeddings completely miss.
 
-No GPU required, no embedding models, no vector databases. Just blazing fast context that actually reasons about your codebase structure using budget management and theorem proving.
+No GPU required, no embedding models, no vector databases. Just blazing fast context that actually reasons about your codebase structure using constraint satisfaction and theorem proving.
 
-We're live in production with npm, PyPI, VS Code marketplace, and 8 other package managers. 14-day optimization trial with full formal reasoning, then $99 lifetime license. Enterprise teams get advanced analytics, multi-repo support, and custom deployment options starting at $5,000/year.
+We're live in production with npm, PyPI, VS Code marketplace, and 8 other package managers. 14-day SMT trial with full formal reasoning, then $99 lifetime license. Enterprise teams get advanced analytics, multi-repo support, and custom deployment options starting at $5,000/year.
 
-The future of AI context isn't more computation – it's mathematical precision. optimization systems can prove correctness; vector databases can only guess similarity.
+The future of AI context isn't more computation – it's mathematical precision. SMT solvers can prove correctness; vector databases can only guess similarity.
 
 Try the math: contextlite.com/downloads
 ```
 
-### **Why This optimization Version Crushes:**
+### **Why This SMT Version Crushes:**
 
 **🧠 Technical Sophistication:**
-- "optimization systems + BM25" = hybrid approach showing depth
+- "SMT solvers + BM25" = hybrid approach showing depth
 - "mathematically prove optimal context" = precision vs guessing
-- "budget management and theorem proving" = serious CS credentials
+- "constraint satisfaction and theorem proving" = serious CS credentials
 - "formal verification" = enterprise-grade reliability
 
 **⚡ Performance + Proof:**
@@ -120,19 +120,19 @@ Try the math: contextlite.com/downloads
 - Mathematical certainty vs probabilistic embeddings
 
 **🎯 HN Nerd Appeal:**
-- optimization is advanced CS that HN audience appreciates
+- SMT is advanced CS that HN audience appreciates
 - "theorem proving" gets computer science respect
 - Shows you understand formal methods, not just APIs
 
-### **optimization in Headline? Analysis:**
+### **SMT in Headline? Analysis:**
 
 **✅ PRO:**
-- optimization is advanced/impressive to HN technical audience
-- "optimization system beats vector databases" = David vs Goliath narrative
+- SMT is advanced/impressive to HN technical audience
+- "SMT solver beats vector databases" = David vs Goliath narrative
 - Shows deep technical sophistication
 
 **⚠️ RISK:** 
-- Many developers don't know optimization
+- Many developers don't know SMT
 - Could reduce click-through if they don't understand
 - Might sound too academic/research-y
 
@@ -140,12 +140,12 @@ Try the math: contextlite.com/downloads
 
 **Best Headline**: **"Show HN: ContextLite – 847x faster than vector databases for code context"**
 
-**Why**: Performance claim is universal, optimization explanation works better in comments/website
+**Why**: Performance claim is universal, SMT explanation works better in comments/website
 
-**optimization Strategy**: 
-- Use optimization prominently on your website
-- Mention optimization in comment responses 
-- Let the speed draw them in, optimization sophistication keeps them
+**SMT Strategy**: 
+- Use SMT prominently on your website
+- Mention SMT in comment responses 
+- Let the speed draw them in, SMT sophistication keeps them
 
 ### **Version 3: Problem-Focused**
 ```

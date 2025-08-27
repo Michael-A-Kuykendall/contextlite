@@ -149,8 +149,8 @@ func getStats() (map[string]interface{}, error) {
 	return stats, nil
 }
 
-func getoptimizationStats() (map[string]interface{}, error) {
-	resp, err := makeRequest("GET", "/api/v1/optimization/stats", nil)
+func getSMTStats() (map[string]interface{}, error) {
+	resp, err := makeRequest("GET", "/api/v1/smt/stats", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +178,7 @@ func runBenchmarkQueries() {
 		"distributed system consensus algorithms",
 	}
 	
-	fmt.Println("\n=== Running optimizer optimization Optimization Benchmark ===")
+	fmt.Println("\n=== Running Z3 SMT Optimization Benchmark ===")
 	
 	for i, query := range queries {
 		fmt.Printf("\nQuery %d: %s\n", i+1, query)
@@ -212,11 +212,11 @@ func runBenchmarkQueries() {
 		time.Sleep(100 * time.Millisecond)
 	}
 	
-	// Get final optimization stats
-	optimizationStats, err := getoptimizationStats()
+	// Get final SMT stats
+	smtStats, err := getSMTStats()
 	if err == nil {
-		fmt.Println("\n=== Final optimizer optimization Statistics ===")
-		statsJson, _ := json.MarshalIndent(optimizationStats, "", "  ")
+		fmt.Println("\n=== Final Z3 SMT Statistics ===")
+		statsJson, _ := json.MarshalIndent(smtStats, "", "  ")
 		fmt.Println(string(statsJson))
 	}
 }

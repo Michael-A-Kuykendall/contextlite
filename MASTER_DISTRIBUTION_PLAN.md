@@ -14,7 +14,7 @@
 - [x] **Resolve main function conflicts**: Multiple `main()` declarations in root directory ✅
   - Moved conflicting files to `archive/benchmarks/` and `archive/` directories
 - [x] **Fix variable redeclarations**: `baseURL`, `authToken`, `QueryRequest`, `makeRequest` conflicts ✅
-- [x] **Fix JSON unmarshaling errors**: `z3_optimization_benchmark.go` lines 121, 141 using `*http.Response` instead of `[]byte` ✅
+- [x] **Fix JSON unmarshaling errors**: `z3_smt_benchmark.go` lines 121, 141 using `*http.Response` instead of `[]byte` ✅
 - [x] **Fix undefined references**: `cmd/demo/demo_test.go` missing imports/definitions ✅
 - [x] **Fix API test nil pointer**: `handleBaselineComparison` in API tests ✅
 

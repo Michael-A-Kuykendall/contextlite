@@ -19,16 +19,16 @@ type QueryRequest struct {
 	MaxResults int    `json:"max_results,omitempty"`
 }
 
-type optimizationMetrics struct {
+type SMTMetrics struct {
 	SolverUsed     string  `json:"solver_used"`
-	optimizerStatus       string  `json:"z3_status"`
+	Z3Status       string  `json:"z3_status"`
 	Objective      int     `json:"objective"`
 	SolveTimeUs    int     `json:"solve_time_us"`
 	SolveTimeMs    float64 `json:"solve_time_ms"`
-	optimizationWallUs      int     `json:"optimization_wall_us"`
-	optimizationWallMs      float64 `json:"optimization_wall_ms"`
+	SMTWallUs      int     `json:"smt_wall_us"`
+	SMTWallMs      float64 `json:"smt_wall_ms"`
 	VariableCount  int     `json:"variable_count"`
-	ConstraintCount int    `json:"budget_count"`
+	ConstraintCount int    `json:"constraint_count"`
 	KCandidates    int     `json:"K_candidates"`
 	PairsCount     int     `json:"pairs_count"`
 	BudgetTokens   int     `json:"budget_tokens"`
@@ -41,7 +41,7 @@ type ContextResponse struct {
 	TotalDocs    int         `json:"total_documents"`
 	TotalTokens  int         `json:"total_tokens"`
 	Coherence    float64     `json:"coherence_score"`
-	optimizationMetrics   optimizationMetrics  `json:"optimization_metrics"`
+	SMTMetrics   SMTMetrics  `json:"smt_metrics"`
 	Timings      interface{} `json:"timings"`
 	CacheHit     bool        `json:"cache_hit"`
 }
@@ -143,7 +143,7 @@ func runQuery(query string, maxResults int) (*ContextResponse, time.Duration, er
 }
 
 func main() {
-	fmt.Println("=== ContextLite optimizer optimization Optimization Benchmark ===")
+	fmt.Println("=== ContextLite Z3 SMT Optimization Benchmark ===")
 	
 	// Check initial state
 	info, err := getStorageInfo()
@@ -159,7 +159,7 @@ func main() {
 		maxResults int
 	}{
 		{"contextlite configuration settings", 5},
-		{"optimizer optimization system optimization", 3},
+		{"Z3 SMT solver optimization", 3},
 		{"database indexing and storage", 7},
 		{"Go programming patterns", 4},
 		{"authentication middleware implementation", 6},
@@ -172,7 +172,7 @@ func main() {
 
 	fmt.Printf("\n=== Running %d Test Queries ===\n", len(testQueries))
 	
-	var totaloptimizerTime time.Duration
+	var totalZ3Time time.Duration
 	var totalQueries int
 	var z3Solves int
 	var cacheMisses int
@@ -193,12 +193,12 @@ func main() {
 			cacheMisses++
 		}
 		
-		optimization := response.optimizationMetrics
-		if optimization.SolverUsed == "z3opt" {
+		smt := response.SMTMetrics
+		if smt.SolverUsed == "z3opt" {
 			z3Solves++
-			totaloptimizerTime += time.Duration(optimization.optimizationWallUs) * time.Microsecond
+			totalZ3Time += time.Duration(smt.SMTWallUs) * time.Microsecond
 			
-			if optimization.optimizerStatus == "sat" {
+			if smt.Z3Status == "sat" {
 				satisfiableResults++
 			}
 		}
@@ -208,12 +208,12 @@ func main() {
 		fmt.Printf("Coherence score: %.3f\n", response.Coherence)
 		fmt.Printf("Cache hit: %v\n", response.CacheHit)
 		
-		fmt.Printf("optimization Metrics:\n")
-		fmt.Printf("  Solver: %s, Status: %s\n", optimization.SolverUsed, optimization.optimizerStatus)
-		fmt.Printf("  Solve time: %.2f ms (Wall: %.2f ms)\n", optimization.SolveTimeMs, optimization.optimizationWallMs)
-		fmt.Printf("  Variables: %d, Constraints: %d\n", optimization.VariableCount, optimization.ConstraintCount)
-		fmt.Printf("  Candidates: %d, Pairs: %d\n", optimization.KCandidates, optimization.PairsCount)
-		fmt.Printf("  Objective value: %d\n", optimization.Objective)
+		fmt.Printf("SMT Metrics:\n")
+		fmt.Printf("  Solver: %s, Status: %s\n", smt.SolverUsed, smt.Z3Status)
+		fmt.Printf("  Solve time: %.2f ms (Wall: %.2f ms)\n", smt.SolveTimeMs, smt.SMTWallMs)
+		fmt.Printf("  Variables: %d, Constraints: %d\n", smt.VariableCount, smt.ConstraintCount)
+		fmt.Printf("  Candidates: %d, Pairs: %d\n", smt.KCandidates, smt.PairsCount)
+		fmt.Printf("  Objective value: %d\n", smt.Objective)
 		
 		if len(response.Documents) > 0 {
 			fmt.Printf("Top document: %s (utility: %.3f)\n", 
@@ -226,17 +226,17 @@ func main() {
 
 	fmt.Printf("\n=== Benchmark Results Summary ===\n")
 	fmt.Printf("Total queries: %d\n", totalQueries)
-	fmt.Printf("optimizer optimization solves: %d\n", z3Solves)
+	fmt.Printf("Z3 SMT solves: %d\n", z3Solves)
 	fmt.Printf("Cache misses: %d\n", cacheMisses)
 	fmt.Printf("Satisfiable results: %d\n", satisfiableResults)
 	
 	if z3Solves > 0 {
-		avgoptimizerTime := totaloptimizerTime / time.Duration(z3Solves)
-		fmt.Printf("Average optimizer solve time: %v\n", avgoptimizerTime)
-		fmt.Printf("Total optimizer computation: %v\n", totaloptimizerTime)
+		avgZ3Time := totalZ3Time / time.Duration(z3Solves)
+		fmt.Printf("Average Z3 solve time: %v\n", avgZ3Time)
+		fmt.Printf("Total Z3 computation: %v\n", totalZ3Time)
 		
 		satisfiabilityRate := float64(satisfiableResults) / float64(z3Solves) * 100
-		fmt.Printf("optimizer satisfiability rate: %.1f%%\n", satisfiabilityRate)
+		fmt.Printf("Z3 satisfiability rate: %.1f%%\n", satisfiabilityRate)
 	}
 	
 	// Final storage check
@@ -246,5 +246,5 @@ func main() {
 			finalInfo.TotalDocs, finalInfo.DatabaseSize)
 	}
 	
-	fmt.Printf("\n=== optimizer optimization Benchmark Complete ===\n")
+	fmt.Printf("\n=== Z3 SMT Benchmark Complete ===\n")
 }

@@ -121,7 +121,7 @@ func (m *WorkspaceMiddleware) extractWorkspaceID(r *http.Request) string {
 	return "default"
 }
 
-// checkResourceLimits verifies workspace is within resource budgets
+// checkResourceLimits verifies workspace is within resource constraints
 func (m *WorkspaceMiddleware) checkResourceLimits(workspaceID string) bool {
 	if !m.config.Cluster.Enabled {
 		return true // No limits in standalone mode

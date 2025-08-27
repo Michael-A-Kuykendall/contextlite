@@ -18,7 +18,7 @@
 - **Real-time feature gating** (instant access control)
 
 #### 2. **COMPLETE REVENUE PROTECTION**
-- **Professional ($99)**: API access, optimization optimization, caching
+- **Professional ($99)**: API access, SMT optimization, caching
 - **Enterprise ($2,999)**: Multi-tenant, custom MCP, SSO, source access
 - **Developer (Free)**: Basic functionality only
 
@@ -58,7 +58,7 @@
 
 #### **Professional Tier ($99)**:
 - ✅ API access completely protected
-- ✅ Advanced optimization optimization gated
+- ✅ Advanced SMT optimization gated
 - ✅ Cache management restricted  
 - ✅ Workspace learning blocked without license
 

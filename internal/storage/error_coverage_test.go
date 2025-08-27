@@ -37,8 +37,8 @@ func TestStorage_ErrorConditions_CoverageFinal(t *testing.T) {
 			Documents: []types.DocumentReference{
 				{ID: "test-doc", UtilityScore: 0.9},
 			},
-			optimizationMetrics: types.optimizationMetrics{
-				SolverUsed:  "optimizer",
+			SMTMetrics: types.SMTMetrics{
+				SolverUsed:  "Z3",
 				SolveTimeMs: 100.0,
 			},
 		}
@@ -86,8 +86,8 @@ func TestStorage_ErrorConditions_CoverageFinal(t *testing.T) {
 			Documents: []types.DocumentReference{
 				{ID: "key-test", UtilityScore: 0.8},
 			},
-			optimizationMetrics: types.optimizationMetrics{
-				SolverUsed:  "optimizer",
+			SMTMetrics: types.SMTMetrics{
+				SolverUsed:  "Z3",
 				SolveTimeMs: 50.0,
 			},
 		}

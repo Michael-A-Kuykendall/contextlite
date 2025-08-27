@@ -115,7 +115,7 @@ func TestTrialSystem(t *testing.T) {
 	_ = featureGate.ValidateCustomMCP()
 	_ = featureGate.ValidateMultiTenant()
 	
-	access := featureGate.CheckAccess("advanced_optimization")
+	access := featureGate.CheckAccess("advanced_smt")
 	_ = access // Just exercise the code path
 }
 

@@ -138,7 +138,7 @@ firstRunPath := getFirstRunPath()
 
 ### PATENT COVERAGE RECOMMENDATIONS:
 
-#### 1. **optimization-Based Context Assembly** (Core Innovation)
+#### 1. **SMT-Based Context Assembly** (Core Innovation)
 ```
 PATENTABLE CLAIMS:
 • Method for assembling AI context using Satisfiability Modulo Theories
@@ -147,12 +147,12 @@ PATENTABLE CLAIMS:
 • Mathematical optimization replacing vector similarity
 ```
 
-#### 2. **Hybrid FTS5 + optimization Architecture**
+#### 2. **Hybrid FTS5 + SMT Architecture**
 ```
 PATENTABLE CLAIMS:
-• Integration of full-text search with optimization optimization
+• Integration of full-text search with SMT optimization
 • Document relevance scoring using multiple mathematical dimensions
-• Real-time context assembly under 1ms budgets
+• Real-time context assembly under 1ms constraints
 ```
 
 #### 3. **License Enforcement via Hardware Fingerprinting**
@@ -169,17 +169,17 @@ PATENTABLE CLAIMS:
 ```html
 <!-- Add to footer -->
 <div class="text-center mt-4 text-xs text-gray-500">
-  <p>ContextLite optimization optimization technology is patent protected.</p>
-  <p>Patents pending: US Application 17/XXX,XXX (optimization Context Assembly)</p>
+  <p>ContextLite SMT optimization technology is patent protected.</p>
+  <p>Patents pending: US Application 17/XXX,XXX (SMT Context Assembly)</p>
   <p>International filing: PCT/US2024/XXXXX</p>
 </div>
 ```
 
 #### Value Proposition for Patents:
-- **Competitive Moat**: Prevents competitors from copying optimization approach
+- **Competitive Moat**: Prevents competitors from copying SMT approach
 - **Licensing Revenue**: Patent licensing to other AI companies  
 - **Investor Appeal**: Strong IP portfolio increases valuation
-- **Market Position**: First-mover advantage in optimization-based RAG
+- **Market Position**: First-mover advantage in SMT-based RAG
 
 ---
 
@@ -208,7 +208,7 @@ PATENTABLE CLAIMS:
    - Payment to license generation
 
 2. **Patent Filing**
-   - File provisional patents for optimization innovation
+   - File provisional patents for SMT innovation
    - Add patent notices to website
    - Document trade secrets
 

@@ -40,24 +40,24 @@ func TestFeatureWeights_Fields(t *testing.T) {
 }
 
 func TestSelectionConstraints_Fields(t *testing.T) {
-	budgets := SelectionConstraints{
+	constraints := SelectionConstraints{
 		MaxTokens:          4000,
 		MaxDocuments:       10,
 		MinRelevance:       0.3,
 		DiversityThreshold: 0.5,
 	}
 
-	if budgets.MaxTokens != 4000 {
-		t.Errorf("Expected MaxTokens to be 4000, got %d", budgets.MaxTokens)
+	if constraints.MaxTokens != 4000 {
+		t.Errorf("Expected MaxTokens to be 4000, got %d", constraints.MaxTokens)
 	}
-	if budgets.MaxDocuments != 10 {
-		t.Errorf("Expected MaxDocuments to be 10, got %d", budgets.MaxDocuments)
+	if constraints.MaxDocuments != 10 {
+		t.Errorf("Expected MaxDocuments to be 10, got %d", constraints.MaxDocuments)
 	}
-	if budgets.MinRelevance != 0.3 {
-		t.Errorf("Expected MinRelevance to be 0.3, got %f", budgets.MinRelevance)
+	if constraints.MinRelevance != 0.3 {
+		t.Errorf("Expected MinRelevance to be 0.3, got %f", constraints.MinRelevance)
 	}
-	if budgets.DiversityThreshold != 0.5 {
-		t.Errorf("Expected DiversityThreshold to be 0.5, got %f", budgets.DiversityThreshold)
+	if constraints.DiversityThreshold != 0.5 {
+		t.Errorf("Expected DiversityThreshold to be 0.5, got %f", constraints.DiversityThreshold)
 	}
 }
 
@@ -68,8 +68,8 @@ func TestOptimizationStrategy_Constants(t *testing.T) {
 	if StrategyLexicographic != "lexicographic" {
 		t.Errorf("Expected StrategyLexicographic to be 'lexicographic', got %s", StrategyLexicographic)
 	}
-	if StrategyEpsilonConstraint != "epsilon-budget" {
-		t.Errorf("Expected StrategyEpsilonConstraint to be 'epsilon-budget', got %s", StrategyEpsilonConstraint)
+	if StrategyEpsilonConstraint != "epsilon-constraint" {
+		t.Errorf("Expected StrategyEpsilonConstraint to be 'epsilon-constraint', got %s", StrategyEpsilonConstraint)
 	}
 }
 
@@ -256,11 +256,11 @@ func TestWorkspaceStats_Fields(t *testing.T) {
 	}
 }
 
-func TestoptimizationResult_Fields(t *testing.T) {
-	result := optimizationResult{
+func TestSMTResult_Fields(t *testing.T) {
+	result := SMTResult{
 		SelectedDocs:    []int{0, 2, 5, 8},
 		SolverUsed:      "z3",
-		optimizerStatus:        "sat",
+		Z3Status:        "sat",
 		Objective:       123.45,
 		SolveTimeUs:     1500,
 		VariableCount:   20,
@@ -281,8 +281,8 @@ func TestoptimizationResult_Fields(t *testing.T) {
 	if result.SolverUsed != "z3" {
 		t.Errorf("Expected SolverUsed to be 'z3', got %s", result.SolverUsed)
 	}
-	if result.optimizerStatus != "sat" {
-		t.Errorf("Expected optimizerStatus to be 'sat', got %s", result.optimizerStatus)
+	if result.Z3Status != "sat" {
+		t.Errorf("Expected Z3Status to be 'sat', got %s", result.Z3Status)
 	}
 	if result.Objective != 123.45 {
 		t.Errorf("Expected Objective to be 123.45, got %f", result.Objective)
@@ -329,7 +329,7 @@ func TestContextRequest_Fields(t *testing.T) {
 func TestContextResult_Fields(t *testing.T) {
 	docs := []DocumentReference{{ID: "doc1"}, {ID: "doc2"}}
 	processingTime := time.Duration(200 * time.Millisecond)
-	optimizationMetrics := &optimizationResult{SolverUsed: "z3", optimizerStatus: "sat"}
+	smtMetrics := &SMTResult{SolverUsed: "z3", Z3Status: "sat"}
 
 	result := ContextResult{
 		Context:        "assembled context content",
@@ -339,7 +339,7 @@ func TestContextResult_Fields(t *testing.T) {
 		CacheHit:       false,
 		Message:        "context assembled successfully",
 		CoherenceScore: 0.88,
-		optimizationMetrics:     optimizationMetrics,
+		SMTMetrics:     smtMetrics,
 	}
 
 	if result.Context != "assembled context content" {
@@ -366,7 +366,7 @@ func TestContextResult_Fields(t *testing.T) {
 	if result.CoherenceScore != 0.88 {
 		t.Errorf("Expected CoherenceScore to be 0.88, got %f", result.CoherenceScore)
 	}
-	if result.optimizationMetrics.SolverUsed != "z3" {
-		t.Errorf("Expected optimizationMetrics.SolverUsed to be 'z3', got %s", result.optimizationMetrics.SolverUsed)
+	if result.SMTMetrics.SolverUsed != "z3" {
+		t.Errorf("Expected SMTMetrics.SolverUsed to be 'z3', got %s", result.SMTMetrics.SolverUsed)
 	}
 }

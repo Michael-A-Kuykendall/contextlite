@@ -1,5 +1,5 @@
 /*
- * ContextLite - optimization-Optimized AI Context Engine
+ * ContextLite - SMT-Optimized AI Context Engine
  * Copyright (c) 2025 Michael A. Kuykendall
  * 
  * Patent Pending - Provisional Patent Filed
@@ -23,7 +23,7 @@ import (
 )
 
 // FeatureExtractor defines the interface for extracting 7-dimensional features
-// This abstracts the proprietary optimization optimization algorithms
+// This abstracts the proprietary SMT optimization algorithms
 type FeatureExtractor interface {
 	// ExtractFeatures calculates 7D feature vector for a document given a query
 	ExtractFeatures(doc Document, query string) FeatureVector
@@ -41,11 +41,11 @@ type FeatureExtractor interface {
 	SetWeights(workspacePath string, weights FeatureWeights) error
 }
 
-// optimizationSolver defines the interface for mathematical optimization
-// This abstracts the patent-pending optimization formulation algorithms
-type optimizationSolver interface {
+// SMTSolver defines the interface for mathematical optimization
+// This abstracts the patent-pending SMT formulation algorithms
+type SMTSolver interface {
 	// OptimizeSelection performs mathematical optimization of document selection
-	OptimizeSelection(docs []ScoredDocument, budgets SelectionConstraints) ([]int, error)
+	OptimizeSelection(docs []ScoredDocument, constraints SelectionConstraints) ([]int, error)
 	
 	// SetStrategy configures optimization strategy (weighted-sum, lexicographic, etc.)
 	SetStrategy(strategy OptimizationStrategy) error
@@ -140,16 +140,16 @@ type SelectionConstraints struct {
 	DiversityThreshold float64 `json:"diversity_threshold"`
 }
 
-// OptimizationStrategy defines the optimization solving approach
+// OptimizationStrategy defines the SMT solving approach
 type OptimizationStrategy string
 
 const (
 	StrategyWeightedSum    OptimizationStrategy = "weighted-sum"
 	StrategyLexicographic  OptimizationStrategy = "lexicographic"
-	StrategyEpsilonConstraint OptimizationStrategy = "epsilon-budget"
+	StrategyEpsilonConstraint OptimizationStrategy = "epsilon-constraint"
 )
 
-// SolverStats provides optimization system performance metrics
+// SolverStats provides SMT solver performance metrics
 type SolverStats struct {
 	TotalSolves       int64         `json:"total_solves"`
 	AverageSolveTime  time.Duration `json:"average_solve_time"`
@@ -163,7 +163,7 @@ type EngineConfig struct {
 	// Feature extraction settings
 	FeatureWeights      FeatureWeights       `json:"feature_weights"`
 	
-	// optimization system settings
+	// SMT solver settings
 	OptimizationStrategy OptimizationStrategy `json:"optimization_strategy"`
 	SolverTimeout       time.Duration        `json:"solver_timeout"`
 	MaxOptimalityGap    float64             `json:"max_optimality_gap"`
@@ -192,7 +192,7 @@ type EngineStats struct {
 	// Feature extraction statistics
 	FeatureExtractionTime time.Duration `json:"feature_extraction_time"`
 	
-	// optimization system statistics
+	// SMT solver statistics
 	SolverStats        SolverStats   `json:"solver_stats"`
 	
 	// Memory usage
@@ -222,19 +222,19 @@ type WorkspaceStats struct {
 	AverageFileSize   int64     `json:"average_file_size"`
 }
 
-// optimizationResult represents the result of optimization optimization
-type optimizationResult struct {
+// SMTResult represents the result of SMT optimization
+type SMTResult struct {
 	SelectedDocs    []int  `json:"selected_docs"`     // Indices of selected documents
-	SolverUsed      string `json:"solver_used"`       // optimization system used (z3, cvc4, etc.)
-	optimizerStatus        string `json:"z3_status"`         // Solver status (satisfied, unsat, etc.)
+	SolverUsed      string `json:"solver_used"`       // SMT solver used (z3, cvc4, etc.)
+	Z3Status        string `json:"z3_status"`         // Solver status (satisfied, unsat, etc.)
 	Objective       float64 `json:"objective"`        // Objective function value
 	SolveTimeUs     int64  `json:"solve_time_us"`     // Solver time in microseconds
-	VariableCount   int    `json:"variable_count"`    // Number of optimization variables
-	ConstraintCount int    `json:"budget_count"`  // Number of optimization budgets
+	VariableCount   int    `json:"variable_count"`    // Number of SMT variables
+	ConstraintCount int    `json:"constraint_count"`  // Number of SMT constraints
 	KCandidates     int    `json:"k_candidates"`      // Number of candidate documents
-	PairsCount      int    `json:"pairs_count"`       // Number of pairwise budgets
-	BudgetTokens    int    `json:"budget_tokens"`     // Token budget budget
-	MaxDocs         int    `json:"max_docs"`          // Maximum documents budget
+	PairsCount      int    `json:"pairs_count"`       // Number of pairwise constraints
+	BudgetTokens    int    `json:"budget_tokens"`     // Token budget constraint
+	MaxDocs         int    `json:"max_docs"`          // Maximum documents constraint
 	FallbackReason  string `json:"fallback_reason"`   // Reason for fallback (if any)
 }
 
@@ -279,7 +279,7 @@ type ContextResult struct {
 	CacheHit       bool                  `json:"cache_hit"`
 	Message        string                `json:"message,omitempty"`
 	CoherenceScore float64               `json:"coherence_score,omitempty"`
-	optimizationMetrics     *optimizationResult            `json:"optimization_metrics,omitempty"`
+	SMTMetrics     *SMTResult            `json:"smt_metrics,omitempty"`
 }
 
 // DocumentReference represents a reference to a selected document

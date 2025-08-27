@@ -1,6 +1,6 @@
 # ContextLite Complete Technical Wiki - UPDATED
 
-> **The Complete Reference Guide to ContextLite: optimization-Optimized AI Context Engine**
+> **The Complete Reference Guide to ContextLite: SMT-Optimized AI Context Engine**
 > **🚀 NOW WITH HUGGING FACE DEPLOYMENT & AUTOMATED DISTRIBUTION**
 
 ---
@@ -9,7 +9,7 @@
 
 1. [Overview & Core Concepts](#overview--core-concepts)
 2. [Distribution & Download](#distribution--download)
-3. [optimization Optimization Theory](#optimization-optimization-theory)
+3. [SMT Optimization Theory](#smt-optimization-theory)
 4. [7-Dimensional Feature System](#7-dimensional-feature-system)
 5. [Architecture & Implementation](#architecture--implementation)
 6. [API Reference](#api-reference)
@@ -27,7 +27,7 @@
 
 ### What is ContextLite?
 
-ContextLite is a **Satisfiability Modulo Theories (optimization) optimized context engine** designed to solve the fundamental problem with RAG (Retrieval-Augmented Generation) systems: **approximate, suboptimal context selection**.
+ContextLite is a **Satisfiability Modulo Theories (SMT) optimized context engine** designed to solve the fundamental problem with RAG (Retrieval-Augmented Generation) systems: **approximate, suboptimal context selection**.
 
 ### The Problem with Vector Databases
 
@@ -40,10 +40,10 @@ Traditional RAG systems use vector databases (Pinecone, Weaviate, Chroma) that r
 ### ContextLite's Solution
 
 Instead of approximations, ContextLite uses:
-- **Mathematical optimization** via optimization systems
+- **Mathematical optimization** via SMT solvers
 - **7-dimensional feature scoring** (not just similarity)
-- **Provably optimal selection** (within defined budgets)
-- **100% local operation** (embedded SQLite + optimizer)
+- **Provably optimal selection** (within defined constraints)
+- **100% local operation** (embedded SQLite + Z3)
 
 ### Key Benefits
 
@@ -127,7 +127,7 @@ sudo snap install contextlite
 ### Trial System & Licensing
 
 #### 🆕 **Enhanced 14-Day Trial**
-- **Full optimization Features**: Complete optimization during trial period
+- **Full SMT Features**: Complete optimization during trial period
 - **Hardware Binding**: Trial tied to machine fingerprint
 - **Graceful Degradation**: Falls back to core engine after expiration
 - **No Registration**: Start using immediately
@@ -190,21 +190,21 @@ git tag v1.0.0 && git push --tags  # Triggers automated release
 
 ---
 
-## optimization Optimization Theory
+## SMT Optimization Theory
 
-### What is optimization?
+### What is SMT?
 
-**Satisfiability Modulo Theories (optimization)** is a mathematical framework for solving budget management problems with provable optimality guarantees. optimization systems like optimizer, CVC4, and Yices are used in:
+**Satisfiability Modulo Theories (SMT)** is a mathematical framework for solving constraint satisfaction problems with provable optimality guarantees. SMT solvers like Z3, CVC4, and Yices are used in:
 - Formal verification
 - AI planning
 - Theorem proving
 - Resource allocation
 
-### ContextLite's optimization Formulation
+### ContextLite's SMT Formulation
 
 Context selection is modeled as a **multi-objective optimization problem**:
 
-```optimization2
+```smt2
 ; Variables: binary selection indicators
 (declare-fun select_doc_i () Bool)
 
@@ -220,7 +220,7 @@ Context selection is modeled as a **multi-objective optimization problem**:
 
 (assert (<= (+ select_doc_1 select_doc_2 ... select_doc_N) max_documents))
 
-; Diversity budgets (pairwise similarity penalties)
+; Diversity constraints (pairwise similarity penalties)
 (assert (=> (and select_doc_i select_doc_j) 
             (<= similarity_ij diversity_threshold)))
 ```
@@ -230,7 +230,7 @@ Context selection is modeled as a **multi-objective optimization problem**:
 #### 1. Weighted-Sum Scalarization (Default)
 ```
 maximize: Σ(αᵢ × FeatureScore(docᵢ))
-subject to: token_budget, max_documents, diversity_budgets
+subject to: token_budget, max_documents, diversity_constraints
 ```
 
 #### 2. Lexicographic Optimization
@@ -241,7 +241,7 @@ Strict priority ordering:
 4. etc.
 
 #### 3. ε-Constraint Method
-Optimize primary objective with secondary objectives as budgets:
+Optimize primary objective with secondary objectives as constraints:
 ```
 maximize: relevance_score
 subject to: recency_score ≥ ε₁, authority_score ≥ ε₂, ...
@@ -249,19 +249,19 @@ subject to: recency_score ≥ ε₁, authority_score ≥ ε₂, ...
 
 ### 🆕 **Performance Improvements**
 
-#### **Enhanced optimization Solver Integration**
-- **optimizer Optimization**: Direct Go bindings for maximum performance
+#### **Enhanced SMT Solver Integration**
+- **Z3 Optimization**: Direct Go bindings for maximum performance
 - **Timeout Handling**: Graceful degradation to heuristics (250ms default)
-- **Multiple Solvers**: optimizer, CVC4, Yices support with auto-selection
+- **Multiple Solvers**: Z3, CVC4, Yices support with auto-selection
 - **Parallel Processing**: Multi-threaded feature extraction and solving
 
 #### **Real-Time Statistics**
 ```json
 {
-  "optimization_solve_time_ms": 45,
+  "smt_solve_time_ms": 45,
   "optimization_gap": 0.02,
   "solver_strategy": "weighted-sum",
-  "budgets_generated": 156,
+  "constraints_generated": 156,
   "variables_count": 89,
   "optimal_solution": true
 }
@@ -271,13 +271,13 @@ subject to: recency_score ≥ ε₁, authority_score ≥ ε₂, ...
 - **Dynamic Constraint Scaling**: Adapts to document corpus size
 - **Diversity Enforcement**: Prevents redundant document selection
 - **Token Budget Optimization**: Precise token counting and optimization
-- **Quality Thresholds**: Minimum quality budgets for selection
+- **Quality Thresholds**: Minimum quality constraints for selection
 
 ---
 
 ## 7-Dimensional Feature System
 
-ContextLite evaluates documents across **7 independent dimensions**. Each feature is **set-independent** to ensure mathematical correctness in optimization optimization.
+ContextLite evaluates documents across **7 independent dimensions**. Each feature is **set-independent** to ensure mathematical correctness in SMT optimization.
 
 ### 1. Relevance (Query Matching)
 
@@ -462,7 +462,7 @@ ContextLite implements a **modular, dual-engine architecture** designed for perf
 │                    Core Engine Layer                        │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐  │
 │  │   CoreEngine    │  │ JSONCLIEngine   │  │ Feature     │  │
-│  │   (BM25 +       │  │ (Private optimization    │  │ Gate        │  │
+│  │   (BM25 +       │  │ (Private SMT    │  │ Gate        │  │
 │  │   Heuristics)   │  │ Binary)         │  │ System      │  │
 │  └─────────────────┘  └─────────────────┘  └─────────────┘  │
 ├─────────────────────────────────────────────────────────────┤
@@ -494,7 +494,7 @@ type EngineManager struct {
 }
 
 func (em *EngineManager) GetOptimalContext(query string) (*ContextResult, error) {
-    if em.featureGate.HasoptimizationAccess() {
+    if em.featureGate.HasSMTAccess() {
         return em.privateEngine.Optimize(query)
     }
     return em.coreEngine.ProcessQuery(query)
@@ -509,7 +509,7 @@ type FeatureGate struct {
     capabilities   map[string]bool
 }
 
-func (fg *FeatureGate) HasoptimizationAccess() bool {
+func (fg *FeatureGate) HasSMTAccess() bool {
     return fg.licenseStatus.Valid || fg.trialManager.IsActive()
 }
 ```
@@ -522,7 +522,7 @@ func (fg *FeatureGate) HasoptimizationAccess() bool {
 
 **Key Classes**:
 - `CoreEngine`: BM25 + heuristic optimization
-- `JSONCLIEngine`: optimization system integration (private binary)
+- `JSONCLIEngine`: SMT solver integration (private binary)
 - `FeatureExtractor`: 7-dimensional feature computation
 - `CacheManager`: Multi-level caching system
 
@@ -530,7 +530,7 @@ func (fg *FeatureGate) HasoptimizationAccess() bool {
 - **BM25**: For text relevance scoring
 - **TF-IDF**: Alternative relevance measure
 - **PMI (Point-wise Mutual Information)**: For entanglement calculation
-- **optimization Solving**: Integer linear programming via optimizer/CVC4
+- **SMT Solving**: Integer linear programming via Z3/CVC4
 
 #### 2. **File System Interface**
 
@@ -621,7 +621,7 @@ type TrialManager struct {
 
 **Trial System Features**:
 - **Hardware Binding**: Unique machine identification
-- **14-Day Duration**: Full optimization access during trial
+- **14-Day Duration**: Full SMT access during trial
 - **Graceful Expiration**: Automatic fallback to core engine
 - **No Registration**: Instant activation on first run
 - **Progress Tracking**: Daily reminders and status updates
@@ -668,7 +668,7 @@ def get_optimal_context(query: str) -> dict:
 
 #### **Response Time Targets**
 - **Core Engine**: < 100ms for typical queries
-- **optimization Engine**: < 500ms with 250ms timeout
+- **SMT Engine**: < 500ms with 250ms timeout
 - **File Scanning**: < 2 seconds for large repositories (50k+ files)
 - **API Responses**: < 50ms for cached requests
 
@@ -748,7 +748,7 @@ def get_optimal_context(query: str) -> dict:
   "total_tokens": 7892,
   "optimization_time_ms": 127,
   "strategy_used": "weighted-sum",
-  "engine_type": "optimization_optimizer",  // or "core_engine"
+  "engine_type": "smt_optimizer",  // or "core_engine"
   "context": "... combined content of selected documents ...",
   "metadata": {
     "documents": [
@@ -770,7 +770,7 @@ def get_optimal_context(query: str) -> dict:
       }
     ],
     "optimization_details": {
-      "budgets_generated": 89,
+      "constraints_generated": 89,
       "variables_count": 45,
       "solver_time_ms": 89,
       "optimal_solution": true,
@@ -819,7 +819,7 @@ def get_optimal_context(query: str) -> dict:
   "components": {
     "database": "healthy",
     "file_system": "healthy", 
-    "optimization_solver": "available",  // or "unavailable" in trial mode
+    "smt_solver": "available",  // or "unavailable" in trial mode
     "license_server": "reachable"
   },
   "workspace": {
@@ -844,7 +844,7 @@ def get_optimal_context(query: str) -> dict:
   "trial_start_date": "2024-01-04T09:15:00Z",
   "trial_end_date": "2024-01-18T09:15:00Z",
   "features_enabled": {
-    "optimization_optimization": true,
+    "smt_optimization": true,
     "advanced_features": true,
     "priority_support": true
   },
@@ -858,7 +858,7 @@ def get_optimal_context(query: str) -> dict:
     "purchase_url": "https://contextlite.com/purchase",
     "price": "$99 USD",
     "features": [
-      "Unlimited optimization optimization",
+      "Unlimited SMT optimization",
       "Priority support",
       "Commercial usage rights",
       "Advanced configuration"
@@ -905,7 +905,7 @@ def get_optimal_context(query: str) -> dict:
     "cache_hit_rate": 0.73,
     "optimization_success_rate": 0.96,
     "engine_usage": {
-      "optimization_optimizer": 0.82,
+      "smt_optimizer": 0.82,
       "core_engine": 0.18
     }
   },
@@ -922,7 +922,7 @@ def get_optimal_context(query: str) -> dict:
     "strategies_used": {
       "weighted-sum": 0.78,
       "lexicographic": 0.15,
-      "epsilon-budget": 0.07
+      "epsilon-constraint": 0.07
     },
     "avg_documents_selected": 8.3,
     "avg_tokens_used": 6847
@@ -986,7 +986,7 @@ def get_optimal_context(query: str) -> dict:
   "license_type": "professional",
   "expiry_date": "2025-01-15T00:00:00Z",
   "features_enabled": {
-    "optimization_optimization": true,
+    "smt_optimization": true,
     "unlimited_queries": true,
     "priority_support": true,
     "commercial_usage": true,
@@ -1043,7 +1043,7 @@ def get_optimal_context(query: str) -> dict:
 - `WORKSPACE_NOT_FOUND`: Specified workspace path doesn't exist
 - `INSUFFICIENT_CONTEXT`: No relevant documents found
 - `TOKEN_LIMIT_EXCEEDED`: Requested tokens exceed maximum
-- `OPTIMIZATION_TIMEOUT`: optimization system timeout (fallback to heuristics)
+- `OPTIMIZATION_TIMEOUT`: SMT solver timeout (fallback to heuristics)
 - `LICENSE_INVALID`: Invalid or expired license
 - `TRIAL_EXPIRED`: Trial period has ended
 - `RATE_LIMIT_EXCEEDED`: Too many requests (new)
@@ -1132,7 +1132,7 @@ print(f"Selected {len(result['metadata']['documents'])} documents")
 
 #### **Response Time Benchmarks** (January 2024)
 
-| Workspace Size | Core Engine | optimization Engine | Improvement |
+| Workspace Size | Core Engine | SMT Engine | Improvement |
 |----------------|-------------|------------|-------------|
 | Small (< 1k files) | 45ms | 89ms | Advanced optimization |
 | Medium (1k-10k files) | 127ms | 234ms | 1.8x feature quality |
@@ -1174,10 +1174,10 @@ Uptime: 99.7% (last 30 days)
 | **Lexicographic** | 89ms | 7.8/10 | 52MB | Fast queries, strict priorities |
 | **ε-Constraint** | 234ms | 9.1/10 | 89MB | High-quality results |
 
-#### **🆕 optimization vs Core Engine Comparison**
+#### **🆕 SMT vs Core Engine Comparison**
 
 ```
-Metric                    | Core Engine | optimization Engine | Improvement
+Metric                    | Core Engine | SMT Engine | Improvement
 --------------------------|-------------|------------|------------
 Context Relevance         | 7.2/10     | 9.1/10    | +26%
 Document Diversity        | 6.8/10     | 8.7/10    | +28%
@@ -1265,7 +1265,7 @@ Go Runtime             | 15MB     | 15MB      | 15MB       | 15MB
 File Cache             | 5MB      | 45MB      | 340MB      | 890MB
 Feature Vectors        | 2MB      | 12MB      | 89MB       | 234MB
 SQLite Database        | 3MB      | 8MB       | 67MB       | 156MB
-optimization Solver Memory      | 0MB      | 12MB      | 45MB       | 123MB
+SMT Solver Memory      | 0MB      | 12MB      | 45MB       | 123MB
 Working Buffers        | 5MB      | 15MB      | 67MB       | 178MB
 **Total**             | **30MB** | **107MB** | **623MB**  | **1.6GB**
 ```
@@ -1370,22 +1370,22 @@ Direct Binary     | 1.2s        | 8.2MB       | 99.9%
   "quality_assessment": {
     "relevance_accuracy": {
       "core_engine": 0.82,
-      "optimization_engine": 0.94,
+      "smt_engine": 0.94,
       "improvement": "+15%"
     },
     "diversity_score": {
       "core_engine": 0.76,
-      "optimization_engine": 0.89,
+      "smt_engine": 0.89,
       "improvement": "+17%"
     },
     "token_efficiency": {
       "core_engine": 0.78,
-      "optimization_engine": 0.91,
+      "smt_engine": 0.91,
       "improvement": "+17%"
     },
     "user_satisfaction": {
       "core_engine": 8.1,
-      "optimization_engine": 9.4,
+      "smt_engine": 9.4,
       "improvement": "+16%"
     }
   }
@@ -1408,7 +1408,7 @@ Direct Binary     | 1.2s        | 8.2MB       | 99.9%
 type PerformanceConfig struct {
     MaxConcurrentQueries    int           `default:"25"`
     CacheSize              int           `default:"500MB"`
-    optimizationTimeout             time.Duration `default:"250ms"`
+    SMTTimeout             time.Duration `default:"250ms"`
     FileScanTimeout        time.Duration `default:"30s"`
     GCTargetPercent        int           `default:"75"`
     MaxMemoryUsage         int64         `default:"1GB"`
@@ -1551,7 +1551,7 @@ class VimIntegration implements EditorIntegration {
 contextlite "implement user authentication"
 
 # Professional features (requires license/trial)
-contextlite --strategy=optimization --max-tokens=8000 "optimize database queries"
+contextlite --strategy=smt --max-tokens=8000 "optimize database queries"
 
 # Pipeline integration
 echo "fix test failures" | contextlite --format=json | jq '.context'
@@ -1583,7 +1583,7 @@ _contextlite_completion() {
     local -a strategies
     strategies=('weighted-sum:Default balanced strategy' 
                 'lexicographic:Strict priority ordering' 
-                'epsilon-budget:High quality results')
+                'epsilon-constraint:High quality results')
     
     _arguments \
         '--strategy[Optimization strategy]:strategy:((${strategies}))' \
@@ -1613,7 +1613,7 @@ class AdvancedContextLiteClient(ContextLiteClient):
         """Get context with automatic trial/license awareness."""
         trial_info = await self.get_trial_info()
         
-        # Use optimization features if available
+        # Use SMT features if available
         if trial_info['trial_status'] == 'active' or trial_info['license_info']['status'] == 'valid':
             kwargs.setdefault('strategy', 'weighted-sum')
             kwargs.setdefault('max_tokens', 8000)
@@ -1764,7 +1764,7 @@ export const ContextLiteWidget: React.FC<ContextLiteWidgetProps> = ({
         setLoading(true);
         try {
             const result = await api.getContext(query, {
-                maxTokens: trialInfo?.features_enabled?.optimization_optimization ? 8000 : 4000,
+                maxTokens: trialInfo?.features_enabled?.smt_optimization ? 8000 : 4000,
                 includeMetadata: true
             });
             setContext(result.context);
@@ -1851,7 +1851,7 @@ def create_download_interface():
         with gr.Row():
             gr.Markdown("""
             ### ✨ Features
-            - **14-day Free Trial** with full optimization optimization
+            - **14-day Free Trial** with full SMT optimization
             - **Cross-platform** support (Windows, macOS, Linux)
             - **Professional License** available for $99
             - **Advanced Context Selection** with mathematical optimization
@@ -1911,7 +1911,7 @@ services:
       - postgres
     environment:
       - WORKER_CONCURRENCY=4
-      - optimization_SOLVER_TIMEOUT=500ms
+      - SMT_SOLVER_TIMEOUT=500ms
     
   redis:
     image: redis:7-alpine
@@ -1987,7 +1987,7 @@ This comprehensive wiki update reflects the **ENTIRETY of our Hugging Face and o
 - ✅ **Enterprise Architecture**: Microservice patterns and Kubernetes deployment
 
 ### **📈 Performance Improvements**
-- **Response Times**: 127ms average (optimization), 89ms (Core Engine)
+- **Response Times**: 127ms average (SMT), 89ms (Core Engine)
 - **Scale Testing**: Successfully handles 12GB repositories with 89k+ files
 - **Memory Efficiency**: 67MB baseline, scales to 1.6GB for enterprise workloads
 - **Cross-Platform**: Native performance on Windows, macOS (ARM64/x64), and Linux

@@ -163,10 +163,10 @@ ContextLite: Mathematically optimal context selection
 
 ## 🧠 **Advanced Technology**
 
-### **optimization-Powered Intelligence**
-- **Satisfiability Modulo Theories (optimization)** for mathematically optimal context selection
-- **optimizer theorem prover** finds provably best combinations instead of approximate similarity
-- **Multi-stage pipeline**: BM25 pre-filtering + optimization optimization for speed + precision
+### **SMT-Powered Intelligence**
+- **Satisfiability Modulo Theories (SMT)** for mathematically optimal context selection
+- **Z3 theorem prover** finds provably best combinations instead of approximate similarity
+- **Multi-stage pipeline**: BM25 pre-filtering + SMT optimization for speed + precision
 
 ### **Enterprise Clustering Architecture**
 - **Workspace-aware load balancing** with intelligent routing

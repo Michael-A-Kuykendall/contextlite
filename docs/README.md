@@ -8,7 +8,7 @@ This directory contains comprehensive documentation for ContextLite development 
 Technical architecture and design documentation:
 - `FEATURE_FORMULAS.md` - Mathematical formulas for 7D feature scoring
 - `SYSTEM_ARCHITECTURE_PLAN.md` - Overall system architecture
-- `PAIRWISE_DEMONSTRATION.md` - optimization optimization demonstrations
+- `PAIRWISE_DEMONSTRATION.md` - SMT optimization demonstrations
 
 ### `/testing`
 Testing strategies and frameworks:
@@ -52,4 +52,4 @@ For **deployment and operations**, see:
 For **technical architecture**, see:
 - [System Architecture Plan](architecture/SYSTEM_ARCHITECTURE_PLAN.md)
 - [Feature Formulas](architecture/FEATURE_FORMULAS.md)
-- [optimization Demonstrations](architecture/PAIRWISE_DEMONSTRATION.md)
+- [SMT Demonstrations](architecture/PAIRWISE_DEMONSTRATION.md)

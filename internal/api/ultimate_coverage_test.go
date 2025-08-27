@@ -153,7 +153,7 @@ func TestAPI_UltimateCoverage_TargetedBoost(t *testing.T) {
 				"query":         "rank function",
 				"max_tokens":    200, 
 				"max_documents": 10,
-				"use_optimization":       true,
+				"use_smt":       true,
 			},
 			{
 				"query":         "",
@@ -216,11 +216,11 @@ func TestAPI_UltimateCoverage_TargetedBoost(t *testing.T) {
 				"workspace_path":  "/test/workspace",
 			},
 			{
-				"query":            "optimization test",
+				"query":            "smt test",
 				"max_tokens":       200,
 				"max_documents":    3,
-				"use_optimization":          true,
-				"optimization_timeout_ms":   2000,
+				"use_smt":          true,
+				"smt_timeout_ms":   2000,
 			},
 			{
 				"query":         "empty context",
@@ -269,10 +269,10 @@ func TestAPI_UltimateCoverage_TargetedBoost(t *testing.T) {
 				"max_documents":  8,
 			},
 			{
-				"query":          "baseline vs optimization",
+				"query":          "baseline vs smt",
 				"max_tokens":     600,
 				"max_documents":  15,
-				"use_optimization":        true,
+				"use_smt":        true,
 			},
 			{
 				"query":          "",

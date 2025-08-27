@@ -12,7 +12,7 @@
 - RSA key generation and validation
 - Stripe payment webhook processing  
 - License generation and verification
-- optimizationP email delivery
+- SMTP email delivery
 - Database operations (users, licenses, payments)
 - API authentication and authorization
 - Error handling for payment failures

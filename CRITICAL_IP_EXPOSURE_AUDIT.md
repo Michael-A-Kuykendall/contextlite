@@ -22,17 +22,17 @@
 **EXPOSURE LEVEL**: 🔴 **CRITICAL**
 
 **Exposed Methodology**:
-- optimization optimization approach and implementation details
+- SMT optimization approach and implementation details
 - Performance benchmarks revealing algorithm efficiency (0.3ms)  
-- Architecture details showing how optimization engine works
+- Architecture details showing how SMT engine works
 - API integration patterns exposing implementation strategy
 - Resource management techniques for enterprise deployment
 
 **Specific Leaks**:
 ```markdown
-- "Advanced intelligent routing" 
+- "SMT-optimized affinity routing" 
 - "mathematically optimal document selection"
-- "budget management for optimal results"
+- "constraint satisfaction for optimal results"
 - Detailed performance metrics exposing algorithm capabilities
 ```
 
@@ -59,14 +59,14 @@
 **EXPOSURE LEVEL**: 🔴 **CRITICAL**
 
 **Exposed Methodology**:
-- "Advanced intelligent routing" details
+- "SMT-optimized affinity routing" details
 - Enterprise workspace clustering implementation  
 - Zero-latency workspace switching methodology
 - Resource management and priority scheduling approach
 
 **Specific Leaks**:
 ```markdown
-- "Advanced intelligent routing automatically learns project relationships"
+- "SMT-optimized affinity routing automatically learns project relationships"
 - "Priority scheduling and per-workspace resource limits"  
 - "Sticky sessions and workspace-aware load balancing"
 - Complete enterprise architecture methodology
@@ -77,7 +77,7 @@
 **EXPOSURE LEVEL**: 🔴 **CRITICAL**
 
 **Exposed Methodology**:
-- Complete optimization budget management implementation details
+- Complete SMT constraint satisfaction implementation details
 - Multi-dimensional relevance analysis approach
 - Workspace clustering architecture and algorithms  
 - Per-workspace calibration and adaptive weight learning
@@ -86,10 +86,10 @@
 
 **Specific Leaks**:
 ```markdown
-- "Advanced Document Selection: Uses budget management for mathematically optimal document selection"
+- "SMT-Optimized Selection: Uses constraint satisfaction for mathematically optimal document selection"
 - "Advanced Feature Scoring: Multi-dimensional relevance analysis with machine learning optimization"  
 - "Per-Workspace Calibration: Adaptive weights that learn from your usage patterns"
-- "Multi-Level Caching: multi-level caching system"
+- "Multi-Level Caching: L1 memory, L2 SQLite, L3 quantum snapshots"
 - Complete configuration examples showing exact implementation
 ```
 
@@ -104,7 +104,7 @@
 ## 🔍 DETAILED METHODOLOGY EXPOSURE
 
 ### Core Algorithm Leaks
-1. **optimization Constraint Satisfaction**: Reveals the mathematical optimization approach
+1. **SMT Constraint Satisfaction**: Reveals the mathematical optimization approach
 2. **Feature Scoring**: Multi-dimensional relevance analysis techniques  
 3. **Workspace Affinity**: Intelligent routing and session management
 4. **Adaptive Learning**: Per-workspace calibration methodology
@@ -143,7 +143,7 @@
 
 ### Phase 1: Immediate Sanitization (URGENT)
 1. **Sanitize Current Documentation**:
-   - Remove optimization implementation details
+   - Remove SMT implementation details
    - Remove architecture methodology exposure  
    - Remove performance benchmarks revealing algorithm capabilities
    - Keep user-focused benefits without implementation details

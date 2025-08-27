@@ -154,7 +154,7 @@ DOCKER_DOWNLOADS=$(curl -s "https://hub.docker.com/v2/repositories/makuykendall/
 body: |
   ## 🎯 Trial Information
   - **Duration**: 14 days from first run
-  - **Features**: Complete optimization optimization included
+  - **Features**: Complete SMT optimization included
   - **Requirement**: None (no registration needed)
 ```
 

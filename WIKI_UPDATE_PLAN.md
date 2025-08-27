@@ -9,7 +9,7 @@ The ContextLite wiki is highly comprehensive and well-structured, but requires s
 ### ✅ **Wiki Strengths**
 - **Comprehensive Coverage**: All 13 major sections thoroughly documented
 - **Professional Structure**: Clear navigation with 200+ internal links
-- **Technical Depth**: Detailed optimization theory, API reference, and performance data
+- **Technical Depth**: Detailed SMT theory, API reference, and performance data
 - **Up-to-Date Architecture**: Reflects dual-engine system and license management
 - **Excellent Examples**: Code samples for multiple languages and platforms
 
@@ -27,7 +27,7 @@ The ContextLite wiki is highly comprehensive and well-structured, but requires s
 - Add glassmorphism design details and contextlite.com styling integration
 - Include live performance metrics: GitHub API response times, download throughput
 - Add platform detection and auto-updating features
-- Update with optimization education section and vector DB comparison
+- Update with SMT education section and vector DB comparison
 
 #### **2. Package Manager Status Accuracy (HIGH PRIORITY)**
 **Current Issues**:
@@ -113,7 +113,7 @@ ContextLite now features a stunning HuggingFace Spaces deployment with comprehen
 • 🖥️ **Smart Platform Detection**: Automatically detects user's OS and shows appropriate downloads
 • 📊 **Live Performance Stats**: Real-time 0.3ms response time, 100x faster messaging, $0 cost highlights
 • 🔄 **Auto-Updating**: GitHub API integration refreshes every 5 minutes
-• 🧠 **optimization Education**: Complete Satisfiability Modulo Theories explanation and vector DB comparison
+• 🧠 **SMT Education**: Complete Satisfiability Modulo Theories explanation and vector DB comparison
 • 💫 **Interactive Elements**: Hover effects, transitions, and professional animations
 
 #### Technical Implementation:

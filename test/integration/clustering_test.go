@@ -325,7 +325,7 @@ func createClusterTestConfig() *config.Config {
 				},
 			},
 		},
-		optimization: config.optimizationConfig{
+		SMT: config.SMTConfig{
 			SolverTimeoutMs:  1000,
 			MaxOptGap:       0.1,
 			MaxCandidates:   50,

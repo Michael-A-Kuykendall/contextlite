@@ -217,7 +217,7 @@ type basicMockFeatureGate struct{}
 
 func (b *basicMockFeatureGate) IsEnabled(feature string) bool {
 	// Basic tier only supports basic features
-	return feature == "basic_optimization" || feature == "rest_api"
+	return feature == "basic_smt" || feature == "rest_api"
 }
 
 func (b *basicMockFeatureGate) RequireFeature(feature string) error {

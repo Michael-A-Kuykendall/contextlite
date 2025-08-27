@@ -10,13 +10,13 @@
 (declare-fun y0_1 () Int)
 (assert (or (= y0_1 0) (= y0_1 1)))
 
-; Token budget budget
+; Token budget constraint
 (assert (<= (+ (* 50 x0) (* 60 x1)) 200))
 
-; Document count budget
+; Document count constraint
 (assert (<= (+ x0 x1) 2))
 
-; Linking budgets
+; Linking constraints
 (assert (<= y0_1 x0))
 (assert (<= y0_1 x1))
 (assert (<= (+ x0 x1 (* -1 y0_1)) 1))

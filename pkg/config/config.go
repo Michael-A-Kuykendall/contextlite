@@ -12,10 +12,10 @@ import (
 type Config struct {
 	Server   ServerConfig   `yaml:"server"`
 	Storage  StorageConfig  `yaml:"storage"`
-	optimization      optimizationConfig      `yaml:"optimization"`
+	SMT      SMTConfig      `yaml:"smt"`
 	Weights  WeightsConfig  `yaml:"weights"`
 	Lexicographic LexConfig `yaml:"lexicographic"`
-	EpsilonConstraint EpsilonConfig `yaml:"epsilon_budget"`
+	EpsilonConstraint EpsilonConfig `yaml:"epsilon_constraint"`
 	Tokenizer TokenizerConfig `yaml:"tokenizer"`
 	Cache     CacheConfig    `yaml:"cache"`
 	Logging   LoggingConfig  `yaml:"logging"`
@@ -42,17 +42,17 @@ type StorageConfig struct {
 	CacheSizeMB  int    `yaml:"cache_size_mb"`
 }
 
-type optimizationConfig struct {
+type SMTConfig struct {
 	SolverTimeoutMs  int     `yaml:"solver_timeout_ms"`
 	MaxOptGap        float64 `yaml:"max_opt_gap"`
 	MaxCandidates    int     `yaml:"max_candidates"`
 	MaxPairsPerDoc   int     `yaml:"max_pairs_per_doc"`
 	IntegerScaling   int     `yaml:"integer_scaling"`
 	ObjectiveStyle   string  `yaml:"objective_style"`
-	optimizer               optimizerConfig `yaml:"z3"`
+	Z3               Z3Config `yaml:"z3"`
 }
 
-type optimizerConfig struct {
+type Z3Config struct {
 	BinaryPath       string `yaml:"binary_path"`
 	EnableVerification bool `yaml:"enable_verification"`
 	MaxVerificationDocs int `yaml:"max_verification_docs"`
@@ -96,7 +96,7 @@ type CacheConfig struct {
 type LoggingConfig struct {
 	Level             string `yaml:"level"`
 	IncludeTimings    bool   `yaml:"include_timings"`
-	IncludeoptimizationMetrics bool   `yaml:"include_optimization_metrics"`
+	IncludeSMTMetrics bool   `yaml:"include_smt_metrics"`
 }
 
 // ClusterConfig defines clustering and multi-project support settings
@@ -146,7 +146,7 @@ type LoadBalancingConfig struct {
 	EnableCircuitBreaker  bool    `yaml:"enable_circuit_breaker"`
 }
 
-// WorkspaceResourceLimits defines resource budgets for a workspace
+// WorkspaceResourceLimits defines resource constraints for a workspace
 type WorkspaceResourceLimits struct {
 	MaxConcurrentRequests int   `yaml:"max_concurrent_requests"`
 	MaxTokensPerMinute   int   `yaml:"max_tokens_per_minute"`
@@ -217,31 +217,31 @@ func validate(config *Config) error {
 		return fmt.Errorf("invalid server port: %d", config.Server.Port)
 	}
 
-	if config.optimization.SolverTimeoutMs <= 0 {
-		return fmt.Errorf("optimization system timeout must be positive")
+	if config.SMT.SolverTimeoutMs <= 0 {
+		return fmt.Errorf("SMT solver timeout must be positive")
 	}
 
-	if config.optimization.MaxCandidates <= 0 {
+	if config.SMT.MaxCandidates <= 0 {
 		return fmt.Errorf("max candidates must be positive")
 	}
 
 	validObjectiveStyles := map[string]bool{
 		"weighted-sum":      true,
 		"lexicographic":     true,
-		"epsilon-budget": true,
+		"epsilon-constraint": true,
 	}
-	if !validObjectiveStyles[config.optimization.ObjectiveStyle] {
-		return fmt.Errorf("invalid objective style: %s", config.optimization.ObjectiveStyle)
+	if !validObjectiveStyles[config.SMT.ObjectiveStyle] {
+		return fmt.Errorf("invalid objective style: %s", config.SMT.ObjectiveStyle)
 	}
 
-	// Validate optimizer configuration
-	if config.optimization.optimizer.BinaryPath != "" {
-		if _, err := os.Stat(config.optimization.optimizer.BinaryPath); err != nil {
-			return fmt.Errorf("optimizer binary not found at path: %s", config.optimization.optimizer.BinaryPath)
+	// Validate Z3 configuration
+	if config.SMT.Z3.BinaryPath != "" {
+		if _, err := os.Stat(config.SMT.Z3.BinaryPath); err != nil {
+			return fmt.Errorf("Z3 binary not found at path: %s", config.SMT.Z3.BinaryPath)
 		}
 	}
 
-	if config.optimization.optimizer.MaxVerificationDocs < 0 {
+	if config.SMT.Z3.MaxVerificationDocs < 0 {
 		return fmt.Errorf("max verification docs must be non-negative")
 	}
 

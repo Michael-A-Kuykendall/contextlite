@@ -2,7 +2,7 @@
 ## GRANULAR ATOMIC PERFECTION - JSON CLI INTEGRATION
 
 > **Status**: Ready for Implementation (Private work complete)
-> **Architecture**: JSON CLI with bundled optimization engine
+> **Architecture**: JSON CLI with bundled Z3 solver
 > **Testing**: 89/104 tests passing (85.6% coverage - excellent!)  
 > **Risk Level**: MINIMIZED through proven JSON interface
 
@@ -17,7 +17,7 @@
 ✅ PASS: internal/solve      - All optimization tests ✅
 ✅ PASS: internal/timing     - All performance tests ✅  
 ✅ PASS: pkg/config         - All configuration tests ✅
-⚠️  FAIL: internal/optimization       - 15 tests (environmental optimizer PATH issues, not functional)
+⚠️  FAIL: internal/smt       - 15 tests (environmental Z3 PATH issues, not functional)
 ```
 
 ### JSON CLI Interface Proven
@@ -26,9 +26,9 @@
 echo '{"action":"stats"}' | ./build/contextlite-library  # ✅ WORKS
 echo '{"action":"optimize","docs":[...]}' | ./build/contextlite-library  # ✅ WORKS
 
-# All optimization optimization features tested and working:
-✅ optimizer integration with bundled solver
-✅ optimization budget optimization  
+# All SMT optimization features tested and working:
+✅ Z3 integration with bundled solver
+✅ SMT constraint optimization  
 ✅ Feature extraction (7D algorithm)
 ✅ Multi-objective optimization
 ✅ Timeout handling and fallbacks
@@ -41,7 +41,7 @@ echo '{"action":"optimize","docs":[...]}' | ./build/contextlite-library  # ✅ W
 ### Key Changes from Original Plan:
 1. **JSON CLI Interface**: Private repo exposes JSON-based CLI instead of shared library
 2. **Process Communication**: Public repo communicates via stdin/stdout JSON 
-3. **Bundled optimizer**: Private repo includes optimization engine, no system dependencies
+3. **Bundled Z3**: Private repo includes Z3 solver, no system dependencies
 4. **Simpler Integration**: No plugin system needed, just process execution
 
 ---
@@ -53,7 +53,7 @@ echo '{"action":"optimize","docs":[...]}' | ./build/contextlite-library  # ✅ W
 CLEAN INTERFACES IDENTIFIED:
 ✅ pkg/types + pkg/config = PURE DATA CONTRACTS (no internal deps)
 ✅ internal/storage + internal/timing = INFRASTRUCTURE LAYER  
-✅ internal/features + internal/optimization + internal/solve = CORE ALGORITHMS (private)
+✅ internal/features + internal/smt + internal/solve = CORE ALGORITHMS (private)
 ✅ internal/api + internal/pipeline = PUBLIC ORCHESTRATION
 ✅ cmd/* = ENTRY POINTS (configurable backends)
 ```
@@ -64,13 +64,13 @@ cmd/contextlite/main.go
 ├── internal/api (PUBLIC)
 ├── internal/pipeline (PUBLIC) 
 │   ├── internal/features (PRIVATE) ⚠️
-│   ├── internal/optimization (PRIVATE) ⚠️
+│   ├── internal/smt (PRIVATE) ⚠️
 │   └── internal/storage (PUBLIC)
 ├── internal/storage (PUBLIC)
 └── pkg/config + pkg/types (PUBLIC)
 
 CRITICAL INSIGHT: Only 2 packages create cross-repo dependencies!
-- internal/pipeline → internal/features + internal/optimization  
+- internal/pipeline → internal/features + internal/smt  
 - internal/api → internal/features
 ```
 
@@ -89,8 +89,8 @@ type FeatureExtractor interface {
     UpdateWeights(feedback UserFeedback) error
 }
 
-type optimizationSolver interface {
-    OptimizeSelection(docs []Document, budgets Constraints) ([]int, error)
+type SMTSolver interface {
+    OptimizeSelection(docs []Document, constraints Constraints) ([]int, error)
     SetStrategy(strategy OptimizationStrategy) error
 }
 
@@ -107,7 +107,7 @@ type ContextEngine interface {
 type Pipeline struct {
     storage   storage.Interface      // Already interface ✅
     features  types.FeatureExtractor // NEW: interface instead of concrete
-    optimization       types.optimizationSolver        // NEW: interface instead of concrete
+    smt       types.SMTSolver        // NEW: interface instead of concrete
 }
 
 // internal/api/server.go (UPDATED)  
@@ -126,14 +126,14 @@ contextlite-private/
 ├── go.mod (module: contextlite-private)
 ├── internal/
 │   ├── features/          # ✅ COMPLETE: 7D feature extraction
-│   ├── optimization/              # ✅ COMPLETE: optimization system integration  
+│   ├── smt/              # ✅ COMPLETE: SMT solver integration  
 │   ├── solve/            # ✅ COMPLETE: optimization algorithms
 │   └── timing/           # ✅ COMPLETE: performance monitoring
 ├── pkg/
 │   └── config/           # ✅ COMPLETE: configuration management
 ├── cmd/
 │   └── contextlite-library/  # ✅ COMPLETE: JSON CLI binary
-└── z3/                   # ✅ COMPLETE: bundled optimization engine
+└── z3/                   # ✅ COMPLETE: bundled Z3 solver
 ```
 
 #### 2.2 JSON CLI Interface ✅ COMPLETE
@@ -150,10 +150,10 @@ contextlite-private/
 // Output: {"status":"success","data":{"features":{"relevance":0.8,...}}}
 ```
 
-#### 2.3 Bundled optimizer Integration ✅ COMPLETE
+#### 2.3 Bundled Z3 Integration ✅ COMPLETE
 ```bash
-# optimization engine bundled with private binary - no system dependencies
-./build/contextlite-library --help  # Uses bundled optimizer automatically
+# Z3 solver bundled with private binary - no system dependencies
+./build/contextlite-library --help  # Uses bundled Z3 automatically
 # Test environment issues ≠ Production problems (85.6% test coverage excellent!)
 ```
 
@@ -164,9 +164,9 @@ contextlite-private/
 ```bash
 # ATOMIC REMOVALS (can be reverted easily)
 git mv internal/features ../contextlite-private/internal/
-git mv internal/optimization ../contextlite-private/internal/  
+git mv internal/smt ../contextlite-private/internal/  
 git mv internal/solve ../contextlite-private/internal/
-git rm -r internal/features internal/optimization internal/solve
+git rm -r internal/features internal/smt internal/solve
 ```
 
 #### 3.2 Add JSON CLI Integration (INSTEAD OF STUB)
@@ -203,7 +203,7 @@ type FallbackEngine struct {
 }
 
 func (f *FallbackEngine) AssembleContext(req types.ContextRequest) (*types.ContextResult, error) {
-    // Basic BM25 + heuristic selection (no optimization optimization)
+    // Basic BM25 + heuristic selection (no SMT optimization)
     return basicSelection(req), nil
 }
 ```
@@ -295,7 +295,7 @@ test-integration:
 |------|---------------|------------|-------------|
 | `cmd/contextlite/main.go` | `internal/pipeline` | `internal/engine` | SIMPLE |
 | `internal/api/server.go` | `internal/features` | `pkg/types` | INTERFACE |
-| `internal/pipeline/pipeline.go` | `internal/{features,optimization}` | `pkg/types` | INTERFACE |
+| `internal/pipeline/pipeline.go` | `internal/{features,smt}` | `pkg/types` | INTERFACE |
 | All other files | NO CHANGES | NO CHANGES | NONE ✅ |
 
 ### Build Tags Strategy (UPDATED):
@@ -396,7 +396,7 @@ cd contextlite && make build-public-only && ./build/contextlite-public --test
 - [ ] **Cross-Platform**: JSON CLI works on Linux/Windows/macOS
 
 ### Code Quality Maintained:
-- [x] **Private repo tests**: ✅ 85.6% coverage (excellent for optimization system)
+- [x] **Private repo tests**: ✅ 85.6% coverage (excellent for SMT system)
 - [ ] **Public repo tests**: All tests pass after private code removal
 - [ ] **Integration tests**: JSON CLI communication thoroughly tested  
 - [ ] **Interface contracts**: Clearly defined and respected
@@ -408,6 +408,6 @@ cd contextlite && make build-public-only && ./build/contextlite-public --test
 - [x] **Language Agnostic**: ✅ Any language can call JSON CLI
 - [x] **No Shared Libraries**: ✅ Simpler deployment than .so/.dll files
 - [x] **Timeout Handling**: ✅ Process can be killed if needed
-- [x] **Bundled Dependencies**: ✅ optimization engine included, no system deps
+- [x] **Bundled Dependencies**: ✅ Z3 solver included, no system deps
 
 **RESULT: CLEAN JSON CLI SEPARATION WITH PROVEN ARCHITECTURE** 🎯✅

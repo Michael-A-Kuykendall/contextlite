@@ -111,7 +111,7 @@ func TestGoClientIntegration(t *testing.T) {
 			"max_tokens":   2000,
 			"max_documents": 5,
 			"model_id":     "gpt-4",
-			"use_optimization":      false,
+			"use_smt":      false,
 		}
 		
 		jsonData, _ := json.Marshal(reqBody)

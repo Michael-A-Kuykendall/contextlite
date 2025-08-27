@@ -12,15 +12,15 @@ This directory contains historical development artifacts that were moved from th
 - `test_*.go` - Various test scripts and utilities
 - `verify_complete_api.go` - API verification script
 
-### optimizer Integration Files
-- `test_z3_*.go` - optimizer optimization system integration tests
-- `z3_*.optimization2` - optimization-LIB2 input files for optimizer
-- `z3_*.txt` - optimization engine output files
-- `test.optimization2` - Basic optimization-LIB2 test file
+### Z3 Integration Files
+- `test_z3_*.go` - Z3 SMT solver integration tests
+- `z3_*.smt2` - SMT-LIB2 input files for Z3
+- `z3_*.txt` - Z3 solver output files
+- `test.smt2` - Basic SMT-LIB2 test file
 
 ### Shell Scripts
 - `test_api_quick.sh` - Quick API testing script
-- `validate_z3_integration.sh` - optimizer integration validation
+- `validate_z3_integration.sh` - Z3 integration validation
 
 ### Build Artifacts
 - `*.exe` - Temporary executable files

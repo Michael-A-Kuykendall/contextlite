@@ -56,7 +56,7 @@ Well-Tested Components:
 // Email Delivery Tests
 - TestLicenseEmailDelivery()
 - TestEmailFailureRetry()
-- TestoptimizationPConfigValidation()
+- TestSMTPConfigValidation()
 
 // Security Tests
 - TestWebhookSignatureVerification()

@@ -18,7 +18,7 @@ func TestDefaultComparisonConfig(t *testing.T) {
 		t.Errorf("Expected output path 'sota_comparison_results.json', got '%s'", config.OutputPath)
 	}
 	
-	expectedSystems := []string{"contextlite_optimization", "bm25_baseline", "embedding_retrieval", "llm_reranking"}
+	expectedSystems := []string{"contextlite_smt", "bm25_baseline", "embedding_retrieval", "llm_reranking"}
 	if len(config.SystemsToTest) != len(expectedSystems) {
 		t.Errorf("Expected %d systems, got %d", len(expectedSystems), len(config.SystemsToTest))
 	}
@@ -223,7 +223,7 @@ func TestExecuteLLMReranking(t *testing.T) {
 	}
 }
 
-func TestExecuteContextLiteoptimization(t *testing.T) {
+func TestExecuteContextLiteSMT(t *testing.T) {
 	config := DefaultComparisonConfig()
 	sota := NewSOTAComparison(config)
 	
@@ -231,17 +231,17 @@ func TestExecuteContextLiteoptimization(t *testing.T) {
 	query := "machine learning"
 	queryType := "factual"
 	
-	docs, latency, _, err := sota.executeContextLiteoptimization(ctx, query, queryType)
+	docs, latency, _, err := sota.executeContextLiteSMT(ctx, query, queryType)
 	if err != nil {
-		t.Fatalf("executeContextLiteoptimization failed: %v", err)
+		t.Fatalf("executeContextLiteSMT failed: %v", err)
 	}
 	
 	if len(docs) == 0 {
-		t.Error("ContextLite optimization should return documents")
+		t.Error("ContextLite SMT should return documents")
 	}
 	
 	if latency <= 0 {
-		t.Log("ContextLite optimization latency was non-positive (expected for mock implementation)")
+		t.Log("ContextLite SMT latency was non-positive (expected for mock implementation)")
 	}
 }
 
@@ -279,8 +279,8 @@ func TestGenerateSummary(t *testing.T) {
 	
 	// Create mock system results
 	systemResults := map[string]*AggregateResults{
-		"contextlite_optimization": {
-			SystemType:      "contextlite_optimization",
+		"contextlite_smt": {
+			SystemType:      "contextlite_smt",
 			MeanRecallAt5:   0.8,
 			MeanNDCG5:       0.85,
 			MeanMAP:         0.75,
@@ -316,8 +316,8 @@ func TestRankSystems(t *testing.T) {
 	
 	// Create system results with different performance
 	systemResults := map[string]*AggregateResults{
-		"contextlite_optimization": {
-			SystemType:    "contextlite_optimization",
+		"contextlite_smt": {
+			SystemType:    "contextlite_smt",
 			MeanRecallAt5: 0.8,
 			MeanNDCG5:     0.85,
 			MeanMAP:       0.75,
@@ -343,8 +343,8 @@ func TestRankSystems(t *testing.T) {
 	}
 	
 	// Best system should be first
-	if rankings[0].System != "contextlite_optimization" {
-		t.Errorf("Expected contextlite_optimization to be ranked first, got %s", rankings[0].System)
+	if rankings[0].System != "contextlite_smt" {
+		t.Errorf("Expected contextlite_smt to be ranked first, got %s", rankings[0].System)
 	}
 	
 	// Scores should be in descending order
@@ -432,18 +432,18 @@ func TestPrintSummary(t *testing.T) {
 		Timestamp: time.Now(),
 		Config:    config,
 		SystemResults: map[string]*AggregateResults{
-			"contextlite_optimization": {
-				SystemType:    "contextlite_optimization",
+			"contextlite_smt": {
+				SystemType:    "contextlite_smt",
 				MeanRecallAt5: 0.85,
 				MeanNDCG5:     0.8,
 				MeanMAP:       0.9,
 			},
 		},
 		Summary: &ComparisonSummary{
-			BestOverall: "contextlite_optimization",
+			BestOverall: "contextlite_smt",
 			RankingByRecall5: []SystemRanking{
 				{
-					System: "contextlite_optimization",
+					System: "contextlite_smt",
 					Score:  0.85,
 					Rank:   1,
 				},
@@ -581,20 +581,20 @@ func TestRunSOTAComparisonErrorHandling(t *testing.T) {
 	}
 }
 
-// Test executeSystemQuery contextlite_optimization path
-func TestExecuteContextLiteoptimizationPath(t *testing.T) {
+// Test executeSystemQuery contextlite_smt path
+func TestExecuteContextLiteSMTPath(t *testing.T) {
 	config := DefaultComparisonConfig()
 	sota := NewSOTAComparison(config)
 	
 	ctx := context.Background()
 	
-	docs, latency, memory, err := sota.executeSystemQuery(ctx, "contextlite_optimization", "test query", "factual")
+	docs, latency, memory, err := sota.executeSystemQuery(ctx, "contextlite_smt", "test query", "factual")
 	if err != nil {
-		t.Fatalf("executeSystemQuery contextlite_optimization failed: %v", err)
+		t.Fatalf("executeSystemQuery contextlite_smt failed: %v", err)
 	}
 	
 	if len(docs) == 0 {
-		t.Error("ContextLite optimization should return documents")
+		t.Error("ContextLite SMT should return documents")
 	}
 	
 	if latency < 0 {

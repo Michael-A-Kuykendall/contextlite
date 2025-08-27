@@ -341,14 +341,14 @@ func TestServer_HandleStorageInfo(t *testing.T) {
 	}
 }
 
-func TestServer_HandleoptimizationStats(t *testing.T) {
+func TestServer_HandleSMTStats(t *testing.T) {
 	server, _, cleanup := setupTestServer(t)
 	defer cleanup()
 	
-	req := httptest.NewRequest("GET", "/optimization/stats", nil)
+	req := httptest.NewRequest("GET", "/smt/stats", nil)
 	w := httptest.NewRecorder()
 	
-	server.handleoptimizationStats(w, req)
+	server.handleSMTStats(w, req)
 	
 	if w.Code != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", w.Code)
@@ -360,7 +360,7 @@ func TestServer_HandleoptimizationStats(t *testing.T) {
 	}
 	
 	if _, ok := response["z3_version"]; !ok {
-		t.Logf("optimization stats missing z3_version (may be expected)")
+		t.Logf("SMT stats missing z3_version (may be expected)")
 	}
 }
 
@@ -434,15 +434,15 @@ func TestServer_WriteError(t *testing.T) {
 	}
 }
 
-func TestServer_GetoptimizerVersion(t *testing.T) {
+func TestServer_GetZ3Version(t *testing.T) {
 	server, _, cleanup := setupTestServer(t)
 	defer cleanup()
 	
-	version := server.getoptimizerVersion()
+	version := server.getZ3Version()
 	
 	// Should return either a version string or "not available"
 	if version == "" {
-		t.Errorf("Expected non-empty optimizer version string")
+		t.Errorf("Expected non-empty Z3 version string")
 	}
 }
 
@@ -1277,7 +1277,7 @@ func TestServer_HandleAssembleContextComprehensive(t *testing.T) {
 		MaxTokens:    1000,
 		MaxDocuments: 5,
 		ModelID:      "gpt-4",
-		Useoptimization:       false, // Disable optimization for simpler testing
+		UseSMT:       false, // Disable SMT for simpler testing
 	}
 	
 	jsonData, _ := json.Marshal(reqBody)

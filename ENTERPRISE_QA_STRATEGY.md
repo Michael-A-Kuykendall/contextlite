@@ -63,7 +63,7 @@ test/integration             | FAILING  | 🚨 FAIL | CRITICAL
 // Required test scenarios:
 - License generation and validation
 - RSA key pair operations  
-- optimizationP email delivery
+- SMTP email delivery
 - Stripe webhook processing
 - Database operations (users, licenses)
 - API endpoint security

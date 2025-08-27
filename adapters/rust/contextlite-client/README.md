@@ -51,9 +51,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## Supported Operations
 
-✓ **Health Checks** - Server status and optimization system information  
+✓ **Health Checks** - Server status and SMT solver information  
 ✓ **Document Management** - Add, search, and delete documents  
-✓ **Context Assembly** - Advanced context compilation  
+✓ **Context Assembly** - SMT-optimized context compilation  
 ✓ **Authentication** - Bearer token security  
 ✓ **Error Handling** - Comprehensive error types and retry logic
 

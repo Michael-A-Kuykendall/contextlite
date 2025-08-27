@@ -74,7 +74,7 @@
 		<div id="content">
 		
 		<pre class="file" id="file0" style="display: none">/*
- * ContextLite - optimization-Optimized AI Context Engine
+ * ContextLite - SMT-Optimized AI Context Engine
  * Copyright (c) 2025 Michael A. Kuykendall
  * 
  * Patent Pending - Provisional Patent Filed
@@ -143,7 +143,7 @@ func (e *CoreEngine) AssembleContext(ctx context.Context, request types.ContextR
         // Step 2: Score documents using basic BM25 + simple heuristics
         <span class="cov8" title="1">scoredDocs := e.scoreDocuments(candidates, request.Query)
         
-        // Step 3: Select documents using greedy heuristic (no optimization optimization)
+        // Step 3: Select documents using greedy heuristic (no SMT optimization)
         selected := e.selectDocuments(scoredDocs, request.MaxTokens, request.MaxDocuments)
         
         // Step 4: Assemble final context
@@ -210,8 +210,8 @@ func (e *CoreEngine) Close() error <span class="cov8" title="1">{
 func (e *CoreEngine) searchCandidates(ctx context.Context, request types.ContextRequest) ([]types.Document, error) <span class="cov8" title="1">{
         // Use storage interface for search
         maxCandidates := 100
-        if e.config != nil &amp;&amp; e.config.optimization.MaxCandidates &gt; 0 </span><span class="cov8" title="1">{
-                maxCandidates = e.config.optimization.MaxCandidates
+        if e.config != nil &amp;&amp; e.config.SMT.MaxCandidates &gt; 0 </span><span class="cov8" title="1">{
+                maxCandidates = e.config.SMT.MaxCandidates
         }</span>
         
         <span class="cov8" title="1">return e.storage.SearchDocuments(ctx, request.Query, maxCandidates)</span>
@@ -258,13 +258,13 @@ func (e *CoreEngine) scoreDocuments(docs []types.Document, query string) []types
         <span class="cov8" title="1">return scored</span>
 }
 
-// selectDocuments uses greedy selection (no optimization optimization)
+// selectDocuments uses greedy selection (no SMT optimization)
 func (e *CoreEngine) selectDocuments(scored []types.ScoredDocument, maxTokens, maxDocs int) []types.ScoredDocument <span class="cov8" title="1">{
         var selected []types.ScoredDocument
         totalTokens := 0
         
         for _, doc := range scored </span><span class="cov8" title="1">{
-                // Check budgets
+                // Check constraints
                 if len(selected) &gt;= maxDocs </span><span class="cov8" title="1">{
                         break</span>
                 }
@@ -312,7 +312,7 @@ func (e *CoreEngine) assembleResult(selected []types.ScoredDocument, request typ
                 TotalTokens:    totalTokens,
                 ProcessingTime: processingTime,
                 CacheHit:       false,
-                Message:        fmt.Sprintf("Selected %d documents using basic heuristics (upgrade for optimization optimization)", len(selected)),
+                Message:        fmt.Sprintf("Selected %d documents using basic heuristics (upgrade for SMT optimization)", len(selected)),
         }</span>
 }
 
@@ -404,7 +404,7 @@ func (e *CoreEngine) isDiverse(candidate types.ScoredDocument, selected []types.
 </pre>
 		
 		<pre class="file" id="file1" style="display: none">/*
- * ContextLite - optimization-Optimized AI Context Engine
+ * ContextLite - SMT-Optimized AI Context Engine
  * Copyright (c) 2025 Michael A. Kuykendall
  * 
  * Patent Pending - Provisional Patent Filed
@@ -446,8 +446,8 @@ type JSONCLIEngine struct {
 // NewJSONCLIEngine creates a new JSON CLI engine instance
 func NewJSONCLIEngine(cfg *config.Config, storage types.StorageInterface, binaryPath string) *JSONCLIEngine <span class="cov0" title="0">{
         timeout := 30 * time.Second
-        if cfg != nil &amp;&amp; cfg.optimization.SolverTimeoutMs &gt; 0 </span><span class="cov0" title="0">{
-                timeout = time.Duration(cfg.optimization.SolverTimeoutMs) * time.Millisecond
+        if cfg != nil &amp;&amp; cfg.SMT.SolverTimeoutMs &gt; 0 </span><span class="cov0" title="0">{
+                timeout = time.Duration(cfg.SMT.SolverTimeoutMs) * time.Millisecond
         }</span>
         
         <span class="cov0" title="0">return &amp;JSONCLIEngine{
@@ -579,8 +579,8 @@ func (e *JSONCLIEngine) Close() error <span class="cov0" title="0">{
 // getCandidateDocuments retrieves candidate documents from storage
 func (e *JSONCLIEngine) getCandidateDocuments(ctx context.Context, request types.ContextRequest) ([]types.Document, error) <span class="cov0" title="0">{
         maxCandidates := 200
-        if e.config != nil &amp;&amp; e.config.optimization.MaxCandidates &gt; 0 </span><span class="cov0" title="0">{
-                maxCandidates = e.config.optimization.MaxCandidates
+        if e.config != nil &amp;&amp; e.config.SMT.MaxCandidates &gt; 0 </span><span class="cov0" title="0">{
+                maxCandidates = e.config.SMT.MaxCandidates
         }</span>
         
         <span class="cov0" title="0">return e.storage.SearchDocuments(ctx, request.Query, maxCandidates)</span>
@@ -676,7 +676,7 @@ func (e *JSONCLIEngine) parseOptimizeResponse(result map[string]interface{}, req
                         UtilityScore:    getFloatField(docData, "utility_score"),
                         RelevanceScore:  getFloatField(docData, "relevance_score"),
                         RecencyScore:    getFloatField(docData, "recency_score"),
-                        InclusionReason: "optimization-optimized",
+                        InclusionReason: "smt-optimized",
                 }
                 
                 docRefs = append(docRefs, docRef)
@@ -687,8 +687,8 @@ func (e *JSONCLIEngine) parseOptimizeResponse(result map[string]interface{}, req
                 }</span>
         }
         
-        // Extract optimization metrics
-        <span class="cov0" title="0">optimizationMetrics := e.extractoptimizationMetrics(result)
+        // Extract SMT metrics
+        <span class="cov0" title="0">smtMetrics := e.extractSMTMetrics(result)
         
         // Build final context
         context := strings.Join(contextParts, "\n\n---\n\n")
@@ -700,25 +700,25 @@ func (e *JSONCLIEngine) parseOptimizeResponse(result map[string]interface{}, req
                 ProcessingTime: processingTime,
                 CacheHit:       false,
                 CoherenceScore: getFloatField(result, "coherence_score"),
-                optimizationMetrics:     optimizationMetrics,
+                SMTMetrics:     smtMetrics,
         }, nil</span>
 }
 
-// extractoptimizationMetrics extracts optimization system metrics from response
-func (e *JSONCLIEngine) extractoptimizationMetrics(result map[string]interface{}) *types.optimizationResult <span class="cov0" title="0">{
-        metricsData, ok := result["optimization_metrics"].(map[string]interface{})
+// extractSMTMetrics extracts SMT solver metrics from response
+func (e *JSONCLIEngine) extractSMTMetrics(result map[string]interface{}) *types.SMTResult <span class="cov0" title="0">{
+        metricsData, ok := result["smt_metrics"].(map[string]interface{})
         if !ok </span><span class="cov0" title="0">{
                 return nil
         }</span>
         
-        <span class="cov0" title="0">return &amp;types.optimizationResult{
+        <span class="cov0" title="0">return &amp;types.SMTResult{
                 SelectedDocs:    nil, // Already processed above
                 SolverUsed:      getStringField(metricsData, "solver_used"),
-                optimizerStatus:        getStringField(metricsData, "z3_status"),
+                Z3Status:        getStringField(metricsData, "z3_status"),
                 Objective:       getFloatField(metricsData, "objective"),
                 SolveTimeUs:     int64(getFloatField(metricsData, "solve_time_us")),
                 VariableCount:   int(getFloatField(metricsData, "variable_count")),
-                ConstraintCount: int(getFloatField(metricsData, "budget_count")),
+                ConstraintCount: int(getFloatField(metricsData, "constraint_count")),
                 KCandidates:     int(getFloatField(metricsData, "k_candidates")),
                 PairsCount:      int(getFloatField(metricsData, "pairs_count")),
                 BudgetTokens:    int(getFloatField(metricsData, "budget_tokens")),
@@ -778,7 +778,7 @@ func getBoolField(data map[string]interface{}, key string) bool <span class="cov
 </pre>
 		
 		<pre class="file" id="file2" style="display: none">/*
- * ContextLite - optimization-Optimized AI Context Engine
+ * ContextLite - SMT-Optimized AI Context Engine
  * Copyright (c) 2025 Michael A. Kuykendall
  * 
  * Patent Pending - Provisional Patent Filed
@@ -908,8 +908,8 @@ func GetEngineInfo(engine types.ContextEngine) map[string]interface{} <span clas
                 info["communication"] = "direct"</span>
         case *JSONCLIEngine:<span class="cov0" title="0">
                 info["type"] = "private-optimized"
-                info["features"] = []string{"optimization-optimization", "7d-features", "patent-pending"}
-                info["description"] = "Full Advanced engine with proprietary algorithms"
+                info["features"] = []string{"smt-optimization", "7d-features", "patent-pending"}
+                info["description"] = "Full SMT-optimized engine with proprietary algorithms"
                 info["communication"] = "json-cli"</span>
         default:<span class="cov0" title="0">
                 // Unknown engine type

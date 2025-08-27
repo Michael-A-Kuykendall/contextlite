@@ -518,7 +518,7 @@ func (s *Storage) SaveQueryCache(ctx context.Context, queryHash, corpusHash, mod
 		return err
 	}
 	
-	metricsJSON, err := json.Marshal(result.optimizationMetrics)
+	metricsJSON, err := json.Marshal(result.SMTMetrics)
 	if err != nil {
 		return err
 	}
@@ -531,7 +531,7 @@ func (s *Storage) SaveQueryCache(ctx context.Context, queryHash, corpusHash, mod
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		queryHash, corpusHash, modelID, tokenizerVersion, string(resultJSON),
 		string(metricsJSON), "", result.CoherenceScore, 0.0, // OptimalityGap removed
-		result.optimizationMetrics.SolveTimeMs, result.optimizationMetrics.FallbackReason != "", expiresAt)
+		result.SMTMetrics.SolveTimeMs, result.SMTMetrics.FallbackReason != "", expiresAt)
 	return err
 }
 
@@ -549,8 +549,8 @@ func (s *Storage) GetQueryCache(ctx context.Context, queryHash, corpusHash, mode
 		      AND tokenizer_version = ? AND expires_at > CURRENT_TIMESTAMP`,
 		queryHash, corpusHash, modelID, tokenizerVersion).Scan(
 		&resultJSON, &metricsJSON, &result.CoherenceScore,
-		&tempGap, &result.optimizationMetrics.SolveTimeMs, // OptimalityGap removed
-		&result.optimizationMetrics.FallbackReason)
+		&tempGap, &result.SMTMetrics.SolveTimeMs, // OptimalityGap removed
+		&result.SMTMetrics.FallbackReason)
 	if err != nil {
 		return nil, err
 	}
@@ -559,7 +559,7 @@ func (s *Storage) GetQueryCache(ctx context.Context, queryHash, corpusHash, mode
 		return nil, err
 	}
 	
-	if err := json.Unmarshal([]byte(metricsJSON), &result.optimizationMetrics); err != nil {
+	if err := json.Unmarshal([]byte(metricsJSON), &result.SMTMetrics); err != nil {
 		return nil, err
 	}
 
@@ -685,7 +685,7 @@ func (s *Storage) SaveQueryCacheWithKey(ctx context.Context, queryHash, corpusHa
 		return err
 	}
 	
-	metricsJSON, err := json.Marshal(result.optimizationMetrics)
+	metricsJSON, err := json.Marshal(result.SMTMetrics)
 	if err != nil {
 		return err
 	}
@@ -721,7 +721,7 @@ func (s *Storage) SaveQueryCacheWithKey(ctx context.Context, queryHash, corpusHa
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 			queryHash, corpusHash, modelID, tokenizerVersion, string(resultJSON),
 			string(metricsJSON), "", result.CoherenceScore, 0.0, // OptimalityGap removed
-			result.optimizationMetrics.SolveTimeMs, result.optimizationMetrics.FallbackReason != "", expiresAt, cacheKey)
+			result.SMTMetrics.SolveTimeMs, result.SMTMetrics.FallbackReason != "", expiresAt, cacheKey)
 	} else {
 		// Fallback to old method without cache_key
 		_, err = s.db.ExecContext(ctx, `
@@ -732,7 +732,7 @@ func (s *Storage) SaveQueryCacheWithKey(ctx context.Context, queryHash, corpusHa
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 			queryHash, corpusHash, modelID, tokenizerVersion, string(resultJSON),
 			string(metricsJSON), "", result.CoherenceScore, 0.0, // OptimalityGap removed
-			result.optimizationMetrics.SolveTimeMs, result.optimizationMetrics.FallbackReason != "", expiresAt)
+			result.SMTMetrics.SolveTimeMs, result.SMTMetrics.FallbackReason != "", expiresAt)
 	}
 	return err
 }

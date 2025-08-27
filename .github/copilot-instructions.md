@@ -24,7 +24,7 @@ Purpose: Enable an AI agent to be productive immediately in this repo. Follow th
 - **License Server**: Complete Stripe integration with email delivery
 
 **Current Architecture**:
-- **Dual-Engine System**: CoreEngine (BM25 + heuristics) + JSONCLIEngine (private optimization binary)
+- **Dual-Engine System**: CoreEngine (BM25 + heuristics) + JSONCLIEngine (private SMT binary)
 - **Enhanced Feature Gate**: Trial-aware licensing with 14-day full access
 - **Automated Distribution**: GitHub Actions for multi-platform releases
 - **Trial Management**: Hardware-bound 14-day trial with graceful expiration
@@ -75,7 +75,7 @@ Purpose: Enable an AI agent to be productive immediately in this repo. Follow th
 - Private Binary: Auto-synced from private repository
 
 ### **Trial Experience**
-- **First Run**: Automatically starts 14-day trial with full optimization features
+- **First Run**: Automatically starts 14-day trial with full SMT features
 - **Day 1-11**: Full access with daily reminders
 - **Day 12-14**: Warning messages about approaching expiration
 - **Day 15+**: Core engine only, purchase prompts
@@ -181,7 +181,7 @@ curl -s -H "Authorization: token $GITHUB_TOKEN" \
 ## 8. Business Model Implementation ✅
 
 ### **14-Day Trial Strategy**
-- **Full Features**: Complete optimization optimization during trial
+- **Full Features**: Complete SMT optimization during trial
 - **No Registration**: Hardware-bound activation
 - **Graceful Expiration**: Falls back to core engine
 - **Clear Path**: Purchase at https://contextlite.com/purchase

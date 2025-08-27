@@ -28,7 +28,7 @@ func TestFinalCoveragePush(t *testing.T) {
 			ExpiresAt:    &expiresAt,
 			MaxDocuments: 100000,
 			MaxUsers:     10,
-			Features:     []string{"basic_search", "advanced_optimization"},
+			Features:     []string{"basic_search", "advanced_smt"},
 			HardwareID:   "test-hw",
 			Signature:    "test-signature",
 		}
@@ -42,7 +42,7 @@ func TestFinalCoveragePush(t *testing.T) {
 		
 		features := manager.GetFeatures()
 		assert.Contains(t, features, "basic_search")
-		assert.Contains(t, features, "advanced_optimization")
+		assert.Contains(t, features, "advanced_smt")
 	})
 	
 	t.Run("GenerateInstallID_DirectCall", func(t *testing.T) {
@@ -79,7 +79,7 @@ func TestFinalCoveragePush(t *testing.T) {
 			ExpiresAt:    &expiresAt,
 			MaxDocuments: 100000,
 			MaxUsers:     10,
-			Features:     []string{"basic_search", "advanced_optimization"},
+			Features:     []string{"basic_search", "advanced_smt"},
 			HardwareID:   "valid-hw",
 			Signature:    "valid-signature",
 		}
@@ -130,7 +130,7 @@ func TestFinalCoveragePush(t *testing.T) {
 			"expires_at": "2026-08-19T00:00:00Z",
 			"max_documents": 100000,
 			"max_users": 10,
-			"features": ["basic_search", "advanced_optimization"],
+			"features": ["basic_search", "advanced_smt"],
 			"hardware_id": "tracked-hw",
 			"signature": "tracked-signature"
 		}`
@@ -162,7 +162,7 @@ func TestFinalCoveragePush(t *testing.T) {
 		testFeatures := []string{
 			"basic_search",     // Should be available in developer tier
 			"rest_api",         // Should be available in developer tier
-			"advanced_optimization",     // May require pro tier
+			"advanced_smt",     // May require pro tier
 			"unlimited_workspaces", // May require pro tier
 			"multi_tenant",     // May require enterprise tier
 			"custom_mcp",       // May require enterprise tier

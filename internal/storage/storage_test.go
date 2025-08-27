@@ -361,10 +361,10 @@ func TestStorage_QueryCache(t *testing.T) {
 			{ID: "doc1", Path: "/path1"},
 			{ID: "doc2", Path: "/path2"},
 		},
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolverUsed:   "test-solver",
 			SolveTimeMs:  100.0,
-			optimizerStatus:     "sat",
+			Z3Status:     "sat",
 		},
 		CoherenceScore: 0.85,
 		CacheKey:       "test-cache-key",
@@ -392,8 +392,8 @@ func TestStorage_QueryCache(t *testing.T) {
 		t.Errorf("Expected 2 documents in cached result, got %d", len(cached.Documents))
 	}
 	
-	if cached.optimizationMetrics.SolverUsed != "test-solver" {
-		t.Errorf("optimization metrics not preserved in cache")
+	if cached.SMTMetrics.SolverUsed != "test-solver" {
+		t.Errorf("SMT metrics not preserved in cache")
 	}
 }
 
@@ -418,7 +418,7 @@ func TestStorage_GetCachedResultByKey(t *testing.T) {
 		Documents: []types.DocumentReference{
 			{ID: "key-doc1", Path: "/key/path1"},
 		},
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolverUsed:  "key-solver",
 			SolveTimeMs: 50.0,
 		},
@@ -986,10 +986,10 @@ func TestStorage_CacheComplexOperations(t *testing.T) {
 		},
 		TotalDocuments: 2,
 		TotalTokens:    100,
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolverUsed:        "z3",
 			SolveTimeMs:       50.0,
-			optimizerStatus:          "sat",
+			Z3Status:          "sat",
 			VariableCount:     10,
 			ConstraintCount:   5,
 		},
@@ -1222,7 +1222,7 @@ func TestStorage_GetQueryCache_AllBranches(t *testing.T) {
 		},
 		TotalDocuments: 1,
 		TotalTokens:    3,
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolverUsed:  "z3",
 			SolveTimeMs: 10.0,
 		},
@@ -1361,7 +1361,7 @@ func TestStorage_GetQueryCacheComprehensive(t *testing.T) {
 			},
 		},
 		CoherenceScore: 0.85,
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolveTimeMs: 50,
 			FallbackReason: "",
 		},
@@ -1407,7 +1407,7 @@ func TestStorage_SaveQueryCacheComprehensive(t *testing.T) {
 			},
 		},
 		CoherenceScore: 0.88,
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolveTimeMs: 75,
 			FallbackReason: "",
 		},
@@ -1435,7 +1435,7 @@ func TestStorage_SaveQueryCacheComprehensive(t *testing.T) {
 			},
 		},
 		CoherenceScore: 0.70,
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolveTimeMs: 25,
 			FallbackReason: "",
 		},
@@ -1525,7 +1525,7 @@ func TestStorage_GetCacheStatsComprehensive(t *testing.T) {
 			{ID: "stats-test-doc", Path: "/test/stats.go", UtilityScore: 0.8},
 		},
 		CoherenceScore: 0.75,
-		optimizationMetrics: types.optimizationMetrics{SolveTimeMs: 25},
+		SMTMetrics: types.SMTMetrics{SolveTimeMs: 25},
 	}
 	
 	cacheEntries := []struct {
@@ -1628,7 +1628,7 @@ func TestStorage_CacheOperationsWithKey(t *testing.T) {
 			{ID: "keyed-cache-doc", Path: "/test/keyed.go", UtilityScore: 0.9},
 		},
 		CoherenceScore: 0.88,
-		optimizationMetrics: types.optimizationMetrics{SolveTimeMs: 60},
+		SMTMetrics: types.SMTMetrics{SolveTimeMs: 60},
 	}
 	
 	// Test SaveQueryCacheWithKey
@@ -1675,7 +1675,7 @@ func TestStorage_InvalidateCache(t *testing.T) {
 			{ID: "invalidate-doc", Path: "/test/invalidate.go", UtilityScore: 0.8},
 		},
 		CoherenceScore: 0.75,
-		optimizationMetrics: types.optimizationMetrics{SolveTimeMs: 40},
+		SMTMetrics: types.SMTMetrics{SolveTimeMs: 40},
 	}
 	
 	// Add some cache entries first
@@ -1905,7 +1905,7 @@ func TestStorage_CacheEdgeCases(t *testing.T) {
 			{ID: "", Path: "", UtilityScore: 0}, // Empty document reference
 		},
 		CoherenceScore: 0,
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolveTimeMs: 0,
 			FallbackReason: "test-fallback",
 		},
@@ -2003,7 +2003,7 @@ func TestStorage_GetQueryCacheErrorPaths(t *testing.T) {
 			{ID: "test-doc", Path: "/test/doc.go", UtilityScore: 0.9},
 		},
 		CoherenceScore: 0.85,
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolveTimeMs: 50,
 			FallbackReason: "",
 		},
@@ -2035,7 +2035,7 @@ func TestStorage_GetQueryCacheErrorPaths(t *testing.T) {
 			{ID: "expired-doc", Path: "/test/expired.go", UtilityScore: 0.5},
 		},
 		CoherenceScore: 0.6,
-		optimizationMetrics: types.optimizationMetrics{SolveTimeMs: 30},
+		SMTMetrics: types.SMTMetrics{SolveTimeMs: 30},
 	}
 	
 	pastExpiry := time.Now().Add(-1 * time.Hour)
@@ -2306,7 +2306,7 @@ func TestStorage_GetCacheStatsAdvanced(t *testing.T) {
 		},
 		CoherenceScore: 0.9,
 		CacheHit:       false,
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolveTimeMs:    100,
 			FallbackReason: "",
 		},
@@ -2386,7 +2386,7 @@ func TestStorage_SaveQueryCacheWithKeyAdvanced(t *testing.T) {
 		},
 		CoherenceScore: 0.88,
 		CacheHit:       false,
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolveTimeMs:    150,
 			FallbackReason: "",
 		},
@@ -2476,7 +2476,7 @@ func TestStorage_ApplyMigrationsAndSchemaEdgeCases(t *testing.T) {
 		},
 		CoherenceScore: 0.75,
 		CacheHit:       false,
-		optimizationMetrics: types.optimizationMetrics{
+		SMTMetrics: types.SMTMetrics{
 			SolveTimeMs:    75,
 			FallbackReason: "",
 		},

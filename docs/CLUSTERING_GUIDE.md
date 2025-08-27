@@ -34,7 +34,7 @@ Single ContextLite instance serving multiple projects with workspace isolation:
 
 ### 2. Distributed Multi-Instance (For High-Load Environments)
 
-Multiple ContextLite instances with load balancing and intelligent routing:
+Multiple ContextLite instances with load balancing and affinity routing:
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -427,7 +427,7 @@ cluster:
 ### Performance Optimization
 
 1. **Cache Strategy**: Enable L1/L2 caching per workspace
-2. **optimization Optimization**: Use appropriate solver timeouts per tier
+2. **SMT Optimization**: Use appropriate solver timeouts per tier
 3. **Document Partitioning**: Distribute documents based on access patterns
 4. **Connection Pooling**: Reuse connections between cluster nodes
 

@@ -10,7 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"net/optimizationp"
+	"net/smtp"
 	"os"
 	"strconv"
 	"time"
@@ -26,10 +26,10 @@ type Config struct {
 	StripeSecretKey     string `json:"stripe_secret_key"`
 	StripeWebhookSecret string `json:"stripe_webhook_secret"`
 	PrivateKeyPath      string `json:"private_key_path"`
-	optimizationPHost            string `json:"optimizationp_host"`
-	optimizationPPort            int    `json:"optimizationp_port"`
-	optimizationPUser            string `json:"optimizationp_user"`
-	optimizationPPassword        string `json:"optimizationp_password"`
+	SMTPHost            string `json:"smtp_host"`
+	SMTPPort            int    `json:"smtp_port"`
+	SMTPUser            string `json:"smtp_user"`
+	SMTPPassword        string `json:"smtp_password"`
 	FromEmail           string `json:"from_email"`
 }
 
@@ -258,7 +258,7 @@ func (ls *LicenseServer) generateAndSendLicense(email string, tier license.Licen
 
 // sendLicenseEmail sends the license to the customer via email
 func (ls *LicenseServer) sendLicenseEmail(email, licenseData string, tier license.LicenseTier) error {
-	if ls.config.optimizationPHost == "" || ls.config.optimizationPUser == "" {
+	if ls.config.SMTPHost == "" || ls.config.SMTPUser == "" {
 		// In development mode, just log the license
 		log.Printf("DEVELOPMENT MODE: Would send license email to %s with license: %s", email, licenseData)
 		return nil
@@ -282,23 +282,23 @@ Best regards,
 The ContextLite Team
 `, tier, licenseData, licenseData)
 	
-	// Set up optimizationP authentication
-	auth := optimizationp.PlainAuth("", ls.config.optimizationPUser, ls.config.optimizationPPassword, ls.config.optimizationPHost)
+	// Set up SMTP authentication
+	auth := smtp.PlainAuth("", ls.config.SMTPUser, ls.config.SMTPPassword, ls.config.SMTPHost)
 	
 	// Compose email
 	fromAddr := ls.config.FromEmail
 	if fromAddr == "" {
-		fromAddr = ls.config.optimizationPUser
+		fromAddr = ls.config.SMTPUser
 	}
 	
 	msg := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n%s",
 		fromAddr, email, subject, body)
 	
 	// Send email
-	optimizationpAddr := fmt.Sprintf("%s:%d", ls.config.optimizationPHost, ls.config.optimizationPPort)
-	err := optimizationp.SendMail(optimizationpAddr, auth, fromAddr, []string{email}, []byte(msg))
+	smtpAddr := fmt.Sprintf("%s:%d", ls.config.SMTPHost, ls.config.SMTPPort)
+	err := smtp.SendMail(smtpAddr, auth, fromAddr, []string{email}, []byte(msg))
 	if err != nil {
-		return fmt.Errorf("failed to send email via optimizationP: %w", err)
+		return fmt.Errorf("failed to send email via SMTP: %w", err)
 	}
 	
 	log.Printf("License email sent successfully to %s", email)
@@ -466,17 +466,17 @@ func loadConfig() (*Config, error) {
         } else {
                 config.PrivateKeyPath = getEnvOrDefault("PRIVATE_KEY_PATH", "./private_key.pem")
         }
-	config.optimizationPHost = getEnvOrDefault("optimizationP_HOST", "optimizationp.gmail.com")
-	config.optimizationPUser = os.Getenv("optimizationP_USER")
-	config.optimizationPPassword = os.Getenv("optimizationP_PASSWORD")
+	config.SMTPHost = getEnvOrDefault("SMTP_HOST", "smtp.gmail.com")
+	config.SMTPUser = os.Getenv("SMTP_USER")
+	config.SMTPPassword = os.Getenv("SMTP_PASSWORD")
 	config.FromEmail = getEnvOrDefault("FROM_EMAIL", "licenses@contextlite.com")
 	
-	if optimizationpPort := os.Getenv("optimizationP_PORT"); optimizationpPort != "" {
-		if p, err := strconv.Atoi(optimizationpPort); err == nil {
-			config.optimizationPPort = p
+	if smtpPort := os.Getenv("SMTP_PORT"); smtpPort != "" {
+		if p, err := strconv.Atoi(smtpPort); err == nil {
+			config.SMTPPort = p
 		}
 	} else {
-		config.optimizationPPort = 587
+		config.SMTPPort = 587
 	}
 	
 	// Validate required configuration

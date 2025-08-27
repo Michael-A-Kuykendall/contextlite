@@ -38,7 +38,7 @@ func main() {
 	// Initialize pipeline
 	pipe := pipeline.New(store, cfg)
 	
-	fmt.Println("\n=== Scale Testing optimization Performance ===")
+	fmt.Println("\n=== Scale Testing SMT Performance ===")
 	
 	// Test various scales: K∈{100,200}, M∈{3,5}, B∈{2000,4000,8000}
 	testConfigs := []struct {
@@ -61,7 +61,7 @@ func main() {
 		{"distributed systems microservices", 5, 8000, "K~200, M=5, B=8000"},
 	}
 	
-	fmt.Printf("| Config | K | M | B | FTS(ms) | Feature(ms) | optimization(ms) | Total(ms) | Variables | Constraints |\n")
+	fmt.Printf("| Config | K | M | B | FTS(ms) | Feature(ms) | SMT(ms) | Total(ms) | Variables | Constraints |\n")
 	fmt.Printf("|--------|---|---|---|---------|-------------|---------|-----------|-----------|-------------|\n")
 	
 	for _, tc := range testConfigs {
@@ -145,7 +145,7 @@ func runScaleTest(pipe *pipeline.Pipeline, query string, maxDocs, maxTokens int,
 		Query:        query,
 		MaxDocuments: maxDocs,
 		MaxTokens:    maxTokens,
-		Useoptimization:       true,
+		UseSMT:       true,
 		UseCache:     false,
 	}
 	
@@ -167,9 +167,9 @@ func runScaleTest(pipe *pipeline.Pipeline, query string, maxDocs, maxTokens int,
 		maxTokens,
 		result.Timings.FTSHarvestMs,
 		result.Timings.FeatureBuildMs,
-		result.Timings.optimizationWallMs,
+		result.Timings.SMTWallMs,
 		result.Timings.TotalMs,
-		result.optimizationMetrics.VariableCount,
-		result.optimizationMetrics.ConstraintCount,
+		result.SMTMetrics.VariableCount,
+		result.SMTMetrics.ConstraintCount,
 	)
 }

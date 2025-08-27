@@ -76,7 +76,7 @@ echo fake binary`
 			// But this exercises the LoadEngine logic paths
 			mockStorage := &MockStorage{}
 			cfg := &config.Config{
-				optimization: config.optimizationConfig{
+				SMT: config.SMTConfig{
 					SolverTimeoutMs: 1000,
 					MaxCandidates:   100,
 				},
@@ -257,7 +257,7 @@ echo fake binary`
 			
 			mockStorage := &MockStorage{}
 			cfg := &config.Config{
-				optimization: config.optimizationConfig{
+				SMT: config.SMTConfig{
 					SolverTimeoutMs: 2000,
 					MaxCandidates:   150,
 				},

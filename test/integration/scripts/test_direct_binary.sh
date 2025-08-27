@@ -34,7 +34,7 @@ storage:
   database_path: "./test.db"
   cache_size_mb: 64
   
-optimization:
+smt:
   solver_timeout_ms: 250
   max_opt_gap: 0.05
   max_candidates: 200
@@ -58,7 +58,7 @@ weights:
 lexicographic:
   compute_at_runtime: true
   
-epsilon_budget:
+epsilon_constraint:
   max_redundancy: 0.4
   min_coherence: 0.3
   min_recency: 0.2
@@ -75,7 +75,7 @@ cache:
 logging:
   level: "info"
   include_timings: true
-  include_optimization_metrics: true
+  include_smt_metrics: true
 EOF
 
 # Test version

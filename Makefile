@@ -13,7 +13,7 @@ SOTA_MAIN_FILE=$(SOTA_CMD_DIR)/main.go
 
 # Default target
 help: ## Show this help message
-	@echo "ContextLite - Advanced context sidecar"
+	@echo "ContextLite - SMT-optimized context sidecar"
 	@echo ""
 	@echo "Available targets:"
 	@awk 'BEGIN {FS = ":.*##"; printf "\033[36m%-15s\033[0m %s\n", "Target", "Description"} /^[a-zA-Z_-]+:.*?##/ { printf "\033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
@@ -130,7 +130,7 @@ dev: ## Run in development mode
 		echo "Starting development server with air..."; \
 		air; \
 	else \
-		echo "Air not found. Install with: go install github.com/cooptimizationrek/air@latest"; \
+		echo "Air not found. Install with: go install github.com/cosmtrek/air@latest"; \
 		echo "Falling back to regular run..."; \
 		make run; \
 	fi
@@ -205,7 +205,7 @@ init: deps ## Initialize development environment
 	@echo "Initializing development environment..."
 	@if ! command -v air > /dev/null; then \
 		echo "Installing air for hot reload..."; \
-		go install github.com/cooptimizationrek/air@latest; \
+		go install github.com/cosmtrek/air@latest; \
 	fi
 	@if ! command -v golangci-lint > /dev/null; then \
 		echo "Installing golangci-lint..."; \

@@ -116,7 +116,7 @@ func (m *mockStorage) Close() error { return nil }
 
 func TestLoadEngine(t *testing.T) {
 	cfg := &config.Config{
-		optimization: config.optimizationConfig{
+		SMT: config.SMTConfig{
 			SolverTimeoutMs: 5000,
 			MaxCandidates:   100,
 		},
@@ -246,7 +246,7 @@ func TestCoreEngine_RemoveDocument(t *testing.T) {
 
 func TestCoreEngine_AssembleContext(t *testing.T) {
 	cfg := &config.Config{
-		optimization: config.optimizationConfig{
+		SMT: config.SMTConfig{
 			MaxCandidates: 10,
 		},
 		Cache: config.CacheConfig{
@@ -509,7 +509,7 @@ func TestCoreEngine_SelectDocuments(t *testing.T) {
 		},
 	}
 	
-	// Test selection with budgets
+	// Test selection with constraints
 	maxTokens := 300
 	maxDocs := 2
 	selected := engine.selectDocuments(scoredDocs, maxTokens, maxDocs)

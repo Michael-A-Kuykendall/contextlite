@@ -34,11 +34,11 @@ func setupTestPipeline(t *testing.T) (*Pipeline, *storage.Storage, func()) {
 			ModelID:          "test-model",
 			MaxTokensDefault: 4000,
 		},
-		optimization: config.optimizationConfig{
+		SMT: config.SMTConfig{
 			SolverTimeoutMs: 5000,
 			MaxCandidates:   50,
 			MaxPairsPerDoc:  4000,
-			optimizer: config.optimizerConfig{
+			Z3: config.Z3Config{
 				BinaryPath:         "z3",
 				EnableVerification: false,
 			},
@@ -536,8 +536,8 @@ func TestPipeline_AssembleContext_ErrorHandling(t *testing.T) {
 	}
 }
 
-// Test AssembleContext with optimization metrics
-func TestPipeline_AssembleContext_optimizationMetrics(t *testing.T) {
+// Test AssembleContext with SMT metrics
+func TestPipeline_AssembleContext_SMTMetrics(t *testing.T) {
 	pipeline, store, cleanup := setupTestPipeline(t)
 	defer cleanup()
 	
@@ -701,8 +701,8 @@ func TestPipeline_AssembleContext_CacheHit(t *testing.T) {
 	}
 }
 
-// Test AssembleContext with cache miss and optimization conversion
-func TestPipeline_AssembleContext_optimizationConversion(t *testing.T) {
+// Test AssembleContext with cache miss and SMT conversion
+func TestPipeline_AssembleContext_SMTConversion(t *testing.T) {
 	pipeline, store, cleanup := setupTestPipeline(t)
 	defer cleanup()
 	
@@ -710,7 +710,7 @@ func TestPipeline_AssembleContext_optimizationConversion(t *testing.T) {
 	
 	ctx := context.Background()
 	req := &types.AssembleRequest{
-		Query:         "optimization conversion test",
+		Query:         "smt conversion test",
 		MaxTokens:     1000,
 		MaxDocuments:  3,
 		WorkspacePath: "/test",
@@ -723,12 +723,12 @@ func TestPipeline_AssembleContext_optimizationConversion(t *testing.T) {
 		t.Fatalf("Failed to assemble context: %v", err)
 	}
 	
-	// Verify optimization metrics conversion
-	if result.optimizationMetrics.SolverUsed != "" {
-		// optimization metrics are available, verify they were properly converted
-		t.Logf("optimization metrics available: solver=%s, status=%s", 
-			result.optimizationMetrics.SolverUsed, 
-			result.optimizationMetrics.optimizerStatus)
+	// Verify SMT metrics conversion
+	if result.SMTMetrics.SolverUsed != "" {
+		// SMT metrics are available, verify they were properly converted
+		t.Logf("SMT metrics available: solver=%s, status=%s", 
+			result.SMTMetrics.SolverUsed, 
+			result.SMTMetrics.Z3Status)
 	}
 	
 	// Verify timing conversion
@@ -848,13 +848,13 @@ func TestPipeline_CacheResult_ModelIDFallback(t *testing.T) {
 	pipeline.cacheResult(ctx, req, result)
 }
 
-// Test AssembleContext with real optimization metrics conversion
-func TestPipeline_AssembleContext_optimizationMetricsConversion(t *testing.T) {
-	// Create a mock engine that returns optimization metrics
-	mockEngine := &mockEngineWithoptimization{}
+// Test AssembleContext with real SMT metrics conversion
+func TestPipeline_AssembleContext_SMTMetricsConversion(t *testing.T) {
+	// Create a mock engine that returns SMT metrics
+	mockEngine := &mockEngineWithSMT{}
 	
 	// Create real storage for the test
-	dbPath := filepath.Join(t.TempDir(), "test_optimization.db")
+	dbPath := filepath.Join(t.TempDir(), "test_smt.db")
 	store, err := storage.New(dbPath)
 	if err != nil {
 		t.Fatalf("Failed to create storage: %v", err)
@@ -866,7 +866,7 @@ func TestPipeline_AssembleContext_optimizationMetricsConversion(t *testing.T) {
 	
 	ctx := context.Background()
 	req := &types.AssembleRequest{
-		Query:         "optimization metrics test",
+		Query:         "SMT metrics test",
 		MaxTokens:     1000,
 		MaxDocuments:  3,
 		WorkspacePath: "/test",
@@ -879,26 +879,26 @@ func TestPipeline_AssembleContext_optimizationMetricsConversion(t *testing.T) {
 		t.Fatalf("Failed to assemble context: %v", err)
 	}
 	
-	// Verify optimization metrics were properly converted
-	if result.optimizationMetrics.SolverUsed != "optimizer" {
-		t.Errorf("Expected SolverUsed 'optimizer', got '%s'", result.optimizationMetrics.SolverUsed)
+	// Verify SMT metrics were properly converted
+	if result.SMTMetrics.SolverUsed != "Z3" {
+		t.Errorf("Expected SolverUsed 'Z3', got '%s'", result.SMTMetrics.SolverUsed)
 	}
 	
-	if result.optimizationMetrics.optimizerStatus != "sat" {
-		t.Errorf("Expected optimizerStatus 'sat', got '%s'", result.optimizationMetrics.optimizerStatus)
+	if result.SMTMetrics.Z3Status != "sat" {
+		t.Errorf("Expected Z3Status 'sat', got '%s'", result.SMTMetrics.Z3Status)
 	}
 	
-	if result.optimizationMetrics.Objective != 42 {
-		t.Errorf("Expected Objective 42, got %d", result.optimizationMetrics.Objective)
+	if result.SMTMetrics.Objective != 42 {
+		t.Errorf("Expected Objective 42, got %d", result.SMTMetrics.Objective)
 	}
 	
-	if result.optimizationMetrics.SolveTimeUs != 1000 {
-		t.Errorf("Expected SolveTimeUs 1000, got %d", result.optimizationMetrics.SolveTimeUs)
+	if result.SMTMetrics.SolveTimeUs != 1000 {
+		t.Errorf("Expected SolveTimeUs 1000, got %d", result.SMTMetrics.SolveTimeUs)
 	}
 	
 	expectedSolveTimeMs := float64(1000) / 1000.0
-	if result.optimizationMetrics.SolveTimeMs != expectedSolveTimeMs {
-		t.Errorf("Expected SolveTimeMs %.3f, got %.3f", expectedSolveTimeMs, result.optimizationMetrics.SolveTimeMs)
+	if result.SMTMetrics.SolveTimeMs != expectedSolveTimeMs {
+		t.Errorf("Expected SolveTimeMs %.3f, got %.3f", expectedSolveTimeMs, result.SMTMetrics.SolveTimeMs)
 	}
 }
 
@@ -935,18 +935,18 @@ func TestPipeline_AssembleContext_HighQualityCaching(t *testing.T) {
 	}
 }
 
-// Mock engine that returns optimization metrics
-type mockEngineWithoptimization struct{}
+// Mock engine that returns SMT metrics
+type mockEngineWithSMT struct{}
 
-func (m *mockEngineWithoptimization) AssembleContext(ctx context.Context, req types.ContextRequest) (*types.ContextResult, error) {
+func (m *mockEngineWithSMT) AssembleContext(ctx context.Context, req types.ContextRequest) (*types.ContextResult, error) {
 	return &types.ContextResult{
 		Documents:      []types.DocumentReference{},
 		TotalTokens:    100,
 		CoherenceScore: 0.8,
 		CacheHit:       false,
-		optimizationMetrics: &types.optimizationResult{
-			SolverUsed:      "optimizer",
-			optimizerStatus:        "sat",
+		SMTMetrics: &types.SMTResult{
+			SolverUsed:      "Z3",
+			Z3Status:        "sat",
 			Objective:       42,
 			SolveTimeUs:     1000,
 			VariableCount:   50,
@@ -960,24 +960,24 @@ func (m *mockEngineWithoptimization) AssembleContext(ctx context.Context, req ty
 	}, nil
 }
 
-func (m *mockEngineWithoptimization) IndexDocument(doc types.Document) error {
+func (m *mockEngineWithSMT) IndexDocument(doc types.Document) error {
 	return nil
 }
 
-func (m *mockEngineWithoptimization) RemoveDocument(docID string) error {
+func (m *mockEngineWithSMT) RemoveDocument(docID string) error {
 	return nil
 }
 
-func (m *mockEngineWithoptimization) GetStats() (*types.EngineStats, error) {
+func (m *mockEngineWithSMT) GetStats() (*types.EngineStats, error) {
 	return &types.EngineStats{
 		LicenseTier: "professional",
 	}, nil
 }
 
-func (m *mockEngineWithoptimization) UpdateConfig(config types.EngineConfig) error {
+func (m *mockEngineWithSMT) UpdateConfig(config types.EngineConfig) error {
 	return nil
 }
 
-func (m *mockEngineWithoptimization) Close() error {
+func (m *mockEngineWithSMT) Close() error {
 	return nil
 }

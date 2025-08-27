@@ -104,7 +104,7 @@ jobs:
             Complete marketplace automation with version compliance for ContextLite ${{ steps.version.outputs.version }}.
             
             **Features:**
-            - 14-day trial system with full optimization optimization
+            - 14-day trial system with full SMT optimization
             - Multi-platform support (Linux, macOS, Windows)
             - Hardware-bound licensing with graceful expiration
             - Real-time statistics and performance metrics

@@ -8,7 +8,7 @@ sdk_version: 5.43.1
 app_file: app.py
 pinned: false
 license: cc0-1.0
-short_description: Advanced context retrieval in 0.3ms vs 50ms vectors
+short_description: SMT-optimized context retrieval in 0.3ms vs 50ms vectors
 ---
 
 # ContextLite Download Hub
@@ -24,7 +24,7 @@ Professional download experience for ContextLite - the mathematically optimal al
 - **🔄 Auto-Updating**: Fetches latest GitHub releases every 5 minutes
 - **🎨 Beautiful UI**: Glassmorphism design matching contextlite.com branding
 - **📊 Live Metrics**: Real-time performance stats and comparisons
-- **🧠 optimization Education**: Deep dive into Satisfiability Modulo Theories optimization
+- **🧠 SMT Education**: Deep dive into Satisfiability Modulo Theories optimization
 
 ## 🚀 Technology Stack
 

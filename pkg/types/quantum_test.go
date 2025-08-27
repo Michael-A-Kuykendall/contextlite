@@ -73,9 +73,9 @@ func TestNormalizationStats_Fields(t *testing.T) {
 	}
 }
 
-func TestoptimizationConstraint_Fields(t *testing.T) {
-	budget := optimizationConstraint{
-		ID:          "budget-1",
+func TestSMTConstraint_Fields(t *testing.T) {
+	constraint := SMTConstraint{
+		ID:          "constraint-1",
 		Name:        "Max Documents",
 		Description: "Limit the number of selected documents",
 		Type:        "hard",
@@ -84,26 +84,26 @@ func TestoptimizationConstraint_Fields(t *testing.T) {
 		Active:      true,
 	}
 
-	if budget.ID != "budget-1" {
-		t.Errorf("Expected ID to be 'budget-1', got %s", budget.ID)
+	if constraint.ID != "constraint-1" {
+		t.Errorf("Expected ID to be 'constraint-1', got %s", constraint.ID)
 	}
-	if budget.Name != "Max Documents" {
-		t.Errorf("Expected Name to be 'Max Documents', got %s", budget.Name)
+	if constraint.Name != "Max Documents" {
+		t.Errorf("Expected Name to be 'Max Documents', got %s", constraint.Name)
 	}
-	if budget.Description != "Limit the number of selected documents" {
-		t.Errorf("Expected Description to be 'Limit the number of selected documents', got %s", budget.Description)
+	if constraint.Description != "Limit the number of selected documents" {
+		t.Errorf("Expected Description to be 'Limit the number of selected documents', got %s", constraint.Description)
 	}
-	if budget.Type != "hard" {
-		t.Errorf("Expected Type to be 'hard', got %s", budget.Type)
+	if constraint.Type != "hard" {
+		t.Errorf("Expected Type to be 'hard', got %s", constraint.Type)
 	}
-	if budget.Expression != "sum(selected) <= 10" {
-		t.Errorf("Expected Expression to be 'sum(selected) <= 10', got %s", budget.Expression)
+	if constraint.Expression != "sum(selected) <= 10" {
+		t.Errorf("Expected Expression to be 'sum(selected) <= 10', got %s", constraint.Expression)
 	}
-	if budget.Weight != 1.0 {
-		t.Errorf("Expected Weight to be 1.0, got %f", budget.Weight)
+	if constraint.Weight != 1.0 {
+		t.Errorf("Expected Weight to be 1.0, got %f", constraint.Weight)
 	}
-	if budget.Active != true {
-		t.Errorf("Expected Active to be true, got %t", budget.Active)
+	if constraint.Active != true {
+		t.Errorf("Expected Active to be true, got %t", constraint.Active)
 	}
 }
 

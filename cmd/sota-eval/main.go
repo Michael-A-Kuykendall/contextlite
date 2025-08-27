@@ -20,7 +20,7 @@ func main() {
 		budgetTokens   = flag.Int("budget", 4000, "Token budget for context")
 		iterations     = flag.Int("iterations", 3, "Number of iterations per query")
 		verbose        = flag.Bool("verbose", false, "Enable verbose logging")
-		systemsFlag    = flag.String("systems", "contextlite_optimization,bm25_baseline,embedding_retrieval,llm_reranking", "Comma-separated list of systems to test")
+		systemsFlag    = flag.String("systems", "contextlite_smt,bm25_baseline,embedding_retrieval,llm_reranking", "Comma-separated list of systems to test")
 	)
 	flag.Parse()
 
@@ -33,10 +33,10 @@ func main() {
 		*maxDocs, *budgetTokens, *iterations)
 
 	// Parse systems to test
-	systems := []string{"contextlite_optimization", "bm25_baseline", "embedding_retrieval", "llm_reranking"}
+	systems := []string{"contextlite_smt", "bm25_baseline", "embedding_retrieval", "llm_reranking"}
 	if *systemsFlag != "" {
 		// Parse comma-separated systems (simplified for demo)
-		systems = []string{"contextlite_optimization", "bm25_baseline", "embedding_retrieval", "llm_reranking"}
+		systems = []string{"contextlite_smt", "bm25_baseline", "embedding_retrieval", "llm_reranking"}
 	}
 
 	// Configure evaluation
@@ -99,14 +99,14 @@ func main() {
 	fmt.Println("\n📈 Statistical Insights:")
 	fmt.Println("----------------------------------------")
 	
-	if results.Summary.BestOverall == "contextlite_optimization" {
-		fmt.Printf("🏆 ContextLite optimization achieves SOTA performance!\n")
+	if results.Summary.BestOverall == "contextlite_smt" {
+		fmt.Printf("🏆 ContextLite SMT achieves SOTA performance!\n")
 		if results.Summary.SOTAAdvantage > 0 {
 			fmt.Printf("📊 Performance advantage: +%.1f%% over next best system\n", results.Summary.SOTAAdvantage)
 		}
 	} else {
 		fmt.Printf("📊 Best performing system: %s\n", results.Summary.BestOverall)
-		if contextLiteResults, exists := results.SystemResults["contextlite_optimization"]; exists {
+		if contextLiteResults, exists := results.SystemResults["contextlite_smt"]; exists {
 			if bestResults, exists := results.SystemResults[results.Summary.BestOverall]; exists {
 				gap := ((bestResults.MeanRecallAt5 - contextLiteResults.MeanRecallAt5) / contextLiteResults.MeanRecallAt5) * 100
 				fmt.Printf("📉 ContextLite gap: -%.1f%% behind best system\n", gap)
@@ -115,15 +115,15 @@ func main() {
 	}
 
 	// Efficiency analysis
-	if results.Summary.BestEfficiency == "contextlite_optimization" {
-		fmt.Printf("⚡ ContextLite optimization is the most efficient system!\n")
+	if results.Summary.BestEfficiency == "contextlite_smt" {
+		fmt.Printf("⚡ ContextLite SMT is the most efficient system!\n")
 	} else {
 		fmt.Printf("⚡ Most efficient system: %s\n", results.Summary.BestEfficiency)
 	}
 
 	// Cross-metric analysis
 	fmt.Println("\n🔍 Cross-Metric Analysis:")
-	if contextLiteResults, exists := results.SystemResults["contextlite_optimization"]; exists {
+	if contextLiteResults, exists := results.SystemResults["contextlite_smt"]; exists {
 		efficiency := contextLiteResults.MeanRecallAt5 / contextLiteResults.MeanLatencyMs * 1000 // Recall per second
 		fmt.Printf("📊 ContextLite efficiency: %.3f Recall@5 per second\n", efficiency)
 		

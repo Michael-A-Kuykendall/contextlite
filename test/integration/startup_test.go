@@ -18,8 +18,8 @@ func TestContextLiteStartup(t *testing.T) {
 		t.Fatalf("Failed to load config: %v", err)
 	}
 
-	// Skip optimizer validation for startup test
-	cfg.optimization.optimizer.BinaryPath = ""
+	// Skip Z3 validation for startup test
+	cfg.SMT.Z3.BinaryPath = ""
 
 	t.Logf("Configuration loaded successfully!")
 	t.Logf("Server host: %s", cfg.Server.Host)

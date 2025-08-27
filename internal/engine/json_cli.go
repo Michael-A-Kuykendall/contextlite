@@ -1,5 +1,5 @@
 /*
- * ContextLite - optimization-Optimized AI Context Engine
+ * ContextLite - SMT-Optimized AI Context Engine
  * Copyright (c) 2025 Michael A. Kuykendall
  * 
  * Patent Pending - Provisional Patent Filed
@@ -41,8 +41,8 @@ type JSONCLIEngine struct {
 // NewJSONCLIEngine creates a new JSON CLI engine instance
 func NewJSONCLIEngine(cfg *config.Config, storage types.StorageInterface, binaryPath string) *JSONCLIEngine {
 	timeout := 30 * time.Second
-	if cfg != nil && cfg.optimization.SolverTimeoutMs > 0 {
-		timeout = time.Duration(cfg.optimization.SolverTimeoutMs) * time.Millisecond
+	if cfg != nil && cfg.SMT.SolverTimeoutMs > 0 {
+		timeout = time.Duration(cfg.SMT.SolverTimeoutMs) * time.Millisecond
 	}
 	
 	return &JSONCLIEngine{
@@ -174,8 +174,8 @@ func (e *JSONCLIEngine) Close() error {
 // getCandidateDocuments retrieves candidate documents from storage
 func (e *JSONCLIEngine) getCandidateDocuments(ctx context.Context, request types.ContextRequest) ([]types.Document, error) {
 	maxCandidates := 200
-	if e.config != nil && e.config.optimization.MaxCandidates > 0 {
-		maxCandidates = e.config.optimization.MaxCandidates
+	if e.config != nil && e.config.SMT.MaxCandidates > 0 {
+		maxCandidates = e.config.SMT.MaxCandidates
 	}
 	
 	return e.storage.SearchDocuments(ctx, request.Query, maxCandidates)
@@ -271,7 +271,7 @@ func (e *JSONCLIEngine) parseOptimizeResponse(result map[string]interface{}, req
 			UtilityScore:    getFloatField(docData, "utility_score"),
 			RelevanceScore:  getFloatField(docData, "relevance_score"),
 			RecencyScore:    getFloatField(docData, "recency_score"),
-			InclusionReason: "optimization-optimized",
+			InclusionReason: "smt-optimized",
 		}
 		
 		docRefs = append(docRefs, docRef)
@@ -282,8 +282,8 @@ func (e *JSONCLIEngine) parseOptimizeResponse(result map[string]interface{}, req
 		}
 	}
 	
-	// Extract optimization metrics
-	optimizationMetrics := e.extractoptimizationMetrics(result)
+	// Extract SMT metrics
+	smtMetrics := e.extractSMTMetrics(result)
 	
 	// Build final context
 	context := strings.Join(contextParts, "\n\n---\n\n")
@@ -295,25 +295,25 @@ func (e *JSONCLIEngine) parseOptimizeResponse(result map[string]interface{}, req
 		ProcessingTime: processingTime,
 		CacheHit:       false,
 		CoherenceScore: getFloatField(result, "coherence_score"),
-		optimizationMetrics:     optimizationMetrics,
+		SMTMetrics:     smtMetrics,
 	}, nil
 }
 
-// extractoptimizationMetrics extracts optimization system metrics from response
-func (e *JSONCLIEngine) extractoptimizationMetrics(result map[string]interface{}) *types.optimizationResult {
-	metricsData, ok := result["optimization_metrics"].(map[string]interface{})
+// extractSMTMetrics extracts SMT solver metrics from response
+func (e *JSONCLIEngine) extractSMTMetrics(result map[string]interface{}) *types.SMTResult {
+	metricsData, ok := result["smt_metrics"].(map[string]interface{})
 	if !ok {
 		return nil
 	}
 	
-	return &types.optimizationResult{
+	return &types.SMTResult{
 		SelectedDocs:    nil, // Already processed above
 		SolverUsed:      getStringField(metricsData, "solver_used"),
-		optimizerStatus:        getStringField(metricsData, "z3_status"),
+		Z3Status:        getStringField(metricsData, "z3_status"),
 		Objective:       getFloatField(metricsData, "objective"),
 		SolveTimeUs:     int64(getFloatField(metricsData, "solve_time_us")),
 		VariableCount:   int(getFloatField(metricsData, "variable_count")),
-		ConstraintCount: int(getFloatField(metricsData, "budget_count")),
+		ConstraintCount: int(getFloatField(metricsData, "constraint_count")),
 		KCandidates:     int(getFloatField(metricsData, "k_candidates")),
 		PairsCount:      int(getFloatField(metricsData, "pairs_count")),
 		BudgetTokens:    int(getFloatField(metricsData, "budget_tokens")),

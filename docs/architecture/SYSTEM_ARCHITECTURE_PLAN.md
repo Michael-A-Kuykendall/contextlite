@@ -12,7 +12,7 @@ This plan outlines the complete system architecture for marrying the private and
 
 ### **Core Strategy: Public Repository with Private Binary Integration**
 - **Public Repo**: Complete application with 14-day trial system
-- **Private Repo**: Advanced binary automatically integrated via CI/CD  
+- **Private Repo**: SMT-optimized binary automatically integrated via CI/CD  
 - **Distribution**: Single download, full features, time-limited trial
 - **Conversion**: After 14 days, requires $99 license to continue
 
@@ -46,12 +46,12 @@ contextlite/
 ```
 contextlite-private/
 ├── build/
-│   └── contextlite-library(.exe)   # Advanced binary
+│   └── contextlite-library(.exe)   # SMT-optimized binary
 ├── cmd/
 │   ├── license-server/             # Payment & license system
-│   └── contextlite-library/        # optimization engine binary
+│   └── contextlite-library/        # SMT engine binary
 ├── internal/
-│   ├── optimization/                        # Your proprietary optimization algorithms
+│   ├── smt/                        # Your proprietary SMT algorithms
 │   └── optimization/               # Performance optimizations
 └── .github/
     └── workflows/
@@ -605,7 +605,7 @@ func getHardwareFingerprint() (string, error) {
 ```bash
 $ contextlite status
 ContextLite Status:
-✅ Engine: optimization-Optimized (contextlite-library detected)
+✅ Engine: SMT-Optimized (contextlite-library detected)
 📅 License: Trial (12 days remaining)
 ⚡ Performance: 0.3ms avg query time
 📊 Usage: 847 queries processed

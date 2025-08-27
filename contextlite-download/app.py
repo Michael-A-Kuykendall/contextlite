@@ -158,7 +158,7 @@ def create_download_page():
                 Get provably perfect results in <strong style="color: #06b6d4;">0.3ms</strong> instead of 50ms guesswork.
             </p>
             <p style="font-size: 1.2rem; color: #64748b; margin-bottom: 30px;">
-                Released {release_date} • Advanced • 100% Local • Zero Dependencies
+                Released {release_date} • SMT-optimized • 100% Local • Zero Dependencies
             </p>
             
             <!-- Performance Stats -->
@@ -323,9 +323,9 @@ def create_download_page():
                 </div>
             </div>
             
-            <!-- optimization Optimization Deep Dive -->
+            <!-- SMT Optimization Deep Dive -->
             <div class="glass-card" style="padding: 50px; margin-bottom: 40px;">
-                <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: #f1f5f9;">🧠 optimization-Powered Intelligence</h2>
+                <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: #f1f5f9;">🧠 SMT-Powered Intelligence</h2>
                 <p style="text-align: center; color: #94a3b8; margin-bottom: 40px; font-size: 1.2rem;">
                     While others guess with vectors, we prove with mathematics
                 </p>
@@ -335,7 +335,7 @@ def create_download_page():
                         <div style="font-size: 3rem; margin-bottom: 20px;">🔬</div>
                         <h3 style="color: #3b82f6; font-size: 1.5rem; margin-bottom: 15px;">Satisfiability Modulo Theories</h3>
                         <p style="color: #94a3b8; line-height: 1.6;">
-                            Uses optimizer theorem prover to find mathematically optimal context combinations instead of approximate similarity
+                            Uses Z3 theorem prover to find mathematically optimal context combinations instead of approximate similarity
                         </p>
                     </div>
                     
@@ -343,7 +343,7 @@ def create_download_page():
                         <div style="font-size: 3rem; margin-bottom: 20px;">⚡</div>
                         <h3 style="color: #8b5cf6; font-size: 1.5rem; margin-bottom: 15px;">Multi-Stage Pipeline</h3>
                         <p style="color: #94a3b8; line-height: 1.6;">
-                            BM25 pre-filtering + optimization optimization ensures both speed and mathematical precision
+                            BM25 pre-filtering + SMT optimization ensures both speed and mathematical precision
                         </p>
                     </div>
                     
@@ -351,7 +351,7 @@ def create_download_page():
                         <div style="font-size: 3rem; margin-bottom: 20px;">🎯</div>
                         <h3 style="color: #06b6d4; font-size: 1.5rem; margin-bottom: 15px;">Constraint-Based Selection</h3>
                         <p style="color: #94a3b8; line-height: 1.6;">
-                            Token limits, relevance thresholds, and dependency analysis as formal budgets
+                            Token limits, relevance thresholds, and dependency analysis as formal constraints
                         </p>
                     </div>
                     
@@ -359,7 +359,7 @@ def create_download_page():
                         <div style="font-size: 3rem; margin-bottom: 20px;">🏆</div>
                         <h3 style="color: #10b981; font-size: 1.5rem; margin-bottom: 15px;">Provably Optimal</h3>
                         <p style="color: #94a3b8; line-height: 1.6;">
-                            When optimization finds a solution, it's mathematically guaranteed to be the best possible
+                            When SMT finds a solution, it's mathematically guaranteed to be the best possible
                         </p>
                     </div>
                 </div>
@@ -886,7 +886,7 @@ def create_download_page():
             <h3 style="color: #1e40af; margin-bottom: 10px;">⚡ Performance Highlights</h3>
             <p style="color: #1e40af; margin: 5px 0;"><strong>0.3ms</strong> average response time</p>
             <p style="color: #1e40af; margin: 5px 0;"><strong>100x faster</strong> than vector databases</p>
-            <p style="color: #1e40af; margin: 5px 0;"><strong>Smart Multi-Token (optimization)</strong> optimization technology</p>
+            <p style="color: #1e40af; margin: 5px 0;"><strong>Smart Multi-Token (SMT)</strong> optimization technology</p>
         </div>
     </div>
     """

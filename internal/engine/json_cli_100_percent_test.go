@@ -69,7 +69,7 @@ func TestJSONCLI_100Percent(t *testing.T) {
 				}
 
 				cfg := &config.Config{
-					optimization: config.optimizationConfig{
+					SMT: config.SMTConfig{
 						SolverTimeoutMs: 1000,
 						MaxCandidates:   100,
 					},
@@ -249,7 +249,7 @@ echo {"status": "success", "data": {"result": "test"}}`,
 				}
 
 				cfg := &config.Config{
-					optimization: config.optimizationConfig{
+					SMT: config.SMTConfig{
 						SolverTimeoutMs: 100, // Short timeout for testing
 					},
 				}
@@ -297,7 +297,7 @@ echo {"status": "success", "data": {"result": "test"}}`,
 		t.Run("NewJSONCLIEngine_ConfigWithTimeout", func(t *testing.T) {
 			mockStorage := &MockStorage{}
 			cfg := &config.Config{
-				optimization: config.optimizationConfig{
+				SMT: config.SMTConfig{
 					SolverTimeoutMs: 5000,
 				},
 			}
@@ -324,7 +324,7 @@ echo {"status": "success", "data": {"result": "test"}}`,
 				{
 					name: "ConfigWithMaxCandidates",
 					config: &config.Config{
-						optimization: config.optimizationConfig{
+						SMT: config.SMTConfig{
 							MaxCandidates: 50,
 						},
 					},
@@ -333,7 +333,7 @@ echo {"status": "success", "data": {"result": "test"}}`,
 				{
 					name: "ConfigWithZeroMaxCandidates_UsesDefault",
 					config: &config.Config{
-						optimization: config.optimizationConfig{
+						SMT: config.SMTConfig{
 							MaxCandidates: 0,
 						},
 					},
@@ -435,7 +435,7 @@ echo {"status": "success", "data": {"result": "test"}}`,
 			}
 
 			binaryContent := `@echo off
-echo {"status": "success", "data": {"selected_docs": [0], "docs": [{"id": "doc1", "content": "test", "token_count": 10, "utility_score": 0.8, "relevance_score": 0.9}], "optimization_metrics": {"solver_used": "z3", "solve_time_us": 1000}, "coherence_score": 0.95}}`
+echo {"status": "success", "data": {"selected_docs": [0], "docs": [{"id": "doc1", "content": "test", "token_count": 10, "utility_score": 0.8, "relevance_score": 0.9}], "smt_metrics": {"solver_used": "z3", "solve_time_us": 1000}, "coherence_score": 0.95}}`
 			binaryPath := createMockBinaryWithContent(t, binaryContent)
 			defer os.Remove(binaryPath)
 

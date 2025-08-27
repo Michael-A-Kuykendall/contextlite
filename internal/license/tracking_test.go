@@ -208,7 +208,7 @@ func TestLicenseTracker_RecordUsage(t *testing.T) {
 			name:      "context_query",
 			eventType: "context_query",
 			metadata: map[string]interface{}{
-				"query_type":   "optimization",
+				"query_type":   "smt",
 				"duration_ms":  450,
 				"result_count": 23,
 			},
@@ -218,7 +218,7 @@ func TestLicenseTracker_RecordUsage(t *testing.T) {
 			name:      "feature_request",
 			eventType: "feature_request",
 			metadata: map[string]interface{}{
-				"feature": "advanced_optimization",
+				"feature": "advanced_smt",
 				"allowed": true,
 			},
 			ipAddress: "192.168.1.100",

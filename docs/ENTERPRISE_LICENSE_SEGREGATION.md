@@ -15,7 +15,7 @@ ContextLite implements strict license-based feature segregation ensuring that en
 ### Developer (Free)
 - ✅ Single workspace
 - ✅ Up to 10,000 documents
-- ✅ Basic optimization optimization
+- ✅ Basic SMT optimization
 - ✅ Community support
 - ❌ Commercial use
 - ❌ Advanced features
@@ -23,7 +23,7 @@ ContextLite implements strict license-based feature segregation ensuring that en
 ### Professional ($99)
 - ✅ Unlimited workspaces (personal)
 - ✅ Unlimited documents
-- ✅ Advanced optimization features
+- ✅ Advanced SMT features
 - ✅ 7D scoring system
 - ✅ Commercial license
 - ✅ Priority support

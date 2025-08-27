@@ -34,10 +34,10 @@ railway up --service license-server
 # Configure environment variables:
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
-optimizationP_HOST=optimizationp.gmail.com
-optimizationP_PORT=587
-optimizationP_USER=licenses@contextlite.com
-optimizationP_PASS=...
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=licenses@contextlite.com
+SMTP_PASS=...
 RSA_PRIVATE_KEY=<base64 encoded private key>
 PORT=8080
 ```
@@ -94,7 +94,7 @@ contextlite validate-license professional.json
 
 ### ��� DEPLOYMENT READY
 - **License Server**: Complete Stripe webhook integration
-- **Email Automation**: optimizationP delivery for license distribution  
+- **Email Automation**: SMTP delivery for license distribution  
 - **Payment Processing**: Professional ($49/mo) and Enterprise ($199/mo) tiers
 - **Infrastructure**: Railway cloud deployment configuration
 
@@ -108,7 +108,7 @@ contextlite validate-license professional.json
 - **Backup License Server**: Secondary Railway deployment
 - **RSA Key Security**: Private key encrypted at rest
 - **Payment Failure Handling**: Stripe retry logic + manual resolution
-- **Email Delivery**: Backup optimizationP providers configured
+- **Email Delivery**: Backup SMTP providers configured
 
 ## Infrastructure Costs
 - **Railway License Server**: ~$5/month (scales automatically)

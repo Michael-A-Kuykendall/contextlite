@@ -365,8 +365,8 @@ func TestStorage_CacheOperations_Comprehensive(t *testing.T) {
 					InclusionReason: "test",
 				},
 			},
-			optimizationMetrics: types.optimizationMetrics{
-				SolverUsed:  "optimizer",
+			SMTMetrics: types.SMTMetrics{
+				SolverUsed:  "Z3",
 				SolveTimeMs: 10.5,
 			},
 			CoherenceScore: 0.85,
@@ -418,8 +418,8 @@ func TestStorage_CacheOperations_Comprehensive(t *testing.T) {
 					InclusionReason: "test",
 				},
 			},
-			optimizationMetrics: types.optimizationMetrics{
-				SolverUsed:  "optimizer",
+			SMTMetrics: types.SMTMetrics{
+				SolverUsed:  "Z3",
 				SolveTimeMs: 15.2,
 			},
 			CoherenceScore: 0.75,
@@ -460,7 +460,7 @@ func TestStorage_CacheOperations_Comprehensive(t *testing.T) {
 			Documents: []types.DocumentReference{
 				{ID: "inv-doc-1", Path: "/test/inv1.go"},
 			},
-			optimizationMetrics: types.optimizationMetrics{SolverUsed: "optimizer"},
+			SMTMetrics: types.SMTMetrics{SolverUsed: "Z3"},
 		}
 
 		err := storage.SaveQueryCache(ctx, queryHash1, corpusHash, modelID, tokenizerVersion, result, expiresAt)

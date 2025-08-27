@@ -253,7 +253,7 @@ func getProFeatures() []string {
 	features := getDeveloperFeatures()
 	return append(features,
 		"unlimited_workspaces",
-		"advanced_optimization",
+		"advanced_smt",
 		"7d_scoring",
 		"caching",
 		"priority_support",

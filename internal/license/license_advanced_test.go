@@ -181,7 +181,7 @@ func TestCoverageBoost80Percent(t *testing.T) {
 		_ = featureGate.ValidateMultiTenant()
 		
 		// Test feature access checking - don't assert since results may vary
-		access := featureGate.CheckAccess("advanced_optimization")
+		access := featureGate.CheckAccess("advanced_smt")
 		_ = access // Just exercise the code path
 		
 		access = featureGate.CheckAccess("basic_search")
@@ -206,14 +206,14 @@ func TestCoverageBoost80Percent(t *testing.T) {
 			switch tier {
 			case TierDeveloper:
 				assert.Contains(t, features, "basic_search")
-				assert.NotContains(t, features, "advanced_optimization")
+				assert.NotContains(t, features, "advanced_smt")
 			case TierPro:
 				assert.Contains(t, features, "basic_search")
-				assert.Contains(t, features, "advanced_optimization")
+				assert.Contains(t, features, "advanced_smt")
 				assert.NotContains(t, features, "multi_tenant")
 			case TierEnterprise:
 				assert.Contains(t, features, "basic_search")
-				assert.Contains(t, features, "advanced_optimization")
+				assert.Contains(t, features, "advanced_smt")
 				assert.Contains(t, features, "multi_tenant")
 			}
 		}
@@ -282,7 +282,7 @@ func TestCoverageBoost80Percent(t *testing.T) {
 		// Test various feature requirements to exercise different code paths
 		features := []string{
 			"basic_search",
-			"advanced_optimization", 
+			"advanced_smt", 
 			"unlimited_workspaces",
 			"multi_tenant",
 			"custom_mcp",

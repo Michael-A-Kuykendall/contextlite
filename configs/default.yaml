@@ -16,7 +16,7 @@ storage:
   database_path: "./contextlite_fresh.db"
   cache_size_mb: 64
   
-optimization:
+smt:
   solver_timeout_ms: 250
   max_opt_gap: 0.05
   max_candidates: 200
@@ -24,7 +24,7 @@ optimization:
   integer_scaling: 10000
   objective_style: "weighted-sum"
   z3:
-    binary_path: "C:\\ProgramData\\chocolatey\\bin\\z3.exe"  # Path to optimizer binary
+    binary_path: "C:\\ProgramData\\chocolatey\\bin\\z3.exe"  # Path to Z3 binary
     enable_verification: true                                # Enable brute-force verification for small problems
     max_verification_docs: 12                                # Maximum docs for verification
   
@@ -46,8 +46,8 @@ weights:
 lexicographic:
   compute_at_runtime: true
   
-# ε-budget thresholds (when objective_style = "epsilon-budget")
-epsilon_budget:
+# ε-constraint thresholds (when objective_style = "epsilon-constraint")
+epsilon_constraint:
   max_redundancy: 0.4
   min_coherence: 0.3
   min_recency: 0.2
@@ -64,7 +64,7 @@ cache:
 logging:
   level: "debug"
   include_timings: true
-  include_optimization_metrics: true
+  include_smt_metrics: true
 
 # Clustering and multi-workspace configuration
 cluster:

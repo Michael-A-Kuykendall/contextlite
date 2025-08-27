@@ -371,7 +371,7 @@ func TestStorage_SaveQueryCache_ErrorConditions(t *testing.T) {
 			Documents: []types.DocumentReference{
 				{ID: "cache-empty-key", Path: "/test/cache.go"},
 			},
-			optimizationMetrics: types.optimizationMetrics{SolverUsed: "optimizer"},
+			SMTMetrics: types.SMTMetrics{SolverUsed: "Z3"},
 		}
 		expiresAt := time.Now().Add(5 * time.Minute)
 
@@ -383,7 +383,7 @@ func TestStorage_SaveQueryCache_ErrorConditions(t *testing.T) {
 	t.Run("SaveQueryCache_EmptyDocuments", func(t *testing.T) {
 		result := &types.QueryResult{
 			Documents: []types.DocumentReference{}, // Empty slice
-			optimizationMetrics: types.optimizationMetrics{SolverUsed: "optimizer"},
+			SMTMetrics: types.SMTMetrics{SolverUsed: "Z3"},
 		}
 		expiresAt := time.Now().Add(5 * time.Minute)
 
@@ -399,7 +399,7 @@ func TestStorage_SaveQueryCache_ErrorConditions(t *testing.T) {
 			Documents: []types.DocumentReference{
 				{ID: "cache-past-expiry", Path: "/test/cache.go"},
 			},
-			optimizationMetrics: types.optimizationMetrics{SolverUsed: "optimizer"},
+			SMTMetrics: types.SMTMetrics{SolverUsed: "Z3"},
 		}
 		// Past expiry time
 		expiresAt := time.Now().Add(-5 * time.Minute)
@@ -416,7 +416,7 @@ func TestStorage_SaveQueryCache_ErrorConditions(t *testing.T) {
 			Documents: []types.DocumentReference{
 				{ID: "cache-invalid-model", Path: "/test/cache.go"},
 			},
-			optimizationMetrics: types.optimizationMetrics{SolverUsed: "optimizer"},
+			SMTMetrics: types.SMTMetrics{SolverUsed: "Z3"},
 		}
 		expiresAt := time.Now().Add(5 * time.Minute)
 

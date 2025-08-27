@@ -26,7 +26,7 @@ func (e *enhancedMockFeatureGate) GetStatus() map[string]interface{} {
 	status := map[string]interface{}{
 		"tier":                "developer",
 		"max_documents":       1000,
-		"features":            []string{"basic_optimization", "workspaces"},
+		"features":            []string{"basic_smt", "workspaces"},
 		"in_grace_period":     false,
 		"status":              "enhanced",
 		"message":             "Enhanced license system active",

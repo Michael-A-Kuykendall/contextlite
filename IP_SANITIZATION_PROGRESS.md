@@ -9,7 +9,7 @@
 
 ### 1. Docker Hub README (`docker/README.md`) - SANITIZED ✅
 **Changes Made**:
-- ❌ Removed "optimization-powered optimization" from description
+- ❌ Removed "SMT-powered optimization" from description
 - ❌ Removed "Uses advanced mathematical optimization for intelligent document selection"  
 - ❌ Removed specific performance metrics ("<0.5ms", ">10,000 requests/second", "<50MB")
 - ✅ Kept user benefits without exposing methodology
@@ -23,18 +23,18 @@
 
 ### 3. VS Code Marketplace README (`vscode-extension/README.md`) - SANITIZED ✅  
 **Changes Made**:
-- ❌ Removed "Advanced intelligent routing" details
+- ❌ Removed "SMT-optimized affinity routing" details
 - ❌ Removed "Zero-Latency" claims with implementation details
-- ❌ Removed "session management and workspace-aware load balancing" methodology
+- ❌ Removed "sticky sessions and workspace-aware load balancing" methodology
 - ✅ Kept enterprise features without exposing technical implementation
 
 ### 4. Main GitHub README (`README.md`) - SANITIZED ✅
 **Changes Made**:
-- ❌ Removed "optimization optimization" and "budget management" references
+- ❌ Removed "SMT optimization" and "constraint satisfaction" references
 - ❌ Removed "L1/L2/L3 quantum snapshots" caching details
 - ❌ Removed specific performance metrics exposing algorithm efficiency
-- ❌ Removed "optimization engine integration" from development status
-- ❌ Removed "optimization Solve" from performance table
+- ❌ Removed "Z3 solver integration" from development status
+- ❌ Removed "SMT Solve" from performance table
 - ✅ Kept all user-facing benefits without methodology exposure
 
 ---
@@ -42,11 +42,11 @@
 ## 🔍 SANITIZATION SUMMARY
 
 ### Removed IP-Exposing Elements
-1. **optimization/Constraint Satisfaction**: All references to mathematical optimization approach
-2. **Specific Algorithms**: optimization engine, budget management, optimization optimization  
+1. **SMT/Constraint Satisfaction**: All references to mathematical optimization approach
+2. **Specific Algorithms**: Z3 solver, constraint satisfaction, SMT optimization  
 3. **Architecture Details**: "Shim" patterns, binary detection strategies, quantum snapshots
 4. **Performance Metrics**: Specific timings that reveal algorithm efficiency
-5. **Implementation Details**: Affinity routing, session management, load balancing methodologies
+5. **Implementation Details**: Affinity routing, sticky sessions, load balancing methodologies
 
 ### Preserved User Value
 1. **Feature Benefits**: All user-facing capabilities maintained
@@ -68,11 +68,11 @@ The sanitized documentation removes current IP exposure, but **all previous comm
 4. **Download Archive**: GitHub's download feature includes full repository history
 
 ### What's Still Exposed in Git History
-- Complete optimization budget management methodology  
-- optimization engine integration implementation details
+- Complete SMT constraint satisfaction methodology  
+- Z3 solver integration implementation details
 - L1/L2/L3 quantum snapshot caching architecture
 - Binary management "shim" strategy details
-- Workspace intelligent routing algorithms
+- Workspace affinity routing algorithms
 - Performance benchmarks revealing algorithm capabilities
 
 ---
@@ -84,9 +84,9 @@ The sanitized documentation removes current IP exposure, but **all previous comm
 #### 1. Identify Commit Range for Scrubbing
 ```bash
 # Find commits that first introduced IP-exposing content
-git log --oneline --grep="optimization"
-git log --oneline --grep="budget"
-git log --oneline --grep="optimizer"
+git log --oneline --grep="SMT"
+git log --oneline --grep="constraint"
+git log --oneline --grep="Z3"
 git log --oneline README.md | head -20
 ```
 
@@ -120,8 +120,8 @@ git push --force-with-lease --tags
 #### 4. Verify Scrubbing Effectiveness
 ```bash
 # Check that old content is completely gone
-git log --all --full-history -- README.md | grep -i "optimization\|budget\|z3"
-git show <any-old-commit>:README.md | grep -i "optimization\|budget"
+git log --all --full-history -- README.md | grep -i "smt\|constraint\|z3"
+git show <any-old-commit>:README.md | grep -i "smt\|constraint"
 ```
 
 ---
@@ -151,7 +151,7 @@ Given the critical IP exposure, **immediate git history scrubbing is recommended
 ## 📋 POST-SCRUBBING CHECKLIST
 
 ### Verification Steps
-- [ ] Verify no optimization/budget/optimizer references exist in any commit
+- [ ] Verify no SMT/constraint/Z3 references exist in any commit
 - [ ] Check all package distribution platforms updated
 - [ ] Confirm Docker Hub, npm, VS Code marketplace show sanitized docs
 - [ ] Test that cloned repositories have clean history

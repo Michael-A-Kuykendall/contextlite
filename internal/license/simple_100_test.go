@@ -114,9 +114,9 @@ func TestSimple100License(t *testing.T) {
 		
 		// HasFeature with various inputs
 		features := []string{
-			"basic_optimization",
+			"basic_smt",
 			"workspaces",
-			"advanced_optimization", 
+			"advanced_smt", 
 			"invalid_feature",
 			"",
 		}

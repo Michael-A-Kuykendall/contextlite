@@ -123,7 +123,7 @@ func TestFinal80PercentPush(t *testing.T) {
 			"sqlite_storage",
 			"single_workspace",
 			"unlimited_workspaces",
-			"advanced_optimization",
+			"advanced_smt",
 			"7d_scoring",
 			"caching",
 			"multi_tenant",

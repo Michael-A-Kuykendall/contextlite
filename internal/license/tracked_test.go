@@ -142,7 +142,7 @@ func TestTrackedFeatureGate_RequireFeature(t *testing.T) {
 	fg := NewTrackedFeatureGate(server.URL)
 
 	// Test feature requirement (should fail without valid license)
-	err := fg.RequireFeature("advanced_optimization")
+	err := fg.RequireFeature("advanced_smt")
 	if err != nil {
 		assert.Error(t, err) // Expected case - no valid license
 	} else {

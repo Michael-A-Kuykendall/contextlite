@@ -15,7 +15,7 @@ import (
 // Helper function to create test config and storage
 func setupTestEngine() (*config.Config, types.StorageInterface) {
 	cfg := &config.Config{
-		optimization: config.optimizationConfig{
+		SMT: config.SMTConfig{
 			SolverTimeoutMs: 1000,
 			MaxCandidates:   100,
 		},

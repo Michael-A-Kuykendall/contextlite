@@ -1,5 +1,5 @@
 /*
- * ContextLite - optimization-Optimized AI Context Engine
+ * ContextLite - SMT-Optimized AI Context Engine
  * Copyright (c) 2025 Michael A. Kuykendall
  * 
  * Patent Pending - Provisional Patent Filed
@@ -129,8 +129,8 @@ func GetEngineInfo(engine types.ContextEngine) map[string]interface{} {
 		info["communication"] = "direct"
 	case *JSONCLIEngine:
 		info["type"] = "private-optimized"
-		info["features"] = []string{"optimization-optimization", "7d-features", "patent-pending"}
-		info["description"] = "Full Advanced engine with proprietary algorithms"
+		info["features"] = []string{"smt-optimization", "7d-features", "patent-pending"}
+		info["description"] = "Full SMT-optimized engine with proprietary algorithms"
 		info["communication"] = "json-cli"
 	default:
 		// Unknown engine type

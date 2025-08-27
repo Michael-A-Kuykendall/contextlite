@@ -34,7 +34,7 @@ X-Node-Preference: node-1
 
 ### POST /assemble
 
-Assembles the most relevant context for a given query using optimization optimization.
+Assembles the most relevant context for a given query using SMT optimization.
 
 **Request:**
 ```http
@@ -46,7 +46,7 @@ X-Workspace-ID: mission-architect
   "query": "How does user authentication work?",
   "max_tokens": 4000,
   "max_documents": 10,
-  "use_optimization": true,
+  "use_smt": true,
   "use_cache": true,
   "workspace_path": "/path/to/project",
   "model_id": "gpt-4"
@@ -66,13 +66,13 @@ X-Workspace-ID: mission-architect
       "utility_score": 0.95,
       "relevance_score": 0.92,
       "recency_score": 0.87,
-      "inclusion_reason": "optimization-optimal"
+      "inclusion_reason": "smt-optimal"
     }
   ],
   "total_tokens": 3847,
   "processing_time": "245ms",
   "cache_hit": false,
-  "message": "Selected 8 documents using optimization optimization",
+  "message": "Selected 8 documents using SMT optimization",
   "workspace_info": {
     "id": "mission-architect",
     "resource_tier": "high",
@@ -83,7 +83,7 @@ X-Workspace-ID: mission-architect
 
 ### POST /baseline-comparison
 
-Compare optimization optimization against baseline heuristics.
+Compare SMT optimization against baseline heuristics.
 
 **Request:**
 ```json
@@ -98,7 +98,7 @@ Compare optimization optimization against baseline heuristics.
 **Response:**
 ```json
 {
-  "optimization_result": { /* ContextResult */ },
+  "smt_result": { /* ContextResult */ },
   "baseline_result": { /* ContextResult */ },
   "comparison": {
     "document_overlap": 0.73,
@@ -278,11 +278,11 @@ Get comprehensive system and cluster health information.
   "timestamp": 1645123456,
   "version": "1.0.0",
   "node_id": "contextlite-node-1",
-  "optimization": {
-    "solver": "optimizer",
+  "smt": {
+    "solver": "Z3",
     "version": "4.12.0",
     "enabled": true,
-    "policy": "optimization optimization selects document subsets to maximize utility while minimizing redundancy using budget management"
+    "policy": "SMT optimization selects document subsets to maximize utility while minimizing redundancy using constraint satisfaction"
   },
   "database": {
     "total_documents": 1247,
@@ -318,7 +318,7 @@ Get comprehensive system and cluster health information.
     "cache_enabled": true,
     "fts_search": true,
     "quantum_scoring": true,
-    "optimization_optimization": true,
+    "smt_optimization": true,
     "clustering": true,
     "workspace_isolation": true,
     "project_affinity": true
@@ -397,7 +397,7 @@ Rank documents for RAG applications (langchain/llamaindex integration).
       },
       "snippet": "func AuthenticateUser(token string) (*User, error) {...",
       "score": 0.95,
-      "why": "optimization-optimal: high relevance + authority"
+      "why": "smt-optimal: high relevance + authority"
     }
   ],
   "p99_ms": 245
@@ -438,7 +438,7 @@ Get current license and trial status.
   "trial_days_remaining": 27,
   "features_enabled": [
     "unlimited_workspaces",
-    "advanced_optimization",
+    "advanced_smt",
     "7d_scoring", 
     "caching",
     "clustering"
@@ -465,7 +465,7 @@ Get detailed trial information.
   },
   "features_available": [
     "unlimited_workspaces",
-    "advanced_optimization",
+    "advanced_smt",
     "7d_scoring",
     "caching", 
     "clustering"
@@ -545,10 +545,10 @@ POST /workspace/mission-architect/api/v1/assemble
 - Global rate limiting available
 - Respects `X-RateLimit-*` headers
 
-### optimization Optimization
+### SMT Optimization
 - Budget processing time with `budget_ms` parameter
-- Fallback to heuristics if optimization timeout exceeded
-- `use_optimization=false` for faster heuristic-only processing
+- Fallback to heuristics if SMT timeout exceeded
+- `use_smt=false` for faster heuristic-only processing
 
 ### Clustering Performance
 - Workspace affinity reduces latency
@@ -577,7 +577,7 @@ class ContextLiteClient {
         query,
         max_tokens: options.maxTokens || 4000,
         max_documents: options.maxDocuments || 10,
-        use_optimization: options.useoptimization !== false,
+        use_smt: options.useSMT !== false,
         use_cache: options.useCache !== false,
       }),
     });
@@ -626,7 +626,7 @@ class ContextLiteClient:
             'query': query,
             'max_tokens': max_tokens,
             'max_documents': max_documents,
-            'use_optimization': True,
+            'use_smt': True,
             'use_cache': True,
         }
         
@@ -677,7 +677,7 @@ curl -X POST http://localhost:8080/api/v1/assemble \
     "query": "How does JWT authentication work?",
     "max_tokens": 4000,
     "max_documents": 10,
-    "use_optimization": true
+    "use_smt": true
   }'
 
 # Check cluster health
@@ -689,4 +689,4 @@ curl "http://localhost:8080/api/v1/documents/search?q=authentication&limit=20" \
   -H "X-Workspace-ID: mission-architect"
 ```
 
-This API provides comprehensive context assembly capabilities with advanced clustering, workspace isolation, and optimization optimization features for AI applications.
+This API provides comprehensive context assembly capabilities with advanced clustering, workspace isolation, and SMT optimization features for AI applications.

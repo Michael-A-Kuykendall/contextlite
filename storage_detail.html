@@ -577,7 +577,7 @@ func (s *Storage) SaveQueryCache(ctx context.Context, queryHash, corpusHash, mod
                 return err
         }</span>
         
-        <span class="cov0" title="0">metricsJSON, err := json.Marshal(result.optimizationMetrics)
+        <span class="cov0" title="0">metricsJSON, err := json.Marshal(result.SMTMetrics)
         if err != nil </span><span class="cov0" title="0">{
                 return err
         }</span>
@@ -590,7 +590,7 @@ func (s *Storage) SaveQueryCache(ctx context.Context, queryHash, corpusHash, mod
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 queryHash, corpusHash, modelID, tokenizerVersion, string(resultJSON),
                 string(metricsJSON), "", result.CoherenceScore, 0.0, // OptimalityGap removed
-                result.optimizationMetrics.SolveTimeMs, result.optimizationMetrics.FallbackReason != "", expiresAt)
+                result.SMTMetrics.SolveTimeMs, result.SMTMetrics.FallbackReason != "", expiresAt)
         return err</span>
 }
 
@@ -608,8 +608,8 @@ func (s *Storage) GetQueryCache(ctx context.Context, queryHash, corpusHash, mode
                       AND tokenizer_version = ? AND expires_at &gt; CURRENT_TIMESTAMP`,
                 queryHash, corpusHash, modelID, tokenizerVersion).Scan(
                 &amp;resultJSON, &amp;metricsJSON, &amp;result.CoherenceScore,
-                &amp;tempGap, &amp;result.optimizationMetrics.SolveTimeMs, // OptimalityGap removed
-                &amp;result.optimizationMetrics.FallbackReason)
+                &amp;tempGap, &amp;result.SMTMetrics.SolveTimeMs, // OptimalityGap removed
+                &amp;result.SMTMetrics.FallbackReason)
         if err != nil </span><span class="cov0" title="0">{
                 return nil, err
         }</span>
@@ -618,7 +618,7 @@ func (s *Storage) GetQueryCache(ctx context.Context, queryHash, corpusHash, mode
                 return nil, err
         }</span>
         
-        <span class="cov0" title="0">if err := json.Unmarshal([]byte(metricsJSON), &amp;result.optimizationMetrics); err != nil </span><span class="cov0" title="0">{
+        <span class="cov0" title="0">if err := json.Unmarshal([]byte(metricsJSON), &amp;result.SMTMetrics); err != nil </span><span class="cov0" title="0">{
                 return nil, err
         }</span>
 
@@ -744,7 +744,7 @@ func (s *Storage) SaveQueryCacheWithKey(ctx context.Context, queryHash, corpusHa
                 return err
         }</span>
         
-        <span class="cov0" title="0">metricsJSON, err := json.Marshal(result.optimizationMetrics)
+        <span class="cov0" title="0">metricsJSON, err := json.Marshal(result.SMTMetrics)
         if err != nil </span><span class="cov0" title="0">{
                 return err
         }</span>
@@ -780,7 +780,7 @@ func (s *Storage) SaveQueryCacheWithKey(ctx context.Context, queryHash, corpusHa
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                         queryHash, corpusHash, modelID, tokenizerVersion, string(resultJSON),
                         string(metricsJSON), "", result.CoherenceScore, 0.0, // OptimalityGap removed
-                        result.optimizationMetrics.SolveTimeMs, result.optimizationMetrics.FallbackReason != "", expiresAt, cacheKey)
+                        result.SMTMetrics.SolveTimeMs, result.SMTMetrics.FallbackReason != "", expiresAt, cacheKey)
         }</span> else<span class="cov0" title="0"> {
                 // Fallback to old method without cache_key
                 _, err = s.db.ExecContext(ctx, `
@@ -791,7 +791,7 @@ func (s *Storage) SaveQueryCacheWithKey(ctx context.Context, queryHash, corpusHa
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                         queryHash, corpusHash, modelID, tokenizerVersion, string(resultJSON),
                         string(metricsJSON), "", result.CoherenceScore, 0.0, // OptimalityGap removed
-                        result.optimizationMetrics.SolveTimeMs, result.optimizationMetrics.FallbackReason != "", expiresAt)
+                        result.SMTMetrics.SolveTimeMs, result.SMTMetrics.FallbackReason != "", expiresAt)
         }</span>
         <span class="cov0" title="0">return err</span>
 }

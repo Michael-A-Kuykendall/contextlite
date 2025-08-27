@@ -1,5 +1,5 @@
 /*
- * ContextLite - optimization-Optimized AI Context Engine
+ * ContextLite - SMT-Optimized AI Context Engine
  * Copyright (c) 2025 Michael A. Kuykendall
  * 
  * Patent Pending - Provisional Patent Filed
@@ -68,7 +68,7 @@ func (e *CoreEngine) AssembleContext(ctx context.Context, request types.ContextR
 	// Step 2: Score documents using basic BM25 + simple heuristics
 	scoredDocs := e.scoreDocuments(candidates, request.Query)
 	
-	// Step 3: Select documents using greedy heuristic (no optimization optimization)
+	// Step 3: Select documents using greedy heuristic (no SMT optimization)
 	selected := e.selectDocuments(scoredDocs, request.MaxTokens, request.MaxDocuments)
 	
 	// Step 4: Assemble final context
@@ -135,8 +135,8 @@ func (e *CoreEngine) Close() error {
 func (e *CoreEngine) searchCandidates(ctx context.Context, request types.ContextRequest) ([]types.Document, error) {
 	// Use storage interface for search
 	maxCandidates := 100
-	if e.config != nil && e.config.optimization.MaxCandidates > 0 {
-		maxCandidates = e.config.optimization.MaxCandidates
+	if e.config != nil && e.config.SMT.MaxCandidates > 0 {
+		maxCandidates = e.config.SMT.MaxCandidates
 	}
 	
 	return e.storage.SearchDocuments(ctx, request.Query, maxCandidates)
@@ -183,13 +183,13 @@ func (e *CoreEngine) scoreDocuments(docs []types.Document, query string) []types
 	return scored
 }
 
-// selectDocuments uses greedy selection (no optimization optimization)
+// selectDocuments uses greedy selection (no SMT optimization)
 func (e *CoreEngine) selectDocuments(scored []types.ScoredDocument, maxTokens, maxDocs int) []types.ScoredDocument {
 	var selected []types.ScoredDocument
 	totalTokens := 0
 	
 	for _, doc := range scored {
-		// Check budgets
+		// Check constraints
 		if len(selected) >= maxDocs {
 			break
 		}
@@ -237,7 +237,7 @@ func (e *CoreEngine) assembleResult(selected []types.ScoredDocument, request typ
 		TotalTokens:    totalTokens,
 		ProcessingTime: processingTime,
 		CacheHit:       false,
-		Message:        fmt.Sprintf("Selected %d documents using basic heuristics (upgrade for optimization optimization)", len(selected)),
+		Message:        fmt.Sprintf("Selected %d documents using basic heuristics (upgrade for SMT optimization)", len(selected)),
 	}
 }
 

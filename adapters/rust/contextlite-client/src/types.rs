@@ -163,9 +163,9 @@ pub struct ContextRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_metadata: Option<bool>,
     
-    /// optimization optimization parameters
+    /// SMT optimization parameters
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub optimization_options: Option<serde_json::Value>,
+    pub smt_options: Option<serde_json::Value>,
 }
 
 impl ContextRequest {
@@ -176,7 +176,7 @@ impl ContextRequest {
             budget: None,
             max_results: None,
             include_metadata: None,
-            optimization_options: None,
+            smt_options: None,
         }
     }
     
@@ -217,9 +217,9 @@ pub struct ContextResponse {
     /// Coherence score of the assembled context
     pub coherence_score: f64,
     
-    /// optimization system metrics
+    /// SMT solver metrics
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub optimization_metrics: Option<serde_json::Value>,
+    pub smt_metrics: Option<serde_json::Value>,
     
     /// Timing information
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -248,8 +248,8 @@ pub struct CompleteHealthStatus {
     /// Database information
     pub database: DatabaseStats,
     
-    /// optimization system information
-    pub optimization: SmtInfo,
+    /// SMT solver information
+    pub smt: SmtInfo,
     
     /// Available features
     pub features: Features,
@@ -271,19 +271,19 @@ pub struct DatabaseStats {
     pub last_optimized: i64,
 }
 
-/// optimization system information
+/// SMT solver information
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SmtInfo {
-    /// Whether optimization optimization is enabled
+    /// Whether SMT optimization is enabled
     pub enabled: bool,
     
-    /// optimization system name
+    /// SMT solver name
     pub solver: String,
     
-    /// optimization system version
+    /// SMT solver version
     pub version: String,
     
-    /// optimization policy description
+    /// SMT policy description
     pub policy: String,
 }
 
@@ -299,8 +299,8 @@ pub struct Features {
     /// Whether quantum scoring is enabled
     pub quantum_scoring: bool,
     
-    /// Whether optimization optimization is available
-    pub optimization_optimization: bool,
+    /// Whether SMT optimization is available
+    pub smt_optimization: bool,
 }
 
 /// Storage information

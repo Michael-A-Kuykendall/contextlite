@@ -98,21 +98,21 @@ func (p *Pipeline) AssembleContext(ctx context.Context, req *types.AssembleReque
 		CacheKey:       cacheKey,
 	}
 	
-	// Convert optimizationResult to optimizationMetrics if present
-	if result.optimizationMetrics != nil {
-		queryResult.optimizationMetrics = types.optimizationMetrics{
-			SolverUsed:      result.optimizationMetrics.SolverUsed,
-			optimizerStatus:        result.optimizationMetrics.optimizerStatus,
-			Objective:       int64(result.optimizationMetrics.Objective),
-			SolveTimeUs:     result.optimizationMetrics.SolveTimeUs,
-			SolveTimeMs:     float64(result.optimizationMetrics.SolveTimeUs) / 1000.0,
-			VariableCount:   result.optimizationMetrics.VariableCount,
-			ConstraintCount: result.optimizationMetrics.ConstraintCount,
-			KCandidates:     result.optimizationMetrics.KCandidates,
-			PairsCount:      result.optimizationMetrics.PairsCount,
-			BudgetTokens:    result.optimizationMetrics.BudgetTokens,
-			MaxDocs:         result.optimizationMetrics.MaxDocs,
-			FallbackReason:  result.optimizationMetrics.FallbackReason,
+	// Convert SMTResult to SMTMetrics if present
+	if result.SMTMetrics != nil {
+		queryResult.SMTMetrics = types.SMTMetrics{
+			SolverUsed:      result.SMTMetrics.SolverUsed,
+			Z3Status:        result.SMTMetrics.Z3Status,
+			Objective:       int64(result.SMTMetrics.Objective),
+			SolveTimeUs:     result.SMTMetrics.SolveTimeUs,
+			SolveTimeMs:     float64(result.SMTMetrics.SolveTimeUs) / 1000.0,
+			VariableCount:   result.SMTMetrics.VariableCount,
+			ConstraintCount: result.SMTMetrics.ConstraintCount,
+			KCandidates:     result.SMTMetrics.KCandidates,
+			PairsCount:      result.SMTMetrics.PairsCount,
+			BudgetTokens:    result.SMTMetrics.BudgetTokens,
+			MaxDocs:         result.SMTMetrics.MaxDocs,
+			FallbackReason:  result.SMTMetrics.FallbackReason,
 		}
 	}
 	

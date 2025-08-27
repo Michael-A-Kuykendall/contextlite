@@ -8,18 +8,18 @@ import (
 
 // Tests to achieve 100% coverage for the validate function
 
-// Test optimizer binary path file existence check
-func TestValidate_optimizerBinaryPathChecks(t *testing.T) {
+// Test Z3 binary path file existence check
+func TestValidate_Z3BinaryPathChecks(t *testing.T) {
 	baseConfig := &Config{
 		Server: ServerConfig{
 			Host: "localhost",
 			Port: 8080,
 		},
-		optimization: optimizationConfig{
+		SMT: SMTConfig{
 			SolverTimeoutMs: 5000,
 			MaxCandidates:   50,
 			ObjectiveStyle:  "weighted-sum",
-			optimizer: optimizerConfig{
+			Z3: Z3Config{
 				MaxVerificationDocs: 10,
 			},
 		},
@@ -28,41 +28,41 @@ func TestValidate_optimizerBinaryPathChecks(t *testing.T) {
 		},
 	}
 
-	// Test with empty optimizer binary path (should not trigger file check)
-	configEmptyoptimizer := *baseConfig
-	configEmptyoptimizer.optimization.optimizer.BinaryPath = ""
-	err := validate(&configEmptyoptimizer)
+	// Test with empty Z3 binary path (should not trigger file check)
+	configEmptyZ3 := *baseConfig
+	configEmptyZ3.SMT.Z3.BinaryPath = ""
+	err := validate(&configEmptyZ3)
 	if err != nil {
-		t.Errorf("Empty optimizer binary path should be valid: %v", err)
+		t.Errorf("Empty Z3 binary path should be valid: %v", err)
 	}
 
-	// Test with existing file as optimizer binary path
+	// Test with existing file as Z3 binary path
 	tempDir := t.TempDir()
 	existingFile := filepath.Join(tempDir, "fake_z3")
 	
-	// Create a fake optimizer binary file
+	// Create a fake Z3 binary file
 	err = os.WriteFile(existingFile, []byte("fake z3 binary"), 0755)
 	if err != nil {
-		t.Fatalf("Failed to create fake optimizer binary: %v", err)
+		t.Fatalf("Failed to create fake Z3 binary: %v", err)
 	}
 
-	configExistingoptimizer := *baseConfig
-	configExistingoptimizer.optimization.optimizer.BinaryPath = existingFile
-	err = validate(&configExistingoptimizer)
+	configExistingZ3 := *baseConfig
+	configExistingZ3.SMT.Z3.BinaryPath = existingFile
+	err = validate(&configExistingZ3)
 	if err != nil {
-		t.Errorf("Existing optimizer binary path should be valid: %v", err)
+		t.Errorf("Existing Z3 binary path should be valid: %v", err)
 	}
 
-	// Test with non-existent optimizer binary path (should trigger error)
+	// Test with non-existent Z3 binary path (should trigger error)
 	nonExistentPath := filepath.Join(tempDir, "non_existent_z3_binary")
 	
-	configNonExistentoptimizer := *baseConfig
-	configNonExistentoptimizer.optimization.optimizer.BinaryPath = nonExistentPath
-	err = validate(&configNonExistentoptimizer)
+	configNonExistentZ3 := *baseConfig
+	configNonExistentZ3.SMT.Z3.BinaryPath = nonExistentPath
+	err = validate(&configNonExistentZ3)
 	if err == nil {
-		t.Error("Non-existent optimizer binary path should cause validation error")
-	} else if !stringContains(err.Error(), "optimizer binary not found") {
-		t.Errorf("Expected 'optimizer binary not found' error, got: %v", err)
+		t.Error("Non-existent Z3 binary path should cause validation error")
+	} else if !stringContains(err.Error(), "Z3 binary not found") {
+		t.Errorf("Expected 'Z3 binary not found' error, got: %v", err)
 	}
 }
 
@@ -73,11 +73,11 @@ func TestValidate_DatabaseDirectoryCreation(t *testing.T) {
 			Host: "localhost",
 			Port: 8080,
 		},
-		optimization: optimizationConfig{
+		SMT: SMTConfig{
 			SolverTimeoutMs: 5000,
 			MaxCandidates:   50,
 			ObjectiveStyle:  "weighted-sum",
-			optimizer: optimizerConfig{
+			Z3: Z3Config{
 				MaxVerificationDocs: 10,
 			},
 		},
@@ -135,11 +135,11 @@ func TestValidate_AdditionalEdgeCases(t *testing.T) {
 			Host: "localhost",
 			Port: 8080,
 		},
-		optimization: optimizationConfig{
+		SMT: SMTConfig{
 			SolverTimeoutMs: 5000,
 			MaxCandidates:   50,
 			ObjectiveStyle:  "weighted-sum",
-			optimizer: optimizerConfig{
+			Z3: Z3Config{
 				MaxVerificationDocs: 10,
 			},
 		},
@@ -185,7 +185,7 @@ func TestValidate_AdditionalEdgeCases(t *testing.T) {
 
 	for _, test := range timeoutTests {
 		config := *baseConfig
-		config.optimization.SolverTimeoutMs = test.timeout
+		config.SMT.SolverTimeoutMs = test.timeout
 		err := validate(&config)
 		
 		if test.shouldError && err == nil {
@@ -208,7 +208,7 @@ func TestValidate_AdditionalEdgeCases(t *testing.T) {
 
 	for _, test := range candidateTests {
 		config := *baseConfig
-		config.optimization.MaxCandidates = test.candidates
+		config.SMT.MaxCandidates = test.candidates
 		err := validate(&config)
 		
 		if test.shouldError && err == nil {
@@ -219,10 +219,10 @@ func TestValidate_AdditionalEdgeCases(t *testing.T) {
 	}
 
 	// Test all valid objective styles to ensure they pass
-	validObjectiveStyles := []string{"weighted-sum", "lexicographic", "epsilon-budget"}
+	validObjectiveStyles := []string{"weighted-sum", "lexicographic", "epsilon-constraint"}
 	for _, style := range validObjectiveStyles {
 		config := *baseConfig
-		config.optimization.ObjectiveStyle = style
+		config.SMT.ObjectiveStyle = style
 		err := validate(&config)
 		if err != nil {
 			t.Errorf("Valid objective style '%s' should not cause error: %v", style, err)
@@ -233,7 +233,7 @@ func TestValidate_AdditionalEdgeCases(t *testing.T) {
 	invalidObjectiveStyles := []string{"invalid", "", "unknown-style", "weighted_sum", "lex"}
 	for _, style := range invalidObjectiveStyles {
 		config := *baseConfig
-		config.optimization.ObjectiveStyle = style
+		config.SMT.ObjectiveStyle = style
 		err := validate(&config)
 		if err == nil {
 			t.Errorf("Invalid objective style '%s' should cause validation error", style)
@@ -252,7 +252,7 @@ func TestValidate_AdditionalEdgeCases(t *testing.T) {
 
 	for _, test := range verificationTests {
 		config := *baseConfig
-		config.optimization.optimizer.MaxVerificationDocs = test.maxDocs
+		config.SMT.Z3.MaxVerificationDocs = test.maxDocs
 		err := validate(&config)
 		
 		if test.shouldError && err == nil {

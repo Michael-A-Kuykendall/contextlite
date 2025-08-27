@@ -43,7 +43,7 @@ func TestLicenseManager_GetFeatures(t *testing.T) {
 			name:         "professional tier",
 			tier:         license.TierPro,
 			expectedCount: 9,
-			expectedCore: []string{"basic_search", "unlimited_workspaces", "advanced_optimization", "caching"},
+			expectedCore: []string{"basic_search", "unlimited_workspaces", "advanced_smt", "caching"},
 		},
 		{
 			name:         "enterprise tier",
@@ -314,7 +314,7 @@ func TestLicenseTierFeatures(t *testing.T) {
 		{
 			name: "professional features",
 			tier: license.TierPro,
-			expectedCore:   []string{"basic_search", "unlimited_workspaces", "advanced_optimization", "caching"},
+			expectedCore:   []string{"basic_search", "unlimited_workspaces", "advanced_smt", "caching"},
 			unexpectedCore: []string{"multi_tenant", "sso_ldap", "white_label"},
 		},
 		{

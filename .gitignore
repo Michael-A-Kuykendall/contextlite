@@ -60,7 +60,7 @@ test_*.go
 *_demo.go
 *_debug.*
 *_output.*
-z3_*.optimization2
+z3_*.smt2
 z3_*.txt
 
 # Evaluation outputs

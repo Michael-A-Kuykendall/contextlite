@@ -14,7 +14,7 @@
 CLEAN INTERFACES IDENTIFIED:
 ✅ pkg/types + pkg/config = PURE DATA CONTRACTS (no internal deps)
 ✅ internal/storage + internal/timing = INFRASTRUCTURE LAYER  
-✅ internal/features + internal/optimization + internal/solve = CORE ALGORITHMS (private)
+✅ internal/features + internal/smt + internal/solve = CORE ALGORITHMS (private)
 ✅ internal/api + internal/pipeline = PUBLIC ORCHESTRATION
 ✅ cmd/* = ENTRY POINTS (configurable backends)
 ```
@@ -25,13 +25,13 @@ cmd/contextlite/main.go
 ├── internal/api (PUBLIC)
 ├── internal/pipeline (PUBLIC) 
 │   ├── internal/features (PRIVATE) ⚠️
-│   ├── internal/optimization (PRIVATE) ⚠️
+│   ├── internal/smt (PRIVATE) ⚠️
 │   └── internal/storage (PUBLIC)
 ├── internal/storage (PUBLIC)
 └── pkg/config + pkg/types (PUBLIC)
 
 CRITICAL INSIGHT: Only 2 packages create cross-repo dependencies!
-- internal/pipeline → internal/features + internal/optimization  
+- internal/pipeline → internal/features + internal/smt  
 - internal/api → internal/features
 ```
 
@@ -50,8 +50,8 @@ type FeatureExtractor interface {
     UpdateWeights(feedback UserFeedback) error
 }
 
-type optimizationSolver interface {
-    OptimizeSelection(docs []Document, budgets Constraints) ([]int, error)
+type SMTSolver interface {
+    OptimizeSelection(docs []Document, constraints Constraints) ([]int, error)
     SetStrategy(strategy OptimizationStrategy) error
 }
 
@@ -68,7 +68,7 @@ type ContextEngine interface {
 type Pipeline struct {
     storage   storage.Interface      // Already interface ✅
     features  types.FeatureExtractor // NEW: interface instead of concrete
-    optimization       types.optimizationSolver        // NEW: interface instead of concrete
+    smt       types.SMTSolver        // NEW: interface instead of concrete
 }
 
 // internal/api/server.go (UPDATED)  
@@ -87,7 +87,7 @@ contextlite-private/
 ├── go.mod (module: contextlite-private)
 ├── internal/
 │   ├── features/          # MOVE: 7D feature extraction
-│   ├── optimization/              # MOVE: optimization system integration  
+│   ├── smt/              # MOVE: SMT solver integration  
 │   ├── solve/            # MOVE: optimization algorithms
 │   └── ml/               # MOVE: learning algorithms (if exists)
 ├── pkg/
@@ -107,7 +107,7 @@ import (
 
 type PrivateEngine struct {
     features *features.Extractor    // Private implementation
-    optimization      *optimization.optimizerSolver         // Private implementation
+    smt      *smt.Z3Solver         // Private implementation
     storage  types.StorageInterface // Public interface
 }
 
@@ -130,9 +130,9 @@ func AssembleContext(requestJSON string) string {
 ```bash
 # ATOMIC REMOVALS (can be reverted easily)
 git mv internal/features ../contextlite-private/internal/
-git mv internal/optimization ../contextlite-private/internal/  
+git mv internal/smt ../contextlite-private/internal/  
 git mv internal/solve ../contextlite-private/internal/
-git rm -r internal/features internal/optimization internal/solve
+git rm -r internal/features internal/smt internal/solve
 ```
 
 #### 3.2 Add Stub Implementations (FALLBACK SAFETY)
@@ -143,7 +143,7 @@ type StubEngine struct {
 }
 
 func (s *StubEngine) AssembleContext(req types.ContextRequest) (*types.ContextResult, error) {
-    // BASIC BM25 + heuristic selection (no optimization optimization)
+    // BASIC BM25 + heuristic selection (no SMT optimization)
     // Ensures public repo ALWAYS WORKS even without private engine
     return basicSelection(req), nil
 }
@@ -213,7 +213,7 @@ build-public-only:
 |------|---------------|------------|-------------|
 | `cmd/contextlite/main.go` | `internal/pipeline` | `internal/engine` | SIMPLE |
 | `internal/api/server.go` | `internal/features` | `pkg/types` | INTERFACE |
-| `internal/pipeline/pipeline.go` | `internal/{features,optimization}` | `pkg/types` | INTERFACE |
+| `internal/pipeline/pipeline.go` | `internal/{features,smt}` | `pkg/types` | INTERFACE |
 | All other files | NO CHANGES | NO CHANGES | NONE ✅ |
 
 ### Build Tags Strategy:
@@ -266,7 +266,7 @@ cd contextlite && make build && ./build/contextlite --test-integrated
 
 ### Day 1 Afternoon (3 hours): Private Repo Setup
 - [ ] Create `../contextlite-private/` directory structure
-- [ ] Move `internal/{features,optimization,solve}` to private repo
+- [ ] Move `internal/{features,smt,solve}` to private repo
 - [ ] Create private engine implementation
 - [ ] **CHECKPOINT**: Private repo compiles ✅
 

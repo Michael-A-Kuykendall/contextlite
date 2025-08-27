@@ -1,4 +1,4 @@
-// Package evaluation provides comprehensive evaluation metrics for ContextLite optimization system
+// Package evaluation provides comprehensive evaluation metrics for ContextLite SMT system
 // against SOTA RAG approaches including classical BM25, embedding-based, and LLM-based systems.
 package evaluation
 
@@ -40,7 +40,7 @@ type EvaluationResult struct {
 	MemoryUsageMB float64 `json:"memory_usage_mb"`
 	
 	// System Information
-	SystemType    string `json:"system_type"`    // "contextlite_optimization", "bm25", "embedding", "llm"
+	SystemType    string `json:"system_type"`    // "contextlite_smt", "bm25", "embedding", "llm"
 	QueryType     string `json:"query_type"`     // "factual", "analytical", "creative"
 	DocumentCount int    `json:"document_count"`
 }

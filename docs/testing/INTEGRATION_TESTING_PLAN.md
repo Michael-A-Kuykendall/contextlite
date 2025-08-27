@@ -395,7 +395,7 @@ docker rm contextlite-prod
 - [ ] Authentication issues with Docker Hub
 - [ ] Permission problems in container
 - [ ] Network connectivity issues
-- [ ] Resource budgets
+- [ ] Resource constraints
 
 ---
 

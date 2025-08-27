@@ -1,6 +1,6 @@
 # ContextLite LlamaIndex Adapter
 
-Drop-in LlamaIndex retriever for ContextLite's Advanced context selection.
+Drop-in LlamaIndex retriever for ContextLite's SMT-optimized context selection.
 
 ## Installation
 

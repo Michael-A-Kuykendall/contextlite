@@ -29,10 +29,10 @@ func (e *JSONCLIEngine) UpdateConfig(config types.EngineConfig) error {
 }
 ```
 
-### 2. Advanced optimization Statistics
+### 2. Advanced SMT Statistics
 **File**: `internal/api/server.go:727`
 **Status**: TODO comment - returns hardcoded stats
-**Description**: Integrate real optimization system statistics from private binary
+**Description**: Integrate real SMT solver statistics from private binary
 **Implementation needed**:
 - Connect to private binary stats endpoint
 - Parse real solver performance metrics
@@ -40,8 +40,8 @@ func (e *JSONCLIEngine) UpdateConfig(config types.EngineConfig) error {
 - Add historical trend tracking
 
 ```go
-func (s *Server) handleoptimizationStats(w http.ResponseWriter, r *http.Request) {
-    // TODO: Get actual optimization system statistics
+func (s *Server) handleSMTStats(w http.ResponseWriter, r *http.Request) {
+    // TODO: Get actual SMT solver statistics
     // Implementation:
     // 1. Query engine for real stats
     // 2. Parse solver metrics (solve times, optimality gaps, etc.)

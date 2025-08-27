@@ -69,11 +69,11 @@ func main() {
 	// Create pipeline
 	pipe := pipeline.New(store, cfg)
 
-	// Test with optimization enabled
+	// Test with SMT enabled
 	req := &types.AssembleRequest{
 		Query:        "authentication systems",
 		MaxDocuments: 3,
-		Useoptimization:       true,
+		UseSMT:       true,
 	}
 
 	result, err := pipe.AssembleContext(nil, req)
@@ -90,25 +90,25 @@ func main() {
 	fmt.Println("=== COMPLETE API RESPONSE ===")
 	fmt.Println(string(jsonData))
 	
-	// Verify all required optimization fields are present
-	fmt.Println("\n=== optimization METRICS VERIFICATION ===")
-	fmt.Printf("solver_used: %s\n", result.optimizationMetrics.SolverUsed)
-	fmt.Printf("z3_status: %s\n", result.optimizationMetrics.optimizerStatus)
-	fmt.Printf("objective: %d\n", result.optimizationMetrics.Objective)
-	fmt.Printf("solve_time_ms: %d\n", result.optimizationMetrics.SolveTimeMs)
-	fmt.Printf("variable_count: %d\n", result.optimizationMetrics.VariableCount)
-	fmt.Printf("budget_count: %d\n", result.optimizationMetrics.ConstraintCount)
+	// Verify all required SMT fields are present
+	fmt.Println("\n=== SMT METRICS VERIFICATION ===")
+	fmt.Printf("solver_used: %s\n", result.SMTMetrics.SolverUsed)
+	fmt.Printf("z3_status: %s\n", result.SMTMetrics.Z3Status)
+	fmt.Printf("objective: %d\n", result.SMTMetrics.Objective)
+	fmt.Printf("solve_time_ms: %d\n", result.SMTMetrics.SolveTimeMs)
+	fmt.Printf("variable_count: %d\n", result.SMTMetrics.VariableCount)
+	fmt.Printf("constraint_count: %d\n", result.SMTMetrics.ConstraintCount)
 	
-	// Confirm optimizer integration is working
-	if result.optimizationMetrics.SolverUsed == "z3opt" && result.optimizationMetrics.optimizerStatus != "" {
-		fmt.Println("\n✅ optimizer optimization integration is working!")
+	// Confirm Z3 integration is working
+	if result.SMTMetrics.SolverUsed == "z3opt" && result.SMTMetrics.Z3Status != "" {
+		fmt.Println("\n✅ Z3 SMT integration is working!")
 		fmt.Println("✅ All API fields are present and complete!")
-	} else if result.optimizationMetrics.SolverUsed != "" {
-		fmt.Printf("\n⚠️  Using fallback solver: %s\n", result.optimizationMetrics.SolverUsed)
-		if result.optimizationMetrics.FallbackReason != "" {
-			fmt.Printf("   Reason: %s\n", result.optimizationMetrics.FallbackReason)
+	} else if result.SMTMetrics.SolverUsed != "" {
+		fmt.Printf("\n⚠️  Using fallback solver: %s\n", result.SMTMetrics.SolverUsed)
+		if result.SMTMetrics.FallbackReason != "" {
+			fmt.Printf("   Reason: %s\n", result.SMTMetrics.FallbackReason)
 		}
 	} else {
-		fmt.Println("\n❌ optimization optimization was not used")
+		fmt.Println("\n❌ SMT optimization was not used")
 	}
 }

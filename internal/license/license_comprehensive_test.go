@@ -23,7 +23,7 @@ func TestLicenseManager_ValidateLicense_Comprehensive(t *testing.T) {
 		IssuedAt:     time.Now(),
 		MaxDocuments: 10000,
 		MaxUsers:     10,
-		Features:     []string{"optimization_optimization", "custom_weights"},
+		Features:     []string{"smt_optimization", "custom_weights"},
 	}
 	
 	// Test 1: Valid license should pass
@@ -105,7 +105,7 @@ func TestTrackedLicenseManager_LoadLicenseWithActivation_Comprehensive(t *testin
 		"issued_at": "%s",
 		"max_documents": 10000,
 		"max_users": 10,
-		"features": ["optimization_optimization", "custom_weights"],
+		"features": ["smt_optimization", "custom_weights"],
 		"signature": "valid-signature"
 	}`, time.Now().Format(time.RFC3339))
 	
@@ -203,9 +203,9 @@ func TestEnhancedFeatureGate_CheckAccess_Comprehensive(t *testing.T) {
 	gate := NewEnhancedFeatureGate()
 	
 	// Check access to professional features (should be allowed in trial)
-	err = gate.CheckAccess("optimization_optimization")
+	err = gate.CheckAccess("smt_optimization")
 	if err != nil {
-		t.Errorf("Trial should allow access to optimization_optimization: %v", err)
+		t.Errorf("Trial should allow access to smt_optimization: %v", err)
 	}
 	
 	// Test 2: Check access to enterprise feature (should be denied in trial)
