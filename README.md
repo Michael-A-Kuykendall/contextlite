@@ -1,10 +1,42 @@
 # ContextLite
 
-> **High-performance context engine for AI systems** - Ultra-fast document retrieval, 100% local, zero dependencies.
+> **High-performance context engine with workspace clustering** - Multi-project AI context management, 100% local, zero dependencies.
 
-ContextLite is a Go-based context assembly engine that uses advanced optimization techniques to select the most relevant documents for AI context windows. Built for speed, privacy, and local operation.
+ContextLite is a Go-based context assembly engine with advanced optimization optimization and **enterprise-grade workspace clustering**. Perfect for managing multiple AI projects with isolated resource management and intelligent load balancing.
 
-📚 **[Documentation](./docs/)** - Technical guides and API reference for integration and development.
+## 🆕 **NEW: Workspace Clustering & Multi-Project Support**
+
+✨ **Just Released**: Professional workspace isolation, resource management, and load balancing for multi-project AI development.
+
+📚 **[Documentation](./docs/)** | 🏘️ **[Clustering Guide](./docs/CLUSTERING_GUIDE.md)** | 📡 **[API Reference](./docs/API_REFERENCE.md)**
+
+## 🏢 **Enterprise Workspace Clustering**
+
+Manage multiple AI projects with professional-grade isolation and resource management:
+
+```bash
+# Enable clustering in your config
+cluster:
+  enabled: true
+  workspace_routing: true
+  resource_limits:
+    "mission-architect":
+      max_concurrent_requests: 10
+      max_memory_mb: 512
+      priority: 8
+
+# Use workspace-specific requests
+curl -H "X-Workspace-ID: mission-architect" \
+     -X POST http://localhost:8080/api/v1/assemble \
+     -d '{"query": "AI enforcement patterns"}'
+```
+
+**Key Benefits:**
+- 🏘️ **Workspace Isolation**: Complete separation of projects and resources
+- ⚖️ **Resource Management**: Per-workspace limits and priority scheduling  
+- 🎯 **Affinity Routing**: Smart request routing and session management
+- 📊 **Usage Analytics**: Detailed monitoring and access pattern detection
+- 🔄 **Load Balancing**: Distribute requests across multiple instances
 
 ## 🚀 Quick Start
 
@@ -68,7 +100,7 @@ See [`examples/automatic_port_management.go`](examples/automatic_port_management
 ## ✨ Key Features
 
 - **Advanced Document Selection**: Uses budget management for mathematically optimal document selection
-- **7D Feature Scoring**: Multi-dimensional relevance, recency, entanglement, prior, authority, specificity, uncertainty
+- **Advanced Feature Scoring**: Multi-dimensional relevance analysis with machine learning optimization
 - **Workspace Clustering**: Multi-project support with resource isolation and intelligent routing
 - **Per-Workspace Calibration**: Adaptive weights that learn from your usage patterns  
 - **Multi-Level Caching**: multi-level caching system with intelligent invalidation
@@ -120,15 +152,10 @@ optimization:
   max_opt_gap: 0.05            # 5% optimality gap acceptable
   objective_style: "weighted-sum"  # weighted-sum | lexicographic | epsilon-budget
 
-# 7D Feature weights (adaptive per workspace)
+# Feature weights (adaptive per workspace)
 weights:
-  relevance: 0.30              # Query match strength
-  recency: 0.20                # Time-based decay
-  entanglement: 0.15           # Cross-document concept density
-  prior: 0.15                  # Historical selection likelihood
-  authority: 0.10              # Document importance
-  specificity: 0.05            # Query-document topic alignment
-  uncertainty: 0.05            # Score variance (subtracted)
+  # Weights are automatically tuned based on usage patterns
+  # See documentation for configuration options
 ```
 
 ## 🏘️ Workspace Clustering
@@ -225,28 +252,15 @@ curl -X POST http://localhost:8080/api/v1/weights/update \
 - **[Contributing Guide](CONTRIBUTING.md)** - Development setup and guidelines  
 - **[Development Context](CLAUDE.md)** - AI assistant setup for contributors
 
-## 🧮 optimization Optimization
+## 🧮 Advanced Optimization
 
-ContextLite uses three optimization optimization formulations:
+ContextLite uses sophisticated mathematical optimization for document selection:
 
-### 1. Weighted-Sum Scalarization (Default)
-Balances all 7D features with learned workspace-specific weights:
-```
-maximize: Σ(α₁·Rel + α₂·Rec + α₃·Ent + α₄·Prior + α₅·Auth + α₆·Spec - α₇·Unc)
-subject to: token_budget, max_documents, coherence_budgets
-```
+- **Weighted Optimization**: Balances multiple relevance factors
+- **Priority-based Selection**: Configurable ranking strategies  
+- **Constraint Satisfaction**: Respects token budgets and document limits
 
-### 2. Lexicographic Priorities
-Strict priority ordering (relevance first, then recency, etc.):
-```
-objective_style: "lexicographic"
-```
-
-### 3. ε-Constraint Method  
-Optimize primary objective with secondary budgets:
-```
-objective_style: "epsilon-budget"
-```
+See documentation for configuration options.
 
 ## 📊 SOTA Evaluation
 

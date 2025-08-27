@@ -22,7 +22,7 @@ docker run -p 8080:8080 -v $(pwd)/data:/app/data makuykendall/contextlite
 ## ✨ Features
 
 - **🔥 Ultra-Fast Performance**: Native Go binary optimized for speed
-- **🧠 optimization-Powered**: Uses Satisfiability Modulo Theories for intelligent optimization
+- **🧠 AI-Optimized**: Uses advanced mathematical optimization for intelligent document selection
 - **🔍 Semantic Search**: Advanced document retrieval with relevance scoring
 - **⚡ Real-time Processing**: Sub-millisecond response times
 - **🛡️ Production Ready**: Battle-tested with enterprise security
