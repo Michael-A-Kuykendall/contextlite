@@ -174,6 +174,9 @@ jobs:
         run: |
           # Use existing npm-wrapper
           cp -r npm-wrapper npm-package
+          # Clean any existing node_modules and lock files
+          rm -rf npm-package/node_modules
+          rm -f npm-package/package-lock.json
 
       - name: Update npm package version
         if: steps.check_npm.outputs.skip == 'false'
