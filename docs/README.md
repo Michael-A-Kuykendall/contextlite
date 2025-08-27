@@ -41,6 +41,7 @@ Historical development logs and status reports (for internal reference):
 
 For **developers getting started**, see:
 - [Main README](../README.md) - Project overview and quick start
+- [**Automatic Port Management**](AUTOMATIC_PORT_MANAGEMENT.md) - 🆕 Zero-configuration port discovery
 - [Contributing Guide](../CONTRIBUTING.md) - Development setup
 - [Claude Development Context](../CLAUDE.md) - AI assistant setup
 

@@ -92,7 +92,7 @@ export class BinaryManager {
             response.body?.pipe(fileStream);
 
             await new Promise<void>((resolve, reject) => {
-                fileStream.on('finish', () => resolve());
+                fileStream.on('finish', resolve);
                 fileStream.on('error', reject);
             });
 

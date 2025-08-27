@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Quick test script to verify Z3 integration and API fields
-cd /c/Users/micha/repos/contextlite
+cd "$(dirname "$0")/.."
 
 echo "Starting server in background..."
 timeout 30s go run ./cmd/contextlite/main.go &

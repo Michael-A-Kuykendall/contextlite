@@ -9,7 +9,7 @@ description: |
   Features:
   - Ultra-fast microsecond-level query responses
   - Zero dependencies - single binary with no external services
-  - Smart scoring with quantum-inspired relevance algorithms
+  - Smart scoring with advanced relevance algorithms
   - REST API for easy integration
   - Built-in analytics and performance monitoring
   - Enterprise features: multi-tenancy, licensing, advanced analytics

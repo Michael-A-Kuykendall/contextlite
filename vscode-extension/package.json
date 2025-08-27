@@ -2,7 +2,7 @@
   "name": "contextlite",
   "displayName": "ContextLite - Enterprise Context Engine with Clustering",
   "description": "Lightning-fast context retrieval with workspace clustering for AI coding assistants. Multi-project isolation and advanced resource management.",
-  "version": "1.0.42",
+  "version": "1.1.2",
   "publisher": "ContextLite",
   "engines": {
     "vscode": "^1.85.0"

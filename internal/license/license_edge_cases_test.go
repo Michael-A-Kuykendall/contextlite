@@ -60,16 +60,17 @@ func TestGetDefaultFeatures_Complete(t *testing.T) {
 		t.Error("Enterprise tier should have features")
 	}
 	
-	// Test invalid tier
+	// Test invalid tier (should default to developer features)
 	invalidFeatures := getDefaultFeatures(LicenseTier("invalid"))
-	if len(invalidFeatures) != 0 {
-		t.Error("Invalid tier should return empty features")
+	devFeaturesRef := getDefaultFeatures(TierDeveloper)
+	if len(invalidFeatures) != len(devFeaturesRef) {
+		t.Errorf("Invalid tier should return developer features, got %d, expected %d", len(invalidFeatures), len(devFeaturesRef))
 	}
 	
-	// Test empty tier
+	// Test empty tier (should default to developer features)
 	emptyFeatures := getDefaultFeatures(LicenseTier(""))
-	if len(emptyFeatures) != 0 {
-		t.Error("Empty tier should return empty features")
+	if len(emptyFeatures) != len(devFeaturesRef) {
+		t.Errorf("Empty tier should return developer features, got %d, expected %d", len(emptyFeatures), len(devFeaturesRef))
 	}
 }
 

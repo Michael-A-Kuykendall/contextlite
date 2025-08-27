@@ -29,7 +29,7 @@ type Registry struct {
 }
 
 func main() {
-    registryPath := "/c/Users/micha/repos/contextlite/system_registry.json"
+    registryPath := "system_registry.json"
     
     // Load existing registry
     var registry Registry
@@ -58,10 +58,9 @@ func main() {
     registry.Components["storage"] = &Component{
         Name:            "Storage Layer",
         Package:         "./pkg/storage/...",
-        Coverage:        0.0 / 100.0,
+        Coverage:        0.0,
         TestsPassing:    0,
-        TestsTotal:      0
-0,
+        TestsTotal:      0,
         ProductionReady: false,
         Priority:        priority,
         RevenueImpact:   revenueImpact,
@@ -110,6 +109,5 @@ func main() {
     os.WriteFile(registryPath, data, 0644)
     
     fmt.Printf("Registry updated: %s (%.1f%% coverage, %d/%d tests)\n",
-        "Storage Layer", 0.0, 0, 0
-0)
+        "Storage Layer", 0.0, 0, 0)
 }

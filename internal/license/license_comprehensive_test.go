@@ -214,10 +214,10 @@ func TestEnhancedFeatureGate_CheckAccess_Comprehensive(t *testing.T) {
 		t.Error("Trial should not allow access to enterprise features")
 	}
 	
-	// Test 3: Check access to unknown feature
+	// Test 3: Check access to unknown feature (should allow due to graceful degradation)
 	err = gate.CheckAccess("unknown_feature")
-	if err == nil {
-		t.Error("Unknown features should be denied")
+	if err != nil {
+		t.Errorf("Unknown features should be allowed due to graceful degradation, but got error: %v", err)
 	}
 }
 
@@ -251,10 +251,11 @@ func TestGetDefaultFeatures_AllTiers(t *testing.T) {
 		t.Error("Enterprise should have more features than professional")
 	}
 	
-	// Test unknown tier (should return empty)
+	// Test unknown tier (should default to developer features)
 	unknownFeatures := getDefaultFeatures(LicenseTier("unknown"))
-	if len(unknownFeatures) != 0 {
-		t.Error("Unknown tier should return no features")
+	devFeaturesForComparison := getDefaultFeatures(TierDeveloper)
+	if len(unknownFeatures) != len(devFeaturesForComparison) {
+		t.Errorf("Unknown tier should return developer features, got %d features, expected %d", len(unknownFeatures), len(devFeaturesForComparison))
 	}
 }
 

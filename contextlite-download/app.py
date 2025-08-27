@@ -2,6 +2,65 @@ import gradio as gr
 import requests
 import json
 from datetime import datetime
+import os
+
+# Simple analytics tracking
+ANALYTICS_FILE = "analytics.json"
+
+def track_visit():
+    """Track page visits and downloads"""
+    try:
+        # Load existing analytics
+        if os.path.exists(ANALYTICS_FILE):
+            with open(ANALYTICS_FILE, 'r') as f:
+                analytics = json.load(f)
+        else:
+            analytics = {"total_visits": 0, "daily_visits": {}}
+        
+        # Update visit count
+        analytics["total_visits"] += 1
+        today = datetime.now().strftime("%Y-%m-%d")
+        analytics["daily_visits"][today] = analytics["daily_visits"].get(today, 0) + 1
+        
+        # Save analytics
+        with open(ANALYTICS_FILE, 'w') as f:
+            json.dump(analytics, f)
+        
+        print(f"📊 Total visits: {analytics['total_visits']}, Today: {analytics['daily_visits'][today]}")
+        return analytics
+    except Exception as e:
+        print(f"Analytics error: {e}")
+        return {"total_visits": 0, "daily_visits": {}}
+
+def track_download(platform="unknown"):
+    """Track download clicks"""
+    try:
+        # Load existing analytics
+        if os.path.exists(ANALYTICS_FILE):
+            with open(ANALYTICS_FILE, 'r') as f:
+                analytics = json.load(f)
+        else:
+            analytics = {"total_visits": 0, "daily_visits": {}, "downloads": {}}
+        
+        # Initialize downloads if not present
+        if "downloads" not in analytics:
+            analytics["downloads"] = {}
+        
+        # Update download count
+        analytics["downloads"][platform] = analytics["downloads"].get(platform, 0) + 1
+        today = datetime.now().strftime("%Y-%m-%d")
+        daily_key = f"{today}_{platform}"
+        analytics["downloads"][daily_key] = analytics["downloads"].get(daily_key, 0) + 1
+        
+        # Save analytics
+        with open(ANALYTICS_FILE, 'w') as f:
+            json.dump(analytics, f)
+        
+        print(f"📥 Download tracked: {platform}")
+        return analytics
+    except Exception as e:
+        print(f"Download tracking error: {e}")
+        return {}
 
 def get_latest_release():
     """Fetch latest release from GitHub API"""
@@ -134,6 +193,8 @@ def get_contextlite_css():
     """
 
 def create_download_page():
+    # Track this visit
+    analytics = track_visit()
     release = get_latest_release()
     
     # Get version and date info
@@ -150,6 +211,12 @@ def create_download_page():
             <h1 style="font-size: 4rem; font-weight: 800; margin-bottom: 30px; line-height: 1.1;" class="hero-gradient">
                 The RAG Revolution Was a Mistake
             </h1>
+            <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 16px; padding: 20px; margin: 30px auto; max-width: 600px;">
+                <h3 style="color: #10b981; font-size: 1.3rem; margin: 0 0 10px 0; font-weight: 700;">🏢 NEW: Enterprise Workspace Clustering</h3>
+                <p style="color: #94a3b8; margin: 0; font-size: 1rem;">
+                    Multi-project isolation • Resource management • Load balancing • Just released in v1.1.1!
+                </p>
+            </div>
             <h2 style="font-size: 2.5rem; font-weight: 700; color: #3b82f6; margin-bottom: 30px;">
                 Download ContextLite {version}
             </h2>
@@ -323,6 +390,71 @@ def create_download_page():
                 </div>
             </div>
             
+            <!-- NEW: Enterprise Clustering Section -->
+            <div class="glass-card" style="padding: 50px; margin-bottom: 40px;">
+                <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: #f1f5f9;">🏢 Enterprise Workspace Clustering</h2>
+                <p style="text-align: center; color: #94a3b8; margin-bottom: 40px; font-size: 1.2rem;">
+                    <strong style="color: #10b981;">NEW in v1.1.1:</strong> Multi-project AI context management, redefined
+                </p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+                    <div class="stats-card" style="padding: 30px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🎯</div>
+                        <h3 style="color: #3b82f6; font-size: 1.5rem; margin-bottom: 15px;">Intelligent Project Affinity</h3>
+                        <p style="color: #94a3b8; line-height: 1.6;">
+                            SMT-optimized affinity routing automatically learns project relationships, ensuring zero context bleeding between confidential codebases
+                        </p>
+                    </div>
+                    
+                    <div class="stats-card" style="padding: 30px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">⚖️</div>
+                        <h3 style="color: #8b5cf6; font-size: 1.5rem; margin-bottom: 15px;">Dynamic Resource Management</h3>
+                        <p style="color: #94a3b8; line-height: 1.6;">
+                            Priority scheduling and per-workspace resource limits keep critical projects running smoothly while background indexing continues
+                        </p>
+                    </div>
+                    
+                    <div class="stats-card" style="padding: 30px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🚀</div>
+                        <h3 style="color: #06b6d4; font-size: 1.5rem; margin-bottom: 15px;">Zero-Latency Workspace Switching</h3>
+                        <p style="color: #94a3b8; line-height: 1.6;">
+                            Sticky sessions and workspace-aware load balancing eliminate context switching delays across all workspaces
+                        </p>
+                    </div>
+                    
+                    <div class="stats-card" style="padding: 30px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">📊</div>
+                        <h3 style="color: #10b981; font-size: 1.5rem; margin-bottom: 15px;">Enterprise Analytics</h3>
+                        <p style="color: #94a3b8; line-height: 1.6;">
+                            Real-time workspace usage statistics, access pattern detection, and performance monitoring for complete visibility
+                        </p>
+                    </div>
+                    
+                    <div class="stats-card" style="padding: 30px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🛡️</div>
+                        <h3 style="color: #f59e0b; font-size: 1.5rem; margin-bottom: 15px;">Battle-Tested Multi-Tenancy</h3>
+                        <p style="color: #94a3b8; line-height: 1.6;">
+                            Hardware-bound licensing, workspace isolation middleware, and configurable security boundaries ensure complete separation
+                        </p>
+                    </div>
+                    
+                    <div class="stats-card" style="padding: 30px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">⚡</div>
+                        <h3 style="color: #ef4444; font-size: 1.5rem; margin-bottom: 15px;">Sub-Millisecond Performance</h3>
+                        <p style="color: #94a3b8; line-height: 1.6;">
+                            Maintain lightning-fast 0.3ms query times even with dozens of concurrent projects and complex workspace hierarchies
+                        </p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px; padding: 30px; background: rgba(16, 185, 129, 0.1); border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <h3 style="color: #10b981; margin-bottom: 15px; font-size: 1.3rem;">🚀 Ready for Enterprise Scale?</h3>
+                    <p style="color: #94a3b8; margin: 0; font-size: 1.1rem;">
+                        From startup chaos to enterprise scale—ContextLite Clustering grows with your ambitions. Deploy in under 5 minutes and experience AI-powered development without compromise.
+                    </p>
+                </div>
+            </div>
+
             <!-- SMT Optimization Deep Dive -->
             <div class="glass-card" style="padding: 50px; margin-bottom: 40px;">
                 <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: #f1f5f9;">🧠 SMT-Powered Intelligence</h2>
@@ -400,6 +532,20 @@ def create_download_page():
                 </div>
             </div>
             
+            <!-- Analytics Display (Hidden by default) -->
+            <div class="glass-card" style="padding: 20px; margin-bottom: 20px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);">
+                <details style="color: #64748b;">
+                    <summary style="cursor: pointer; font-size: 0.9rem; color: #10b981;">📊 Usage Statistics (Click to expand)</summary>
+                    <div style="margin-top: 15px; font-size: 0.8rem; color: #64748b;">
+                        <p>Total Visits: <strong style="color: #10b981;">{analytics.get('total_visits', 0):,}</strong></p>
+                        <p>Today's Visits: <strong style="color: #3b82f6;">{analytics.get('daily_visits', {}).get(datetime.now().strftime('%Y-%m-%d'), 0):,}</strong></p>
+                        <p style="font-size: 0.7rem; margin-top: 10px; opacity: 0.7;">
+                            Analytics are stored locally and help improve the download experience.
+                        </p>
+                    </div>
+                </details>
+            </div>
+
             <!-- Repository Links -->
             <div class="glass-card" style="padding: 50px; margin-bottom: 40px;">
                 <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: #f1f5f9;">📚 Learn More</h2>

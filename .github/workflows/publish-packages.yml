@@ -181,17 +181,31 @@ jobs:
           cd npm-package
           npm version ${{ steps.version.outputs.version }} --no-git-tag-version
 
-      - name: Install npm dependencies (dev only, skip postinstall)
+      - name: Install npm dependencies (skip postinstall)
         if: steps.check_npm.outputs.skip == 'false'
         run: |
           cd npm-package
-          NODE_ENV=development npm install
+          npm install --ignore-scripts
+
+      - name: Remove prepare script to prevent postinstall
+        if: steps.check_npm.outputs.skip == 'false'
+        run: |
+          cd npm-package
+          # Temporarily remove prepare script to prevent postinstall during build
+          npm pkg delete scripts.prepare
 
       - name: Build npm package
         if: steps.check_npm.outputs.skip == 'false'
         run: |
           cd npm-package
           npm run build
+
+      - name: Restore prepare script
+        if: steps.check_npm.outputs.skip == 'false'
+        run: |
+          cd npm-package
+          # Restore prepare script for the published package
+          npm pkg set scripts.prepare="npm run build"
 
       - name: Publish to npm
         if: steps.check_npm.outputs.skip == 'false'

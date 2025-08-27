@@ -75,7 +75,8 @@
       "WebFetch(domain:support.google.com)",
       "WebFetch(domain:developers.google.com)",
       "WebFetch(domain:docs.sendgrid.com)",
-      "WebFetch(domain:www.twilio.com)"
+      "WebFetch(domain:www.twilio.com)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": [],

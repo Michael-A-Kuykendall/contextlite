@@ -40,7 +40,6 @@ type Storage struct {
 
 // New creates a new Storage instance
 func New(dbPath string) (*Storage, error) {
-	// Basic path validation
 	if dbPath == "" {
 		return nil, fmt.Errorf("database path cannot be empty")
 	}
@@ -61,7 +60,6 @@ func New(dbPath string) (*Storage, error) {
 
 	for _, pragma := range pragmas {
 		if _, err := db.Exec(pragma); err != nil {
-			db.Close()
 			return nil, fmt.Errorf("failed to apply pragma %s: %w", pragma, err)
 		}
 	}
@@ -70,13 +68,11 @@ func New(dbPath string) (*Storage, error) {
 
 	// Initialize schema
 	if err := storage.initSchema(); err != nil {
-		db.Close()
 		return nil, fmt.Errorf("failed to initialize schema: %w", err)
 	}
 
 	// Apply migrations
 	if err := storage.applyMigrations(); err != nil {
-		db.Close()
 		return nil, fmt.Errorf("failed to apply migrations: %w", err)
 	}
 
@@ -331,12 +327,12 @@ func (s *Storage) UpdateDocument(doc types.Document) error {
 	return s.AddDocument(context.Background(), &doc)
 }
 
-// SearchDocuments performs FTS search with LIKE fallback
+// SearchDocuments performs FTS search
 func (s *Storage) SearchDocuments(ctx context.Context, query string, limit int) ([]types.Document, error) {
 	// First try FTS search
 	docs, err := s.searchFTS(ctx, query, limit)
-	if err != nil || len(docs) == 0 {
-		// Fallback to LIKE search if FTS fails or returns no results
+	if err != nil {
+		// Fallback to LIKE search
 		return s.searchLike(ctx, query, limit)
 	}
 	return docs, nil
@@ -652,7 +648,7 @@ func (s *Storage) GetCachedResultByKey(ctx context.Context, cacheKey string) (*t
 	
 	var resultContext, quantumMetrics, documentScores string
 	var coherenceScore float64
-	var solveTimeMs sql.NullFloat64
+	var solveTimeMs sql.NullInt64
 	var fallbackUsed bool
 	var createdAt time.Time
 	
@@ -680,7 +676,7 @@ func (s *Storage) GetCachedResultByKey(ctx context.Context, cacheKey string) (*t
 func (s *Storage) SaveQueryCacheWithKey(ctx context.Context, queryHash, corpusHash, modelID, tokenizerVersion, cacheKey string,
 	result *types.QueryResult, expiresAt time.Time) error {
 	
-	resultJSON, err := json.Marshal(result)
+	resultJSON, err := json.Marshal(result.Documents)
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,2834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-0WDD29GGN2"></script>
+<script is:inline>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', 'G-0WDD29GGN2');
+</script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chocolatey Software | ContextLite 1.0.15</title>
+    
+    
+        <meta name="robots" content="noindex" />
+        <meta property="og:description" content="Ultra-fast context engine for retrieval and AI applications" />
+        <meta property="description" content="Ultra-fast context engine for retrieval and AI applications" />
+
+
+    <meta name="description" content="Chocolatey is software management automation for Windows that wraps installers, executables, zips, and scripts into compiled packages. Chocolatey integrates w/SCCM, Puppet, Chef, etc. Chocolatey is trusted by businesses to manage software deployments.">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@chocolateynuget">
+    <meta name="twitter:title" content="ContextLite 1.0.15">
+    <meta name="twitter:image" content="https://community.chocolatey.org/content/images/global-shared/twitter-share.png">
+    
+    <meta property="og:title" content="ContextLite 1.0.15">
+    <meta property="og:description" content="Chocolatey is software management automation for Windows that wraps installers, executables, zips, and scripts into compiled packages. Chocolatey integrates w/SCCM, Puppet, Chef, etc. Chocolatey is trusted by businesses to manage software deployments.">
+    <meta property="og:site_name" content="Chocolatey Software">
+    <meta property="og:type" content="product">
+    <meta property="og:image" content="https://community.chocolatey.org/content/images/global-shared/facebook-share.png">
+    <meta property="og:url" content="/packages/contextlite">
+    
+    <meta property="product:brand" content="Chocolatey Software">
+    <meta property="product:category" content="software">
+    <meta name="flattr:id" content="mqgjkp">
+    <meta property="DC.title" content="ContextLite 1.0.15">
+    <meta property="copyright" content="Chocolatey is Copyright 2017 - 2025 Chocolatey Software, Inc. Copyright 2011 - 2017 RealDimensions Software, LLC.">
+    <link rel="nuget" type="application/atom+xml" title="Chocolatey" href="https://community.chocolatey.org/api/v2">
+    <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="Chocolatey Search">
+    
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+    
+    <link rel="stylesheet" href="/Content/css/community.min.purged.css" />
+    
+    
+
+    <script type="text/javascript" src="/Scripts/theme-toggle.min.js"></script>
+    
+    <script type="text/javascript" async referrerpolicy="unsafe-url" src="https://ws.zoominfo.com/pixel/KPKpTJOFOv5SuV7X3eGx"></script>
+    
+    
+
+</head>
+
+
+
+
+<body class="chocolatey-org community-chocolatey-org ">
+    <svg class="position-absolute" style="right:999999px">
+    <defs>
+        <linearGradient id="bg-gradient-primary" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:var(--bs-primary);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:var(--bs-primary);stop-opacity:1" />
+        </linearGradient>
+        <linearGradient id="bg-gradient-light" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:var(--bs-secondary-bg);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:var(--bs-secondary-bg);stop-opacity:1" />
+        </linearGradient>
+    </defs>
+</svg>
+<button class="btn btn-primary btn-collapsing-right-sidebar btn-announcement-notifications py-3 shadow d-none d-md-block" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRightAnnouncements" aria-controls="offcanvasRightAnnouncements"><span class="notification-badge notification-badge-announcements d-none" title="You have unread notifications"></span><i class="fa-solid fa-bullhorn"></i></button>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRightAnnouncements" aria-labelledby="offcanvasRightAnnouncementsLabel">
+    <div class="offcanvas-header justify-content-end justify-content-md-start">
+        <button type="button" class="btn-close text-primary pt-3" data-bs-dismiss="offcanvas" aria-label="Close"><i class="fa-solid fa-xmark h3"></i></button>
+    </div>
+    <div class="offcanvas-body pt-0">
+        <!-- When adding a new announcement, change the number on the end of the value to the next available. Example: 1 becomes 2, 2 becomes 3. -->
+<input id="announcementCookie" value="chocolatey_announcement_10" type="hidden" />
+<!-- When adding a new announcement, update the value number to the amount of new announcements added. -->
+<input id="announcementCount" value="1" type="hidden" />
+
+<div id="announcementCount"></div>
+<div id="announcementCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="6000">
+    <div class="position-relative w-100 overflow-hidden">
+        <div class="carousel-item active">
+            <div class="card card-body text-bg-primary text-center">
+                <h3>Resources</h3>
+                <p>Watch videos, read documentation, and hear Chocolatey success stories from companies you trust.</p>
+                <a href="https://chocolatey.org/resources" class="btn btn-bg-body">View Resources</a>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="card card-body text-bg-success text-center">
+                <h3>Events</h3>
+                <p>Find past and upcoming webinars, workshops, and conferences. New events have recently been added!</p>
+                <a href="https://chocolatey.org/events" class="btn btn-bg-body">View Events</a>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="card card-body text-bg-primary-900 text-center">
+                <h3>Courses</h3>
+                <p>Step-by-step guides for all things Chocolatey! Earn badges as you learn through interactive digital courses.</p>
+                <a href="https://community.chocolatey.org/courses" class="btn btn-bg-body">View Courses</a>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="text-center">
+    <a href="https://chocolatey.org/events/unpacking-software" rel="noreferrer" target="_blank">
+        <img class="border rounded mb-3" src="https://img.chocolatey.org/events/01-25.jpg" alt="Unpacking Software Livestream" />
+    </a>
+    <p class="text-start">Join our monthly Unpacking Software livestream to hear about the latest news, chat and opinion on packaging, software deployment and lifecycle management!</p>
+    <a href="https://chocolatey.org/events/unpacking-software" rel="noreferrer" target="_blank" class="btn btn-secondary mt-2 mx-1">Learn More</a>
+</div>
+<hr />
+<div class="text-center">
+    <a href="https://chocolatey.org/events/chocolatey-product-spotlight" rel="noreferrer" target="_blank">
+        <img class="border rounded mb-3" src="https://img.chocolatey.org/events/01-23.jpg" alt="Chocolatey Product Spotlight" />
+    </a>
+    <p class="text-start">Join the Chocolatey Team on our regular monthly stream where we put a spotlight on the most recent Chocolatey product releases. You'll have a chance to have your questions answered in a live Ask Me Anything format.</p>
+    <a href="https://chocolatey.org/events/chocolatey-product-spotlight" rel="noreferrer" target="_blank" class="btn btn-secondary mt-2 mx-1">Learn More</a>
+</div>
+<hr />
+<div class="text-center">
+    <a href="https://chocolatey.org/events/chocolatey-coding-livestream" rel="noreferrer" target="_blank">
+        <img class="border rounded mb-3" src="https://img.chocolatey.org/events/01-21-2.jpg" alt="Chocolatey Coding Livestream" />
+    </a>
+    <p class="text-start">Join us for the Chocolatey Coding Livestream, where members of our team dive into the heart of open source development by coding live on various Chocolatey projects. Tune in to witness real-time coding, ask questions, and gain insights into the world of package management. Don't miss this opportunity to engage with our team and contribute to the future of Chocolatey!</p>
+    <a href="https://chocolatey.org/events/chocolatey-coding-livestream" rel="noreferrer" target="_blank" class="btn btn-secondary mt-2 mx-1">Learn More</a>
+</div>
+<hr />
+<div class="shuffle">
+    <div class="text-center">
+        <a href="https://chocolatey.org/events/whipping-up-windows-automation-with-chocolatey-central-management" rel="noreferrer" target="_blank">
+            <img class="border rounded mb-3" src="https://img.chocolatey.org/events/01-24.png" alt="Calling All Chocolatiers! Whipping Up Windows Automation with Chocolatey Central Management" />
+        </a>
+        <p><strong>Webinar from<br />Wednesday, 17 January 2024</strong></p>
+        <p class="text-start">We are delighted to announce the release of Chocolatey Central Management v0.12.0, featuring seamless Deployment Plan creation, time-saving duplications, insightful Group Details, an upgraded Dashboard, bug fixes, user interface polishing, and refined documentation. As an added bonus we'll have members of our Solutions Engineering team on-hand to dive into some interesting ways you can leverage the new features available!</p>
+        <a href="https://chocolatey.org/events/whipping-up-windows-automation-with-chocolatey-central-management" rel="noreferrer" target="_blank" class="btn btn-secondary mt-2 mx-1">Watch On-Demand</a>
+        <hr />
+    </div>
+    <div class="text-center">
+        <a href="https://chocolatey.org/events/chocolatey-community-coffee-break" rel="noreferrer" target="_blank">
+            <img class="border rounded mb-3" src="https://img.chocolatey.org/events/01-15-2.jpg" alt="Chocolatey Community Coffee Break" />
+        </a>
+        <p class="text-start">Join the Chocolatey Team as we discuss all things Community, what we do, how you can get involved and answer your Chocolatey questions.</p>
+        <a href="https://chocolatey.org/events/chocolatey-community-coffee-break" class="btn btn-secondary mt-2 mx-1">Watch The Replays</a>
+        <hr />
+    </div>
+    <div class="text-center">
+        <a href="https://chocolatey.org/events/chocolatey-and-intune-overview" rel="noreferrer" target="_blank">
+            <img class="border rounded mb-3" src="https://img.chocolatey.org/events/01-11.jpg" alt="Chocolatey and Intune Overview" />
+        </a>
+        <p><strong>Webinar Replay from<br />Wednesday, 30 March 2022</strong></p>
+        <p class="text-start">At Chocolatey Software we strive for simple, and teaching others. Let us teach you just how simple it could be to keep your 3rd party applications updated across your devices, all with Intune!</p>
+        <a href="https://chocolatey.org/events/chocolatey-and-intune-overview" class="btn btn-secondary mt-2 mx-1">Watch On-Demand</a>
+        <hr />
+    </div>
+    <div class="text-center">
+        <a href="https://chocolatey.org/events/chocolatey-for-business-in-azure" rel="noreferrer" target="_blank">
+            <img class="border rounded mb-3" src="https://img.chocolatey.org/events/01-14.jpg" alt="Chocolatey For Business. In Azure. In One Click." />
+        </a>
+        <p><strong>Livestream from<br />Thursday, 9 June 2022</strong></p>
+        <p class="text-start">Join James and Josh to show you how you can get the Chocolatey For Business recommended infrastructure and workflow, created, in Azure, in around 20 minutes.</p>
+        <a href="https://chocolatey.org/events/chocolatey-for-business-in-azure" class="btn btn-secondary mt-2 mx-1">Watch On-Demand</a>
+        <hr />
+    </div>
+    <div class="text-center">
+        <a href="https://chocolatey.org/events/the-future-of-chocolatey-cli" rel="noreferrer" target="_blank">
+            <img class="border rounded mb-3" src="https://img.chocolatey.org/events/01-17.jpg" alt="The Future of Chocolatey CLI" />
+        </a>
+        <p><strong>Livestream from<br />Thursday, 04 August 2022</strong></p>
+        <p class="text-start">Join Paul and Gary to hear more about the plans for the Chocolatey CLI in the not so distant future. We'll talk about some cool new features, long term asks from Customers and Community and how you can get involved!</p>
+        <a href="https://chocolatey.org/events/the-future-of-chocolatey-cli" class="btn btn-secondary mt-2 mx-1">Watch On-Demand</a>
+        <hr />
+    </div>
+    <div class="text-center">
+        <a href="https://chocolatey.org/events/hacktoberfest-tuesdays-2022" rel="noreferrer" target="_blank">
+            <img class="border rounded mb-3" src="https://img.chocolatey.org/events/01-19.jpg" alt="Hacktoberfest Tuesdays 2022" />
+        </a>
+        <p><strong>Livestreams from<br />October 2022</strong></p>
+        <p class="text-start">For Hacktoberfest, Chocolatey ran a livestream every Tuesday! Re-watch Cory, James, Gary, and Rain as they share knowledge on how to contribute to open-source projects such as Chocolatey CLI.</p>
+        <a href="https://chocolatey.org/events/hacktoberfest-tuesdays-2022" class="btn btn-secondary mt-2 mx-1">Watch On-Demand</a>
+        <hr />
+    </div>
+</div>
+
+    </div>
+</div>
+<header>
+            <div id="topNoticeAlert" class="alert alert-purple alert-dismissible alert-dismissible-center fade show d-none" role="alert">
+            <p class="mb-0 me-3 me-xl-0"><a href='https://chocolatey.org/events' target='_blank'>Don't miss a byte of Chocolatey goodness! Explore our livestream events now!</a></p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        </div>
+
+    <div class="d-none d-sm-flex">
+        <div class="global-nav w-100">
+            <div class="container-fluid pe-0 pe-md-c75">
+                <ul class="nav global-nav-ul fw-bold flex-wrap flex-sm-fill justify-content-sm-end">
+    <li class="nav-item"><a class="nav-link" href="https://chocolatey.org" target="_blank" rel="noreferrer">Main</a></li>
+    <li class="nav-item"><a class="nav-link" href="https://community.chocolatey.org" target="_blank" rel="noreferrer">Community</a></li>
+    <li class="nav-item"><a class="nav-link" href="https://docs.chocolatey.org/en-us/" target="_blank" rel="noreferrer">Docs</a></li>
+    <li class="nav-item"><a class="nav-link" href="https://blog.chocolatey.org" target="_blank" rel="noreferrer">Blog</a></li>
+    <li class="nav-item"><a class="nav-link" href="https://chocolatey.org/install" target="_blank" rel="noreferrer">Install</a></li>
+    <li class="nav-item d-none d-md-flex align-items-center">
+        <div class="vr me-3 my-auto h-50"></div>
+        <div class="dropdown dropdown-theme">
+    <button class="btn btn-outline-hover-secondary dropdown-toggle w-px-60 d-md-none" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
+        <span class="theme-icon-active"><i></i></span>
+    </button>
+    <button class="btn nav-link dropdown-toggle py-0 px-0 w-px-30 d-none d-md-block" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
+        <span class="theme-icon-active"><i></i></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+        <li>
+            <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                <i class="fa-solid fa-sun me-2" data-ct-theme-icon="fa-sun"></i>
+                    Light
+                <i class="fa-solid fa-check ms-auto d-none"></i>
+            </button>
+        </li>
+        <li>
+            <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="true">
+                <i class="fa-solid fa-moon me-2" data-ct-theme-icon="fa-moon"></i>
+                    Dark
+                <i class="fa-solid fa-check ms-auto d-none"></i>
+            </button>
+        </li>
+        <li>
+            <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" aria-pressed="false">
+                <i class="fa-solid fa-circle-half-stroke me-2" data-ct-theme-icon="fa-circle-half-stroke"></i>
+                    Auto
+                <i class="fa-solid fa-check ms-auto d-none"></i>
+            </button>
+        </li>
+    </ul>
+</div>
+    </li>
+</ul>
+            </div>
+        </div>
+    </div>
+    <nav id="topNav" class="navbar navbar-expand-md">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img class="d-md-none" src="/content/images/global-shared/logo.svg" alt="Chocolatey" />
+                <img class="d-none d-md-block navbar-brand-desktop" src="/content/images/global-shared/logo-square.svg" alt="Chocolatey" />
+            </a>
+            <div class="d-flex align-items-center justify-content-center order-md-2">
+                <div class="mb-0 me-2 d-md-none">
+                    <div class="dropdown dropdown-theme">
+    <button class="btn btn-outline-hover-secondary dropdown-toggle w-px-60 d-md-none" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
+        <span class="theme-icon-active"><i></i></span>
+    </button>
+    <button class="btn nav-link dropdown-toggle py-0 px-0 w-px-30 d-none d-md-block" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
+        <span class="theme-icon-active"><i></i></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+        <li>
+            <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                <i class="fa-solid fa-sun me-2" data-ct-theme-icon="fa-sun"></i>
+                    Light
+                <i class="fa-solid fa-check ms-auto d-none"></i>
+            </button>
+        </li>
+        <li>
+            <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="true">
+                <i class="fa-solid fa-moon me-2" data-ct-theme-icon="fa-moon"></i>
+                    Dark
+                <i class="fa-solid fa-check ms-auto d-none"></i>
+            </button>
+        </li>
+        <li>
+            <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" aria-pressed="false">
+                <i class="fa-solid fa-circle-half-stroke me-2" data-ct-theme-icon="fa-circle-half-stroke"></i>
+                    Auto
+                <i class="fa-solid fa-check ms-auto d-none"></i>
+            </button>
+        </li>
+    </ul>
+</div>
+                </div>
+                <button class="d-md-none btn btn-top-nav btn-outline-hover-secondary me-2 btn-announcements btn-announcement-notifications position-relative" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRightAnnouncements" aria-controls="collapsing right sidebar">
+                    <span class="notification-badge notification-badge-announcements d-none" title="You have unread notifications"></span>
+                    <i class="fa-solid fa-bullhorn"></i>
+                </button>
+                    <button type="button" aria-label="Search packages" class="btn btn-top-nav btn-outline-hover-secondary btn-search me-2 me-md-0 ms-md-4"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
+                <button type="button" class="d-md-none btn btn-top-nav btn-outline-hover-secondary" data-bs-toggle="collapse" data-bs-target="#topNavContent" aria-expanded="false" aria-controls="topNavContent" aria-label="Toggle navigation">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+<form class="search-box" autocomplete="off" role="search" action="/packages" method="get" style="opacity:0;">
+    <div class="flex-grow-1 position-relative">
+        <input id="autoComplete" class="search-input" name="q" inputmode="search" type="search" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off" autocapitalize="off" value="">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <span class="d-none d-md-block search-key-container">
+            <kbd class="search-key"></kbd>
+            <kbd>k</kbd>
+        </span>
+    </div>
+        <button type="button" aria-label="Close search" class="btn btn-search-close btn-outline-secondary ms-2"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+</form>            </div>
+            <div class="collapse navbar-collapse mt-2 mt-md-0" id="topNavContent">
+                <ul class="navbar-nav me-auto me-md-0 ms-md-auto mb-2 mb-md-0">
+                    <li class="nav-item d-sm-none">
+                        <div class="global-nav">
+                            <ul class="nav global-nav-ul fw-bold flex-wrap flex-sm-fill justify-content-sm-end">
+    <li class="nav-item"><a class="nav-link" href="https://chocolatey.org" target="_blank" rel="noreferrer">Main</a></li>
+    <li class="nav-item"><a class="nav-link" href="https://community.chocolatey.org" target="_blank" rel="noreferrer">Community</a></li>
+    <li class="nav-item"><a class="nav-link" href="https://docs.chocolatey.org/en-us/" target="_blank" rel="noreferrer">Docs</a></li>
+    <li class="nav-item"><a class="nav-link" href="https://blog.chocolatey.org" target="_blank" rel="noreferrer">Blog</a></li>
+    <li class="nav-item"><a class="nav-link" href="https://chocolatey.org/install" target="_blank" rel="noreferrer">Install</a></li>
+    <li class="nav-item d-none d-md-flex align-items-center">
+        <div class="vr me-3 my-auto h-50"></div>
+        <div class="dropdown dropdown-theme">
+    <button class="btn btn-outline-hover-secondary dropdown-toggle w-px-60 d-md-none" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
+        <span class="theme-icon-active"><i></i></span>
+    </button>
+    <button class="btn nav-link dropdown-toggle py-0 px-0 w-px-30 d-none d-md-block" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
+        <span class="theme-icon-active"><i></i></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+        <li>
+            <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                <i class="fa-solid fa-sun me-2" data-ct-theme-icon="fa-sun"></i>
+                    Light
+                <i class="fa-solid fa-check ms-auto d-none"></i>
+            </button>
+        </li>
+        <li>
+            <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="true">
+                <i class="fa-solid fa-moon me-2" data-ct-theme-icon="fa-moon"></i>
+                    Dark
+                <i class="fa-solid fa-check ms-auto d-none"></i>
+            </button>
+        </li>
+        <li>
+            <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" aria-pressed="false">
+                <i class="fa-solid fa-circle-half-stroke me-2" data-ct-theme-icon="fa-circle-half-stroke"></i>
+                    Auto
+                <i class="fa-solid fa-check ms-auto d-none"></i>
+            </button>
+        </li>
+    </ul>
+</div>
+    </li>
+</ul>
+                        </div>
+                    </li>
+                        <li class="nav-item mt-3 mb-n3 my-md-0">
+                            <a class="nav-link" href="/packages">Packages</a>
+                        </li>
+
+                    <li class="nav-item dropdown-hover mt-3 mt-md-0">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Learn
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-md-end p-0">
+                            <div class="container-md px-3 p-md-4">
+                                <ul class="list-unstyled">
+                                    <li class="mb-3"><a href="https://chocolatey.org/resources" target="_blank" rel="noreferrer"><i class="fa-solid fa-info w-px-15 text-center me-3"></i>Resources</a></li>
+                                    <li class="mb-3 mb-md-0"><a href="/courses"><i class="fa-solid fa-question w-px-15 text-center me-3"></i>Courses</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown-hover">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Product
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-md-end dropdown-menu-product dropdown-menu-700 p-0 overflow-hidden">
+                            <div class="container-md py-md-4">
+                                <div class="row">
+                                    <div class="col-md-6 px-3 px-md-4">
+                                        <p class="text-body-secondary">Products</p>
+                                        <ul class="list-unstyled">
+                                            <li class="mb-3"><a href="https://chocolatey.org/chocolatey-for-business" target="_blank" rel="noreferrer"><i class="fa-solid fa-briefcase w-px-15 text-center me-3"></i>Chocolatey for Business</a></li>
+                                            <li class="mb-3"><a href="https://chocolatey.org/products#pro-edition" target="_blank" rel="noreferrer"><i class="fa-solid fa-user-gear w-px-15 text-center me-3"></i>Pro Edition</a></li>
+                                            <li class="mb-3"><a href="https://community.chocolatey.org/packages" target="_blank" rel="noreferrer"><i class="fa-solid fa-users w-px-15 text-center me-3"></i>Chocolatey Open Source</a></li>
+                                            <li class="mb-3"><a href="https://chocolatey.org/compare" target="_blank" rel="noreferrer"><i class="fa-solid fa-code-compare w-px-15 text-center me-3"></i>Compare Editions</a></li>
+                                            <li class="mb-3"><a href="https://chocolatey.org/pricing" target="_blank" rel="noreferrer"><i class="fa-solid fa-comments-dollar w-px-15 text-center me-3"></i>Pricing</a></li>
+                                            <li class="mb-3 mb-md-0"><a href="https://chocolatey.org/support" target="_blank" rel="noreferrer"><i class="fa-solid fa-hand-holding-heart w-px-15 text-center me-3"></i>Support</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6 px-3 px-md-4 border-start">
+                                        <p class="text-body-secondary">Solutions</p>
+                                        <ul class="list-unstyled">
+                                            <li class="mb-3"><a href="https://chocolatey.org/solutions/self-service-anywhere" target="_blank" rel="noreferrer"><i class="fa-solid fa-globe w-px-15 text-center me-3"></i>Self-Service Anywhere</a></li>
+                                            <li class="mb-3"><a href="https://chocolatey.org/solutions/central-management-deployments" target="_blank" rel="noreferrer"><i class="fa-solid fa-rocket w-px-15 text-center me-3"></i>Central Management Deployments</a></li>
+                                            <li class="mb-3 mb-md-0"><a href="https://chocolatey.org/solutions/secure-offline-deployments" target="_blank" rel="noreferrer"><i class="fa-solid fa-lock w-px-15 text-center me-3"></i>Secure Offline Deployments</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-bg-body-tertiary p-4 d-md-flex align-items-md-center justify-content-md-between text-center text-md-start">
+                                <div>
+                                    <p class="h3 my-0">Ready to give Chocolatey for Business a Try?</p>
+                                    <p class="mb-0">We offer a 14 day white glove free trial to help get you started.</p>
+                                </div>
+                                <a class="btn btn-primary text-dark mt-3 mt-md-0" href="https://chocolatey.org/contact/trial" target="_blank" rel="noreferrer">Start Trial</a>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown-hover">
+                        <a class="nav-link dropdown-toggle" href='#' role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Connect
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-md-end dropdown-menu-connect dropdown-menu-550 overflow-hidden p-0">
+                            <div class="container-md py-md-4">
+                                <div class="row">
+                                    <div class="col-md-6 px-3 px-md-4">
+                                        <ul class="list-unstyled">
+                                            <li class="mb-3"><a href="https://chocolatey.org/events" target="_blank" rel="noreferrer"><i class="fa-solid fa-calendar w-px-15 text-center me-3"></i>Events</a></li>
+                                            <li class="mb-3"><a href="https://chocolatey.org/careers" target="_blank" rel="noreferrer"><i class="fa-solid fa-star w-px-15 text-center me-3"></i>Careers</a></li>
+                                            <li class="mb-3 mb-md-0"><a href="http://eepurl.com/4qUJH" target="_blank" rel="noreferrer"><i class="fa-solid fa-bullhorn w-px-15 text-center me-3"></i>Newsletter</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6 px-3 px-md-4 border-start">
+                                        <ul class="list-unstyled">
+                                            <li class="mb-3"><a href="https://community.chocolatey.org" target="_blank" rel="noreferrer"><i class="fa-solid fa-users w-px-15 text-center me-3"></i>Chocolatey Community</a></li>
+                                            <li class="mb-3"><a href="https://chocolatey.org/support" target="_blank" rel="noreferrer"><i class="fa-solid fa-hand-holding-heart w-px-15 text-center me-3"></i>Support</a></li>
+                                            <li class="mb-3 mb-md-0"><a href="https://chocolatey.org/contact" target="_blank" rel="noreferrer"><i class="fa-solid fa-envelope w-px-15 text-center me-3"></i>Contact</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-bg-body-tertiary p-4 text-center">
+                                <ul class="list-unstyled list-inline mb-0">
+    <li class="list-inline-item">
+        <a href="https://twitter.com/chocolateynuget" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on Twitter" title="Connect with Chocolatey on Twitter">
+            <div class="text-bg-twitter circle" aria-hidden="true">
+                <i class="fa-brands fa-x-twitter"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://www.linkedin.com/company/chocolatey-software/" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on LinkedIn" title="Connect with Chocolatey on LinkedIn">
+            <div class="text-bg-linkedin circle" aria-hidden="true">
+                <i class="fa-brands fa-linkedin-in"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://github.com/chocolatey" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on GitHub" title="Connect with Chocolatey on GitHub">
+            <div class="text-bg-body-contrast circle" aria-hidden="true">
+                <i class="fa-brands fa-github"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://www.youtube.com/chocolateysoftware" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on YouTube" title="Connect with Chocolatey on YouTube">
+            <div class="text-bg-youtube circle" aria-hidden="true">
+                <i class="fa-brands fa-youtube"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://www.twitch.tv/chocolateysoftware" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on Twitch" title="Connect with Chocolatey on Twitch">
+            <div class="text-bg-twitch circle" aria-hidden="true">
+                <i class="fa-brands fa-twitch"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://facebook.com/ChocolateySoftware" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on Facebook" title="Connect with Chocolatey on Facebook">
+            <div class="text-bg-facebook circle" aria-hidden="true">
+                <i class="fa-brands fa-facebook-f"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://ch0.co/community" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on Community Chat" title="Connect with Chocolatey on Community Chat">
+            <div class="text-bg-chat circle" aria-hidden="true">
+                <i class="fa-solid fa-comment"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://groups.google.com/forum/#!forum/chocolatey" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on Google Groups" title="Connect with Chocolatey on Google Groups">
+            <div class="text-bg-google circle" aria-hidden="true">
+                <i class="fa-brands fa-google"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://fosstodon.org/@chocolatey" class="link-underline-none" target="_blank" rel="me" aria-label="Connect with Chocolatey on Mastodon" title="Connect with Chocolatey on Mastodon">
+            <div class="text-bg-mastodon circle" aria-hidden="true">
+                <i class="fa-brands fa-mastodon"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://bsky.app/profile/chocolatey.org" class="link-underline-none" target="_blank" rel="me" aria-label="Connect with Chocolatey on Bluesky" title="Connect with Chocolatey on Bluesky">
+            <div class="text-bg-bluesky circle" aria-hidden="true">
+                <svg class="w-50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 568 501"><title>Bluesky butterfly logo</title><path fill="#fff" d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.192 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.778 166.555-20.275 72.453-94.155 90.933-159.875 79.748C507.222 323.8 536.444 388.56 473.333 453.32c-119.86 122.992-172.272-30.859-185.702-70.281-2.462-7.227-3.614-10.608-3.631-7.733-.017-2.875-1.169.506-3.631 7.733-13.43 39.422-65.842 193.273-185.702 70.281-63.111-64.76-33.89-129.52 80.986-149.071-65.72 11.185-139.6-7.295-159.875-79.748C9.945 203.659 0 75.291 0 57.946 0-28.906 76.135-1.612 123.121 33.664Z"></path></svg>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://ch0.co/podcast" class="link-underline-none" target="_blank" rel="me" aria-label="Listen to the Unpacking Software Podcast" title="Listen to the Unpacking Software Podcast">
+            <div class="text-bg-podcast circle" aria-hidden="true">
+                <i class="fa-solid fa-podcast"></i>
+            </div>
+        </a>
+    </li>
+</ul>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="nav-item d-md-flex">
+                        <div class="vr d-none d-md-inline-block h-50 my-auto"></div>
+                        <hr class="d-md-none" />
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link user-unauthenticated px-md-4" href="/users/account/LogOn">Sign In</a>
+                    </li>
+                    <li class="nav-item user-unauthenticated mt-2 mt-md-0">
+                        <a class="btn btn-primary" href="/account/Register">Sign Up</a>
+                    </li>
+                    <li class="nav-item d-none d-md-flex">
+                        <div class="dropdown dropdown-hover user-authenticated ms-4">
+                            <button class="btn btn-primary dropdown-toggle user-authenticated-name" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-md-end p-0" style="--bs-dropdown-min-width:10rem">
+                                <div class="container-md px-3 p-md-4">
+                                    <ul class="list-unstyled">
+                                        <li class="mb-3"><a class="user-authenticated-name link-theme" href="#"><i class="fa-solid fa-user w-px-15 text-center me-3"></i>Profile</a></li>
+                                        <li class="mb-3"><a class="link-theme" href="/account"><i class="fa-solid fa-gears w-px-15 text-center me-3"></i>Account</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li class="mt-3 text-center">
+<form action="/users/account/LogOff" method="post">                                                <fieldset>
+                                                    <input name="__RequestVerificationToken" type="hidden" value="H2iRyg9yMpgpPWCldAI3FRgJOLng9/YB5W1as4LDICMOfv6Zd/keFAFJQ0RlEzDI5r9LVIi+mVrEDzQwe8ZIg00NvuNXioYFZb7jNnS/CavgL6F8wuqoRdERjOvZWWO8s9GcIZBhDYIO1KljPnj3i0zvi8ianM12YSXclVExn7U=" />
+                                                    <button class="btn btn-primary" type="submit"><i class="fa-solid fa-right-from-bracket fa-flip-horizontal me-2"></i>Sign Out</button>
+                                                </fieldset>
+</form>                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item d-md-none">
+                        <a class="nav-link user-authenticated user-authenticated-name" href="#">Profile</a>
+                    </li>
+                    <li class="nav-item d-md-none">
+                        <a class="nav-link user-authenticated" href="/account">Account</a>
+                    </li>
+                    <li class="nav-item d-md-none">
+<form action="/users/account/LogOff" class="w-100 user-authenticated" method="post">                            <fieldset class="nav-link">
+                                <input name="__RequestVerificationToken" type="hidden" value="IiRhQBF3z6Qs41GUl2/u0V3LiXJbFCUHP8Nqt78DthMnvGx+rlegRKyHnIlwTuHbWgv5n6Lh7bzuYlTZ7Qb9UJ0VxhRgYdxKUN94mzQdU/2fNEEJYTl41QurpRFW4q54OeDeFK4IdfillZtQArdjL2KDh3Fz/+07x8sOCTwWA6c=" />
+                                <button class="btn btn-primary" type="submit">Sign Out</button>
+                            </fieldset>
+</form>                    </li>
+
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+    <main class="mb-auto">
+        
+<div class="video-story">
+    <div class="modal fade" id="qualcomm-story" tabindex="-1" role="dialog" aria-labelledby="Dwight Bragdon at Qualcomm" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="fa-solid fa-xmark"></span>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="ratio ratio-16x9">
+                        <iframe data-src="https://www.youtube.com/embed/R9OClPwBpdk?autoplay=1" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        
+
+<div id="loader">
+    <div>
+        <img src="https://community.chocolatey.org/content/images/global-shared/logo.svg" />
+        <div></div>
+    </div>
+</div>
+<div class="modal fade" id="package-disclaimer" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p>Welcome to the Chocolatey Community Package Repository! The packages found in this section of the site are provided, maintained, and moderated by the community.</p>
+                <h3>Moderation</h3>
+                <p>Every version of each package undergoes a rigorous moderation process before it goes live that typically includes:</p>
+                <ul>
+                    <li><a href="https://docs.chocolatey.org/en-us/information/security#chocolatey.org-packages" target="_blank">Security</a>, consistency, and <a href="https://docs.chocolatey.org/en-us/community-repository/moderation/package-validator/rules/" target="_blank">quality checking</a></li>
+                    <li><a href="https://docs.chocolatey.org/en-us/community-repository/moderation/package-verifier" target="_blank">Installation testing</a></li>
+                    <li><a href="https://docs.chocolatey.org/en-us/information/security#chocolatey.org-packages" target="_blank">Virus checking through VirusTotal</a></li>
+                    <li>Human moderators who give final review and sign off</li>
+                </ul>
+                <p>More detail at <a href="https://docs.chocolatey.org/en-us/information/security#chocolatey.org-packages" target="_blank">Security</a> and <a href="https://docs.chocolatey.org/en-us/community-repository/moderation" target="_blank">Moderation</a>.</p>
+                <h3>Organizational Use</h3>
+                <p>
+                    If you are an organization using Chocolatey, we want your experience to be fully reliable.
+                    Due to the nature of this publicly offered repository, <a href="https://docs.chocolatey.org/en-us/community-repository/community-packages-disclaimer#reliability" target="_blank">reliability</a> cannot be guaranteed.
+                    Packages offered here are subject to distribution rights, which means they may need to reach out further to the internet to the official locations to download files at runtime.
+                </p>
+                <p>
+                    Fortunately, distribution rights do not apply for internal use. With any edition of Chocolatey (including the free open source edition), you can <a href="https://docs.chocolatey.org/en-us/features/host-packages" rel="noreferrer" target="_blank">host your own packages</a> and cache or <a href="https://docs.chocolatey.org/en-us/guides/create/recompile-packages" target="_blank">internalize</a> existing community packages.
+                </p>
+                <h3>Disclaimer</h3>
+                <p>Your use of the packages on this site means you understand they are not supported or guaranteed in any way. <a href="https://docs.chocolatey.org/en-us/community-repository/community-packages-disclaimer" rel="noreferrer" target="_blank">Learn more...</a></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Understand</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="offcanvas offcanvas-start builder-tab visible" tabindex="-1" id="navScriptBuilder" aria-labelledby="navScriptBuilderLabel" data-bs-scroll="true" data-bs-backdrop="false">
+    <div class="offcanvas-header justify-content-end">
+        <button type="button" class="btn-close text-primary pt-3" data-bs-toggle="offcanvas" data-bs-target="#navScriptBuilder" aria-controls="navScriptBuilder" aria-label="Close"><i class="fa-solid fa-xmark h3"></i></button>
+    </div>
+    <div class="offcanvas-body pt-0">
+        
+        <div class="text-center mt-3">
+            <button type="button" class="btn btn-success btn-modalScriptBuilder" data-bs-toggle="modal" data-bs-target="#modalScriptBuilder"><span class="fa-solid fa-rotate"></span> Generate Script</button>
+        </div>
+        <div class="storage"></div>
+    </div>
+    <button class="btn btn-secondary btn-view-builder btn-collapsing-left-sidebar py-3 shadow d-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#navScriptBuilder" aria-controls="navScriptBuilder">
+        <span class="notification-badge notification-badge-builder"></span>
+        <span class="d-block">B</span>
+        <span class="d-block">U</span>
+        <span class="d-block">I</span>
+        <span class="d-block">L</span>
+        <span class="d-block">D</span>
+        <span class="d-block">E</span>
+        <span class="d-block">R</span>
+    </button>
+</div>
+
+
+
+
+<div class="modal fade" id="modalScriptBuilder" tabindex="-1" role="dialog" aria-labelledby="Build Script" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="fa-solid fa-xmark"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="wizard">
+                    <ul class="nav nav-pills mb-3" id="builder-steps" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active d-hash-none" id="builder-step-1-tab" data-bs-toggle="pill" href="#builder-step-1" role="tab" aria-controls="builder-step-1" aria-selected="true"><strong><span class="d-none d-sm-inline-block me-1">STEP</span><span>1</span></strong><p class="mb-0 d-none d-lg-block">Package Review</p></a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link d-hash-none" id="builder-step-2-tab" data-bs-toggle="pill" href="#builder-step-2" role="tab" aria-controls="builder-step-2" aria-selected="false"><strong><span class="d-none d-sm-inline-block me-1">STEP</span><span>2</span></strong><p class="mb-0 d-none d-lg-block">Integration Method</p></a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link d-hash-none" id="builder-step-3-tab" data-bs-toggle="pill" href="#builder-step-3" role="tab" aria-controls="builder-step-3" aria-selected="false"><strong><span class="d-none d-sm-inline-block me-1">STEP</span><span>3</span></strong><p class="mb-0 d-none d-lg-block">Internal Repo Url</p></a>
+                        </li>
+                        <li class="nav-item builder-step-4-tab" role="presentation">
+                            <a class="nav-link d-hash-none" id="builder-step-4-tab" data-bs-toggle="pill" href="#builder-step-4" role="tab" aria-controls="builder-step-4" aria-selected="false"><strong><span class="d-none d-sm-inline-block me-1">STEP</span><span>4</span></strong><p class="mb-0 d-none d-lg-block">Environment Setup</p></a>
+                        </li>
+                        <li class="nav-item builder-step-5-tab" role="presentation">
+                            <a class="nav-link d-hash-none" id="builder-step-5-tab" data-bs-toggle="pill" href="#builder-step-5" role="tab" aria-controls="builder-step-3" aria-selected="false"><strong><span class="d-none d-sm-inline-block me-1">STEP</span><span>5</span></strong><p class="mb-0 d-none d-lg-block">Install Script</p></a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="builder-steps-content">
+                        <nav class="d-flex justify-content-end" aria-label="Navigate to previous or next script builder steps">
+                            <div class="btn-group" role="group" aria-label="Navigate to previous or next script builder steps">
+                                <button type="button" class="btn btn-outline-secondary btn-prev-step">Previous</button>
+                                <button type="button" class="btn btn-outline-secondary btn-next-step">Next</button>
+                            </div>
+                        </nav>
+                        <div class="tab-pane fade my-3 show active" id="builder-step-1" role="tabpanel" aria-labelledby="builder-step-1-tab">
+                            <h3 class="text-center mb-4">Step 1: Review Your Packages</h3>
+                            <div class="storage storage-builder"></div>
+                        </div>
+                        <div class="tab-pane fade my-3" id="builder-step-2" role="tabpanel" aria-labelledby="builder-step-2-tab">
+                            <h3 class="text-center mb-4">Step 2: Choose Your Integration Method</h3>
+                            <ul class="nav nav-tabs nav-tabs-image-boxes nav-tabs-image-boxes-sm" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link d-hash-none" id="builder-generic-tab" data-bs-toggle="tab" href="#builder-generic" role="tab" aria-controls="builder-generic" aria-selected="false" data-deployment-method="generic">Generic</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active d-hash-none" id="builder-individual-tab" data-bs-toggle="tab" href="#builder-individual" role="tab" aria-controls="builder-individual" aria-selected="true" data-deployment-method="individual">Individual</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link d-hash-none" id="builder-ansible-tab" data-bs-toggle="tab" href="#builder-ansible" role="tab" aria-controls="builder-ansible" aria-selected="false" data-deployment-method="ansible">
+                                        <img class="nav-img" src="https://img.chocolatey.org/businesses/Ansible-red-sm.png" alt="Ansible" title="Ansible" />
+                                        Ansible
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link d-hash-none" id="builder-chef-tab" data-bs-toggle="tab" href="#builder-chef" role="tab" aria-controls="builder-chef" aria-selected="false" data-deployment-method="chef">
+                                        <img class="nav-img" src="https://img.chocolatey.org/businesses/Chef-Dark.png" alt="Chef" title="Chef" />
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link d-hash-none" id="builder-psdsc-tab" data-bs-toggle="tab" href="#builder-psdsc" role="tab" aria-controls="builder-psdsc" aria-selected="false" data-deployment-method="psdsc">
+                                        <img class="nav-img" src="https://img.chocolatey.org/businesses/Powershell-sm.png" alt="PS DSC" title="PS DSC" />
+                                        PS DSC
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link d-hash-none" id="builder-puppet-tab" data-bs-toggle="tab" href="#builder-puppet" role="tab" aria-controls="builder-puppet" aria-selected="false" data-deployment-method="puppet">
+                                        <img class="nav-img" src="https://img.chocolatey.org/businesses/Puppet-Dark.png" alt="Puppet" title="Puppet" />
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tab-pane fade my-3" id="builder-step-3" role="tabpanel" aria-labelledby="builder-step-3-tab">
+                            <div class="text-center builder-organization d-none">
+                                <h3 class="mb-4">Step 3: Enter Your Internal Repository Url</h3>
+                                <input class="form-control w-50 internal-repo-url-input" type="text" placeholder="https://internal/odata/repo" />
+<p><small>(this should look similar to <a href="https://community.chocolatey.org/api/v2/">https://community.chocolatey.org/api/v2/</a>)</small></p>
+                            </div>
+                            <div class="builder-individual d-none">
+                                <h3 class="text-center mb-4">Step 3: Copy Your Script or Download Config</h3>
+                                <h4 class="mb-3">Option 1: Copy Script</h4>
+                                <div class="copy-command">
+<pre class="line-numbers border py-3 highlight-delay"><code class="command-builder-individual"></code></pre>
+                                </div>
+                                <h4 class="mt-4 mb-3">Option 2: Download Config</h4>
+                                <button type="button" class="btn btn-success btn-xml"><i class="fa-solid fa-file-code"></i> Save as .config File</button>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade my-3" id="builder-step-4" role="tabpanel" aria-labelledby="builder-step-4-tab">
+                            <h3 class="text-center mb-4">Step 4: Setup Your Environment</h3>
+                            
+                            <h4>1. Ensure you are set for organizational deployment</h4>
+                            <p>Please see the <a href="https://docs.chocolatey.org/en-us/guides/organizations/organizational-deployment-guide" target="_blank">organizational deployment guide</a></p>
+                            
+                            <h4 class="mt-4">2. Get the package into your environment</h4>
+                            
+                            <a class="h5 collapsed btn-collapse d-block d-hash-none" data-bs-toggle="collapse" href="#builder-step-4-option-1" role="button" aria-expanded="false" aria-controls="builder-step-4-option-1" title="Get packages into your environment: Option 1">Option 1: Cached Package (Unreliable, Requires Internet - Same As Community)</a>
+                            <div class="collapse" id="builder-step-4-option-1">
+                                <ul>
+                                    <li>
+                                        Open Source or Commercial:
+                                        <ul>
+                                            <li>Proxy Repository - Create a proxy nuget repository on Nexus, Artifactory Pro, or a proxy Chocolatey repository on ProGet. Point your upstream to <strong>https://community.chocolatey.org/api/v2/</strong>. Packages cache on first access automatically. Make sure your choco clients are using your proxy repository as a source and NOT the default community repository. See <a href="https://docs.chocolatey.org/en-us/choco/commands/source" target="_blank">source command</a> for more information.</li>
+                                            <li>
+                                                <p>You can also just download the packages and push them to a repository</p>
+                                                <a class="btn btn-secondary btn-bulk-package-download" href="#"><i class="fa-solid fa-download" alt="Download"></i> Download Packages</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <a class="h5 mt-3 collapsed d-block btn-collapse d-hash-none" data-bs-toggle="collapse" href="#builder-step-4-option-2" role="button" aria-expanded="false" aria-controls="builder-step-4-option-2" title="Get packages into your environment: Option 2">Option 2: Internalized Package (Reliable, Scalable)</a>
+                            <div class="collapse" id="builder-step-4-option-2">
+                                <ul>
+                                    <li>
+                                        Open Source
+                                        <ul>
+                                            <li class="mb-3">
+                                                <p>Download the packages:</p>
+                                                <a class="btn btn-secondary btn-bulk-package-download" href="#"><i class="fa-solid fa-download" alt="Download"></i> Download Packages</a>
+                                            </li>
+                                            <li><a href="https://docs.chocolatey.org/en-us/guides/create/recompile-packages" target="_blank">Follow manual internalization instructions</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        Package Internalizer (C4B)
+                                        <ul>
+                                            <li>
+                                                Run: <a href="https://docs.chocolatey.org/en-us/choco/commands/download" target="_blank">(additional options)</a>
+                                                <div class="copy-command">
+<pre class="line-numbers border py-3 highlight-delay"><code class="command-builder-environment-one command-injected-environment-script"></code></pre>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                For package and dependencies run:
+                                                <div class="copy-command">
+<pre class="line-numbers border py-3 highlight-delay"><code class="command-builder-environment-two command-injected-environment-script"></code></pre>
+                                                </div>
+                                            </li>
+                                            <li><a href="https://docs.chocolatey.org/en-us/guides/organizations/automate-package-internalization" target="_blank">Automate package internalization</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade my-3" id="builder-step-5" role="tabpanel" aria-labelledby="builder-step-5-tab">
+                            <h3 class="text-center mb-4">Step 5: Copy Your Script</h3>
+                            <div class="tab-content">
+                                <div class="tab-pane fade" id="builder-generic" role="tabpanel" aria-labelledby="builder-generic-tab">
+                                    <div class="copy-command">
+<pre class="line-numbers border py-3 highlight-delay"><code class="command-builder-organization-generic-one command-injected-organization-script"></code></pre>
+                                    </div>
+                                    <p class="mt-3">See <a href="https://docs.chocolatey.org/en-us/choco/commands/upgrade#options-and-switches" target="_blank">options you can pass to upgrade.</a></p>
+                                    <p>See <a href="https://docs.chocolatey.org/en-us/choco/commands/#scripting-integration-best-practices-style-guide" target="_blank">best practices for scripting.</a></p>
+                                    <p>Add this to a PowerShell script or use a Batch script with tools and in places where you are calling directly to Chocolatey. If you are integrating, keep in mind enhanced exit codes.</p>
+                                    <p>If you do use a PowerShell script, use the following to ensure bad exit codes are shown as failures:</p>
+                                    <div class="copy-command">
+<pre class="line-numbers border py-3 highlight-delay"><code class="command-builder-organization-generic-two command-injected-organization-script"></code></pre>
+                                    </div>
+                                    <a class="h4 collapsed btn-collapse d-block d-hash-none mt-4" data-bs-toggle="collapse" href="#builder-generic-chocolatey-configuration" role="button" aria-expanded="false" aria-controls="builder-generic-chocolatey-configuration" title="If Applicable - Chocolatey Configuration/Installation">If Applicable - Chocolatey Configuration/Installation</a>
+                                    <div class="collapse" id="builder-generic-chocolatey-configuration">
+                                        <div class="contains-internal-repo-url copy-command">
+<pre class="line-numbers border py-3 language-powershell"><code class="command-chocolatey-configuration-generic">
+## 1. REQUIREMENTS ##
+### Here are the requirements necessary to ensure this is successful.
+
+### a. Internal/Private Cloud Repository Set Up ###
+#### You'll need an internal/private cloud repository you can use. These are
+####  generally really quick to set up and there are quite a few options.
+####  Chocolatey Software recommends Nexus, Artifactory Pro, or ProGet as they
+####  are repository servers and will give you the ability to manage multiple
+####  repositories and types from one server installation.
+
+### b. Download Chocolatey Package and Put on Internal Repository ###
+#### You need to have downloaded the Chocolatey package as well.
+####  Please see https://chocolatey.org/install#organization
+
+### c. Other Requirements ###
+
+#### We initialize a few things that are needed by this script - there are no other requirements.
+$ErrorActionPreference = "Stop"
+
+#### Set TLS 1.2 (3072) as that is the minimum required by various up-to-date repositories.
+#### Use integers because the enumeration value for TLS 1.2 won't exist
+#### in .NET 4.0, even though they are addressable if .NET 4.5+ is
+#### installed (.NET 4.5 is an in-place upgrade).
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+
+#### We use this variable for future REST calls.
+$RequestArguments = @{
+    UseBasicParsing = $true
+}
+
+## 2. TOP LEVEL VARIABLES ##
+
+### a. Your internal repository url (the main one). ###
+####  Should be similar to what you see when you browse
+#### to https://community.chocolatey.org/api/v2/
+$NugetRepositoryUrl = "INTERNAL REPO URL"
+
+### b. Internal Repository Credential ###
+#### If required, add the repository access credential here
+# $NugetRepositoryCredential = [PSCredential]::new(
+#     "username",
+#     ("password" | ConvertTo-SecureString -AsPlainText -Force)
+# )
+# $RequestArguments.Credential = $NugetRepositoryCredential
+
+### c. Chocolatey nupkg download url ###
+#### This url should result in an immediate download when you navigate to it
+$ChocolateyDownloadUrl = "$($NugetRepositoryUrl.TrimEnd('/'))/package/chocolatey.2.5.0.nupkg"
+
+### d. Chocolatey Central Management (CCM) ###
+#### If using CCM to manage Chocolatey, add the following:
+#### i. Endpoint URL for CCM
+# $ChocolateyCentralManagementUrl = "https://chocolatey-central-management:24020/ChocolateyManagementService"
+
+#### ii. If using a Client Salt, add it here
+# $ChocolateyCentralManagementClientSalt = "clientsalt"
+
+#### iii. If using a Service Salt, add it here
+# $ChocolateyCentralManagementServiceSalt = "servicesalt"
+
+## 3. ENSURE CHOCOLATEY IS INSTALLED ##
+### Ensure Chocolatey is installed from your internal repository
+
+#### Download the Nupkg, appending .zip to the filename to handle archive cmdlet limitations
+if (-not (Get-Command choco.exe -ErrorAction SilentlyContinue)) {
+    $TempDirectory = Join-Path $env:Temp "chocolateyInstall"
+    if (-not (Test-Path $TempDirectory -PathType Container)) {
+        $null = New-Item -Path $TempDirectory -ItemType Directory
+    }
+    $DownloadedNupkg = Join-Path $TempDirectory "$(Split-Path $ChocolateyDownloadUrl -Leaf).zip"
+    Invoke-WebRequest -Uri $ChocolateyDownloadUrl -OutFile $DownloadedNupkg @RequestArguments
+
+    #### Extract the Nupkg, and run the chocolateyInstall script
+    if (Get-Command Microsoft.PowerShell.Archive\Expand-Archive -ErrorAction SilentlyContinue) {
+        Microsoft.PowerShell.Archive\Expand-Archive -Path $DownloadedNupkg -DestinationPath $TempDirectory -Force
+    } else {
+        # PowerShell versions <4.0 do not have this function available
+        try {
+            $shellApplication = New-Object -ComObject Shell.Application
+            $zipPackage = $shellApplication.NameSpace($DownloadedNupkg)
+            $destinationFolder = $shellApplication.NameSpace($TempDirectory)
+            $destinationFolder.CopyHere($zipPackage.Items(), 0x10)
+        } catch {
+            Write-Warning "Unable to unzip package using built-in compression."
+            throw $_
+        }
+    }
+
+    & $(Join-Path $TempDirectory "tools\chocolateyInstall.ps1")
+}
+
+if (-not (Get-Command choco.exe -ErrorAction SilentlyContinue)) {
+    refreshenv
+}
+
+## 4. CONFIGURE CHOCOLATEY BASELINE ##
+### a. FIPS Feature ###
+#### If you need FIPS compliance - make this the first thing you configure
+#### before you do any additional configuration or package installations
+# choco feature enable -n useFipsCompliantChecksums
+
+### b. Apply Recommended Configuration ###
+#### Move cache location so Chocolatey is very deterministic about
+#### cleaning up temporary data and the location is secured to admins
+choco config set --name cacheLocation --value C:\ProgramData\chocolatey\cache
+
+#### Increase timeout to at least 4 hours
+choco config set --name commandExecutionTimeoutSeconds --value 14400
+
+#### Turn off download progress when running choco through integrations
+choco feature disable --name showDownloadProgress
+
+### c. Sources ###
+#### Remove the default community package repository source
+choco source list --limitoutput | ConvertFrom-Csv -Header 'Name', 'Location' -Delimiter '|' | ForEach-Object {
+    if ($_.Location -eq 'https://community.chocolatey.org/api/v2/') {
+        choco source remove -n $_.Name
+    }
+}
+
+#### Add internal default sources
+#### You could have multiple sources here, so we will provide an example
+#### of one using the remote repo variable here
+
+#### NOTE: This EXAMPLE may require changes
+if ($NugetRepositoryCredential) {
+    choco source add --name ChocolateyInternal --source $NugetRepositoryUrl --user $NugetRepositoryCredential.UserName --password $NugetRepositoryCredential.GetNetworkCredential().Password --priority 1
+} else {
+    choco source add --name ChocolateyInternal --source $NugetRepositoryUrl --priority 1
+}
+
+### b. Keep Chocolatey Up To Date ###
+#### Keep chocolatey up to date based on your internal source
+#### You control the upgrades based on when you push an updated version
+####  to your internal repository.
+#### Note the source here is to the OData feed, similar to what you see
+####  when you browse to https://community.chocolatey.org/api/v2/
+choco upgrade chocolatey --confirm
+
+## 5. ENSURE CHOCOLATEY FOR BUSINESS ##
+### If you don't have Chocolatey for Business (C4B), you'll want to remove from here down.
+
+### a. Ensure The License File Is Installed ###
+#### Create a license package using script from https://docs.chocolatey.org/en-us/how-tos/setup-offline-installation#exercise-4-create-a-package-for-the-license
+choco install chocolatey-license --source $NugetRepositoryUrl --confirm
+
+### b. Disable The Licensed Source ###
+#### The licensed source cannot be removed, so it must be disabled.
+#### This must occur after the license has been set by the license package.
+if ("chocolatey-license" -in (choco list --localonly --limitoutput | ConvertFrom-Csv -Header "Name" -Delimiter "|").Name) {
+    choco source disable --name chocolatey.licensed
+} else {
+    Write-Warning "Not disabling 'chocolatey.licensed' feed, as Chocolatey-License has not been installed."
+}
+
+### c. Ensure Chocolatey Licensed Extension ###
+#### You will have downloaded the licensed extension to your internal repository
+#### as you have disabled the licensed repository in step 5b.
+
+#### Ensure the chocolatey.extension package (aka Chocolatey Licensed Extension)
+if ("chocolatey-license" -in (choco list --localonly --limitoutput | ConvertFrom-Csv -Header "Name" -Delimiter "|").Name) {
+    choco install chocolatey.extension --source $NugetRepositoryUrl --confirm
+} else {
+    Write-Warning "Not installing 'chocolatey.extension', as Chocolatey-License has not been installed."
+}
+
+#### The Chocolatey Licensed Extension unlocks all of the following, which also have configuration/feature items available with them. You may want to visit the feature pages to see what you might want to also enable:
+#### - Package Builder - https://docs.chocolatey.org/en-us/features/paid/package-builder
+#### - Package Internalizer - https://docs.chocolatey.org/en-us/features/paid/package-internalizer
+#### - Package Synchronization (3 components) - https://docs.chocolatey.org/en-us/features/paid/package-synchronization
+#### - Package Reducer - https://docs.chocolatey.org/en-us/features/paid/package-reducer
+#### - Package Audit - https://docs.chocolatey.org/en-us/features/paid/package-audit
+#### - Package Throttle - https://docs.chocolatey.org/en-us/features/paid/package-throttle
+#### - CDN Cache Access - https://docs.chocolatey.org/en-us/features/paid/private-cdn
+#### - Branding - https://docs.chocolatey.org/en-us/features/paid/branding
+#### - Self-Service Anywhere (more components will need to be installed and additional configuration will need to be set) - https://docs.chocolatey.org/en-us/features/paid/self-service-anywhere
+#### - Chocolatey Central Management (more components will need to be installed and additional configuration will need to be set) - https://docs.chocolatey.org/en-us/features/paid/chocolatey-central-management
+#### - Other - https://docs.chocolatey.org/en-us/features/paid/
+
+### d. Ensure Self-Service Anywhere ###
+#### If you have desktop clients where users are not administrators, you may
+#### to take advantage of deploying and configuring Self-Service anywhere
+choco feature disable --name showNonElevatedWarnings
+choco feature enable --name useBackgroundService
+choco feature enable --name useBackgroundServiceWithNonAdministratorsOnly
+choco feature enable --name allowBackgroundServiceUninstallsFromUserInstallsOnly
+choco config set --name allowedBackgroundServiceCommands --value "install,upgrade,uninstall"
+
+### e. Ensure Chocolatey Central Management ###
+#### If you want to manage and report on endpoints, you can set up and configure
+### Central Management. There are multiple portions to manage, so you'll see
+### a section on agents here along with notes on how to configure the server
+### side components.
+if ($ChocolateyCentralManagementUrl) {
+    choco install chocolatey-agent --source $NugetRepositoryUrl --confirm
+    choco config set --name CentralManagementServiceUrl --value $ChocolateyCentralManagementUrl
+    if ($ChocolateyCentralManagementClientSalt) {
+        choco config set --name centralManagementClientCommunicationSaltAdditivePassword --value $ChocolateyCentralManagementClientSalt
+    }
+    if ($ChocolateyCentralManagementServiceSalt) {
+        choco config set --name centralManagementServiceCommunicationSaltAdditivePassword --value $ChocolateyCentralManagementServiceSalt
+    }
+    choco feature enable --name useChocolateyCentralManagement
+    choco feature enable --name useChocolateyCentralManagementDeployments
+}
+</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="builder-individual" role="tabpanel" aria-labelledby="builder-individual-tab"></div>
+                                <div class="tab-pane fade" id="builder-ansible" role="tabpanel" aria-labelledby="builder-ansible-tab">
+                                    <div class="copy-command">
+<pre class="line-numbers border py-3 highlight-delay"><code class="command-builder-organization-ansible command-injected-organization-script"></code></pre>
+                                    </div>
+                                    <p>See docs at <a href="https://docs.ansible.com/ansible/latest/modules/win_chocolatey_module.html" target="_blank" rel="noreferrer">https://docs.ansible.com/ansible/latest/modules/win_chocolatey_module.html</a>.</p>
+                                    <a class="h4 collapsed btn-collapse d-block d-hash-none mt-4" data-bs-toggle="collapse" href="#builder-ansible-chocolatey-configuration" role="button" aria-expanded="false" aria-controls="builder-ansible-chocolatey-configuration" title="If Applicable - Chocolatey Configuration/Installation">If Applicable - Chocolatey Configuration/Installation</a>
+                                    <div class="collapse" id="builder-ansible-chocolatey-configuration">
+                                        <div class="contains-internal-repo-url copy-command">
+<pre class="line-numbers border py-3 language-yaml"><code class="command-chocolatey-configuration-ansible">
+## 1. REQUIREMENTS ##
+### Here are the requirements necessary to ensure this is successful.
+
+### a. Internal/Private Cloud Repository Set Up ###
+#### You'll need an internal/private cloud repository you can use. These are
+####  generally really quick to set up and there are quite a few options.
+####  Chocolatey Software recommends Nexus, Artifactory Pro, or ProGet as they
+####  are repository servers and will give you the ability to manage multiple
+####  repositories and types from one server installation.
+
+### b. Download Chocolatey Package and Put on Internal Repository ###
+#### You need to have downloaded the Chocolatey package as well.
+####  Please see https://chocolatey.org/install#organization
+
+### c. Other Requirements ###
+#### i. chocolatey.chocolatey
+##### You will require the chocolatey.chocolatey collection to be installed
+##### on all machines using this playbook.
+##### Please see https://github.com/chocolatey/chocolatey-ansible/#installing-the-collection-from-ansible-galaxy
+
+- name: Install and Configure Chocolatey
+  hosts: all
+
+## 2. TOP LEVEL VARIABLES ##
+  vars:
+
+### a. Your internal repository url (the main one). ###
+####  Should be similar to what you see when you browse
+#### to https://community.chocolatey.org/api/v2/
+    nuget_repository_url: INTERNAL REPO URL
+
+### b. Internal Repository Credential ###
+#### If required, add the repository access credential here and
+#### uncomment lines with source_username and source_password below
+#    nuget_repository_username: username
+#    nuget_repository_password: password
+
+### c. Chocolatey Central Management (CCM) ###
+#### If using CCM to manage Chocolatey, add the following:
+#### i. Endpoint URL for CCM
+#    chocolatey_central_management_url: https://chocolatey-central-management:24020/ChocolateyManagementService
+
+#### ii. If using a Client Salt, add it here
+#    chocolatey_central_management_client_salt: clientsalt
+
+#### iii. If using a Service Salt, add it here
+#    chocolatey_central_management_service_salt: servicesalt
+
+## 3. ENSURE CHOCOLATEY IS INSTALLED ##
+### Ensure Chocolatey is installed from your internal repository
+
+  tasks:
+  - name: Install chocolatey
+    win_chocolatey:
+      name: chocolatey
+      source: ""{{ nuget_repository_url }}""
+      # source_username: ""{{ nuget_repository_username }}""
+      # source_password: ""{{ nuget_repository_password }}""
+
+## 4. CONFIGURE CHOCOLATEY BASELINE ##
+### a. FIPS Feature ###
+#### If you need FIPS compliance - make this the first thing you configure
+#### before you do any additional configuration or package installations
+#   - name: Enable FIPS compliance
+#     win_chocolatey_feature:
+#       name: useFipsCompliantChecksums
+#       state: enabled
+
+### b. Apply Recommended Configuration ###
+
+#### Move cache location so Chocolatey is very deterministic about
+#### cleaning up temporary data and the location is secured to admins
+  - name: Set the cache location
+    win_chocolatey_config:
+      name: cacheLocation
+      state: present
+      value: C:\ProgramData\chocolatey\cache
+
+#### Increase timeout to at least 4 hours
+  - name: Set the command execution timeout
+    win_chocolatey_config:
+      name: commandExecutionTimeoutSeconds
+      state: present
+      value: 14400
+
+#### Turn off download progress when running choco through integrations
+  - name: Disable showing download progress
+    win_chocolatey_feature:
+      name: showDownloadProgress
+      state: disabled
+
+### c. Sources ###
+#### Remove the default community package repository source
+  - name: Remove Chocolatey Community Repository
+    win_chocolatey_source:
+      name: chocolatey
+      state: absent
+
+#### Add internal default sources
+#### You could have multiple sources here, so we will provide an example
+#### of one using the remote repo variable here
+#### NOTE: This EXAMPLE may require changes
+  - name: Add Internal Repository
+    win_chocolatey_source:
+      name: ChocolateyInternal
+      state: present
+      source: {{ nuget_repository_url }}
+      # source_username: {{ nuget_repository_username }}
+      # source_password: {{ nuget_repository_password }}
+      priority: 1
+
+### b. Keep Chocolatey Up To Date ###
+#### Keep chocolatey up to date based on your internal source
+#### You control the upgrades based on when you push an updated version
+####  to your internal repository.
+#### Note the source here is to the OData feed, similar to what you see
+####  when you browse to https://community.chocolatey.org/api/v2/
+  - name: Upgrade Chocolatey
+    win_chocolatey:
+      name: chocolatey
+      state: latest
+
+## 5. ENSURE CHOCOLATEY FOR BUSINESS ##
+### If you don't have Chocolatey for Business (C4B), you'll want to remove from here down.
+### a. Ensure The License File Is Installed ###
+#### Create a license package using script from https://docs.chocolatey.org/en-us/how-tos/setup-offline-installation#exercise-4-create-a-package-for-the-license
+  - name: Install Chocolatey License
+    win_chocolatey:
+      name: chocolatey-license
+      source: ChocolateyInternal
+      state: latest
+
+### b. Disable The Licensed Source ###
+#### The licensed source cannot be removed, so it must be disabled.
+#### This must occur after the license has been set by the license package.
+  - name: Disable Chocolatey Community Repository
+    win_chocolatey_source:
+      name: chocolatey.licensed
+      state: disabled
+
+### c. Ensure Chocolatey Licensed Extension ###
+#### You will have downloaded the licensed extension to your internal repository
+#### as you have disabled the licensed repository in step 5b.
+
+#### Ensure the chocolatey.extension package (aka Chocolatey Licensed Extension)
+  - name: Install Chocolatey Extension
+    win_chocolatey:
+      name: chocolatey.extension
+      source: ChocolateyInternal
+      state: latest
+
+#### The Chocolatey Licensed Extension unlocks all of the following, which also have configuration/feature items available with them. You may want to visit the feature pages to see what you might want to also enable:
+#### - Package Builder - https://docs.chocolatey.org/en-us/features/paid/package-builder
+#### - Package Internalizer - https://docs.chocolatey.org/en-us/features/paid/package-internalizer
+#### - Package Synchronization (3 components) - https://docs.chocolatey.org/en-us/features/paid/package-synchronization
+#### - Package Reducer - https://docs.chocolatey.org/en-us/features/paid/package-reducer
+#### - Package Audit - https://docs.chocolatey.org/en-us/features/paid/package-audit
+#### - Package Throttle - https://docs.chocolatey.org/en-us/features/paid/package-throttle
+#### - CDN Cache Access - https://docs.chocolatey.org/en-us/features/paid/private-cdn
+#### - Branding - https://docs.chocolatey.org/en-us/features/paid/branding
+#### - Self-Service Anywhere (more components will need to be installed and additional configuration will need to be set) - https://docs.chocolatey.org/en-us/features/paid/self-service-anywhere
+#### - Chocolatey Central Management (more components will need to be installed and additional configuration will need to be set) - https://docs.chocolatey.org/en-us/features/paid/chocolatey-central-management
+#### - Other - https://docs.chocolatey.org/en-us/features/paid/
+
+### d. Ensure Self-Service Anywhere ###
+#### If you have desktop clients where users are not administrators, you may
+#### to take advantage of deploying and configuring Self-Service anywhere
+  - name: Hide not-elevated warnings
+    win_chocolatey_feature:
+      name: showNonElevatedWarnings
+      state: disabled
+
+  - name: Use background mode for self-service
+    win_chocolatey_feature:
+      name: useBackgroundService
+      state: enabled
+
+  - name: Use background service for non-admins
+    win_chocolatey_feature:
+      name: useBackgroundServiceWithNonAdministratorsOnly
+      state: enabled
+
+  - name: Allow background uninstallation for user installs
+    win_chocolatey_feature:
+      name: allowBackgroundServiceUninstallsFromUserInstallsOnly
+      state: enabled
+
+  - name: Set allowed background service commands
+    win_chocolatey_config:
+      name: backgroundServiceAllowedCommands
+      state: present
+      value: install,upgrade,uninstall
+
+### e. Ensure Chocolatey Central Management ###
+#### If you want to manage and report on endpoints, you can set up and configure
+### Central Management. There are multiple portions to manage, so you'll see
+### a section on agents here along with notes on how to configure the server
+### side components.
+  - name: Install Chocolatey Agent
+    when: chocolatey_central_management_url is defined
+    win_chocolatey:
+      name: chocolatey-agent
+      source: ChocolateyInternal
+      state: latest
+
+  - name: Set the Central Management Service URL
+    when: chocolatey_central_management_url is defined
+    win_chocolatey_config:
+      name: CentralManagementServiceUrl
+      state: present
+      value: {{ chocolatey_central_management_url }}
+
+  - name: Set the Central Management Client Salt
+    when: chocolatey_central_management_client_salt is defined
+    win_chocolatey_config:
+      name: centralManagementClientCommunicationSaltAdditivePassword
+      state: present
+      value: {{ chocolatey_central_management_client_salt }}
+
+  - name: Set the Central Management Service Salt
+    when: chocolatey_central_management_service_salt is defined
+    win_chocolatey_config:
+      name: centralManagementServiceCommunicationSaltAdditivePassword
+      state: present
+      value: {{ chocolatey_central_management_service_salt }}
+
+  - name: Use Central Management
+    when: chocolatey_central_management_url is defined
+    win_chocolatey_feature:
+      name: useChocolateyCentralManagement
+      state: enabled
+
+  - name: Use Central Management Deployments
+    when: chocolatey_central_management_url is defined
+    win_chocolatey_feature:
+      name: useChocolateyCentralManagementDeployments
+      state: enabled
+</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="builder-chef" role="tabpanel" aria-labelledby="builder-chef-tab">
+                                    <div class="copy-command">
+<pre class="line-numbers border py-3 highlight-delay"><code class="command-builder-organization-chef command-injected-organization-script"></code></pre>
+                                    </div>
+                                    <p>See docs at <a href="https://docs.chef.io/resource_chocolatey_package.html" target="_blank" rel="noreferrer">https://docs.chef.io/resource_chocolatey_package.html</a>.</p>
+                                    <a class="h4 collapsed btn-collapse d-block d-hash-none mt-4" data-bs-toggle="collapse" href="#builder-chef-chocolatey-configuration" role="button" aria-expanded="false" aria-controls="builder-chef-chocolatey-configuration" title="If Applicable - Chocolatey Configuration/Installation">If Applicable - Chocolatey Configuration/Installation</a>
+                                    <div class="collapse" id="builder-chef-chocolatey-configuration">
+                                        <div class="contains-internal-repo-url copy-command">
+<pre class="line-numbers border py-3 language-ruby"><code class="command-chocolatey-configuration-chef">
+## 1. REQUIREMENTS ##
+### Here are the requirements necessary to ensure this is successful.
+
+### a. Internal/Private Cloud Repository Set Up ###
+#### You'll need an internal/private cloud repository you can use. These are
+####  generally really quick to set up and there are quite a few options.
+####  Chocolatey Software recommends Nexus, Artifactory Pro, or ProGet as they
+####  are repository servers and will give you the ability to manage multiple
+####  repositories and types from one server installation.
+
+### b. Download Chocolatey Package and Put on Internal Repository ###
+#### You need to have downloaded the Chocolatey package as well.
+####  Please see https://chocolatey.org/install#organization
+
+### c. Other Requirements ###
+#### The Chocolatey resources are available with any recent version of Chef.
+#### We utilise the Chocolatey recipe to install the Chocolatey binaries.
+include_recipe "chocolatey"
+
+## 2. TOP LEVEL VARIABLES ##
+### a. Your internal repository url (the main one). ###
+####  Should be similar to what you see when you browse
+#### to https://community.chocolatey.org/api/v2/
+NugetRepositoryUrl = "INTERNAL REPO URL"
+
+### b. Internal Repository Credential ###
+#### If required, add the repository access credential here
+# NugetRepositoryUsername = "username"
+# NugetRepositoryPassword = "password"
+
+### c. Chocolatey nupkg download url ###
+#### This url should result in an immediate download when you navigate to it in
+#### a web browser
+ChocolateyNupkgUrl = "INTERNAL REPO URL/package/chocolatey.2.5.0.nupkg",
+
+### d. Chocolatey Central Management (CCM) ###
+#### If using CCM to manage Chocolatey, add the following:
+#### i. Endpoint URL for CCM
+# ChocolateyCentralManagementUrl = "https://chocolatey-central-management:24020/ChocolateyManagementService"
+
+#### ii. If using a Client Salt, add it here
+# ChocolateyCentralManagementClientSalt = "clientsalt"
+
+#### iii. If using a Service Salt, add it here
+# ChocolateyCentralManagementServiceSalt = "servicesalt"
+
+## 3. ENSURE CHOCOLATEY IS INSTALLED ##
+### Ensure Chocolatey is installed from your internal repository
+node['chocolatey']['install vars'] = {
+  'chocolateyDownloadUrl' => "#{ChocolateyNupkgUrl}",
+}
+
+## 4. CONFIGURE CHOCOLATEY BASELINE ##
+### a. FIPS Feature ###
+#### If you need FIPS compliance - make this the first thing you configure
+#### before you do any additional configuration or package installations
+# chocolatey_feature 'useFipsCompliantChecksums' do
+#   action :enable
+# end
+
+### b. Apply Recommended Configuration ###
+
+#### Move cache location so Chocolatey is very deterministic about
+#### cleaning up temporary data and the location is secured to admins
+chocolatey_config 'cacheLocation' do
+  value 'C:\ProgramData\chocolatey\cache'
+end
+
+#### Increase timeout to at least 4 hours
+chocolatey_config 'commandExecutionTimeoutSeconds' do
+  value '14400'
+end
+
+#### Turn off download progress when running choco through integrations
+chocolatey_feature 'showDownloadProgress' do
+  action :disable
+end
+
+### c. Sources ###
+#### Remove the default community package repository source
+chocolatey_source 'chocolatey' do
+  action :remove
+end
+
+#### Add internal default sources
+#### You could have multiple sources here, so we will provide an example
+#### of one using the remote repo variable here
+
+#### NOTE: This EXAMPLE may require changes
+chocolatey_source 'ChocolateyInternal' do
+  source "#{NugetRepositoryUrl}"
+  priority 1
+  action   :add
+end
+
+execute 'ChocolateyInternal' do
+  command "choco source add --name ChocolateyInternal -s #{NugetRepositoryUrl} -u=#{NugetRepositoryUsername} -p=#{NugetRepositoryPassword} --priority=1"
+  only_if { NugetRepositoryUsername != nil || NugetRepositoryPassword != nil }
+end
+
+### b. Keep Chocolatey Up To Date ###
+#### Keep chocolatey up to date based on your internal source
+#### You control the upgrades based on when you push an updated version
+####  to your internal repository.
+#### Note the source here is to the OData feed, similar to what you see
+####  when you browse to https://community.chocolatey.org/api/v2/
+chocolatey_package 'chocolatey' do
+  action :upgrade
+  source "#{NugetRepositoryUrl}"
+end
+
+## 5. ENSURE CHOCOLATEY FOR BUSINESS ##
+### If you don't have Chocolatey for Business (C4B), you'll want to remove from here down.
+
+### a. Ensure The License File Is Installed ###
+#### Create a license package using script from https://docs.chocolatey.org/en-us/how-tos/setup-offline-installation#exercise-4-create-a-package-for-the-license
+chocolatey_package 'chocolatey-license' do
+  action :install
+  source "#{NugetRepositoryUrl}"
+end
+
+### b. Disable The Licensed Source ###
+#### The licensed source cannot be removed, so it must be disabled.
+#### This must occur after the license has been set by the license package.
+chocolatey_source 'chocolatey.licensed' do
+  action            :disable
+end
+
+### c. Ensure Chocolatey Licensed Extension ###
+#### You will have downloaded the licensed extension to your internal repository
+#### as you have disabled the licensed repository in step 5b.
+
+#### Ensure the chocolatey.extension package (aka Chocolatey Licensed Extension)
+chocolatey_package 'chocolatey.extention' do
+  action     install
+  source     "#{NugetRepositoryUrl}"
+end
+
+#### The Chocolatey Licensed Extension unlocks all of the following, which also have configuration/feature items available with them. You may want to visit the feature pages to see what you might want to also enable:
+#### - Package Builder - https://docs.chocolatey.org/en-us/features/paid/package-builder
+#### - Package Internalizer - https://docs.chocolatey.org/en-us/features/paid/package-internalizer
+#### - Package Synchronization (3 components) - https://docs.chocolatey.org/en-us/features/paid/package-synchronization
+#### - Package Reducer - https://docs.chocolatey.org/en-us/features/paid/package-reducer
+#### - Package Audit - https://docs.chocolatey.org/en-us/features/paid/package-audit
+#### - Package Throttle - https://docs.chocolatey.org/en-us/features/paid/package-throttle
+#### - CDN Cache Access - https://docs.chocolatey.org/en-us/features/paid/private-cdn
+#### - Branding - https://docs.chocolatey.org/en-us/features/paid/branding
+#### - Self-Service Anywhere (more components will need to be installed and additional configuration will need to be set) - https://docs.chocolatey.org/en-us/features/paid/self-service-anywhere
+#### - Chocolatey Central Management (more components will need to be installed and additional configuration will need to be set) - https://docs.chocolatey.org/en-us/features/paid/chocolatey-central-management
+#### - Other - https://docs.chocolatey.org/en-us/features/paid/
+
+### d. Ensure Self-Service Anywhere ###
+#### If you have desktop clients where users are not administrators, you may
+#### to take advantage of deploying and configuring Self-Service anywhere
+chocolatey_feature 'showNonElevatedWarnings' do
+  action :disable
+end
+
+chocolatey_feature 'useBackgroundService' do
+  action :enable
+end
+
+chocolatey_feature 'useBackgroundServiceWithNonAdministratorsOnly' do
+  action :enable
+end
+
+chocolatey_feature 'allowBackgroundServiceUninstallsFromUserInstallsOnly' do
+  action :enable
+end
+
+chocolatey_config 'backgroundServiceAllowedCommands' do
+  value 'install,upgrade,uninstall'
+end
+
+### e. Ensure Chocolatey Central Management ###
+#### If you want to manage and report on endpoints, you can set up and configure
+### Central Management. There are multiple portions to manage, so you'll see
+### a section on agents here along with notes on how to configure the server
+### side components.
+chocolatey_package 'chocolatey-agent' do
+  action     install
+  source     "#{NugetRepositoryUrl}"
+  # user       "#{NugetRepositoryUsername}"
+  # password   "#{NugetRepositoryPassword}"
+  only_if { ChocolateyCentralManagementUrl != nil }
+end
+
+chocolatey_config 'CentralManagementServiceUrl' do
+  value  "#{ChocolateyCentralManagementUrl}"
+  only_if { ChocolateyCentralManagementUrl != nil }
+end
+
+chocolatey_config 'centralManagementClientCommunicationSaltAdditivePassword' do
+  value   "#{ChocolateyCentralManagementClientSalt}"
+  only_if { ChocolateyCentralManagementClientSalt != nil }
+end
+
+chocolatey_config 'centralManagementServiceCommunicationSaltAdditivePassword' do
+  value   "#{ChocolateyCentralManagementServiceSalt}"
+  only_if { ChocolateyCentralManagementServiceSalt != nil }
+end
+
+chocolatey_feature 'useChocolateyCentralManagement' do
+  action :enable
+  only_if { ChocolateyCentralManagementUrl != nil }
+end
+
+chocolatey_feature 'useChocolateyCentralManagementDeployments' do
+  action :enable
+  only_if { ChocolateyCentralManagementUrl != nil }
+end
+</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="builder-psdsc" role="tabpanel" aria-labelledby="builder-psdsc-tab">
+                                    <div class="copy-command">
+<pre class="line-numbers border py-3 highlight-delay"><code class="command-builder-organization-psdsc command-injected-organization-script"></code></pre>
+                                    </div>
+                                    <p>Requires cChoco DSC Resource. See docs at <a href="https://github.com/chocolatey/cChoco" target="_blank" rel="noreferrer">https://github.com/chocolatey/cChoco</a>.</p>
+                                    <a class="h4 collapsed btn-collapse d-block d-hash-none mt-4" data-bs-toggle="collapse" href="#builder-psdsc-chocolatey-configuration" role="button" aria-expanded="false" aria-controls="builder-psdsc-chocolatey-configuration" title="If Applicable - Chocolatey Configuration/Installation">If Applicable - Chocolatey Configuration/Installation</a>
+                                    <div class="collapse" id="builder-psdsc-chocolatey-configuration">
+                                        <div class="contains-internal-repo-url copy-command">
+<pre class="line-numbers border py-3 language-powershell"><code class="command-chocolatey-configuration-psdsc">
+#requires -Modules cChoco
+## 1. REQUIREMENTS ##
+### Here are the requirements necessary to ensure this is successful.
+
+### a. Internal/Private Cloud Repository Set Up ###
+#### You'll need an internal/private cloud repository you can use. These are
+####  generally really quick to set up and there are quite a few options.
+####  Chocolatey Software recommends Nexus, Artifactory Pro, or ProGet as they
+####  are repository servers and will give you the ability to manage multiple
+####  repositories and types from one server installation.
+
+### b. Download Chocolatey Package and Put on Internal Repository ###
+#### You need to have downloaded the Chocolatey package as well.
+####  Please see https://chocolatey.org/install#organization
+
+### c. Other Requirements ###
+#### i. Requires chocolatey\cChoco DSC module to be installed on the machine compiling the DSC manifest
+#### NOTE: This will need to be installed before running the DSC portion of this script
+if (-not (Get-Module cChoco -ListAvailable)) {
+    $null = Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+    if (($PSGallery = Get-PSRepository -Name PSGallery).InstallationPolicy -ne "Trusted") {
+        Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+    }
+    Install-Module -Name cChoco
+    if ($PSGallery.InstallationPolicy -ne "Trusted") {
+        Set-PSRepository -Name PSGallery -InstallationPolicy $PSGallery.InstallationPolicy
+    }
+}
+
+#### ii. Requires a hosted copy of the install.ps1 script
+##### This should be available to download without authentication.
+##### The original script can be found here: https://community.chocolatey.org/install.ps1
+
+Configuration ChocolateyConfig {
+## 2. TOP LEVEL VARIABLES ##
+    param(
+### a. Your internal repository url (the main one). ###
+####  Should be similar to what you see when you browse
+#### to https://community.chocolatey.org/api/v2/
+        $NugetRepositoryUrl      = "INTERNAL REPO URL",
+
+### b. Chocolatey nupkg download url ###
+#### This url should result in an immediate download when you navigate to it in
+#### a web browser
+        $ChocolateyNupkgUrl      = "INTERNAL REPO URL/package/chocolatey.2.5.0.nupkg",
+
+### c. Internal Repository Credential ###
+#### If required, add the repository access credential here
+#        $NugetRepositoryCredential = [PSCredential]::new(
+#            "username",
+#            ("password" | ConvertTo-SecureString -AsPlainText -Force)
+#        ),
+
+### d. Install.ps1 URL
+#### The path to the hosted install script:
+        $ChocolateyInstallPs1Url = "https://community.chocolatey.org/install.ps1"
+
+### e. Chocolatey Central Management (CCM) ###
+#### If using CCM to manage Chocolatey, add the following:
+#### i. Endpoint URL for CCM
+#        $ChocolateyCentralManagementUrl = "https://chocolatey-central-management:24020/ChocolateyManagementService",
+
+#### ii. If using a Client Salt, add it here
+#        $ChocolateyCentralManagementClientSalt = "clientsalt",
+
+#### iii. If using a Service Salt, add it here
+#        $ChocolateyCentralManagementServiceSalt = "servicesalt"
+    )
+    Import-DscResource -ModuleName PSDesiredStateConfiguration
+    Import-DscResource -ModuleName cChoco
+
+    Node 'localhost' {
+## 3. ENSURE CHOCOLATEY IS INSTALLED ##
+### Ensure Chocolatey is installed from your internal repository
+        Environment chocoDownloadUrl {
+            Name  = "chocolateyDownloadUrl"
+            Value = $ChocolateyNupkgUrl
+        }
+
+        cChocoInstaller installChocolatey {
+            DependsOn = "[Environment]chocoDownloadUrl"
+            InstallDir = Join-Path $env:ProgramData "chocolatey"
+            ChocoInstallScriptUrl = $ChocolateyInstallPs1Url
+        }
+
+## 4. CONFIGURE CHOCOLATEY BASELINE ##
+### a. FIPS Feature ###
+#### If you need FIPS compliance - make this the first thing you configure
+#### before you do any additional configuration or package installations
+#        cChocoFeature featureFipsCompliance {
+#            FeatureName = "useFipsCompliantChecksums"
+#        }
+
+### b. Apply Recommended Configuration ###
+
+#### Move cache location so Chocolatey is very deterministic about
+#### cleaning up temporary data and the location is secured to admins
+        cChocoConfig cacheLocation {
+            DependsOn  = "[cChocoInstaller]installChocolatey"
+            ConfigName = "cacheLocation"
+            Value      = "C:\ProgramData\chocolatey\cache"
+        }
+
+#### Increase timeout to at least 4 hours
+        cChocoConfig commandExecutionTimeoutSeconds {
+            DependsOn  = "[cChocoInstaller]installChocolatey"
+            ConfigName = "commandExecutionTimeoutSeconds"
+            Value      = 14400
+        }
+
+#### Turn off download progress when running choco through integrations
+        cChocoFeature showDownloadProgress {
+            DependsOn   = "[cChocoInstaller]installChocolatey"
+            FeatureName = "showDownloadProgress"
+            Ensure      = "Absent"
+        }
+
+### c. Sources ###
+#### Remove the default community package repository source
+        cChocoSource removeCommunityRepository {
+            DependsOn  = "[cChocoInstaller]installChocolatey"
+            Name       = "chocolatey"
+            Ensure     = "Absent"
+        }
+
+#### Add internal default sources
+#### You could have multiple sources here, so we will provide an example
+#### of one using the remote repo variable here.
+#### NOTE: This EXAMPLE may require changes
+        cChocoSource addInternalSource {
+            DependsOn  = "[cChocoInstaller]installChocolatey"
+            Name        = "ChocolateyInternal"
+            Source      = $NugetRepositoryUrl
+            Credentials = $NugetRepositoryCredential
+            Priority    = 1
+        }
+
+### b. Keep Chocolatey Up To Date ###
+#### Keep chocolatey up to date based on your internal source
+#### You control the upgrades based on when you push an updated version
+####  to your internal repository.
+#### Note the source here is to the OData feed, similar to what you see
+####  when you browse to https://community.chocolatey.org/api/v2/
+        cChocoPackageInstaller updateChocolatey {
+            DependsOn   = "[cChocoSource]addInternalSource", "[cChocoSource]removeCommunityRepository"
+            Name        = "chocolatey"
+            AutoUpgrade = $true
+        }
+
+## 5. ENSURE CHOCOLATEY FOR BUSINESS ##
+### If you don't have Chocolatey for Business (C4B), you'll want to remove from here down.
+
+### a. Ensure The License File Is Installed ###
+#### Create a license package using script from https://docs.chocolatey.org/en-us/how-tos/setup-offline-installation#exercise-4-create-a-package-for-the-license
+        cChocoPackageInstaller chocolateyLicense {
+            DependsOn = "[cChocoPackageInstaller]updateChocolatey"
+            Name      = "chocolatey-license"
+        }
+
+### b. Disable The Licensed Source ###
+#### The licensed source cannot be removed, so it must be disabled.
+#### This must occur after the license has been set by the license package.
+        Script disableLicensedSource {
+            DependsOn  = "[cChocoPackageInstaller]chocolateyLicense"
+            GetScript  = {
+                $Source = choco source list --limitoutput | `
+                    ConvertFrom-Csv -Delimiter '|' -Header Name, Source, Disabled | `
+                    Where-Object Name -eq "chocolatey.licensed"
+
+                return @{
+                    Result = if ($Source) {
+                        [bool]::Parse($Source.Disabled)
+                    } else {
+                        Write-Warning "Source 'chocolatey.licensed' was not present."
+                        $true  # Source does not need disabling
+                    }
+                }
+            }
+            SetScript  = {
+                $null = choco source disable --name "chocolatey.licensed"
+            }
+            TestScript = {
+                $State = [ScriptBlock]::Create($GetScript).Invoke()
+                return $State.Result
+            }
+        }
+
+### c. Ensure Chocolatey Licensed Extension ###
+#### You will have downloaded the licensed extension to your internal repository
+#### as you have disabled the licensed repository in step 5b.
+
+#### Ensure the chocolatey.extension package (aka Chocolatey Licensed Extension)
+        cChocoPackageInstaller chocolateyLicensedExtension {
+            DependsOn = "[Script]disableLicensedSource"
+            Name      = "chocolatey.extension"
+        }
+
+#### The Chocolatey Licensed Extension unlocks all of the following, which also have configuration/feature items available with them. You may want to visit the feature pages to see what you might want to also enable:
+#### - Package Builder - https://docs.chocolatey.org/en-us/features/paid/package-builder
+#### - Package Internalizer - https://docs.chocolatey.org/en-us/features/paid/package-internalizer
+#### - Package Synchronization (3 components) - https://docs.chocolatey.org/en-us/features/paid/package-synchronization
+#### - Package Reducer - https://docs.chocolatey.org/en-us/features/paid/package-reducer
+#### - Package Audit - https://docs.chocolatey.org/en-us/features/paid/package-audit
+#### - Package Throttle - https://docs.chocolatey.org/en-us/features/paid/package-throttle
+#### - CDN Cache Access - https://docs.chocolatey.org/en-us/features/paid/private-cdn
+#### - Branding - https://docs.chocolatey.org/en-us/features/paid/branding
+#### - Self-Service Anywhere (more components will need to be installed and additional configuration will need to be set) - https://docs.chocolatey.org/en-us/features/paid/self-service-anywhere
+#### - Chocolatey Central Management (more components will need to be installed and additional configuration will need to be set) - https://docs.chocolatey.org/en-us/features/paid/chocolatey-central-management
+#### - Other - https://docs.chocolatey.org/en-us/features/paid/
+
+### d. Ensure Self-Service Anywhere ###
+#### If you have desktop clients where users are not administrators, you may
+#### to take advantage of deploying and configuring Self-Service anywhere
+        cChocoFeature hideElevatedWarnings {
+            DependsOn   = "[cChocoPackageInstaller]chocolateyLicensedExtension"
+            FeatureName = "showNonElevatedWarnings"
+            Ensure      = "Absent"
+        }
+
+        cChocoFeature useBackgroundService {
+            DependsOn   = "[cChocoPackageInstaller]chocolateyLicensedExtension"
+            FeatureName = "useBackgroundService"
+            Ensure      = "Present"
+        }
+
+        cChocoFeature useBackgroundServiceWithNonAdmins {
+            DependsOn   = "[cChocoPackageInstaller]chocolateyLicensedExtension"
+            FeatureName = "useBackgroundServiceWithNonAdministratorsOnly"
+            Ensure      = "Present"
+        }
+
+        cChocoFeature useBackgroundServiceUninstallsForUserInstalls {
+            DependsOn   = "[cChocoPackageInstaller]chocolateyLicensedExtension"
+            FeatureName = "allowBackgroundServiceUninstallsFromUserInstallsOnly"
+            Ensure      = "Present"
+        }
+
+        cChocoConfig allowedBackgroundServiceCommands {
+            DependsOn   = "[cChocoFeature]useBackgroundService"
+            ConfigName = "backgroundServiceAllowedCommands"
+            Value       = "install,upgrade,uninstall"
+        }
+
+### e. Ensure Chocolatey Central Management ###
+#### If you want to manage and report on endpoints, you can set up and configure
+### Central Management. There are multiple portions to manage, so you'll see
+### a section on agents here along with notes on how to configure the server
+### side components.
+        if ($ChocolateyCentralManagementUrl) {
+            cChocoPackageInstaller chocolateyAgent {
+                DependsOn = "[cChocoPackageInstaller]chocolateyLicensedExtension"
+                Name      = "chocolatey-agent"
+            }
+
+            cChocoConfig centralManagementServiceUrl {
+                DependsOn   = "[cChocoPackageInstaller]chocolateyAgent"
+                ConfigName = "CentralManagementServiceUrl"
+                Value       = $ChocolateyCentralManagementUrl
+            }
+
+            if ($ChocolateyCentralManagementClientSalt) {
+                cChocoConfig centralManagementClientSalt {
+                    DependsOn  = "[cChocoPackageInstaller]chocolateyAgent"
+                    ConfigName = "centralManagementClientCommunicationSaltAdditivePassword"
+                    Value      = $ChocolateyCentralManagementClientSalt
+                }
+            }
+
+            if ($ChocolateyCentralManagementServiceSalt) {
+                cChocoConfig centralManagementServiceSalt {
+                    DependsOn  = "[cChocoPackageInstaller]chocolateyAgent"
+                    ConfigName = "centralManagementServiceCommunicationSaltAdditivePassword"
+                    Value      = $ChocolateyCentralManagementServiceSalt
+                }
+            }
+
+            cChocoFeature useCentralManagement {
+                DependsOn   = "[cChocoPackageInstaller]chocolateyAgent"
+                FeatureName = "useChocolateyCentralManagement"
+                Ensure      = "Present"
+            }
+
+            cChocoFeature useCentralManagementDeployments {
+                DependsOn   = "[cChocoPackageInstaller]chocolateyAgent"
+                FeatureName = "useChocolateyCentralManagementDeployments"
+                Ensure      = "Present"
+            }
+        }
+    }
+}
+
+# If working this into an existing configuration with a good method for
+$ConfigData = @{
+    AllNodes = @(
+        @{
+            NodeName                    = "localhost"
+            PSDscAllowPlainTextPassword = $true
+        }
+    )
+}
+
+try {
+    Push-Location $env:Temp
+    $Config = ChocolateyConfig -ConfigurationData $ConfigData
+    Start-DscConfiguration -Path $Config.PSParentPath -Wait -Verbose -Force
+} finally {
+    Pop-Location
+}
+</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="builder-puppet" role="tabpanel" aria-labelledby="builder-puppet-tab">
+                                    <div class="copy-command">
+<pre class="line-numbers border py-3 highlight-delay"><code class="command-builder-organization-puppet command-injected-organization-script"></code></pre>
+                                    </div>
+                                    <p>Requires Puppet Chocolatey Provider module. See docs at <a href="https://forge.puppet.com/puppetlabs/chocolatey" target="_blank" rel="noreferrer">https://forge.puppet.com/puppetlabs/chocolatey</a>.</p>
+                                    <a class="h4 collapsed btn-collapse d-block d-hash-none mt-4" data-bs-toggle="collapse" href="#builder-puppet-chocolatey-configuration" role="button" aria-expanded="false" aria-controls="builder-puppet-chocolatey-configuration" title="If Applicable - Chocolatey Configuration/Installation">If Applicable - Chocolatey Configuration/Installation</a>
+                                    <div class="collapse" id="builder-puppet-chocolatey-configuration">
+                                        <div class="contains-internal-repo-url copy-command">
+<pre class="line-numbers border py-3 language-puppet"><code class="command-chocolatey-configuration-puppet">
+## 1. REQUIREMENTS ##
+### Here are the requirements necessary to ensure this is successful.
+
+### a. Internal/Private Cloud Repository Set Up ###
+#### You'll need an internal/private cloud repository you can use. These are
+####  generally really quick to set up and there are quite a few options.
+####  Chocolatey Software recommends Nexus, Artifactory Pro, or ProGet as they
+####  are repository servers and will give you the ability to manage multiple
+####  repositories and types from one server installation.
+
+### b. Download Chocolatey Package and Put on Internal Repository ###
+#### You need to have downloaded the Chocolatey package as well.
+####  Please see https://chocolatey.org/install#organization
+
+### c. Other Requirements ###
+#### i. Requires puppetlabs/chocolatey module
+####  See https://forge.puppet.com/puppetlabs/chocolatey
+
+
+## 2. TOP LEVEL VARIABLES ##
+### a. Your internal repository url (the main one). ###
+####  Should be similar to what you see when you browse
+#### to https://community.chocolatey.org/api/v2/
+$_repository_url = 'INTERNAL REPO URL'
+
+### b. Chocolatey nupkg download url ###
+#### This url should result in an immediate download when you navigate to it in
+#### a web browser
+$_choco_download_url = 'INTERNAL REPO URL/package/chocolatey.2.5.0.nupkg'
+
+### c. Chocolatey Central Management (CCM) ###
+#### If using CCM to manage Chocolatey, add the following:
+#### i. Endpoint URL for CCM
+# $_chocolatey_central_management_url = 'https://chocolatey-central-management:24020/ChocolateyManagementService'
+
+#### ii. If using a Client Salt, add it here
+# $_chocolatey_central_management_client_salt = "clientsalt"
+
+#### iii. If using a Service Salt, add it here
+# $_chocolatey_central_management_service_salt = 'servicesalt'
+
+
+## 3. ENSURE CHOCOLATEY IS INSTALLED ##
+### Ensure Chocolatey is installed from your internal repository
+### Note: `chocolatey_download_url is completely different than normal
+###  source locations. This is directly to the bare download url for the
+###  chocolatey.nupkg, similar to what you see when you browse to
+###  https://community.chocolatey.org/api/v2/package/chocolatey
+class {'chocolatey':
+  chocolatey_download_url => $_choco_download_url,
+  use_7zip                => false,
+}
+
+
+## 4. CONFIGURE CHOCOLATEY BASELINE ##
+### a. FIPS Feature ###
+#### If you need FIPS compliance - make this the first thing you configure
+#### before you do any additional configuration or package installations
+
+#chocolateyfeature {'useFipsCompliantChecksums':
+#  ensure => enabled,
+#}
+
+### b. Apply Recommended Configuration ###
+
+#### Move cache location so Chocolatey is very deterministic about
+#### cleaning up temporary data and the location is secured to admins
+chocolateyconfig {'cacheLocation':
+  value => 'C:\ProgramData\chocolatey\cache',
+}
+
+#### Increase timeout to at least 4 hours
+chocolateyconfig {'commandExecutionTimeoutSeconds':
+  value => '14400',
+}
+
+#### Turn off download progress when running choco through integrations
+chocolateyfeature {'showDownloadProgress':
+  ensure => disabled,
+}
+
+### c. Sources ###
+#### Remove the default community package repository source
+chocolateysource {'chocolatey':
+  ensure   => absent,
+  location => 'https://community.chocolatey.org/api/v2/',
+}
+
+#### Add internal default sources
+#### You could have multiple sources here, so we will provide an example
+#### of one using the remote repo variable here
+
+#### NOTE: This EXAMPLE requires changes
+chocolateysource {'internal_chocolatey':
+  ensure             => present,
+  location           => $_repository_url,
+  priority           => 1,
+  username           => 'optional',
+  password           => 'optional,not ensured',
+  bypass_proxy       => true,
+  admin_only         => false,
+  allow_self_service => false,
+}
+
+### b. Keep Chocolatey Up To Date ###
+#### Keep chocolatey up to date based on your internal source
+#### You control the upgrades based on when you push an updated version
+####  to your internal repository.
+#### Note the source here is to the OData feed, similar to what you see
+####  when you browse to https://community.chocolatey.org/api/v2/
+
+package {'chocolatey':
+  ensure   => latest,
+  provider => chocolatey,
+  source   => $_repository_url,
+}
+
+
+## 5. ENSURE CHOCOLATEY FOR BUSINESS ##
+### If you don't have Chocolatey for Business (C4B), you'll want to remove from here down.
+
+### a. Ensure The License File Is Installed ###
+#### Create a license package using script from https://docs.chocolatey.org/en-us/guides/organizations/organizational-deployment-guide#exercise-4-create-a-package-for-the-license
+
+# TODO: Add resource for installing/ensuring the chocolatey-license package
+package {'chocolatey-license':
+  ensure   => latest,
+  provider => chocolatey,
+  source   => $_repository_url,
+}
+
+### b. Disable The Licensed Source ###
+#### The licensed source cannot be removed, so it must be disabled.
+#### This must occur after the license has been set by the license package.
+## Disabled sources still need all other attributes until
+## https://tickets.puppetlabs.com/browse/MODULES-4449 is resolved.
+## Password is necessary with user, but not ensurable, so it should not
+## matter what it is set to here. If you ever do get into trouble here,
+## the password is your license GUID.
+chocolateysource {'chocolatey.licensed':
+  ensure   => disabled,
+  priority => '10',
+  user     => 'customer',
+  password => '1234',
+  require  => Package['chocolatey-license'],
+}
+
+### c. Ensure Chocolatey Licensed Extension ###
+#### You will have downloaded the licensed extension to your internal repository
+#### as you have disabled the licensed repository in step 5b.
+
+#### Ensure the chocolatey.extension package (aka Chocolatey Licensed Extension)
+package {'chocolatey.extension':
+  ensure   => latest,
+  provider => chocolatey,
+  source   => $_repository_url,
+  require  => Package['chocolatey-license'],
+}
+
+#### The Chocolatey Licensed Extension unlocks all of the following, which also have configuration/feature items available with them. You may want to visit the feature pages to see what you might want to also enable:
+#### - Package Builder - https://docs.chocolatey.org/en-us/features/paid/package-builder
+#### - Package Internalizer - https://docs.chocolatey.org/en-us/features/paid/package-internalizer
+#### - Package Synchronization (3 components) - https://docs.chocolatey.org/en-us/features/paid/package-synchronization
+#### - Package Reducer - https://docs.chocolatey.org/en-us/features/paid/package-reducer
+#### - Package Audit - https://docs.chocolatey.org/en-us/features/paid/package-audit
+#### - Package Throttle - https://docs.chocolatey.org/en-us/features/paid/package-throttle
+#### - CDN Cache Access - https://docs.chocolatey.org/en-us/features/paid/private-cdn
+#### - Branding - https://docs.chocolatey.org/en-us/features/paid/branding
+#### - Self-Service Anywhere (more components will need to be installed and additional configuration will need to be set) - https://docs.chocolatey.org/en-us/features/paid/self-service-anywhere
+#### - Chocolatey Central Management (more components will need to be installed and additional configuration will need to be set) - https://docs.chocolatey.org/en-us/features/paid/chocolatey-central-management
+#### - Other - https://docs.chocolatey.org/en-us/features/paid/
+
+### d. Ensure Self-Service Anywhere ###
+#### If you have desktop clients where users are not administrators, you may
+#### to take advantage of deploying and configuring Self-Service anywhere
+chocolateyfeature {'showNonElevatedWarnings':
+  ensure => disabled,
+}
+
+chocolateyfeature {'useBackgroundService':
+  ensure => enabled,
+}
+
+chocolateyfeature {'useBackgroundServiceWithNonAdministratorsOnly':
+  ensure => enabled,
+}
+
+chocolateyfeature {'allowBackgroundServiceUninstallsFromUserInstallsOnly':
+  ensure => enabled,
+}
+
+chocolateyconfig {'backgroundServiceAllowedCommands':
+  value => 'install,upgrade,uninstall',
+}
+
+### e. Ensure Chocolatey Central Management ###
+#### If you want to manage and report on endpoints, you can set up and configure
+### Central Management. There are multiple portions to manage, so you'll see
+### a section on agents here along with notes on how to configure the server
+### side components.
+if $_chocolatey_central_management_url {
+  package {'chocolatey-agent':
+    ensure   => latest,
+    provider => chocolatey,
+    source   => $_repository_url,
+    require  => Package['chocolatey-license'],
+  }
+
+  chocolateyconfig {'CentralManagementServiceUrl':
+    value   => $_chocolatey_central_management_url,
+  }
+
+  if $_chocolatey_central_management_client_salt {
+    chocolateyconfig {'centralManagementClientCommunicationSaltAdditivePassword':
+      value => $_chocolatey_central_management_client_salt,
+    }
+  }
+
+  if $_chocolatey_central_management_service_salt {
+    chocolateyconfig {'centralManagementClientCommunicationSaltAdditivePassword':
+      value => $_chocolatey_central_management_client_salt,
+    }
+  }
+
+  chocolateyfeature {'useChocolateyCentralManagement':
+    ensure  => enabled,
+    require => Package['chocolatey-agent'],
+  }
+
+  chocolateyfeature {'useChocolateyCentralManagementDeployments':
+    ensure  => enabled,
+    require => Package['chocolatey-agent'],
+  }
+}
+</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <nav class="d-flex justify-content-end" aria-label="Navigate to previous or next script builder steps">
+                            <div class="btn-group" role="group" aria-label="Navigate to previous or next script builder steps">
+                                <button type="button" class="btn btn-outline-secondary btn-prev-step">Previous</button>
+                                <button type="button" class="btn btn-outline-secondary btn-next-step">Next</button>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <div class="position-absolute bottom-0 start-50 translate-middle-x">
+                <p>Need Help? <a href="https://docs.chocolatey.org/en-us/community-repository/script-builder" target="_blank">View our docs</a> or <a href="https://github.com/chocolatey/home/issues" target="_blank">file an issue</a>.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalScriptBuilderVersionWarning" tabindex="-1" role="dialog" aria-labelledby="Warning Version" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <i class="display-3 text-danger fa-solid fa-circle-exclamation"></i>
+                <h3 class="text-danger mt-3 mb-4">There is already a version of this package in your Script Builder</h3>
+
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Current Version</th>
+                            <th scope="col">New Version</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="current-version"></td>
+                            <td class="new-version"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="justify-content-center mt-4">
+                    <button class="btn btn-danger btn-builder-version btn-builder" data-bs-dismiss="modal">Delete and Add New Version</button>
+                    <button class="btn btn-outline-hover-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="container py-3 py-lg-5">
+    <div id="packageSidebar" class="row">
+        
+        <div class="col-md-3 col-xl-2 d-none d-md-block">
+            <div class="ratio ratio-1x1 package-logo">
+                <div class="d-flex flex-fill align-items-center justify-content-center package-icon">
+                    <img src="/content/packageimages/contextlite.1.0.15.png" alt="Icon for package contextlite" title="Icon for package contextlite | Nuspec reference: &lt;iconUrl&gt;https://raw.githubusercontent.com/Michael-A-Kuykendall/contextlite/main/assets/contextlite-logo.png&lt;/iconurl&gt;" onerror="this.src='/Content/Images/packageDefaultIcon.png';" />
+                </div>
+            </div>
+            <p class="mb-0 mt-3"><strong>Downloads:</strong></p>
+            <h3 class="mt-0 mb-3">7</h3>
+            <p class="mb-0"><strong>Downloads of v 1.0.15:</strong></p>
+            <h3 class="mt-0 mb-3">7</h3>
+            <p class="mb-0"><strong>Last Update:</strong></p>
+            <h3 class="mt-0 mb-3">20 Aug 2025</h3>
+            <p class="mb-0" title="Nuspec reference: owners | nuspec value not used on community feed | Specified as comma-separated"><strong>Package Maintainer(s):</strong></p>
+                <ul class="list-unstyled mb-2 mb-md-0">
+        <li>
+                <a class="d-flex align-items-center mb-2" href="/profiles/michael-kuykendall" title="michael-kuykendall">
+<img src="https://secure.gravatar.com/avatar/8177fbf2afba4b18e66b85384cd33014?s=32&amp;r=g&amp;d=retro" class="rounded-circle" height="32" title="michael-kuykendall" width="32" alt="gravatar" />            <span class="ms-2">michael-kuykendall</span>
+    </a>
+
+        </li>
+    </ul>
+
+            <p class="mb-0 mt-3" title="Software authors. Nuspec reference: authors | Specified as comma-separated"><strong>Software Author(s):</strong></p>
+            <ul class="list-unstyled">
+                    <li class="text-break">ContextLite Team</li>
+            </ul>
+                <p class="mb-0" title="Nuspec reference: tags | Specified as space-separated"><strong>Tags:</strong></p>
+                <ul class="list-unstyled list-inline">
+                        <li class="list-inline-item">
+                            <a class="btn btn-sm btn-bg-body-contrast package-tag" data-package-tag="contextlite" href="#" title="Search for contextlite">#contextlite</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a class="btn btn-sm btn-bg-body-contrast package-tag" data-package-tag="context" href="#" title="Search for context">#context</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a class="btn btn-sm btn-bg-body-contrast package-tag" data-package-tag="ai" href="#" title="Search for ai">#ai</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a class="btn btn-sm btn-bg-body-contrast package-tag" data-package-tag="retrieval" href="#" title="Search for retrieval">#retrieval</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a class="btn btn-sm btn-bg-body-contrast package-tag" data-package-tag="search" href="#" title="Search for search">#search</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a class="btn btn-sm btn-bg-body-contrast package-tag" data-package-tag="database" href="#" title="Search for database">#database</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a class="btn btn-sm btn-bg-body-contrast package-tag" data-package-tag="sqlite" href="#" title="Search for sqlite">#sqlite</a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a class="btn btn-sm btn-bg-body-contrast package-tag" data-package-tag="cli" href="#" title="Search for cli">#cli</a>
+                        </li>
+                </ul>
+            <ul class="list-unstyled">
+                <li class="mt-3"><strong>Software Specific:</strong></li>
+                    <li><a href="https://contextlite.com/" title="Visit the software site to learn more about the software this package installs. Nuspec reference: &lt;projectUrl&gt;https://contextlite.com/&lt;/projectUrl&gt;">Software Site</a></li>
+                    <li><a href="https://github.com/Michael-A-Kuykendall/contextlite" title="See the software source. Nuspec reference: &lt;projectSourceUrl&gt;https://github.com/Michael-A-Kuykendall/contextlite&lt;/projectSourceUrl&gt;">Software Source</a></li>
+                    <li><a href="https://github.com/Michael-A-Kuykendall/contextlite/blob/main/LICENSE" title="Make sure you agree with the software license. Nuspec reference: &lt;licenseUrl&gt;https://github.com/Michael-A-Kuykendall/contextlite/blob/main/LICENSE&lt;/licenseUrl&gt;">Software License</a></li>
+                    <li><a href="https://github.com/Michael-A-Kuykendall/contextlite#readme" title="See the project's documentation. Nuspec reference: &lt;docsUrl&gt;https://github.com/Michael-A-Kuykendall/contextlite#readme&lt;/docsUrl&gt;">Software Docs</a></li>
+                    <li><a href="https://github.com/Michael-A-Kuykendall/contextlite/issues" title="See the project's issue link. Nuspec reference: &lt;bugTrackerUrl&gt;https://github.com/Michael-A-Kuykendall/contextlite/issues&lt;/bugTrackerUrl&gt;">Software Issues</a></li>
+                <li class="mt-3"><strong>Package Specific:</strong></li>
+                    <li><a href="https://github.com/Michael-A-Kuykendall/contextlite/tree/main/chocolatey" title="See the package source. Nuspec reference: &lt;packageSourceUrl&gt;https://github.com/Michael-A-Kuykendall/contextlite/tree/main/chocolatey&lt;/packageSourceUrl&gt;">Package Source</a></li>
+                <li><a href="https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process">Package outdated?</a></li>
+                <li><a href="https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process">Package broken?</a></li>
+                <li><a href="/packages/contextlite/ContactOwners">Contact Maintainers</a></li>
+                <li><a href="/packages/contextlite/1.0.15/ContactAdmins" title="Contact Site Moderators">Contact Site Admins</a></li>
+                <li><a href="https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process#are-you-a-software-vendor">Software Vendor?</a></li>
+                <li><a href="/packages/contextlite/1.0.15/ReportAbuse" title="Report Abuse">Report Abuse</a></li>
+                <li>
+                    <a class="btn btn-secondary btn-sm mt-2" href="https://community.chocolatey.org/api/v2/package/contextlite/1.0.15" title="Download the raw nupkg file." download><i class="fa-solid fa-download" alt="Download"></i> Download</a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="col-12 d-md-none">
+            <div class="justify-content-center align-items-center d-flex">
+                <div class="ratio ratio-1x1 package-logo">
+                    <div class="d-flex flex-fill align-items-center justify-content-center package-icon">
+                        <img src="/content/packageimages/contextlite.1.0.15.png" alt="Icon for package contextlite" title="Icon for package contextlite | Nuspec reference: &lt;iconUrl&gt;https://raw.githubusercontent.com/Michael-A-Kuykendall/contextlite/main/assets/contextlite-logo.png&lt;/iconurl&gt;" onerror="this.src='/Content/Images/packageDefaultIcon.png';" />
+                    </div>
+                </div>
+                <h4 class="mb-0 ms-2" title="Nuspec reference: &lt;title&gt;ContextLite&lt;/title&gt;">ContextLite</h4>
+            </div>
+            <div class="justify-content-center align-items-center d-flex">
+                <a href="#status" title="Click to view test results">
+                    <ul class="status status-sm">
+                        <li><div class="status-passing">1</div></li>
+                        <li><div class="status-unknown">2</div></li>
+                        <li><div class="status-pending-unknown">3</div></li>
+                    </ul>
+                </a>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-sm btn-primary btn-collapse btn-show-hide collapsed mb-3 mt-1" type="button" data-bs-toggle="collapse" data-bs-target="#additional-links" aria-expanded="false" aria-controls="additional-links">
+                    Show Additional Links
+                </button>
+                <div class="collapse text-start" id="additional-links">
+                    <ul class="list-unstyled">
+                        <li class="mt-3"><strong>Software Specific:</strong></li>
+                            <li><a href="https://contextlite.com/" title="Visit the software site to learn more about the software this package installs. Nuspec reference: &lt;projectUrl&gt;https://contextlite.com/&lt;/projectUrl&gt;">Software Site</a></li>
+                            <li><a href="https://github.com/Michael-A-Kuykendall/contextlite" title="See the software source. Nuspec reference: &lt;projectSourceUrl&gt;https://github.com/Michael-A-Kuykendall/contextlite&lt;/projectSourceUrl&gt;">Software Source</a></li>
+                            <li><a href="https://github.com/Michael-A-Kuykendall/contextlite/blob/main/LICENSE" title="Make sure you agree with the software license. Nuspec reference: &lt;licenseUrl&gt;https://github.com/Michael-A-Kuykendall/contextlite/blob/main/LICENSE&lt;/licenseUrl&gt;">Software License</a></li>
+                            <li><a href="https://github.com/Michael-A-Kuykendall/contextlite#readme" title="See the project's documentation. Nuspec reference: &lt;docsUrl&gt;https://github.com/Michael-A-Kuykendall/contextlite#readme&lt;/docsUrl&gt;">Software Docs</a></li>
+                            <li><a href="https://github.com/Michael-A-Kuykendall/contextlite/issues" title="See the project's issue link. Nuspec reference: &lt;bugTrackerUrl&gt;https://github.com/Michael-A-Kuykendall/contextlite/issues&lt;/bugTrackerUrl&gt;">Software Issues</a></li>
+                        <li class="mt-3"><strong>Package Specific:</strong></li>
+                            <li><a href="https://github.com/Michael-A-Kuykendall/contextlite/tree/main/chocolatey" title="See the package source. Nuspec reference: &lt;packageSourceUrl&gt;https://github.com/Michael-A-Kuykendall/contextlite/tree/main/chocolatey&lt;/packageSourceUrl&gt;">Package Source</a></li>
+                        <li><a href="https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process">Package outdated?</a></li>
+                        <li><a href="https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process">Package broken?</a></li>
+                        <li><a href="/packages/contextlite/ContactOwners">Contact Maintainers</a></li>
+                        <li><a href="/packages/contextlite/1.0.15/ContactAdmins" title="Contact Site Moderators">Contact Site Admins</a></li>
+                        <li><a href="https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process#are-you-a-software-vendor">Software Vendor?</a></li>
+                        <li><a href="/packages/contextlite/1.0.15/ReportAbuse" title="Report Abuse">Report Abuse</a></li>
+                        <li>
+                            <a href="https://community.chocolatey.org/api/v2/package/contextlite/1.0.15" title="Download the raw nupkg file.">Download</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row border-bottom">
+                <div class="col">
+                    <p class="mb-0"><small>Downloads:</small></p>
+                    <p class="mb-1">7</p>
+                </div>
+                <div class="col">
+                    <p class="mb-0"><small>Downloads of v 1.0.15:</small></p>
+                    <p class="mb-1">7</p>
+                </div>
+            </div>
+            <div class="border-bottom">
+                <p class="mb-0" title="Nuspec reference: owners | nuspec value not used on community feed | Specified as comma-separated"><small>Maintainer(s):</small></p>
+                    <ul class="list-unstyled mb-2 mb-md-0">
+        <li>
+                <a class="d-flex align-items-center mb-2" href="/profiles/michael-kuykendall" title="michael-kuykendall">
+<img src="https://secure.gravatar.com/avatar/8177fbf2afba4b18e66b85384cd33014?s=32&amp;r=g&amp;d=retro" class="rounded-circle" height="32" title="michael-kuykendall" width="32" alt="gravatar" />            <span class="ms-2">michael-kuykendall</span>
+    </a>
+
+        </li>
+    </ul>
+
+            </div>
+            <p class="mb-0" title="Software authors. Nuspec reference: authors | Specified as comma-separated"><small>Software Author(s):</small></p>
+            <ul class="list-unstyled mb-0 pb-1 border-bottom">
+                    <li class="text-break">ContextLite Team</li>
+            </ul>
+                <div class="mb-3">
+                    <p class="mb-0" title="Nuspec reference: tags | Specified as space-separated"><small>Tags:</small></p>
+                        <a class="badge text-bg-primary package-tag" data-package-tag="contextlite" href="#" title="Search for contextlite">contextlite</a>
+                        <a class="badge text-bg-primary package-tag" data-package-tag="context" href="#" title="Search for context">context</a>
+                        <a class="badge text-bg-primary package-tag" data-package-tag="ai" href="#" title="Search for ai">ai</a>
+                        <a class="badge text-bg-primary package-tag" data-package-tag="retrieval" href="#" title="Search for retrieval">retrieval</a>
+                        <a class="badge text-bg-primary package-tag" data-package-tag="search" href="#" title="Search for search">search</a>
+                        <a class="badge text-bg-primary package-tag" data-package-tag="database" href="#" title="Search for database">database</a>
+                        <a class="badge text-bg-primary package-tag" data-package-tag="sqlite" href="#" title="Search for sqlite">sqlite</a>
+                        <a class="badge text-bg-primary package-tag" data-package-tag="cli" href="#" title="Search for cli">cli</a>
+                </div>
+        </div>
+        
+        <div class="col-md-9 col-xl-10">
+            <div class="mb-3 d-none d-md-block">
+                <h1 class="mb-0 text-center" title="Nuspec reference: &lt;title&gt;ContextLite&lt;/title&gt;">
+                    ContextLite
+                </h1>
+
+                
+    <p class="text-center text-body-secondary">
+        <i>
+            Legal Disclaimer: Neither this package nor Chocolatey Software, Inc. are affiliated with or endorsed by ContextLite Team.
+            The inclusion of ContextLite Team trademark(s), if any, upon this webpage is solely to identify ContextLite Team goods or services
+            and not for commercial purposes.
+        </i>
+    </p>
+
+            </div>
+            
+            <div id="status" class="callout callout-marker-none p-0 callout-warning">
+                <div class="d-flex justify-content-between p-3">
+                    <div class="d-flex">
+                        <div>
+                            <ul class="status mt-0">
+                                <li><div class="status-passing" title="Validation Results: Passing">1</div></li>
+                                <li><div class="status-unknown" title="Package Verification Results: Unknown">2</div></li>
+                                <li><div class="status-pending-unknown" title="Package Scan Results: Pending Unknown">3</div></li>
+                            </ul>
+                        </div>
+                        <div>
+                                    <h3>Some Checks Have Failed or Are Not Yet Complete</h3>
+                                <p>Not All Tests Have Passed</p>
+                        </div>
+                    </div>
+                    <div class="d-none d-xl-block">
+                        <a class="btn-collapse  btn btn-sm btn-secondary btn-show-hide" data-bs-toggle="collapse" href="#testingResults" role="button" aria-expanded="true" aria-controls="testing results" title="Testing Results">
+Hide Checks                    </a>
+                </div>
+            </div>
+            <div class="px-3 pb-3 d-xl-none">
+                <a class="btn-collapse  btn btn-sm btn-secondary btn-show-hide" data-bs-toggle="collapse" href="#testingResults" role="button" aria-expanded="true" aria-controls="testing results" title="Testing Results">
+Hide Checks            </a>
+        </div>
+        <div class="collapse show" id="testingResults">
+            <hr class="mt-0" />
+            
+            <div class="px-3">
+                    <p class="mb-0"><span class="fa-solid fa-check text-success me-3"></span>Validation Testing Passed</p>
+            </div>
+            <hr />
+            
+            <div class="px-3">
+                    <p class="mb-0"><span class="fa-solid fa-question text-secondary me-3"></span>Verification Testing Unknown</p>
+            </div>
+            <hr />
+            
+            <div class="px-3 pb-3">
+                    <p class="mb-0"><span class="fa-solid fa-clock text-warning me-3"></span>Scan Testing Pending</p>
+            </div>
+        </div>
+    </div>
+    
+    
+        <div class="callout callout-danger position-relative z-1">
+            <div class="callout-header">WARNING</div>
+            <p>This package was rejected on 22 Aug 2025. The reviewer michael-kuykendall has listed the following reason(s):</p>
+            <div class="comments-list-container">
+                <div class="comments-list user-unknown">
+                    <h4 id="michael-kuykendall-maintainer-on-20-aug-2025-075244-0000">michael-kuykendall (maintainer) on 20 Aug 2025 07:52:44 +00:00:</h4>
+<p>User 'michael-kuykendall' (maintainer) submitted package.</p>
+<h4 id="chocolatey-ops-reviewer-on-20-aug-2025-082822-0000">chocolatey-ops (reviewer) on 20 Aug 2025 08:28:22 +00:00:</h4>
+<p>contextlite has passed automated validation. It may have or may still fail other checks like testing (verification).<br />
+<strong>NOTE</strong>: No <a href="https://docs.chocolatey.org/en-us/community-repository/moderation/package-validator/rules/#requirements" rel="nofollow">required changes</a> that the validator checks have been flagged! It is appreciated if you fix other items, but only Requirements will hold up a package version from approval. A human review could still turn up issues a computer may not easily find.</p>
+<h5 id="guidelines">Guidelines</h5>
+<p>Guidelines are strong suggestions that improve the quality of a package version. These are considered something to fix for next time to increase the quality of the package. Over time Guidelines can become Requirements. A package version can be approved without addressing Guideline comments but will reduce the quality of the package.</p>
+<ul>
+<li>In the Description element of the nuspec file a potentially invalid Url has been found.  Recommendation is to fix this URL <a href="https://docs.chocolatey.org/en-us/community-repository/moderation/package-validator/rules/cpmr0056" rel="nofollow">More...</a></li>
+</ul>
+<h5 id="notes">Notes</h5>
+<p>Notes typically flag things for both you and the reviewer to go over. Sometimes this is the use of things that may or may not be necessary given the constraints of what you are trying to do and/or are harder for automation to flag for other reasons. Items found in Notes might be Requirements depending on the context. A package version can be approved without addressing Note comments.</p>
+<ul>
+<li>The package maintainer field (owners) matches the software author field (authors) in the nuspec.  The reviewer will ensure that the package maintainer is also the software author. <a href="https://docs.chocolatey.org/en-us/community-repository/moderation/package-validator/rules/cpmr0068" rel="nofollow">More...</a></li>
+<li>The DocsUrl element in the nuspec file should be a valid Url. The reviewer will ensure the specified Url is valid. <a href="https://ch0.co/rules/cpmr0031" rel="nofollow">More...</a></li>
+</ul>
+<h4 id="chocolatey-ops-reviewer-on-20-aug-2025-110346-0000">chocolatey-ops (reviewer) on 20 Aug 2025 11:03:46 +00:00:</h4>
+<p>contextlite has failed automated package testing (verification).<br />
+Please visit <a href="https://gist.github.com/choco-bot/1e9fa81361a1a578d685e25fcf399d47" rel="nofollow">https://gist.github.com/choco-bot/1e9fa81361a1a578d685e25fcf399d47</a> for details.<br />
+The package status will be changed and will be waiting on your next actions.</p>
+<ul>
+<li><strong>NEW!</strong> We have a <a href="https://github.com/chocolatey-community/chocolatey-test-environment" rel="nofollow">test environment</a> for you to replicate the testing we do. This can be used at any time to test packages! See <a href="https://github.com/chocolatey-community/chocolatey-test-environment" rel="nofollow">https://github.com/chocolatey-community/chocolatey-test-environment</a></li>
+<li>Please log in and leave a review comment if you have questions and/or comments.</li>
+<li>If you see the verifier needs to rerun testing against the package without resubmitting (a issue in the test results), you can do that on the package page in the review section.</li>
+<li>If the verifier is <a href="https://docs.chocolatey.org/en-us/community-repository/moderation/package-verifier" rel="nofollow">incompatible with the package</a>, please log in and leave a review comment if the package needs to bypass testing (e.g. package installs specific drivers).</li>
+<li>Automated testing can also fail when a package is not completely silent or has pop ups (<a href="https://community.chocolatey.org/packages/autohotkey.portable" rel="nofollow">AutoHotKey</a> can assist - a great example is the <a href="https://community.chocolatey.org/packages/veracrypt/1.16#files" rel="nofollow">VeraCrypt package</a>).</li>
+<li>A package that cannot be made completely unattended should have the notSilent tag. Note that this must be approved by moderators.</li>
+</ul>
+<h4 id="michael-kuykendall-maintainer-on-20-aug-2025-141419-0000">michael-kuykendall (maintainer) on 20 Aug 2025 14:14:19 +00:00:</h4>
+<p>User 'michael-kuykendall' (maintainer) submitted package.</p>
+<h4 id="chocolatey-ops-reviewer-on-20-aug-2025-144749-0000">chocolatey-ops (reviewer) on 20 Aug 2025 14:47:49 +00:00:</h4>
+<p>contextlite has passed automated validation. It may have or may still fail other checks like testing (verification).<br />
+<strong>NOTE</strong>: No <a href="https://docs.chocolatey.org/en-us/community-repository/moderation/package-validator/rules/#requirements" rel="nofollow">required changes</a> that the validator checks have been flagged! It is appreciated if you fix other items, but only Requirements will hold up a package version from approval. A human review could still turn up issues a computer may not easily find.</p>
+<h5 id="guidelines-1">Guidelines</h5>
+<p>Guidelines are strong suggestions that improve the quality of a package version. These are considered something to fix for next time to increase the quality of the package. Over time Guidelines can become Requirements. A package version can be approved without addressing Guideline comments but will reduce the quality of the package.</p>
+<ul>
+<li>In the ReleaseNotes element of the nuspec file a potentially invalid Url has been found.  Recommendation is to fix this URL <a href="https://docs.chocolatey.org/en-us/community-repository/moderation/package-validator/rules/cpmr0056" rel="nofollow">More...</a></li>
+</ul>
+<h5 id="notes-1">Notes</h5>
+<p>Notes typically flag things for both you and the reviewer to go over. Sometimes this is the use of things that may or may not be necessary given the constraints of what you are trying to do and/or are harder for automation to flag for other reasons. Items found in Notes might be Requirements depending on the context. A package version can be approved without addressing Note comments.</p>
+<ul>
+<li>The package maintainer field (owners) matches the software author field (authors) in the nuspec.  The reviewer will ensure that the package maintainer is also the software author. <a href="https://docs.chocolatey.org/en-us/community-repository/moderation/package-validator/rules/cpmr0068" rel="nofollow">More...</a></li>
+</ul>
+<h4 id="chocolatey-ops-reviewer-on-20-aug-2025-150941-0000">chocolatey-ops (reviewer) on 20 Aug 2025 15:09:41 +00:00:</h4>
+<p>contextlite has failed automated package testing (verification).<br />
+Please visit <a href="https://gist.github.com/choco-bot/548bdf39f319a5e19e6101db813f1c1b" rel="nofollow">https://gist.github.com/choco-bot/548bdf39f319a5e19e6101db813f1c1b</a> for details.<br />
+The package status will be changed and will be waiting on your next actions.</p>
+<ul>
+<li><strong>NEW!</strong> We have a <a href="https://github.com/chocolatey-community/chocolatey-test-environment" rel="nofollow">test environment</a> for you to replicate the testing we do. This can be used at any time to test packages! See <a href="https://github.com/chocolatey-community/chocolatey-test-environment" rel="nofollow">https://github.com/chocolatey-community/chocolatey-test-environment</a></li>
+<li>Please log in and leave a review comment if you have questions and/or comments.</li>
+<li>If you see the verifier needs to rerun testing against the package without resubmitting (a issue in the test results), you can do that on the package page in the review section.</li>
+<li>If the verifier is <a href="https://docs.chocolatey.org/en-us/community-repository/moderation/package-verifier" rel="nofollow">incompatible with the package</a>, please log in and leave a review comment if the package needs to bypass testing (e.g. package installs specific drivers).</li>
+<li>Automated testing can also fail when a package is not completely silent or has pop ups (<a href="https://community.chocolatey.org/packages/autohotkey.portable" rel="nofollow">AutoHotKey</a> can assist - a great example is the <a href="https://community.chocolatey.org/packages/veracrypt/1.16#files" rel="nofollow">VeraCrypt package</a>).</li>
+<li>A package that cannot be made completely unattended should have the notSilent tag. Note that this must be approved by moderators.</li>
+</ul>
+<h4 id="michael-kuykendall-maintainer-on-22-aug-2025-225431-0000">michael-kuykendall (maintainer) on 22 Aug 2025 22:54:31 +00:00:</h4>
+<p>Corrected in newest version<br />
+Verification Status Change - Verification tests have been set to rerun.</p>
+<h4 id="chocolatey-ops-reviewer-on-22-aug-2025-225638-0000">chocolatey-ops (reviewer) on 22 Aug 2025 22:56:38 +00:00:</h4>
+<p>contextlite has failed automated package testing (verification).<br />
+Please visit <a href="https://gist.github.com/choco-bot/1d0f45237752a08b6a6d9a2659cef61d" rel="nofollow">https://gist.github.com/choco-bot/1d0f45237752a08b6a6d9a2659cef61d</a> for details.<br />
+The package status will be changed and will be waiting on your next actions.</p>
+<ul>
+<li><strong>NEW!</strong> We have a <a href="https://github.com/chocolatey-community/chocolatey-test-environment" rel="nofollow">test environment</a> for you to replicate the testing we do. This can be used at any time to test packages! See <a href="https://github.com/chocolatey-community/chocolatey-test-environment" rel="nofollow">https://github.com/chocolatey-community/chocolatey-test-environment</a></li>
+<li>Please log in and leave a review comment if you have questions and/or comments.</li>
+<li>If you see the verifier needs to rerun testing against the package without resubmitting (a issue in the test results), you can do that on the package page in the review section.</li>
+<li>If the verifier is <a href="https://docs.chocolatey.org/en-us/community-repository/moderation/package-verifier" rel="nofollow">incompatible with the package</a>, please log in and leave a review comment if the package needs to bypass testing (e.g. package installs specific drivers).</li>
+<li>Automated testing can also fail when a package is not completely silent or has pop ups (<a href="https://community.chocolatey.org/packages/autohotkey.portable" rel="nofollow">AutoHotKey</a> can assist - a great example is the <a href="https://community.chocolatey.org/packages/veracrypt/1.16#files" rel="nofollow">VeraCrypt package</a>).</li>
+<li>A package that cannot be made completely unattended should have the notSilent tag. Note that this must be approved by moderators.</li>
+</ul>
+<h4 id="michael-kuykendall-maintainer-on-22-aug-2025-225901-0000">michael-kuykendall (maintainer) on 22 Aug 2025 22:59:01 +00:00:</h4>
+<p>Self rejecting old version<br />
+Status Change - Changed status of package from 'submitted' to 'rejected'.</p>
+<h4 id="michael-kuykendall-reviewer-on-23-aug-2025-034812-0000">michael-kuykendall (reviewer) on 23 Aug 2025 03:48:12 +00:00:</h4>
+<p>Approved<br />
+Verification Status Change - Verification tests have been set to rerun.</p>
+
+                </div>
+            </div>
+        </div>
+    <div class="mb-4 pb-4">
+        <a class="h2 btn-collapse d-block mb-n5" data-bs-toggle="collapse" href="#description" role="button" aria-expanded="true" aria-controls="description" title="Nuspec reference: description">Description</a>
+        <div class="collapse show mb-n4" id="description">
+            <span class="pt-5 d-block"></span>
+            <hr />
+            <h1 id="contextlite">ContextLite</h1>
+<p>ContextLite is an ultra-fast context engine designed for retrieval and AI applications. Built with Go for maximum performance, it provides lightning-fast document indexing and semantic search capabilities.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li><strong>🔥 Ultra-Fast</strong>: Microsecond-level query responses with SQLite FTS5</li>
+<li><strong>🚀 Zero Dependencies</strong>: Single binary with no external services required</li>
+<li><strong>🔍 Smart Scoring</strong>: Quantum-inspired relevance algorithms with recency weighting</li>
+<li><strong>⚡ REST API</strong>: Easy integration with any language or framework</li>
+<li><strong>📊 Built-in Analytics</strong>: Query statistics and performance monitoring</li>
+<li><strong>🛡️ Enterprise Ready</strong>: Multi-tenancy, licensing, and advanced features</li>
+</ul>
+<h2 id="installation">Installation</h2>
+<p>After installation, ContextLite will be available as the <code>contextlite</code> command:</p>
+<pre><code>contextlite --help
+contextlite --port 8080
+</code></pre>
+<h2 id="quick-start">Quick Start</h2>
+<ol>
+<li>Start the server: <code>contextlite --port 8080</code></li>
+<li>Add documents via REST API</li>
+<li>Query for relevant content</li>
+<li>Get lightning-fast results</li>
+</ol>
+<p>Visit <a href="https://github.com/Michael-A-Kuykendall/contextlite#readme" rel="nofollow">https://github.com/Michael-A-Kuykendall/contextlite#readme</a> for complete documentation.</p>
+<h2 id="package-notes">Package Notes</h2>
+<p>This Chocolatey package installs the ContextLite binary and makes it available system-wide via PATH.</p>
+
+        </div>
+    </div>
+    
+    <div class="mb-4 pb-4">
+        <a class="h2 btn-collapse d-block mb-n5 collapsed" data-bs-toggle="collapse" href="#files" role="button" aria-expanded="false" aria-controls="files" title="Nuspec reference: files, optional - will default to all files next to nuspec">Files</a>
+        <div class="collapse mb-n4 " id="files">
+            <span class="pt-5 d-block"></span>
+            <hr />
+                    <div class="mb-1">
+                                <button type="button" class="btn btn-sm btn-secondary btn-show-hide me-2" data-bs-toggle="collapse" data-bs-target=".file-path-chocolateyinstall-ps1-665592889" role="button" aria-expanded="false">Show</button>
+                        <span class="file-name align-middle">tools\chocolateyinstall.ps1</span>
+                        <div class="file-path-chocolateyinstall-ps1-665592889 collapse ">
+                            <pre class="highlight-delay"><code class="">$ErrorActionPreference = &#39;Stop&#39;
+
+$packageName = &#39;contextlite&#39;
+$toolsDir = &quot;$(Split-Path -parent $MyInvocation.MyCommand.Definition)&quot;
+$url64 = &#39;https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v1.0.15/contextlite-1.0.15-windows-amd64.zip&#39;
+
+# Package parameters
+$packageArgs = @{
+  packageName   = $packageName
+  unzipLocation = $toolsDir
+  fileType      = &#39;zip&#39;
+  url64bit      = $url64
+  softwareName  = &#39;ContextLite*&#39;
+  
+  # Checksums - Dynamic replacement by CI
+  checksum64    = &#39;8F40C56C5649A8350ACDB2B385592D1F9EC323A2BACC90F7B96CDD54F321E23A&#39;
+  checksumType64= &#39;sha256&#39;
+  
+  # Silent install arguments (not needed for single exe)
+  silentArgs    = &quot;&quot;
+  validExitCodes= @(0)
+}
+
+# Download and extract
+Install-ChocolateyZipPackage @packageArgs
+
+# Create a shim for the executable
+$exePath = Join-Path $toolsDir &#39;contextlite-windows-amd64&#39;
+if (Test-Path $exePath) {
+    Install-ChocolateyShim -Name &#39;contextlite&#39; -Path $exePath
+    Write-Host &quot;ContextLite installed successfully!&quot; -ForegroundColor Green
+    Write-Host &quot;Use &#39;contextlite --help&#39; to get started.&quot; -ForegroundColor Yellow
+} else {
+    Write-Error &quot;Installation failed - executable not found at $exePath&quot;
+}
+
+</code></pre>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                                <button type="button" class="btn btn-sm btn-secondary btn-show-hide me-2" data-bs-toggle="collapse" data-bs-target=".file-path-chocolateyuninstall-ps1-2076824336" role="button" aria-expanded="false">Show</button>
+                        <span class="file-name align-middle">tools\chocolateyuninstall.ps1</span>
+                        <div class="file-path-chocolateyuninstall-ps1-2076824336 collapse ">
+                            <pre class="highlight-delay"><code class="">$ErrorActionPreference = &#39;Stop&#39;
+
+$packageName = &#39;contextlite&#39;
+
+# Remove the shim
+Uninstall-ChocolateyShim -Name &#39;contextlite&#39;
+
+Write-Host &quot;ContextLite has been uninstalled.&quot; -ForegroundColor Green
+</code></pre>
+                        </div>
+                    </div>
+        </div>
+    </div>
+    
+    <div class="mb-4 pb-4">
+        <a class="h2 btn-collapse d-block mb-n5 collapsed" data-bs-toggle="collapse" href="#virus" role="button" aria-expanded="false" aria-controls="virus" title="Virus Scan Results">Virus Scan Results</a>
+        <div class="collapse mb-n4 " id="virus">
+            <span class="pt-5 d-block"></span>
+                <div class="callout callout-warning mt-3">
+                    <p>No results available for this package. We are building up results for older packages over time so expect to see results. If this is a new package, it should have results within a day or two.</p>
+                </div>
+        </div>
+    </div>
+    
+    <div class="mb-4 pb-4">
+        <a class="h2 btn-collapse d-block mb-n5 collapsed" data-bs-toggle="collapse" href="#versionhistory" role="button" aria-expanded="false" aria-controls="versionhistory" title="Version History">Version History</a>
+        <div class="collapse mb-n4 " id="versionhistory">
+            <span class="pt-5 d-block"></span>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped mt-3">
+                    <thead>
+                        <tr>
+                                <th scope="col">Add to Builder <span><a href="https://docs.chocolatey.org/en-us/community-repository/script-builder" title="Learn more about Script Builder" target="_blank"><i class="fa-solid fa-circle-question text-primary"></i></a></span></th>
+                            <th scope="col">Version</th>
+                            <th scope="col">Downloads</th>
+                            <th scope="col">Last Updated</th>
+                            <th scope="col" last>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+        <div class="mb-4 pb-4">
+            <a class="h2 btn-collapse mb-n5 d-block collapsed" data-bs-toggle="collapse" href="#copyright" role="button" aria-expanded="false" aria-controls="copyright" title="Nuspec reference: copyright">Copyright</a>
+            <div class="collapse mb-n4" id="copyright">
+                <span class="pt-5 d-block"></span>
+                <hr />
+                <p class="mb-0">2024 ContextLite Team</p>
+            </div>
+        </div>
+        <div class="mb-4 pb-4">
+            <a class="h2 btn-collapse d-block mb-n5 collapsed" data-bs-toggle="collapse" href="#releasenotes" role="button" aria-expanded="false" aria-controls="releasenotes" title="Nuspec reference: releaseNotes">Release Notes</a>
+            <div class="collapse mb-n4" id="releasenotes">
+                <span class="pt-5 d-block"></span>
+                <hr />
+                <p><a href="https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/1.0.15" rel="nofollow">https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/1.0.15</a></p>
+
+            </div>
+        </div>
+    <div class="mb-4 pb-4">
+        <a class="h2 btn-collapse d-block mb-n5 collapsed" data-bs-toggle="collapse" href="#dependencies" role="button" aria-expanded="false" aria-controls="dependencies" title="Nuspec reference: dependencies">Dependencies</a>
+        <div class="collapse mb-n4 " id="dependencies">
+            <span class="pt-5 d-block"></span>
+            <hr />
+                <p>This package has no dependencies.</p>
+
+        </div>
+    </div>
+    
+    <div class="mb-4 pb-4">
+        <a class="h2 btn-collapse d-block mb-n5" data-bs-toggle="collapse" href="#discussion" role="button" aria-expanded="true" aria-controls="discussion" title=">Discussion for the ContextLite Package">Discussion for the ContextLite Package</a>
+        <div class="collapse show" id="discussion">
+            <span class="pt-5 d-block"></span>
+            <hr />
+            <h3>Ground Rules:</h3>
+            <ul>
+                <li>This discussion is only about ContextLite and the ContextLite package. If you have feedback for Chocolatey, please contact the <a href="https://groups.google.com/group/chocolatey">Google Group</a>.</li>
+                <li>This discussion will carry over multiple versions. If you have a comment about a particular version, please note that in your comments.</li>
+                <li>
+                    The maintainers of this Chocolatey Package will be notified about new comments that are posted to this Disqus thread, however, it is NOT a guarantee that you
+                    will get a response. If you do not hear back from the maintainers after posting a message below, please follow up by using the link
+                    on the left side of this page or follow this link to <a href="/packages/contextlite/ContactOwners">contact maintainers</a>.
+                    If you still hear nothing back, please follow the <a href="https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process">package triage process</a>.
+                </li>
+                <li>Tell us what you love about the package or ContextLite, or tell us what needs improvement.</li>
+                <li>Share your experiences with the package, or extra configuration or gotchas that you've found.</li>
+                <li>If you use a url, the comment will be flagged for moderation until you've been whitelisted. Disqus moderated comments are approved on a weekly schedule if not sooner. It could take between 1-5 days for your comment to show up.</li>
+            </ul>
+            <a name="disqus"></a>
+            <div id="disqus_thread"></div>
+            <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
+    </div>
+</div>
+</div>
+</section>
+
+
+    </main>
+    <footer class="flex-shrink-0">
+        <section id="mc_embed_signup" class="text-bg-primary border-top py-3">
+    <div class="container-fluid">
+        <form action="//chocolatey.us8.list-manage.com/subscribe/post?u=86a6d80146a0da7f2223712e4&amp;id=73b018498d" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+            <div class="d-flex flex-wrap align-items-center justify-content-center">
+                <h3 class="mb-0 me-3">Signup for the Newsletter!</h3>
+                <input title="Invisible Field" type="text" name="b_86a6d80146a0da7f2223712e4_73b018498d" tabindex="-1" value="" class="position-absolute" style="left:-5000px">
+                <div class="input-group w-auto">
+                    <input type="email" class="form-control" placeholder="Your e-mail address" aria-label="Email Address for Newsletter" aria-describedby="mc-embedded-subscribe" name="EMAIL" required>
+                    <button class="btn btn-secondary" type="submit" id="mc-embedded-subscribe">Subscribe</button>
+                </div>
+            </div>
+            <p class="mb-0 mt-1 text-center"><i>Be the first to know about upcoming features, security releases, and news about Chocolatey.</i></p>
+        </form>
+    </div>
+</section>
+        <section class="text-bg-adaptive fw-bold border-top py-5 text-center text-md-start">
+    <div class="container">
+        <div class="row row-divider row-md-divider-none ">
+            <div class="col-md-3 pb-3 pb-md-0">
+                <h4>Overview</h4>
+                <ul class="list-unstyled mb-0">
+                    <li><a href="/courses">Getting Started Guide</a></li>
+                    <li><a href="https://docs.chocolatey.org/en-us/information/security">Security</a></li>
+                    <li><a href="https://chocolatey.org/privacy">Privacy Policy</a></li>
+                    <li><a href="https://chocolatey.org/partner">Partner</a></li>
+                    <li><a href="/terms">Terms of Use</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3 py-3 py-md-0">
+                <h4>Product</h4>
+                <ul class="list-unstyled mb-0">
+                    <li><a href="https://chocolatey.org/contact/trial">C4B Trial</a></li>
+                    <li><a href="https://chocolatey.org/pricing">Pricing</a></li>
+                    <li><a href="https://chocolatey.org/support">Support</a></li>
+                    <li><a href="/packages">Community Packages</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3 py-3 py-md-0">
+                <h4>Learn</h4>
+                <ul class="list-unstyled mb-0">
+                    <li><a href="https://docs.chocolatey.org/en-us/">Docs</a></li>
+                    <li><a href="/courses">Courses</a></li>
+                    <li><a href="/sitemap">Sitemap</a></li>
+                    <li class="d-flex justify-content-center justify-content-md-start">
+                        <a class="me-2" href="https://blog.chocolatey.org/">Blog</a>
+                        <a class="link-underline-none" href="http://feeds.feedburner.com/ChocolateyBlog" rel="alternate" type="application/rss+xml" target="_blank" aria-label="Connect with Chocolatey on pur Blog RSS feed">
+                            <div class="text-bg-rss circle circle-sm" aria-hidden="true">
+                                <i class="fa-solid fa-rss"></i>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-3 pt-3 pt-md-0">
+                <h4>Connect</h4>
+                <ul class="list-unstyled mb-0">
+                    <li><a href="https://chocolatey.org/contact/">Contact Us</a></li>
+                    <li><a href="https://chocolatey.org/support">Support</a></li>
+                    <li><a href="http://eepurl.com/4qUJH">Newsletter</a></li>
+                    <li><a href="http://cafepress.com/chocolatey">Shop</a></li>
+                    <li><a href="https://chocolatey.org/bugs">Report a Bug</a></li>
+                    <li><a href="https://status.chocolatey.org">Status</a></li>
+                    <li class="pt-3">
+                        <ul class="list-unstyled list-inline mb-0">
+    <li class="list-inline-item">
+        <a href="https://twitter.com/chocolateynuget" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on Twitter" title="Connect with Chocolatey on Twitter">
+            <div class="text-bg-twitter circle" aria-hidden="true">
+                <i class="fa-brands fa-x-twitter"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://www.linkedin.com/company/chocolatey-software/" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on LinkedIn" title="Connect with Chocolatey on LinkedIn">
+            <div class="text-bg-linkedin circle" aria-hidden="true">
+                <i class="fa-brands fa-linkedin-in"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://github.com/chocolatey" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on GitHub" title="Connect with Chocolatey on GitHub">
+            <div class="text-bg-body-contrast circle" aria-hidden="true">
+                <i class="fa-brands fa-github"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://www.youtube.com/chocolateysoftware" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on YouTube" title="Connect with Chocolatey on YouTube">
+            <div class="text-bg-youtube circle" aria-hidden="true">
+                <i class="fa-brands fa-youtube"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://www.twitch.tv/chocolateysoftware" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on Twitch" title="Connect with Chocolatey on Twitch">
+            <div class="text-bg-twitch circle" aria-hidden="true">
+                <i class="fa-brands fa-twitch"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://facebook.com/ChocolateySoftware" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on Facebook" title="Connect with Chocolatey on Facebook">
+            <div class="text-bg-facebook circle" aria-hidden="true">
+                <i class="fa-brands fa-facebook-f"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://ch0.co/community" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on Community Chat" title="Connect with Chocolatey on Community Chat">
+            <div class="text-bg-chat circle" aria-hidden="true">
+                <i class="fa-solid fa-comment"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://groups.google.com/forum/#!forum/chocolatey" class="link-underline-none" target="_blank" rel="noreferrer" aria-label="Connect with Chocolatey on Google Groups" title="Connect with Chocolatey on Google Groups">
+            <div class="text-bg-google circle" aria-hidden="true">
+                <i class="fa-brands fa-google"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://fosstodon.org/@chocolatey" class="link-underline-none" target="_blank" rel="me" aria-label="Connect with Chocolatey on Mastodon" title="Connect with Chocolatey on Mastodon">
+            <div class="text-bg-mastodon circle" aria-hidden="true">
+                <i class="fa-brands fa-mastodon"></i>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://bsky.app/profile/chocolatey.org" class="link-underline-none" target="_blank" rel="me" aria-label="Connect with Chocolatey on Bluesky" title="Connect with Chocolatey on Bluesky">
+            <div class="text-bg-bluesky circle" aria-hidden="true">
+                <svg class="w-50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 568 501"><title>Bluesky butterfly logo</title><path fill="#fff" d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.192 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.778 166.555-20.275 72.453-94.155 90.933-159.875 79.748C507.222 323.8 536.444 388.56 473.333 453.32c-119.86 122.992-172.272-30.859-185.702-70.281-2.462-7.227-3.614-10.608-3.631-7.733-.017-2.875-1.169.506-3.631 7.733-13.43 39.422-65.842 193.273-185.702 70.281-63.111-64.76-33.89-129.52 80.986-149.071-65.72 11.185-139.6-7.295-159.875-79.748C9.945 203.659 0 75.291 0 57.946 0-28.906 76.135-1.612 123.121 33.664Z"></path></svg>
+            </div>
+        </a>
+    </li>
+    <li class="list-inline-item">
+        <a href="https://ch0.co/podcast" class="link-underline-none" target="_blank" rel="me" aria-label="Listen to the Unpacking Software Podcast" title="Listen to the Unpacking Software Podcast">
+            <div class="text-bg-podcast circle" aria-hidden="true">
+                <i class="fa-solid fa-podcast"></i>
+            </div>
+        </a>
+    </li>
+</ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+        <section class="text-bg-body-secondary border-top text-center px-3 pt-3">
+    <span class="small">
+        <span>&copy; 2025 Chocolatey Software, Inc.</span><br />
+        <span class="text-body-secondary">Deployed from 6c463c0583. You are on EC2AMAZ-H61KIUO. Page generated 26 Aug 2025 07:15:53 +00:00.</span>
+    </span>
+</section>
+        <div id="cookieNoticeAlert" class="alert alert-primary alert-dismissible alert-dismissible-center alert-btn-center fade show d-none" role="alert">
+    <p class="mb-0"><strong>chocolatey.org uses cookies to enhance the user experience of the site.</strong></p>
+    <button type="button" class="btn btn-bg-body btn-sm d-none d-md-inline-block" data-bs-dismiss="alert" aria-label="Close">I accept</button>
+    <button type="button" class="btn btn-bg-body d-md-none" data-bs-dismiss="alert" aria-label="Close">I accept</button>
+</div>
+    </footer>
+    <div id="cookieNoticeAlert" class="alert alert-primary alert-dismissible alert-dismissible-center alert-btn-center fade show d-none" role="alert">
+    <p class="mb-0"><strong>chocolatey.org uses cookies to enhance the user experience of the site.</strong></p>
+    <button type="button" class="btn btn-bg-body btn-sm d-none d-md-inline-block" data-bs-dismiss="alert" aria-label="Close">I accept</button>
+    <button type="button" class="btn btn-bg-body d-md-none" data-bs-dismiss="alert" aria-label="Close">I accept</button>
+</div>
+    
+    <script type="text/javascript" src="/Scripts/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="/Scripts/community-packages.min.js"></script>
+    <script type="text/javascript" src="/Scripts/community-package-differ.min.js"></script>
+    <script type="text/javascript" language="javascript">
+        var disqus_shortname = 'chocolatey';
+        var disqus_url = 'https://community.chocolatey.org/packages/contextlite';
+        var commentItem;
+
+        function disqus_config() {
+            this.callbacks.onNewComment = [
+                function(comment) {
+                    var commentViewModel = { Id: comment.id, Text: comment.text };
+                    var commentPostUrl = location.protocol + '//community.chocolatey.org/packages/contextlite/notify-comment';
+
+                    var requestOptions = {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(commentViewModel),
+                    };
+
+                    fetch(commentPostUrl, requestOptions).then(function (response) {
+                        if (response.ok) {
+                            console.log('Email sent successfully');
+                        } else {
+                            throw new Error('Network response was not ok');
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error('Error:', error);
+                    });
+                }
+            ];
+        }
+    </script>
+    <script type="text/javascript" src='/Scripts/disqus.min.js'></script>
+
+    <noscript><img src="https://ws.zoominfo.com/pixel/KPKpTJOFOv5SuV7X3eGx" width="1" height="1" style="display: none;" /></noscript>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97518a61587bd307',t:'MTc1NjE5MjU1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

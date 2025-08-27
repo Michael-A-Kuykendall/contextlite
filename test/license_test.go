@@ -5,10 +5,8 @@ import (
 	"crypto/rsa"
 	"encoding/base64"
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"contextlite/internal/license"
 	"github.com/stretchr/testify/assert"
