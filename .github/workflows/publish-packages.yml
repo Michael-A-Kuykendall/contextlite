@@ -137,18 +137,14 @@ jobs:
 
   publish-npm:
     runs-on: ubuntu-latest
-    needs: build-and-release
     if: inputs.platforms == 'all' || contains(inputs.platforms, 'npm') || github.event_name != 'workflow_dispatch'
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org'
-
+      
       - name: Get version
         id: version
         run: |
@@ -158,43 +154,20 @@ jobs:
             echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Check if npm package exists
-        id: check_npm
+      - name: Check if version exists
+        id: check
         run: |
           if npm view contextlite@${{ steps.version.outputs.version }} >/dev/null 2>&1; then
-            echo "skip=true" >> $GITHUB_OUTPUT
-            echo "✅ npm package already exists, skipping"
+            echo "exists=true" >> $GITHUB_OUTPUT
           else
-            echo "skip=false" >> $GITHUB_OUTPUT
-            echo "🚀 npm package not found, proceeding"
+            echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create npm package structure
-        if: steps.check_npm.outputs.skip == 'false'
+      - name: Update version and publish
+        if: steps.check.outputs.exists == 'false'
+        working-directory: npm-wrapper
         run: |
-          # Use existing npm-wrapper (already built)
-          cp -r npm-wrapper npm-package
-          # Clean any existing node_modules and lock files
-          rm -rf npm-package/node_modules
-          rm -f npm-package/package-lock.json
-
-      - name: Update npm package version
-        if: steps.check_npm.outputs.skip == 'false'
-        run: |
-          cd npm-package
           npm version ${{ steps.version.outputs.version }} --no-git-tag-version
-
-      - name: Install npm dependencies (production only)
-        if: steps.check_npm.outputs.skip == 'false'
-        run: |
-          cd npm-package
-          # Install only production dependencies, skip all scripts
-          npm install --only=production --ignore-scripts
-
-      - name: Publish to npm
-        if: steps.check_npm.outputs.skip == 'false'
-        run: |
-          cd npm-package
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

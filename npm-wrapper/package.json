@@ -46,8 +46,6 @@
   ],
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build",
-    "postinstall": "node scripts/fetch-binary.js",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts"
