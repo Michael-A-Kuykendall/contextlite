@@ -187,8 +187,15 @@ jobs:
           cd npm-package
           # Backup original package.json
           cp package.json package.json.backup
-          # Remove postinstall script using sed
-          sed '/"postinstall":/d' package.json > package.json.tmp && mv package.json.tmp package.json
+          # Create minimal package.json without scripts section for install
+          node -e "
+            const pkg = require('./package.json');
+            const { scripts, ...rest } = pkg;
+            require('fs').writeFileSync('package-minimal.json', JSON.stringify({...rest, scripts: {build: 'tsc'}}, null, 2));
+          "
+          # Install with minimal package.json
+          mv package.json package-full.json
+          mv package-minimal.json package.json
           npm install
 
       - name: Build npm package
@@ -197,11 +204,11 @@ jobs:
           cd npm-package
           npm run build
 
-      - name: Restore postinstall script for published package
+      - name: Restore full package.json for published package
         if: steps.check_npm.outputs.skip == 'false'
         run: |
           cd npm-package
-          # Restore original package.json with postinstall script
+          # Restore original package.json with all scripts
           mv package.json.backup package.json
 
       - name: Publish to npm
