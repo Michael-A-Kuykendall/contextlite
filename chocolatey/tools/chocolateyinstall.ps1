@@ -27,7 +27,7 @@ Install-ChocolateyZipPackage @packageArgs
 # Create a shim for the executable
 $exePath = Join-Path $toolsDir 'contextlite.exe'
 if (Test-Path $exePath) {
-    Install-ChocolateyShim -Name 'contextlite' -Path $exePath
+    Install-BinFile -Name 'contextlite' -Path $exePath
     Write-Host "ContextLite installed successfully!" -ForegroundColor Green
     Write-Host "Use 'contextlite --help' to get started." -ForegroundColor Yellow
 } else {
