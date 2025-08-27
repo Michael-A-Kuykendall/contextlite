@@ -185,8 +185,10 @@ jobs:
         if: steps.check_npm.outputs.skip == 'false'
         run: |
           cd npm-package
-          # Completely disable postinstall during workflow build
-          npm pkg delete scripts.postinstall
+          # Backup original package.json
+          cp package.json package.json.backup
+          # Remove postinstall script using jq
+          jq 'del(.scripts.postinstall)' package.json > package.json.tmp && mv package.json.tmp package.json
           npm install
 
       - name: Build npm package
@@ -199,8 +201,8 @@ jobs:
         if: steps.check_npm.outputs.skip == 'false'
         run: |
           cd npm-package
-          # Restore postinstall script for the final published package
-          npm pkg set scripts.postinstall="node scripts/fetch-binary.js"
+          # Restore original package.json with postinstall script
+          mv package.json.backup package.json
 
       - name: Publish to npm
         if: steps.check_npm.outputs.skip == 'false'
