@@ -181,11 +181,11 @@ jobs:
           cd npm-package
           npm version ${{ steps.version.outputs.version }} --no-git-tag-version
 
-      - name: Install npm dependencies
+      - name: Install npm dependencies (dev only, skip postinstall)
         if: steps.check_npm.outputs.skip == 'false'
         run: |
           cd npm-package
-          npm install
+          NODE_ENV=development npm install
 
       - name: Build npm package
         if: steps.check_npm.outputs.skip == 'false'
