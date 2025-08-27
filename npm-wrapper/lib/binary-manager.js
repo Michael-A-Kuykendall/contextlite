@@ -80,7 +80,7 @@ class BinaryManager {
             const fileStream = (0, fs_2.createWriteStream)(destPath);
             response.body?.pipe(fileStream);
             await new Promise((resolve, reject) => {
-                fileStream.on('finish', () => resolve());
+                fileStream.on('finish', resolve);
                 fileStream.on('error', reject);
             });
             // Make executable on Unix systems
