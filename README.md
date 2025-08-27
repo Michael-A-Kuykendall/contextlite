@@ -258,7 +258,7 @@ ContextLite uses sophisticated mathematical optimization for document selection:
 
 - **Weighted Optimization**: Balances multiple relevance factors
 - **Priority-based Selection**: Configurable ranking strategies  
-- **Constraint Satisfaction**: Respects token budgets and document limits
+- **Budget Management**: Respects token budgets and document limits
 
 See documentation for configuration options.
 
@@ -357,7 +357,7 @@ curl http://localhost:8080/health
 # Storage statistics
 curl http://localhost:8080/api/v1/storage/info
 
-# optimization system performance
+# Optimization performance
 curl http://localhost:8080/api/v1/optimization/stats
 
 # Cache performance
