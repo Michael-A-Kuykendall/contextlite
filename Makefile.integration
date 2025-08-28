@@ -1,0 +1,66 @@
+# ContextLite Integration Makefile
+
+.PHONY: all clean install test help
+
+# Build all integration tools
+all: contextlite-port contextlite-cli vscode-extension
+
+# Build the intelligent port manager
+contextlite-port:
+	@echo "🔧 Building ContextLite Port Manager..."
+	go build -o bin/contextlite-port.exe ./cmd/contextlite-port/main.go
+
+# Build the CLI discovery tool  
+contextlite-cli:
+	@echo "🔍 Building ContextLite CLI Discovery Tool..."
+	go build -o bin/contextlite-cli.exe ./cmd/contextlite-cli/main.go
+
+# Build VS Code extension
+vscode-extension:
+	@echo "🆚 Building VS Code Extension..."
+	cd vscode-extension && npm install && npm run compile
+
+# Install tools globally (requires admin/sudo)
+install: all
+	@echo "📦 Installing tools globally..."
+	cp bin/contextlite-port.exe /usr/local/bin/contextlite-port.exe 2>/dev/null || cp bin/contextlite-port.exe ~/bin/ || echo "⚠️ Could not install globally"
+	cp bin/contextlite-cli.exe /usr/local/bin/contextlite-cli.exe 2>/dev/null || cp bin/contextlite-cli.exe ~/bin/ || echo "⚠️ Could not install globally"
+
+# Test the integration
+test: all
+	@echo "🧪 Testing ContextLite Integration..."
+	@echo "1. Testing Port Manager..."
+	./bin/contextlite-port.exe list
+	@echo "2. Testing CLI Discovery..."
+	./bin/contextlite-cli.exe discover
+	@echo "3. Testing CLI Status..."
+	./bin/contextlite-cli.exe status
+
+# Clean build artifacts
+clean:
+	@echo "🧹 Cleaning build artifacts..."
+	rm -f bin/contextlite-port.exe bin/contextlite-cli.exe
+	rm -f contextlite-port.exe contextlite-cli.exe
+
+# Show help
+help:
+	@echo "ContextLite Integration Build System"
+	@echo "==================================="
+	@echo ""
+	@echo "Commands:"
+	@echo "  make all              # Build all tools"
+	@echo "  make contextlite-port # Build port manager"
+	@echo "  make contextlite-cli  # Build CLI discovery tool"
+	@echo "  make vscode-extension # Build VS Code extension"
+	@echo "  make install          # Install tools globally"
+	@echo "  make test             # Test integration"
+	@echo "  make clean            # Clean build artifacts"
+	@echo ""
+	@echo "Usage Examples:"
+	@echo "  ./bin/contextlite-port.exe assign /path/to/project"
+	@echo "  ./bin/contextlite-cli.exe discover"
+	@echo "  ./bin/contextlite-cli.exe query project-name \"search terms\""
+
+# Create bin directory if it doesn't exist
+bin:
+	mkdir -p bin

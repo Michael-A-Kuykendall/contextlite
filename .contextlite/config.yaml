@@ -1,0 +1,76 @@
+# Auto-generated ContextLite configuration for contextlite
+# Generated at: 2025-08-28T12:53:57-05:00
+# Port: 8080
+
+server:
+  port: 8080
+  host: "127.0.0.1"
+  cors_enabled: true
+
+storage:
+  database_path: "./contextlite.db"
+  cache_size_mb: 256
+
+cluster:
+  enabled: true
+  node_id: "contextlite-contextlite-8080"
+  
+  affinity:
+    workspace_routing: true
+    sticky_sessions: true
+    rules:
+      "contextlite":
+        resource_tier: "high"
+        max_memory_mb: 512
+        priority: 8
+
+# Project isolation settings
+privacy:
+  project_isolation: true
+  exclude_patterns:
+    - "*.env*"
+    - "*.key" 
+    - "*.pem"
+    - "secrets/*"
+    - "node_modules/*"
+    - ".git/*"
+    - "vendor/*"
+    - "__pycache__/*"
+    - "*.pyc"
+    - ".DS_Store"
+    - "Thumbs.db"
+
+# Performance optimization
+performance:
+  cache_embeddings: true
+  enable_smart_indexing: true
+  update_frequency: "on_save"
+  precompute_similar_files: true
+
+# SMT solver settings optimized for development
+smt:
+  solver_timeout_ms: 1000
+  max_candidates: 100
+  objective_style: "weighted-sum"
+  enable_code_structure_analysis: true
+
+# Weights optimized for code understanding
+weights:
+  relevance: 0.30
+  recency: 0.20
+  entanglement: 0.20
+  specificity: 0.15
+  authority: 0.10
+  prior: 0.05
+
+# Logging
+logging:
+  level: "info"
+  file: "./contextlite.log"
+
+# Port management metadata
+port_management:
+  assigned_by: "contextlite-port-manager"
+  assignment_time: "2025-08-28T12:53:57-05:00"
+  project_path: "/c/users/micha/repos/contextlite"
+  auto_cleanup: true

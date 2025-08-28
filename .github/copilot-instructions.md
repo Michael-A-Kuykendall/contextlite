@@ -273,7 +273,132 @@ From successful npm/PyPI implementations:
 3. **Debug token/permission issues** (1 hour) → fixes publishing failures
 4. **Implement missing packages** (4 hours) → completes ecosystem
 
-## 12. Hugging Face Page Management 🎯
+## 12. Mission Architecture & AI Integration 🎯
+
+### **Shimmy as Primary Interface (Future Intention)**
+- **Architecture Decision**: Shimmy will be the primary interaction point with Rustchain
+- **Integration Flow**: Mission YAML → Rustchain → Shimmy → Champion Model → Results
+- **Fallback Strategy**: Direct Ollama/HTTP APIs for specific edge cases
+- **Champion Model**: `llama32-champion:latest` (custom-trained on Rust/Go projects)
+
+### **Mission Workflow System**
+```
+docs/mission-stacks/
+├── current/     # Active missions being executed
+└── done/        # Completed missions with results
+```
+
+### **Mission Lifecycle Management**
+1. Critical tasks → Mission chunks → YAML generation
+2. **MANDATORY**: Validate mission with `./rustchain.exe mission validate [mission.yaml]`
+3. **MANDATORY**: Dry-run validation with `./rustchain.exe run --dry-run [mission.yaml]`
+4. Place in `current/` → Rustchain execution → Champion AI processing
+5. **MANDATORY**: Validate results and fix template variables before archival
+6. Validation → Results archival → Move to `done/`
+7. Expected processing time: 20-30 minutes for full critical task list
+
+**⚠️ CRITICAL WORKFLOW RULE**: Always run validate → dry-run first to catch issues early and save time!
+
+## 13. Complete Release Mission Workflow 🚀
+
+### **Mission Organization Structure**
+```
+docs/mission-stacks/
+├── current/        # Active missions being executed
+├── hopper/         # Ready missions queued for execution  
+└── done/           # Completed missions with results
+```
+
+### **Mission Execution Protocol**
+1. **Validate**: `./rustchain.exe mission validate [mission.yaml]`
+2. **Dry-run**: `./rustchain.exe run --dry-run [mission.yaml]`
+3. **Execute**: `./rustchain.exe run [mission.yaml]`
+4. **Validate Results**: Check output quality and completeness
+5. **Fix & Retry**: If mission fails, correct once and retry; if fails twice, finish manually and move on
+6. **Archive**: Move completed missions to `done/` folder with timestamp
+
+### **Mission Failure Protocol**
+- **First Failure**: Debug, fix mission, retry once
+- **Second Failure**: Complete task manually, document issue, move to next mission
+- **Quality Control**: All results must be validated before archival
+- **Persistence**: All work must be documented and preserved
+
+### **Release Process Integration**
+- Code fixes → Documentation updates → Marketing materials → Deployment preparation
+- All steps must be mission-driven with Champion AI execution
+- Maintain consistency across all release artifacts
+- Ensure complete traceability from code to marketing
+
+## 14. Railway CLI Master Guide 🎯
+
+### **CRITICAL: Interactive vs Non-Interactive Commands**
+**ROOT PROBLEM**: Railway CLI defaults to interactive prompts that LOCK UP scripts
+
+### **✅ CORRECT: Non-Interactive Usage**
+```bash
+# ALWAYS specify service/environment explicitly
+railway service contextlite-testing
+railway logs -s contextlite-testing  
+railway up -s contextlite-testing
+railway variables -s contextlite-testing
+railway ssh -s contextlite-testing -- ls
+```
+
+### **❌ WRONG: Interactive Commands (WILL LOCK UP)**
+```bash
+# NEVER USE - these open interactive selectors
+railway service      # Opens selector menu - LOCKS UP
+railway ssh          # Waits for service selection - LOCKS UP
+railway environment  # Opens environment selector - LOCKS UP
+```
+
+### **Authentication with Project Tokens**
+```bash
+export RAILWAY_TOKEN="d66cb512-df83-4f65-8bfb-77074517baaa"
+
+# Project tokens work for:
+railway up           # Deploy
+railway status       # Check status  
+railway redeploy     # Redeploy
+railway variables    # Environment variables
+
+# Project tokens DON'T work for:
+railway whoami       # Needs account token
+railway logs         # May be restricted
+railway list         # Needs account token
+```
+
+### **Current Service Status**
+- **contextlite-testing**: Has abandoned cart system with SQL bug
+- **contextlite**: Main production, no abandoned cart endpoints  
+- **contextlite-backup**: Backup service, no abandoned cart endpoints
+
+### **SSH Usage (Non-Interactive)**
+```bash
+# Execute single commands only
+railway ssh -s contextlite-testing -- ls -la
+railway ssh -s contextlite-testing -- cat /app/abandoned_carts.db
+railway ssh -s contextlite-testing -- find /app -name "*.db"
+
+# Some containers have no shell - use HTTP endpoints instead
+curl -s "https://contextlite-testing-production.up.railway.app/cart/status"
+```
+
+### **Debugging Abandoned Carts**
+```bash
+# Working endpoints:
+curl -s "https://contextlite-testing-production.up.railway.app/health"
+curl -X POST "https://contextlite-testing-production.up.railway.app/cart/abandon"
+
+# Broken endpoint (SQL bug):
+curl -s "https://contextlite-testing-production.up.railway.app/cart/status"
+# Error: "sql: Scan error converting NULL to int64"
+```
+
+### **Complete Documentation**
+See `RAILWAY_CLI_MASTER_GUIDE.md` for complete reference
+
+## 13. Hugging Face Page Management 🎯
 
 ### **Professional Download Experience**
 - **URL**: https://huggingface.co/spaces/MikeKuykendall/contextlite-download

@@ -19,6 +19,7 @@ import (
 	"github.com/stripe/stripe-go/v74"
 	"github.com/stripe/stripe-go/v74/webhook"
 	"contextlite/internal/license"
+	_ "modernc.org/sqlite" // SQLite driver for abandoned cart functionality
 )
 
 // Configuration
@@ -32,12 +33,14 @@ type Config struct {
 	optimizationPUser            string `json:"optimizationp_user"`
 	optimizationPPassword        string `json:"optimizationp_password"`
 	FromEmail           string `json:"from_email"`
+	AbandonedCartEnabled bool  `json:"abandoned_cart_enabled"`
 }
 
 // LicenseServer handles license generation and distribution
 type LicenseServer struct {
 	config     *Config
 	privateKey *rsa.PrivateKey
+	abandonedCartManager *license.AbandonedCartManager
 }
 
 // NewLicenseServer creates a new license server
@@ -67,7 +70,31 @@ func NewLicenseServer(config *Config) (*LicenseServer, error) {
 		}
 		privateKey = pk
 	}
-	return &LicenseServer{config: config, privateKey: privateKey}, nil
+
+	server := &LicenseServer{config: config, privateKey: privateKey}
+
+	// Initialize abandoned cart service if enabled
+	if config.AbandonedCartEnabled {
+		log.Printf("Abandoned cart recovery system enabled")
+		smtpConfig := license.SMTPConfig{
+			Host:     config.optimizationPHost,
+			Port:     config.optimizationPPort,
+			User:     config.optimizationPUser,
+			Password: config.optimizationPPassword,
+			FromAddr: config.FromEmail,
+		}
+		cartManager, err := license.NewAbandonedCartManager("./abandoned_carts.db", smtpConfig)
+		if err != nil {
+			log.Printf("WARNING: Failed to initialize abandoned cart manager: %v", err)
+			log.Printf("Continuing without abandoned cart functionality...")
+		} else {
+			server.abandonedCartManager = cartManager
+		}
+	} else {
+		log.Printf("Abandoned cart recovery system disabled")
+	}
+
+	return server, nil
 }
 
 // Start starts the license server
@@ -98,6 +125,15 @@ func (ls *LicenseServer) Start() error {
 	mux.HandleFunc("/usage", ls.handleRecordUsage)
 	mux.HandleFunc("/analytics", ls.handleGetAnalytics)
 	mux.HandleFunc("/security", ls.handleSecurityEvents)
+	
+	// Abandoned cart endpoints (if enabled)
+	if ls.config.AbandonedCartEnabled && ls.abandonedCartManager != nil {
+		mux.HandleFunc("/cart/create", ls.handleCreateCart)
+		mux.HandleFunc("/cart/complete", ls.handleCompleteCart)
+		mux.HandleFunc("/cart/abandon", ls.handleAbandonCart)
+		mux.HandleFunc("/cart/status", ls.handleCartStatus)
+		log.Printf("Abandoned cart endpoints enabled")
+	}
 	
 	log.Printf("License server starting on port %d", ls.config.Port)
 	return http.ListenAndServe(fmt.Sprintf(":%d", ls.config.Port), mux)
@@ -664,6 +700,174 @@ func (ls *LicenseServer) handleSecurityEvents(w http.ResponseWriter, r *http.Req
 	})
 }
 
+// Abandoned cart handlers
+// handleCreateCart creates a new shopping cart
+func (ls *LicenseServer) handleCreateCart(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if ls.abandonedCartManager == nil {
+		http.Error(w, "Abandoned cart service not available", http.StatusServiceUnavailable)
+		return
+	}
+
+	var req struct {
+		SessionID   string `json:"session_id"`
+		Email       string `json:"email"`
+		Amount      int64  `json:"amount"`
+		Currency    string `json:"currency"`
+		ProductName string `json:"product_name"`
+		PaymentURL  string `json:"payment_url"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	// Set defaults
+	if req.Currency == "" {
+		req.Currency = "usd"
+	}
+	if req.ProductName == "" {
+		req.ProductName = "ContextLite License"
+	}
+
+	// Record abandoned cart (expires in 24 hours)
+	expiredAt := time.Now().Add(24 * time.Hour)
+	err := ls.abandonedCartManager.RecordAbandonedCart(
+		req.SessionID, req.Email, req.Amount, req.Currency, 
+		req.ProductName, req.PaymentURL, expiredAt)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success":    true,
+		"session_id": req.SessionID,
+		"message":    "Cart recorded for abandoned cart recovery",
+	})
+}
+
+// handleCompleteCart marks a cart as completed
+func (ls *LicenseServer) handleCompleteCart(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if ls.abandonedCartManager == nil {
+		http.Error(w, "Abandoned cart service not available", http.StatusServiceUnavailable)
+		return
+	}
+
+	var req struct {
+		SessionID string `json:"session_id"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	err := ls.abandonedCartManager.MarkRecovered(req.SessionID)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": "Cart marked as completed/recovered",
+	})
+}
+
+// handleAbandonCart processes abandoned carts (triggers email sequence)
+func (ls *LicenseServer) handleAbandonCart(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if ls.abandonedCartManager == nil {
+		http.Error(w, "Abandoned cart service not available", http.StatusServiceUnavailable)
+		return
+	}
+
+	// Process all abandoned carts (triggers email sequences)
+	err := ls.abandonedCartManager.ProcessAbandonedCarts()
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": "Abandoned cart processing completed",
+	})
+}
+
+// handleCartStatus gets cart status and analytics
+func (ls *LicenseServer) handleCartStatus(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if ls.abandonedCartManager == nil {
+		http.Error(w, "Abandoned cart service not available", http.StatusServiceUnavailable)
+		return
+	}
+
+	// Get days parameter (default 30)
+	days := 30
+	if daysStr := r.URL.Query().Get("days"); daysStr != "" {
+		if d, err := strconv.Atoi(daysStr); err == nil && d > 0 {
+			days = d
+		}
+	}
+
+	// Get analytics
+	analytics, err := ls.abandonedCartManager.GetAbandonedCartStats(days)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success":   true,
+		"analytics": analytics,
+		"period":    fmt.Sprintf("Last %d days", days),
+	})
+}
+
 // loadConfig loads configuration from environment variables or config file
 func loadConfig() (*Config, error) {
 	config := &Config{
@@ -704,12 +908,12 @@ func loadConfig() (*Config, error) {
 		if config.PrivateKeyPath == "" {
 			config.PrivateKeyPath = getEnvOrDefault("PRIVATE_KEY_PATH", "./private_key.pem")
 		}
-	config.optimizationPHost = getEnvOrDefault("optimizationP_HOST", "optimizationp.gmail.com")
-	config.optimizationPUser = os.Getenv("optimizationP_USER")
-	config.optimizationPPassword = os.Getenv("optimizationP_PASSWORD")
+	config.optimizationPHost = getEnvOrDefault("SMTP_HOST", "smtp.sendgrid.net")
+	config.optimizationPUser = getEnvOrDefault("SMTP_USERNAME", "")
+	config.optimizationPPassword = getEnvOrDefault("SMTP_PASSWORD", "")
 	config.FromEmail = getEnvOrDefault("FROM_EMAIL", "licenses@contextlite.com")
 	
-	if optimizationpPort := os.Getenv("optimizationP_PORT"); optimizationpPort != "" {
+	if optimizationpPort := os.Getenv("SMTP_PORT"); optimizationpPort != "" {
 		if p, err := strconv.Atoi(optimizationpPort); err == nil {
 			config.optimizationPPort = p
 		}
@@ -720,6 +924,9 @@ func loadConfig() (*Config, error) {
 	// Warn instead of fail hard so service stays online
 	if config.StripeSecretKey == "" { log.Printf("WARNING: STRIPE_SECRET_KEY missing - Stripe webhooks disabled") }
 	if config.StripeWebhookSecret == "" { log.Printf("WARNING: STRIPE_WEBHOOK_SECRET missing - webhook verification disabled") }
+	
+	// Load abandoned cart feature flag
+	config.AbandonedCartEnabled = getEnvOrDefault("ABANDONED_CART_ENABLED", "false") == "true"
 	
 	return config, nil
 }

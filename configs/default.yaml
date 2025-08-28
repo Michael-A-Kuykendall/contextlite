@@ -1,6 +1,6 @@
 # ContextLite Default Configuration
 server:
-  port: 8082
+  port: 8084
   host: "127.0.0.1"
   cors_enabled: false
   auth_token: "contextlite-dev-token-2025"  # Default token for development
@@ -13,7 +13,7 @@ server:
       "/api/v1/enterprise": 100
   
 storage:
-  database_path: "./contextlite_fresh.db"
+  database_path: "./contextlite.db"
   cache_size_mb: 64
   
 smt:

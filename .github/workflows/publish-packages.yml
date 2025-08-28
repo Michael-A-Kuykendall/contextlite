@@ -159,20 +159,52 @@ jobs:
             echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Check if version exists
+      - name: Check if npm package exists
         id: check
         run: |
           if npm view contextlite@${{ steps.version.outputs.version }} >/dev/null 2>&1; then
             echo "exists=true" >> $GITHUB_OUTPUT
+            echo "📦 npm package contextlite@${{ steps.version.outputs.version }} already exists, skipping"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
+            echo "📦 npm package contextlite@${{ steps.version.outputs.version }} does not exist, will publish"
           fi
 
-      - name: Update version and publish
+      - name: Create npm package structure
         if: steps.check.outputs.exists == 'false'
         working-directory: npm-wrapper
         run: |
+          echo "📦 Creating npm package structure..."
+          ls -la
+
+      - name: Update npm package version
+        if: steps.check.outputs.exists == 'false'
+        working-directory: npm-wrapper
+        run: |
+          echo "📦 Updating package.json version to ${{ steps.version.outputs.version }}..."
           npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+
+      - name: Install npm dependencies
+        if: steps.check.outputs.exists == 'false'
+        working-directory: npm-wrapper
+        run: |
+          echo "📦 Installing npm dependencies..."
+          npm install
+
+      - name: Build npm package
+        if: steps.check.outputs.exists == 'false'
+        working-directory: npm-wrapper
+        run: |
+          echo "📦 Building TypeScript to JavaScript..."
+          npm run build
+          echo "📦 Verifying build output..."
+          ls -la lib/
+
+      - name: Publish to npm
+        if: steps.check.outputs.exists == 'false'
+        working-directory: npm-wrapper
+        run: |
+          echo "📦 Publishing to npm registry..."
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

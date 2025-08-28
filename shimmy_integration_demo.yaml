@@ -1,0 +1,31 @@
+name: "Shimmy Integration Demo"
+description: "Demonstrates RustChain using Shimmy for local-first AI inference"
+version: "1.0"
+
+steps:
+  - id: "test_shimmy_connection"
+    step_type: "llm"
+    parameters:
+      provider: "shimmy"
+      prompt: "Hello! Can you confirm that Shimmy integration with RustChain is working?"
+      max_tokens: 50
+      temperature: 0.7
+      
+  - id: "local_code_analysis"
+    step_type: "llm" 
+    parameters:
+      provider: "shimmy"
+      prompt: "Analyze this simple Rust function and suggest improvements: fn add(a: i32, b: i32) -> i32 { a + b }"
+      max_tokens: 200
+      
+  - id: "create_result_file"
+    step_type: "create_file"
+    parameters:
+      path: "shimmy_test_results.txt"
+      content: "Shimmy integration test completed successfully!"
+      
+dependencies:
+  - from: "test_shimmy_connection"
+    to: "local_code_analysis"
+  - from: "local_code_analysis" 
+    to: "create_result_file"

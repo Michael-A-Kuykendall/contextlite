@@ -1,0 +1,123 @@
+# Per-Project ContextLite Configuration for VSCode Copilot Integration
+# This configuration enables unlimited storage and context per project
+
+cluster:
+  enabled: true
+  node_id: "contextlite-copilot-${PROJECT_NAME}"
+  
+  # Dynamic port discovery - automatically finds available ports
+  discovery:
+    method: "dynamic_scan"
+    port_strategy: "auto_discover_free"
+    
+    # Safe port ranges to scan (avoiding system/common service ports)
+    scan_ranges:
+      - start: 8000
+        end: 8999
+        description: "Primary development range"
+      - start: 9000  
+        end: 9999
+        description: "Secondary development range"
+      - start: 10000
+        end: 19999
+        description: "User application range"
+      - start: 20000
+        end: 29999
+        description: "Extended user range"
+    
+    # Ports to avoid (known to be used by common services)
+    excluded_ports:
+      - 8080  # Often used by web servers
+      - 8443  # HTTPS alt
+      - 8888  # Jupyter
+      - 9090  # Prometheus
+      - 3000  # Node.js dev
+      - 3001  # React dev
+      - 4200  # Angular dev
+      - 5000  # Flask dev
+      - 5432  # PostgreSQL
+      - 6379  # Redis
+      - 27017 # MongoDB
+    
+    # Dynamic allocation strategy
+    allocation:
+      method: "port_scan_and_bind"
+      max_attempts: 100           # Try up to 100 ports before giving up
+      bind_test: true            # Actually bind to port to test availability
+      collision_backoff: "random_offset"  # If collision, try random offset
+      preferred_spacing: 10      # Try to space projects 10 ports apart
+      
+    # No static endpoints - everything is discovered dynamically
+    static_endpoints: []  # Remove all predefined ports
+
+  # Workspace isolation - each project gets its own context
+  affinity:
+    workspace_routing: true
+    sticky_sessions: true
+    default_tier: "medium"
+    rules:
+      "${PROJECT_NAME}":
+        preferred_nodes: ["contextlite-copilot-${PROJECT_NAME}"]
+        resource_tier: "high"
+        sticky_session: true
+        privacy_level: "project_isolated"  # Keep contexts separate
+
+  # Resource limits per project
+  resource_limits:
+    "${PROJECT_NAME}":
+      max_concurrent_requests: 15
+      max_tokens_per_minute: 100000    # Unlimited for practical purposes
+      max_documents_per_query: 50      # Large context windows
+      max_memory_mb: 1024              # Generous memory
+      max_storage_mb: 10240            # 10GB storage per project
+      priority: 8
+
+# Project-specific storage (isolated by project)
+storage:
+  database_path: "./data/${PROJECT_NAME}/contextlite.db"
+  cache_size_mb: 256
+  fts_index_path: "./data/${PROJECT_NAME}/fts.db"
+  
+# Copilot integration settings
+copilot_integration:
+  enabled: true
+  context_window_tokens: 8000        # Large context for Copilot
+  max_file_context: 100              # Include many files
+  exclude_patterns:
+    - "*.env"                        # Exclude sensitive files
+    - "*.key"
+    - "*.pem"
+    - ".env*"
+    - "secrets/*"
+    - "config/production/*"
+  include_patterns:
+    - "src/**/*"                     # Include source code
+    - "docs/**/*"                    # Include documentation
+    - "*.md"                         # Include markdown files
+    - "*.ts"                         # TypeScript
+    - "*.js"                         # JavaScript
+    - "*.py"                         # Python
+    - "*.go"                         # Go
+    - "*.rs"                         # Rust
+
+# Enhanced privacy and security
+privacy:
+  project_isolation: true            # Complete isolation between projects
+  anonymize_paths: false             # Keep file paths for better context
+  exclude_binary_files: true        # Skip binary files
+  max_file_size_mb: 5               # Skip large files
+  enable_content_filtering: true    # Filter sensitive content
+
+# Performance optimization for Copilot
+performance:
+  cache_embeddings: true            # Cache for faster responses
+  precompute_similar_files: true    # Background similarity computation
+  enable_smart_indexing: true       # Index only relevant files
+  update_frequency: "on_save"       # Update context when files change
+
+# SMT optimization for better code context
+smt:
+  solver_timeout_ms: 1000           # Fast responses for Copilot
+  max_candidates: 200               # More candidates for better context
+  objective_style: "code_context"   # Optimize for code understanding
+  enable_code_structure_analysis: true

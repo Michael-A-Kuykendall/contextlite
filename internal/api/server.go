@@ -111,6 +111,10 @@ func (s *Server) setupRoutes() {
 		r.Delete("/documents/{id}", s.handleDeleteDocument)
 		r.Get("/documents/search", s.handleSearchDocuments)
 		
+		// Workspace log consumption (Professional+ feature)
+		r.With(s.requireProfessional).Get("/workspace/logs/discover", s.handleDiscoverWorkspaceLogs)
+		r.With(s.requireProfessional).Post("/workspace/logs/consume", s.handleConsumeWorkspaceLogs)
+		
 		// Weight management (requires Professional+)
 		r.With(s.requireProfessional).Post("/weights/update", s.handleUpdateWeights)
 		r.With(s.requireProfessional).Get("/weights", s.handleGetWeights)

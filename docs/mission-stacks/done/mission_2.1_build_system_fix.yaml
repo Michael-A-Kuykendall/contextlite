@@ -1,0 +1,113 @@
+---
+version: "1.0"
+mission:
+  name: "Critical Build System Fix - Go Compilation Error"
+  id: "mission_2.1_build_system_fix"
+  phase: "Phase 1: Core Infrastructure"
+  priority: "CRITICAL"
+  model_assignment: "deepseek-coder-1.3b-personal"
+  estimated_duration: "30 minutes"
+  
+description: |
+  CRITICAL FIX: The build-and-release job is failing with Go compilation errors, 
+  which blocks 5+ package managers (Docker, Homebrew, Snap, AUR, Crates).
+  This is the highest priority fix as it's the root cause of deployment failures.
+  
+  From DEPLOYMENT_AUDIT_FINDINGS.md:
+  - build-and-release job failing with Go compilation error
+  - Blocks all binary-dependent package managers
+  - Must be fixed before other deployment issues can be resolved
+
+objectives:
+  - Analyze Go compilation error in build-and-release workflow
+  - Fix the underlying Go code issue
+  - Test compilation on multiple platforms (Linux, Windows, macOS)
+  - Verify GitHub Actions workflow executes successfully
+  - Ensure binary artifacts are properly generated
+  
+context:
+  repository: "Michael-A-Kuykendall/contextlite"
+  workflow_file: ".github/workflows/publish-packages.yml"
+  build_target: "Go application with cross-platform compilation"
+  deployment_status: "4/12 package managers working, 5+ blocked by build failure"
+  
+inputs:
+  - current_error_logs: "build_and_release.log"
+  - workflow_configuration: ".github/workflows/publish-packages.yml"
+  - go_module_files: "go.mod, go.sum"
+  - main_application: "main.go and related source files"
+  - deployment_audit: "DEPLOYMENT_AUDIT_FINDINGS.md"
+
+tasks:
+  1:
+    name: "Analyze Current Build Failure"
+    action: "Review build_and_release.log for exact Go compilation error"
+    expected_output: "Detailed error analysis with root cause identification"
+    
+  2:
+    name: "Examine Go Code Structure"
+    action: "Review main.go and related files for compilation issues"
+    expected_output: "Code analysis identifying problematic imports, syntax, or logic"
+    
+  3:
+    name: "Check Dependencies"
+    action: "Validate go.mod and go.sum for dependency conflicts"
+    expected_output: "Dependency validation report with recommendations"
+    
+  4:
+    name: "Test Local Compilation"
+    action: "Attempt local build with same parameters as GitHub Actions"
+    expected_output: "Local build success confirmation or specific error reproduction"
+    
+  5:
+    name: "Fix Compilation Issues"
+    action: "Implement necessary code changes to resolve build errors"
+    expected_output: "Working Go code that compiles successfully"
+    
+  6:
+    name: "Update Build Configuration"
+    action: "Modify GitHub Actions workflow if needed for proper compilation"
+    expected_output: "Updated workflow configuration ensuring cross-platform builds"
+    
+  7:
+    name: "Verify Multi-Platform Build"
+    action: "Test compilation for Linux, Windows, and macOS targets"
+    expected_output: "Successful build artifacts for all target platforms"
+
+validation_criteria:
+  - Go code compiles without errors locally
+  - GitHub Actions build-and-release job passes
+  - Binary artifacts are generated for all platforms
+  - No regression in existing functionality
+  - Build time remains reasonable (under 10 minutes)
+  
+success_metrics:
+  - build-and-release job status: "passing"
+  - binary_artifacts_generated: "linux-amd64, windows-amd64, darwin-amd64"
+  - downstream_jobs_unblocked: "docker, homebrew, snap, aur, crates"
+  - compilation_time: "< 10 minutes"
+  
+deliverables:
+  - Fixed Go source code (if needed)
+  - Updated GitHub Actions workflow (if needed)
+  - Successful build log demonstrating fix
+  - Multi-platform binary artifacts
+  - Documentation of changes made
+  
+follow_up_missions:
+  - "mission_2.2_docker_deployment_fix"
+  - "mission_2.3_homebrew_checksum_fix" 
+  - "mission_2.4_token_permission_fixes"
+  
+risk_assessment: "MEDIUM"
+risk_notes: |
+  - Changes to core build system could affect all platforms
+  - Must maintain backward compatibility
+  - Testing required on all target platforms
+  
+model_rationale: |
+  Using DeepSeek Coder Personal (Champion, 5.11 score) because:
+  - Best overall coding proficiency (47.4% Rust, 45.3% Go)
+  - Strong Go language skills needed for compilation fixes
+  - Proven reliability for complex technical debugging
+  - High success rate on build system problems

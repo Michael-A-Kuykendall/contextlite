@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "contextlite": {
+      "command": "python",
+      "args": [
+        "-m",
+        "contextlite_mcp_server"
+      ],
+      "env": {
+        "CONTEXTLITE_AUTO_DISCOVER": "true",
+        "CONTEXTLITE_PROJECT_ROOT": "{{workspaceRoot}}"
+      }
+    }
+  }
+}

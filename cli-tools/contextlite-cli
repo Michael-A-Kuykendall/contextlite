@@ -1,0 +1,336 @@
+#!/usr/bin/env python3
+"""
+ContextLite CLI Discovery Tool
+
+This tool allows CLI applications (Claude, cursor, rust-chain, etc.) to discover 
+and connect to ContextLite instances started by VS Code or other means.
+
+Usage:
+    contextlite-cli discover           # Show all running instances
+    contextlite-cli connect <project>  # Get connection info for project
+    contextlite-cli query <project> "search term"  # Query project's context
+    contextlite-cli list-projects      # List all registered projects
+    contextlite-cli status             # Show overall status
+"""
+
+import json
+import os
+import sys
+import argparse
+import requests
+import time
+from pathlib import Path
+from typing import Dict, List, Optional, Any
+import urllib3
+
+# Disable SSL warnings for localhost
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+class ContextLiteDiscovery:
+    """Discovers and manages connections to ContextLite instances."""
+    
+    def __init__(self):
+        self.home_dir = Path.home()
+        self.registry_path = self.home_dir / ".contextlite" / "port_registry.json"
+        self.cache_path = self.home_dir / ".contextlite" / "cli_cache.json"
+        self.port_range = list(range(8080, 8091))
+        
+    def load_registry(self) -> Dict[str, Any]:
+        """Load the port registry created by VS Code extension."""
+        try:
+            if self.registry_path.exists():
+                with open(self.registry_path, 'r') as f:
+                    return json.load(f)
+        except Exception as e:
+            print(f"Warning: Failed to load registry: {e}")
+        return {}
+    
+    def discover_instances(self) -> List[Dict[str, Any]]:
+        """Discover all running ContextLite instances."""
+        instances = []
+        registry = self.load_registry()
+        
+        # Check registered instances first
+        for path, instance in registry.items():
+            port = instance.get('port')
+            if port and self.is_instance_healthy(port):
+                instance_info = self.get_instance_info(port)
+                if instance_info:
+                    instance_info.update({
+                        'registered': True,
+                        'project_path': instance.get('projectPath', path),
+                        'project_name': instance.get('projectName', Path(path).name)
+                    })
+                    instances.append(instance_info)
+        
+        # Scan for unregistered instances
+        for port in self.port_range:
+            if not any(i.get('port') == port for i in instances):
+                if self.is_instance_healthy(port):
+                    instance_info = self.get_instance_info(port)
+                    if instance_info:
+                        instance_info.update({
+                            'registered': False,
+                            'project_name': f'unregistered-{port}',
+                            'project_path': 'unknown'
+                        })
+                        instances.append(instance_info)
+        
+        return instances
+    
+    def is_instance_healthy(self, port: int) -> bool:
+        """Check if ContextLite is healthy on the given port."""
+        try:
+            response = requests.get(f"http://localhost:{port}/health", timeout=2)
+            return response.status_code == 200
+        except:
+            return False
+    
+    def get_instance_info(self, port: int) -> Optional[Dict[str, Any]]:
+        """Get detailed information about a ContextLite instance."""
+        try:
+            response = requests.get(f"http://localhost:{port}/health", timeout=5)
+            if response.status_code == 200:
+                health_data = response.json()
+                
+                # Get additional stats if available
+                try:
+                    stats_response = requests.get(f"http://localhost:{port}/api/v1/storage/info", timeout=3)
+                    storage_stats = stats_response.json() if stats_response.status_code == 200 else {}
+                except:
+                    storage_stats = {}
+                
+                return {
+                    'port': port,
+                    'url': f"http://localhost:{port}",
+                    'status': 'healthy',
+                    'health': health_data,
+                    'storage': storage_stats,
+                    'discovery_time': int(time.time())
+                }
+        except Exception as e:
+            print(f"Failed to get info for port {port}: {e}")
+        
+        return None
+    
+    def find_project_instance(self, project_identifier: str) -> Optional[Dict[str, Any]]:
+        """Find ContextLite instance for a specific project."""
+        instances = self.discover_instances()
+        
+        # Try exact project name match
+        for instance in instances:
+            if instance.get('project_name') == project_identifier:
+                return instance
+        
+        # Try project path match
+        for instance in instances:
+            project_path = instance.get('project_path', '')
+            if project_identifier.lower() in project_path.lower():
+                return instance
+        
+        # Try partial name match
+        for instance in instances:
+            project_name = instance.get('project_name', '')
+            if project_identifier.lower() in project_name.lower():
+                return instance
+        
+        return None
+    
+    def query_project_context(self, project_identifier: str, query: str, max_results: int = 10) -> Dict[str, Any]:
+        """Query context from a specific project's ContextLite instance."""
+        instance = self.find_project_instance(project_identifier)
+        if not instance:
+            return {
+                'error': f'No ContextLite instance found for project: {project_identifier}',
+                'available_projects': [i.get('project_name') for i in self.discover_instances()]
+            }
+        
+        try:
+            url = f"{instance['url']}/api/v1/context/assemble"
+            payload = {
+                'query': query,
+                'max_documents': max_results,
+                'use_optimization': True
+            }
+            
+            headers = {
+                'Content-Type': 'application/json',
+                'X-Workspace-ID': instance.get('project_name', 'default')
+            }
+            
+            response = requests.post(url, json=payload, headers=headers, timeout=30)
+            
+            if response.status_code == 200:
+                return {
+                    'success': True,
+                    'project': instance.get('project_name'),
+                    'port': instance.get('port'),
+                    'query': query,
+                    'results': response.json()
+                }
+            else:
+                return {
+                    'error': f'Query failed with status {response.status_code}',
+                    'details': response.text
+                }
+                
+        except Exception as e:
+            return {
+                'error': f'Failed to query project: {e}',
+                'instance': instance
+            }
+
+def main():
+    parser = argparse.ArgumentParser(description='ContextLite CLI Discovery Tool')
+    parser.add_argument('action', choices=['discover', 'connect', 'query', 'list-projects', 'status'], 
+                       help='Action to perform')
+    parser.add_argument('project', nargs='?', help='Project name or identifier')
+    parser.add_argument('query_text', nargs='?', help='Search query text')
+    parser.add_argument('--max-results', type=int, default=10, help='Maximum number of results')
+    parser.add_argument('--json', action='store_true', help='Output in JSON format')
+    parser.add_argument('--verbose', '-v', action='store_true', help='Verbose output')
+    
+    args = parser.parse_args()
+    discovery = ContextLiteDiscovery()
+    
+    if args.action == 'discover':
+        instances = discovery.discover_instances()
+        
+        if args.json:
+            print(json.dumps(instances, indent=2))
+        else:
+            print("🔍 ContextLite Instance Discovery")
+            print("=" * 50)
+            
+            if not instances:
+                print("❌ No ContextLite instances found")
+                print("\nTip: Start ContextLite from VS Code or run 'contextlite' manually")
+                return
+            
+            for i, instance in enumerate(instances, 1):
+                status_icon = "✅" if instance.get('registered') else "⚠️"
+                print(f"\n{status_icon} Instance {i}:")
+                print(f"   Project: {instance.get('project_name', 'unknown')}")
+                print(f"   Port: {instance.get('port')}")
+                print(f"   URL: {instance.get('url')}")
+                print(f"   Registered: {'Yes' if instance.get('registered') else 'No (discovered)'}")
+                
+                if args.verbose:
+                    health = instance.get('health', {})
+                    if 'database' in health:
+                        db_info = health['database']
+                        print(f"   Documents: {db_info.get('documents_indexed', 'unknown')}")
+                    
+                    if 'workspaces' in health:
+                        workspaces = health['workspaces']
+                        print(f"   Workspaces: {workspaces.get('total_workspaces', 'unknown')}")
+    
+    elif args.action == 'connect':
+        if not args.project:
+            print("❌ Project name required for connect action")
+            print("Usage: contextlite-cli connect <project-name>")
+            return
+        
+        instance = discovery.find_project_instance(args.project)
+        
+        if args.json:
+            print(json.dumps(instance, indent=2))
+        else:
+            if not instance:
+                print(f"❌ No ContextLite instance found for project: {args.project}")
+                print("\nAvailable projects:")
+                for inst in discovery.discover_instances():
+                    print(f"   • {inst.get('project_name')}")
+            else:
+                print(f"✅ Found ContextLite instance for {args.project}")
+                print(f"   URL: {instance['url']}")
+                print(f"   Port: {instance['port']}")
+                print(f"   Status: {instance['status']}")
+                
+                # Test connection
+                try:
+                    response = requests.get(f"{instance['url']}/health", timeout=3)
+                    if response.status_code == 200:
+                        print("   Connection: ✅ Healthy")
+                    else:
+                        print(f"   Connection: ⚠️ Status {response.status_code}")
+                except:
+                    print("   Connection: ❌ Failed")
+    
+    elif args.action == 'query':
+        if not args.project or not args.query_text:
+            print("❌ Project name and query text required")
+            print("Usage: contextlite-cli query <project-name> \"<search query>\"")
+            return
+        
+        result = discovery.query_project_context(args.project, args.query_text, args.max_results)
+        
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            if 'error' in result:
+                print(f"❌ {result['error']}")
+                if 'available_projects' in result:
+                    print("\nAvailable projects:")
+                    for proj in result['available_projects']:
+                        print(f"   • {proj}")
+            else:
+                print(f"✅ Query results for '{args.project}':")
+                print(f"   Query: {result['query']}")
+                print(f"   Port: {result['port']}")
+                
+                documents = result.get('results', {}).get('documents', [])
+                print(f"   Found: {len(documents)} documents")
+                
+                for i, doc in enumerate(documents[:5], 1):  # Show first 5
+                    print(f"\n   📄 Document {i}:")
+                    print(f"      Path: {doc.get('path', 'unknown')}")
+                    score = doc.get('score', 0)
+                    print(f"      Relevance: {score:.3f}")
+                    content = doc.get('content', '')
+                    preview = content[:100] + "..." if len(content) > 100 else content
+                    print(f"      Preview: {preview}")
+    
+    elif args.action == 'list-projects':
+        instances = discovery.discover_instances()
+        projects = [(i.get('project_name'), i.get('port'), i.get('registered')) for i in instances]
+        
+        if args.json:
+            print(json.dumps(projects, indent=2))
+        else:
+            print("📋 Registered Projects")
+            print("=" * 30)
+            
+            if not projects:
+                print("No projects found")
+            else:
+                for name, port, registered in projects:
+                    status = "✅ Registered" if registered else "⚠️ Discovered"
+                    print(f"   {name:<20} Port {port:<5} {status}")
+    
+    elif args.action == 'status':
+        instances = discovery.discover_instances()
+        registry = discovery.load_registry()
+        
+        if args.json:
+            print(json.dumps({
+                'instances': instances,
+                'registry_entries': len(registry),
+                'healthy_instances': len(instances)
+            }, indent=2))
+        else:
+            print("📊 ContextLite System Status")
+            print("=" * 35)
+            print(f"   Healthy Instances: {len(instances)}")
+            print(f"   Registry Entries: {len(registry)}")
+            print(f"   Port Range: {discovery.port_range[0]}-{discovery.port_range[-1]}")
+            
+            if instances:
+                print(f"\n   Active Projects:")
+                for instance in instances:
+                    name = instance.get('project_name', 'unknown')
+                    port = instance.get('port')
+                    print(f"     • {name} (port {port})")
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,26 @@
+# Rustchain Configuration
+# Auto-generated for ContextLite integration
+
+[llm]
+# Prioritize Ollama over Shimmy for local models
+providers = ["ollama", "shimmy"]
+default_provider = "ollama"
+
+[ollama]
+url = "http://localhost:11434"
+timeout = 60
+
+[shimmy]
+url = "http://localhost:11436"
+timeout = 60
+
+[mission]
+timeout_seconds = 300
+max_parallel_steps = 4
+default_temperature = 0.3
+
+[audit]
+enabled = true
+
+[network]
+policy = "offline"

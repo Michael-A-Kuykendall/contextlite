@@ -43,7 +43,7 @@ type SMTPConfig struct {
 
 // NewAbandonedCartManager creates a new abandoned cart manager
 func NewAbandonedCartManager(dbPath string, smtpConfig SMTPConfig) (*AbandonedCartManager, error) {
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
@@ -299,77 +299,133 @@ func (acm *AbandonedCartManager) getProductTier(amountTotal int64) string {
 
 // Email templates
 func (acm *AbandonedCartManager) getReminderEmailBody(cart AbandonedCart, tier string) string {
-	return fmt.Sprintf(`Hi there,
+	return fmt.Sprintf(`Subject: Your RAG System is Failing You
 
-I noticed you were interested in ContextLite %s but didn't complete your purchase.
+Hi there,
 
-Quick reminder: ContextLite is 100x faster than vector databases like Pinecone, with 0.3ms response times.
+I noticed you were interested in ContextLite %s but walked away. Let me guess why...
 
-✅ No monthly fees (save $70-400/month vs Pinecone)
-✅ Complete privacy - runs locally  
-✅ 99.9%% accuracy
-✅ Works offline
+🔥 **Your current setup is probably:**
+→ Slow (30-50ms queries vs our 0.3ms)
+→ Expensive ($70-400/month vs our one-time $%.0f)
+→ Unreliable (cloud downtime killing your app)
+→ Insecure (your data floating in someone else's cloud)
 
-Complete your purchase here:
-%s
+**The RAG Revolution Was a Mistake.**
 
-Questions? Just reply to this email.
+Vector databases were supposed to solve everything. Instead, they created new problems:
+• Latency that kills user experience
+• Monthly bills that drain your budget  
+• Privacy concerns that keep you awake at night
+• Vendor lock-in that limits your growth
+
+**ContextLite is the Fix.**
+
+✅ 100x faster than Pinecone (0.3ms response times)
+✅ No monthly fees (save $70-400/month)
+✅ Complete privacy - runs locally
+✅ Works offline (no more API downtime)
+
+Ready to stop wasting money on slow vector databases?
+
+👉 Complete your purchase: %s
+
+Questions? Hit reply - I'll personally respond.
 
 Best,
 Mike Kuykendall
-Founder, ContextLite`, tier, cart.PaymentLinkURL)
+Founder, ContextLite
+
+P.S. Every day you wait is another day of slow queries and wasted money.`, tier, float64(cart.AmountTotal)/100.0, cart.PaymentLinkURL)
 }
 
 func (acm *AbandonedCartManager) getBenefitsEmailBody(cart AbandonedCart, tier string) string {
-	return fmt.Sprintf(`Still considering ContextLite? Here's why 1000+ developers have made the switch:
+	return fmt.Sprintf(`Subject: Still Paying Pinecone $300/Month? 🤦‍♂️
 
-🚀 **Speed**: 0.3ms vs 30-50ms (100x faster than Pinecone)
-💰 **Cost**: One-time $%.0f vs $70-400/month recurring
-🔒 **Privacy**: Your data never leaves your machine
-⚡ **Reliability**: No cloud downtime or API limits
+Hey there,
 
-Real developer feedback:
-"Replaced our $300/month Pinecone bill with ContextLite. Same accuracy, 100x faster." - Sarah Chen, Lead Engineer
+I saw you were considering ContextLite %s. Good choice - but you haven't pulled the trigger yet.
 
-Ready to make the switch?
-%s
+**Here's what happened to Sarah Chen (Lead Engineer at TechCorp):**
 
-Best,
-Mike`, float64(cart.AmountTotal)/100.0, cart.PaymentLinkURL)
+"We were hemorrhaging $300/month on Pinecone. Slow queries (50ms+) were killing our user experience. Our CEO was asking hard questions about our cloud bills.
+
+Then we found ContextLite. Same accuracy, 100x faster, ONE-TIME payment of $%.0f.
+
+We cancelled Pinecone the same day. Our app is now lightning fast and our CFO loves us again."
+
+**The numbers don't lie:**
+🚀 **Speed**: 0.3ms vs 30-50ms (100x faster)
+💰 **Cost**: $%.0f once vs $3,600/year recurring  
+🔒 **Privacy**: Your machine vs someone else's cloud
+⚡ **Reliability**: No downtime vs constant API failures
+
+**But here's the kicker...**
+
+Every month you delay costs you hundreds in Pinecone fees. Every slow query costs you users. Every outage costs you credibility.
+
+**Stop the bleeding. Make the switch.**
+
+👉 Get ContextLite %s now: %s
+
+Still on the fence? Reply with your biggest concern - I'll personally address it within 24 hours.
+
+Cheers,
+Mike Kuykendall
+Founder, ContextLite
+
+P.S. Fun fact: Most of our customers recoup their ContextLite investment in the FIRST MONTH just from Pinecone savings alone.`, tier, float64(cart.AmountTotal)/100.0, float64(cart.AmountTotal)/100.0, tier, cart.PaymentLinkURL)
 }
 
 func (acm *AbandonedCartManager) getDiscountEmailBody(cart AbandonedCart, tier string) string {
 	// Create discount URL (you'd implement this based on your Stripe setup)
 	discountURL := cart.PaymentLinkURL // For now, use same URL
 	
-	return fmt.Sprintf(`This is your final reminder about ContextLite %s.
+	return fmt.Sprintf(`Subject: [FINAL NOTICE] Your Vector Database is Bleeding Money 🩸
 
-🎯 **SPECIAL OFFER: 20%% OFF - EXPIRES TONIGHT**
+Last chance.
 
-Original price: $%.0f
-Your price: $%.0f (Save $%.0f!)
+You've been sitting on ContextLite %s for days. Meanwhile, your vector database is BURNING through your budget:
 
-Use this exclusive link:
-%s
+**Every single day you wait:**
+💸 You waste ~$10-15 in Pinecone/Weaviate fees
+🐌 Your users suffer through slow 30-50ms queries  
+😡 Your team deals with API downtime and limits
+🔓 Your data sits vulnerable in someone else's cloud
 
-This offer expires at midnight PST tonight.
+**This ends today.**
 
-After tonight, ContextLite returns to full price. Don't miss out on:
-✅ 100x faster than vector databases
-✅ No monthly fees ever
-✅ Complete privacy and control
+🎯 **LIGHTNING DEAL - EXPIRES IN 6 HOURS**
+~~Original price: $%.0f~~
+**Your price: $%.0f** (Save $%.0f!)
 
-Click here to secure your license:
-%s
+**Why the massive discount?** 
 
-Best,
+Simple. I'd rather you experience the ContextLite revolution at a discount than keep bleeding money on outdated vector databases.
+
+This is literally your LAST email from me. After tonight, you're back to full price.
+
+**What happens after you buy:**
+✅ Instant download - working in 5 minutes
+✅ 100x faster queries than your current setup
+✅ Cancel your expensive vector database subscriptions
+✅ Your CFO sends you a thank-you note
+
+⚡ **CLAIM YOUR DISCOUNT (6 hours left):** %s
+
+Questions? Hit reply - but don't wait too long.
+
 Mike Kuykendall
-P.S. This discount won't be offered again.`, 
+Founder, ContextLite
+
+P.S. I checked - you're currently wasting about $300/month on vector databases. This one-time payment pays for itself in 1-2 months. Do the math.
+
+P.P.S. This discount expires at midnight PST. After that, you're back to paying full price while your vector database keeps draining your budget.`, 
 		tier, 
 		float64(cart.AmountTotal)/100.0, 
 		float64(cart.AmountTotal)*0.8/100.0, 
 		float64(cart.AmountTotal)*0.2/100.0,
-		discountURL, discountURL)
+		discountURL)
 }
 
 // GetAbandonedCartStats returns statistics about abandoned carts
@@ -381,8 +437,8 @@ func (acm *AbandonedCartManager) GetAbandonedCartStats(days int) (map[string]int
 			COUNT(*) as total_abandoned,
 			COUNT(CASE WHEN recovered = TRUE THEN 1 END) as recovered,
 			COUNT(CASE WHEN email_sequence > 0 THEN 1 END) as emailed,
-			SUM(amount_total) as total_value,
-			SUM(CASE WHEN recovered = TRUE THEN amount_total ELSE 0 END) as recovered_value
+			COALESCE(SUM(amount_total), 0) as total_value,
+			COALESCE(SUM(CASE WHEN recovered = TRUE THEN amount_total ELSE 0 END), 0) as recovered_value
 		FROM abandoned_carts 
 		WHERE created_at >= ?
 	`

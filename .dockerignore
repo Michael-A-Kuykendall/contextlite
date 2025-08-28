@@ -1,0 +1,45 @@
+# Build artifacts
+build/
+*.out
+*.html
+
+# Documentation
+*.md
+docs/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+*.swp
+*.swo
+
+# Test files
+*_test.go
+
+# Coverage files
+coverage.*
+*coverage*
+
+# Deployment scripts
+deploy.sh
+*.sh
+
+# Demo files
+demo*/
+*demo*
+
+# Analysis files
+api_*.out
+*analysis*
+*audit*
+*deployment*
+*DEPLOYMENT*
+*DEMO*
+*CHAT*
+
+# OS files
+.DS_Store
+Thumbs.db

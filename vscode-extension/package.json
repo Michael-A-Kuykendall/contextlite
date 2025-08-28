@@ -55,6 +55,16 @@
         "command": "contextlite.openUI",
         "title": "Open ContextLite Dashboard",
         "category": "ContextLite"
+      },
+      {
+        "command": "contextlite.enableForProject",
+        "title": "Enable ContextLite for This Project",
+        "category": "ContextLite"
+      },
+      {
+        "command": "contextlite.ingestChatHistory",
+        "title": "Ingest Chat History",
+        "category": "ContextLite"
       }
     ],
     "configuration": {

@@ -1,0 +1,25 @@
+version: "1.0"
+name: "champion_test_trial"
+description: "Trial run: Test Champion AI via Ollama integration"
+steps:
+  - id: "test_champion_knowledge"
+    name: "Test Champion AI project awareness"
+    step_type: "llm"
+    parameters:
+      prompt: "Hello Champion! I'm testing our mission system. Can you briefly explain what ContextLite does and what Rustchain is for? Keep response under 100 words."
+      model: "llama32-champion"
+      provider: "ollama"
+      temperature: 0.3
+      max_tokens: 150
+
+  - id: "save_trial_result"
+    name: "Save trial result" 
+    step_type: "create_file"
+    depends_on: ["test_champion_knowledge"]
+    parameters:
+      path: "docs/mission-stacks/current/trial_result.txt"
+      content: "Champion AI trial completed successfully - ready for mission deployment"
+
+config:
+  max_parallel_steps: 1
+  timeout_seconds: 120

@@ -1,7 +1,9 @@
 {
   "name": "contextlite-mcp",
   "version": "0.1.0",
-  "bin": { "contextlite-mcp": "dist/index.js" },
+  "bin": {
+    "contextlite-mcp": "dist/index.js"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc -p .",
@@ -9,9 +11,11 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.5.0",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "zod": "^4.1.5"
   },
   "devDependencies": {
+    "@types/node": "^24.3.0",
     "typescript": "^5.6.2"
   }
 }

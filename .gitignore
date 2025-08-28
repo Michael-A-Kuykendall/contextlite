@@ -78,6 +78,16 @@ production_license.json
 test_license.json
 validation_test.json
 
+# Internal Documentation (PRIVATE - DO NOT COMMIT)
+docs/internal/
+private-docs/
+.claude/
+
+# Specific Internal Files (PRIVATE - DO NOT COMMIT) 
+*_INTERNAL*.md
+*_PRIVATE*.md
+*_CONFIDENTIAL*.md
+
 # Business Planning Documents (INTERNAL USE ONLY)
 MASTER_DISTRIBUTION_PLAN.md
 PRODUCTION_READINESS_ACTION_PLAN.md
@@ -98,7 +108,6 @@ SECURITY_IMPLEMENTATION_STATUS.md
 VSCODE_EXTENSION_IMPLEMENTATION_PLAN.md
 CONTEXTLITE-CLOUD.md
 CONTEXTLITE_WIKI.md
-private-docs/
 
 # License Server (temporarily unignored for emergency redeploy)
 # (Do NOT ignore cmd/license-server/ so Railway can build the binary)
