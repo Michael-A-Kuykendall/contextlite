@@ -1,10 +1,11 @@
 package main
 
 import (
+	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/json"
-        "encoding/base64"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
 	"io"
@@ -41,26 +42,32 @@ type LicenseServer struct {
 
 // NewLicenseServer creates a new license server
 func NewLicenseServer(config *Config) (*LicenseServer, error) {
-	// Load RSA private key
-	privateKeyData, err := os.ReadFile(config.PrivateKeyPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read private key: %w", err)
+	var privateKey *rsa.PrivateKey
+	loadErr := func() error {
+		data, err := os.ReadFile(config.PrivateKeyPath)
+		if err != nil {
+			return fmt.Errorf("read key: %w", err)
+		}
+		block, _ := pem.Decode(data)
+		if block == nil {
+			return fmt.Errorf("decode pem: empty block")
+		}
+		pk, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+		if err != nil {
+			return fmt.Errorf("parse key: %w", err)
+		}
+		privateKey = pk
+		return nil
+	}()
+	if loadErr != nil {
+		log.Printf("WARNING: Failed loading provided RSA key (%v) - generating ephemeral key", loadErr)
+		pk, genErr := rsa.GenerateKey(rand.Reader, 2048)
+		if genErr != nil {
+			return nil, fmt.Errorf("failed to generate fallback key: %v", genErr)
+		}
+		privateKey = pk
 	}
-	
-	block, _ := pem.Decode(privateKeyData)
-	if block == nil {
-		return nil, fmt.Errorf("failed to decode PEM block")
-	}
-	
-	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse private key: %w", err)
-	}
-	
-	return &LicenseServer{
-		config:     config,
-		privateKey: privateKey,
-	}, nil
+	return &LicenseServer{config: config, privateKey: privateKey}, nil
 }
 
 // Start starts the license server
@@ -673,21 +680,30 @@ func loadConfig() (*Config, error) {
 	config.StripeSecretKey = os.Getenv("STRIPE_SECRET_KEY")
 	config.StripeWebhookSecret = os.Getenv("STRIPE_WEBHOOK_SECRET")
         // Handle RSA private key from environment or file
-        if rsaPrivateKey := os.Getenv("RSA_PRIVATE_KEY"); rsaPrivateKey != "" {
-                // Decode base64 private key and write to temp file
-                privateKeyData, err := base64.StdEncoding.DecodeString(rsaPrivateKey)
-                if err != nil {
-                        return nil, fmt.Errorf("failed to decode RSA_PRIVATE_KEY: %w", err)
-                }
-                
-                tmpFile := "/tmp/private_key.pem"
-                if err := os.WriteFile(tmpFile, privateKeyData, 0600); err != nil {
-                        return nil, fmt.Errorf("failed to write private key to temp file: %w", err)
-                }
-                config.PrivateKeyPath = tmpFile
-        } else {
-                config.PrivateKeyPath = getEnvOrDefault("PRIVATE_KEY_PATH", "./private_key.pem")
-        }
+		if rsaEnv := os.Getenv("RSA_PRIVATE_KEY"); rsaEnv != "" {
+			// Try base64 first
+			decoded, err := base64.StdEncoding.DecodeString(rsaEnv)
+			var pemData []byte
+			if err == nil && len(decoded) > 0 && string(decoded)[:10] == "-----BEGIN" {
+				pemData = decoded
+			} else if err == nil && len(decoded) > 0 && string(decoded)[:10] != "-----BEGIN" {
+				// Decoded but not a PEM header; treat original as already base64 of DER -> wrap
+				log.Printf("WARNING: Decoded RSA_PRIVATE_KEY lacks PEM header - attempting direct parse later")
+				pemData = decoded
+			} else {
+				// Treat original as literal PEM
+				pemData = []byte(rsaEnv)
+			}
+			tmpFile := "/tmp/private_key.pem"
+			if writeErr := os.WriteFile(tmpFile, pemData, 0600); writeErr != nil {
+				log.Printf("WARNING: Could not write RSA key file (%v) - will generate ephemeral key", writeErr)
+			} else {
+				config.PrivateKeyPath = tmpFile
+			}
+		}
+		if config.PrivateKeyPath == "" {
+			config.PrivateKeyPath = getEnvOrDefault("PRIVATE_KEY_PATH", "./private_key.pem")
+		}
 	config.optimizationPHost = getEnvOrDefault("optimizationP_HOST", "optimizationp.gmail.com")
 	config.optimizationPUser = os.Getenv("optimizationP_USER")
 	config.optimizationPPassword = os.Getenv("optimizationP_PASSWORD")
@@ -702,12 +718,8 @@ func loadConfig() (*Config, error) {
 	}
 	
 	// Warn instead of fail hard so service stays online
-	if config.StripeSecretKey == "" {
-		log.Printf("WARNING: STRIPE_SECRET_KEY missing - Stripe webhooks disabled")
-	}
-	if config.StripeWebhookSecret == "" {
-		log.Printf("WARNING: STRIPE_WEBHOOK_SECRET missing - webhook verification disabled")
-	}
+	if config.StripeSecretKey == "" { log.Printf("WARNING: STRIPE_SECRET_KEY missing - Stripe webhooks disabled") }
+	if config.StripeWebhookSecret == "" { log.Printf("WARNING: STRIPE_WEBHOOK_SECRET missing - webhook verification disabled") }
 	
 	return config, nil
 }
