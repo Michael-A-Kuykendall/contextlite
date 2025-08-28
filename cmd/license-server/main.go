@@ -916,3 +916,60 @@ func main() {
 		log.Fatalf("License server failed: %v", err)
 	}
 }
+
+// handleProcessAbandonedCarts manually triggers abandoned cart processing
+func (ls *LicenseServer) handleProcessAbandonedCarts(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := ls.abandonedCartMgr.ProcessAbandonedCarts()
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": "Abandoned cart processing completed",
+	})
+}
+
+// handleAbandonedCartStats returns abandoned cart statistics
+func (ls *LicenseServer) handleAbandonedCartStats(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse days parameter
+	days := 30 // default
+	if daysStr := r.URL.Query().Get("days"); daysStr != "" {
+		if parsed, err := strconv.Atoi(daysStr); err == nil && parsed > 0 {
+			days = parsed
+		}
+	}
+
+	stats, err := ls.abandonedCartMgr.GetAbandonedCartStats(days)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"stats":   stats,
+	})
+}
