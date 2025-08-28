@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/smtp"
 	"os"
 	"strconv"
 	"time"
@@ -307,7 +308,7 @@ The ContextLite Team
 `, tier, licenseData, licenseData)
 	
 	// Set up optimizationP authentication
-	auth := optimizationp.PlainAuth("", ls.config.optimizationPUser, ls.config.optimizationPPassword, ls.config.optimizationPHost)
+	auth := smtp.PlainAuth("", ls.config.optimizationPUser, ls.config.optimizationPPassword, ls.config.optimizationPHost)
 	
 	// Compose email
 	fromAddr := ls.config.FromEmail
@@ -320,7 +321,7 @@ The ContextLite Team
 	
 	// Send email
 	optimizationpAddr := fmt.Sprintf("%s:%d", ls.config.optimizationPHost, ls.config.optimizationPPort)
-	err := optimizationp.SendMail(optimizationpAddr, auth, fromAddr, []string{email}, []byte(msg))
+	err := smtp.SendMail(optimizationpAddr, auth, fromAddr, []string{email}, []byte(msg))
 	if err != nil {
 		return fmt.Errorf("failed to send email via optimizationP: %w", err)
 	}
