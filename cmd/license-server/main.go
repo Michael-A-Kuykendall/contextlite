@@ -671,7 +671,7 @@ func loadConfig() (*Config, error) {
 	}
 	
 	config.StripeSecretKey = os.Getenv("STRIPE_SECRET_KEY")
-        config.StripeWebhookSecret = os.Getenv("STRIPE_WEBHOOK_SECRET")
+	config.StripeWebhookSecret = os.Getenv("STRIPE_WEBHOOK_SECRET")
         // Handle RSA private key from environment or file
         if rsaPrivateKey := os.Getenv("RSA_PRIVATE_KEY"); rsaPrivateKey != "" {
                 // Decode base64 private key and write to temp file
@@ -701,12 +701,12 @@ func loadConfig() (*Config, error) {
 		config.optimizationPPort = 587
 	}
 	
-	// Validate required configuration
+	// Warn instead of fail hard so service stays online
 	if config.StripeSecretKey == "" {
-		return nil, fmt.Errorf("STRIPE_SECRET_KEY is required")
+		log.Printf("WARNING: STRIPE_SECRET_KEY missing - Stripe webhooks disabled")
 	}
 	if config.StripeWebhookSecret == "" {
-		return nil, fmt.Errorf("STRIPE_WEBHOOK_SECRET is required")
+		log.Printf("WARNING: STRIPE_WEBHOOK_SECRET missing - webhook verification disabled")
 	}
 	
 	return config, nil
