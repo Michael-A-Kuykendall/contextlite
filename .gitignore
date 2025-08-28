@@ -123,3 +123,7 @@ contextlite-download/
 .punch-tool/
 punch_results/
 punch.yaml
+# Large ML model files
+champion-lora-adapter/
+*.safetensors
+optimizer.pt
