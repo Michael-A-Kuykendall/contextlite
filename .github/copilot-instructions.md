@@ -2,6 +2,9 @@
 
 Purpose: Enable an AI agent to be productive immediately in this repo. Follow these repo-specific conventions. Keep changes minimal, fast, and aligned with the existing architecture.
 
+## 🎯 COMMUNICATION PROTOCOL
+**MANDATORY**: Always use professional language when communicating with the user. Maintain a respectful, technical, and business-appropriate tone in all interactions.
+
 ## 🎯 CURRENT MISSION: DEPLOYMENT ECOSYSTEM HARDENING  
 **Status: PRODUCTION LIVE → DEPLOYMENT AUDIT & FIXES**
 **Active Documents**: 
