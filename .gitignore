@@ -100,8 +100,8 @@ CONTEXTLITE-CLOUD.md
 CONTEXTLITE_WIKI.md
 private-docs/
 
-# License Server and Private Repository Files
-cmd/license-server/
+# License Server (temporarily unignored for emergency redeploy)
+# (Do NOT ignore cmd/license-server/ so Railway can build the binary)
 build/license-server*
 contextlite-license-server*
 contextlite_private.h
