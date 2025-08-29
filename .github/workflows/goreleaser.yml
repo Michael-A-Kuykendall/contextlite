@@ -38,9 +38,13 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Snapcraft
+        if: env.SNAPCRAFT_STORE_CREDENTIALS != ''
         run: |
           sudo snap install snapcraft --classic
-          echo "${{ secrets.SNAPCRAFT_TOKEN }}" | snapcraft login --with -
+          # Export credentials using environment variable (new method)
+          export SNAPCRAFT_STORE_CREDENTIALS="${{ secrets.SNAPCRAFT_TOKEN }}"
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_TOKEN }}
 
       - name: Import GPG key for AUR
         if: env.AUR_KEY != ''
