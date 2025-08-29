@@ -1,0 +1,1289 @@
+{
+  "total_count": 14,
+  "jobs": [
+    {
+      "id": 49145249766,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUj_5g",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145249766",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145249766",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2025-08-29T00:19:43Z",
+      "started_at": "2025-08-29T00:19:45Z",
+      "completed_at": "2025-08-29T00:20:19Z",
+      "name": "build-and-release",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2025-08-29T00:19:45Z",
+          "completed_at": "2025-08-29T00:19:46Z"
+        },
+        {
+          "name": "Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2025-08-29T00:19:46Z",
+          "completed_at": "2025-08-29T00:19:50Z"
+        },
+        {
+          "name": "Setup Go",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2025-08-29T00:19:50Z",
+          "completed_at": "2025-08-29T00:20:02Z"
+        },
+        {
+          "name": "Download dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2025-08-29T00:20:02Z",
+          "completed_at": "2025-08-29T00:20:03Z"
+        },
+        {
+          "name": "Get version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2025-08-29T00:20:03Z",
+          "completed_at": "2025-08-29T00:20:03Z"
+        },
+        {
+          "name": "Build multi-platform binaries",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2025-08-29T00:20:03Z",
+          "completed_at": "2025-08-29T00:20:06Z"
+        },
+        {
+          "name": "Create release archives",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2025-08-29T00:20:06Z",
+          "completed_at": "2025-08-29T00:20:11Z"
+        },
+        {
+          "name": "Create GitHub Release",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2025-08-29T00:20:11Z",
+          "completed_at": "2025-08-29T00:20:13Z"
+        },
+        {
+          "name": "Trigger website update",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2025-08-29T00:20:13Z",
+          "completed_at": "2025-08-29T00:20:13Z"
+        },
+        {
+          "name": "Post Setup Go",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2025-08-29T00:20:13Z",
+          "completed_at": "2025-08-29T00:20:18Z"
+        },
+        {
+          "name": "Post Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2025-08-29T00:20:18Z",
+          "completed_at": "2025-08-29T00:20:18Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2025-08-29T00:20:18Z",
+          "completed_at": "2025-08-29T00:20:18Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145249766",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000001812,
+      "runner_name": "GitHub Actions 1000001812",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 49145249775,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUj_7w",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145249775",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145249775",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2025-08-29T00:19:43Z",
+      "started_at": "2025-08-29T00:19:49Z",
+      "completed_at": "2025-08-29T00:19:57Z",
+      "name": "publish-npm",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2025-08-29T00:19:49Z",
+          "completed_at": "2025-08-29T00:19:50Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2025-08-29T00:19:50Z",
+          "completed_at": "2025-08-29T00:19:53Z"
+        },
+        {
+          "name": "Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2025-08-29T00:19:53Z",
+          "completed_at": "2025-08-29T00:19:54Z"
+        },
+        {
+          "name": "Get version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2025-08-29T00:19:54Z",
+          "completed_at": "2025-08-29T00:19:54Z"
+        },
+        {
+          "name": "Check if npm package exists",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2025-08-29T00:19:54Z",
+          "completed_at": "2025-08-29T00:19:55Z"
+        },
+        {
+          "name": "Create npm package structure",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2025-08-29T00:19:55Z",
+          "completed_at": "2025-08-29T00:19:55Z"
+        },
+        {
+          "name": "Update npm package version",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2025-08-29T00:19:55Z",
+          "completed_at": "2025-08-29T00:19:55Z"
+        },
+        {
+          "name": "Install npm dependencies",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8,
+          "started_at": "2025-08-29T00:19:55Z",
+          "completed_at": "2025-08-29T00:19:55Z"
+        },
+        {
+          "name": "Build npm package",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2025-08-29T00:19:55Z",
+          "completed_at": "2025-08-29T00:19:55Z"
+        },
+        {
+          "name": "Publish to npm",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 10,
+          "started_at": "2025-08-29T00:19:55Z",
+          "completed_at": "2025-08-29T00:19:55Z"
+        },
+        {
+          "name": "Post Run actions/setup-node@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2025-08-29T00:19:55Z",
+          "completed_at": "2025-08-29T00:19:56Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2025-08-29T00:19:56Z",
+          "completed_at": "2025-08-29T00:19:56Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2025-08-29T00:19:56Z",
+          "completed_at": "2025-08-29T00:19:56Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145249775",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000001813,
+      "runner_name": "GitHub Actions 1000001813",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 49145249794,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUkAAg",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145249794",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145249794",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2025-08-29T00:19:43Z",
+      "started_at": "2025-08-29T00:19:45Z",
+      "completed_at": "2025-08-29T00:20:04Z",
+      "name": "publish-pypi",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2025-08-29T00:19:46Z",
+          "completed_at": "2025-08-29T00:19:46Z"
+        },
+        {
+          "name": "Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2025-08-29T00:19:46Z",
+          "completed_at": "2025-08-29T00:19:50Z"
+        },
+        {
+          "name": "Setup Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2025-08-29T00:19:50Z",
+          "completed_at": "2025-08-29T00:19:56Z"
+        },
+        {
+          "name": "Install build tools",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2025-08-29T00:19:56Z",
+          "completed_at": "2025-08-29T00:20:01Z"
+        },
+        {
+          "name": "Get version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2025-08-29T00:20:01Z",
+          "completed_at": "2025-08-29T00:20:01Z"
+        },
+        {
+          "name": "Check if PyPI package exists",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2025-08-29T00:20:01Z",
+          "completed_at": "2025-08-29T00:20:01Z"
+        },
+        {
+          "name": "Use existing Python package structure",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 7,
+          "started_at": "2025-08-29T00:20:01Z",
+          "completed_at": "2025-08-29T00:20:01Z"
+        },
+        {
+          "name": "Update Python package version",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 8,
+          "started_at": "2025-08-29T00:20:01Z",
+          "completed_at": "2025-08-29T00:20:01Z"
+        },
+        {
+          "name": "Build Python package",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2025-08-29T00:20:01Z",
+          "completed_at": "2025-08-29T00:20:01Z"
+        },
+        {
+          "name": "Publish to PyPI",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 10,
+          "started_at": "2025-08-29T00:20:01Z",
+          "completed_at": "2025-08-29T00:20:01Z"
+        },
+        {
+          "name": "Post Setup Python",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2025-08-29T00:20:01Z",
+          "completed_at": "2025-08-29T00:20:01Z"
+        },
+        {
+          "name": "Post Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2025-08-29T00:20:01Z",
+          "completed_at": "2025-08-29T00:20:02Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2025-08-29T00:20:02Z",
+          "completed_at": "2025-08-29T00:20:02Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145249794",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000001817,
+      "runner_name": "GitHub Actions 1000001817",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 49145249796,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUkABA",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145249796",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145249796",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2025-08-29T00:19:43Z",
+      "started_at": "2025-08-29T00:19:45Z",
+      "completed_at": "2025-08-29T00:21:11Z",
+      "name": "publish-docker",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2025-08-29T00:19:46Z",
+          "completed_at": "2025-08-29T00:19:49Z"
+        },
+        {
+          "name": "Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2025-08-29T00:19:49Z",
+          "completed_at": "2025-08-29T00:19:53Z"
+        },
+        {
+          "name": "Set up Docker Buildx",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2025-08-29T00:19:53Z",
+          "completed_at": "2025-08-29T00:20:02Z"
+        },
+        {
+          "name": "Login to Docker Hub",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2025-08-29T00:20:02Z",
+          "completed_at": "2025-08-29T00:20:03Z"
+        },
+        {
+          "name": "Get version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2025-08-29T00:20:03Z",
+          "completed_at": "2025-08-29T00:20:04Z"
+        },
+        {
+          "name": "Build multi-platform binary for Docker",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2025-08-29T00:20:04Z",
+          "completed_at": "2025-08-29T00:20:53Z"
+        },
+        {
+          "name": "Create multi-arch Dockerfile",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2025-08-29T00:20:53Z",
+          "completed_at": "2025-08-29T00:20:53Z"
+        },
+        {
+          "name": "Build and push Docker image",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2025-08-29T00:20:53Z",
+          "completed_at": "2025-08-29T00:21:07Z"
+        },
+        {
+          "name": "Post Build and push Docker image",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2025-08-29T00:21:07Z",
+          "completed_at": "2025-08-29T00:21:07Z"
+        },
+        {
+          "name": "Post Login to Docker Hub",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2025-08-29T00:21:07Z",
+          "completed_at": "2025-08-29T00:21:08Z"
+        },
+        {
+          "name": "Post Set up Docker Buildx",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2025-08-29T00:21:08Z",
+          "completed_at": "2025-08-29T00:21:08Z"
+        },
+        {
+          "name": "Post Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2025-08-29T00:21:08Z",
+          "completed_at": "2025-08-29T00:21:09Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2025-08-29T00:21:09Z",
+          "completed_at": "2025-08-29T00:21:09Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145249796",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000001814,
+      "runner_name": "GitHub Actions 1000001814",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 49145249799,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUkABw",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145249799",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145249799",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2025-08-29T00:19:43Z",
+      "started_at": "2025-08-29T00:19:47Z",
+      "completed_at": "2025-08-29T00:21:30Z",
+      "name": "publish-homebrew",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2025-08-29T00:21:13Z",
+          "completed_at": "2025-08-29T00:21:14Z"
+        },
+        {
+          "name": "Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2025-08-29T00:21:14Z",
+          "completed_at": "2025-08-29T00:21:25Z"
+        },
+        {
+          "name": "Get version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2025-08-29T00:21:25Z",
+          "completed_at": "2025-08-29T00:21:25Z"
+        },
+        {
+          "name": "Check if Homebrew formula exists",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2025-08-29T00:21:25Z",
+          "completed_at": "2025-08-29T00:21:25Z"
+        },
+        {
+          "name": "Get checksums from GitHub API",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2025-08-29T00:21:25Z",
+          "completed_at": "2025-08-29T00:21:26Z"
+        },
+        {
+          "name": "Create/update formula in repository",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2025-08-29T00:21:26Z",
+          "completed_at": "2025-08-29T00:21:26Z"
+        },
+        {
+          "name": "Commit updated formula to repository",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2025-08-29T00:21:26Z",
+          "completed_at": "2025-08-29T00:21:26Z"
+        },
+        {
+          "name": "Post Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2025-08-29T00:21:26Z",
+          "completed_at": "2025-08-29T00:21:27Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2025-08-29T00:21:27Z",
+          "completed_at": "2025-08-29T00:21:29Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145249799",
+      "labels": [
+        "macos-latest"
+      ],
+      "runner_id": 1000001815,
+      "runner_name": "GitHub Actions 1000001815",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 49145249802,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUkACg",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145249802",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145249802",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2025-08-29T00:19:43Z",
+      "started_at": "2025-08-29T00:19:49Z",
+      "completed_at": "2025-08-29T00:20:41Z",
+      "name": "publish-crates",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2025-08-29T00:19:50Z",
+          "completed_at": "2025-08-29T00:19:51Z"
+        },
+        {
+          "name": "Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2025-08-29T00:19:51Z",
+          "completed_at": "2025-08-29T00:19:55Z"
+        },
+        {
+          "name": "Setup Rust",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2025-08-29T00:19:55Z",
+          "completed_at": "2025-08-29T00:19:57Z"
+        },
+        {
+          "name": "Get version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2025-08-29T00:19:57Z",
+          "completed_at": "2025-08-29T00:19:57Z"
+        },
+        {
+          "name": "Check if Crates version exists",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2025-08-29T00:19:57Z",
+          "completed_at": "2025-08-29T00:19:57Z"
+        },
+        {
+          "name": "Update Cargo.toml version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2025-08-29T00:19:57Z",
+          "completed_at": "2025-08-29T00:19:57Z"
+        },
+        {
+          "name": "Clean and prepare for publishing",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2025-08-29T00:19:57Z",
+          "completed_at": "2025-08-29T00:19:58Z"
+        },
+        {
+          "name": "Build for publishing",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2025-08-29T00:19:58Z",
+          "completed_at": "2025-08-29T00:20:38Z"
+        },
+        {
+          "name": "Publish to crates.io",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 9,
+          "started_at": "2025-08-29T00:20:38Z",
+          "completed_at": "2025-08-29T00:20:39Z"
+        },
+        {
+          "name": "Post Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2025-08-29T00:20:39Z",
+          "completed_at": "2025-08-29T00:20:39Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19,
+          "started_at": "2025-08-29T00:20:39Z",
+          "completed_at": "2025-08-29T00:20:39Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145249802",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000001818,
+      "runner_name": "GitHub Actions 1000001818",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 49145249819,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUkAGw",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145249819",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145249819",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2025-08-29T00:19:43Z",
+      "started_at": "2025-08-29T00:19:50Z",
+      "completed_at": "2025-08-29T00:20:27Z",
+      "name": "publish-aur",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2025-08-29T00:19:51Z",
+          "completed_at": "2025-08-29T00:19:52Z"
+        },
+        {
+          "name": "Build KSXGitHub/github-actions-deploy-aur@v2.7.2",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2025-08-29T00:19:52Z",
+          "completed_at": "2025-08-29T00:20:12Z"
+        },
+        {
+          "name": "Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2025-08-29T00:20:12Z",
+          "completed_at": "2025-08-29T00:20:16Z"
+        },
+        {
+          "name": "Get version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2025-08-29T00:20:16Z",
+          "completed_at": "2025-08-29T00:20:16Z"
+        },
+        {
+          "name": "Check if AUR package exists",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2025-08-29T00:20:16Z",
+          "completed_at": "2025-08-29T00:20:17Z"
+        },
+        {
+          "name": "Create AUR package",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2025-08-29T00:20:17Z",
+          "completed_at": "2025-08-29T00:20:17Z"
+        },
+        {
+          "name": "Publish to AUR",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 7,
+          "started_at": "2025-08-29T00:20:17Z",
+          "completed_at": "2025-08-29T00:20:25Z"
+        },
+        {
+          "name": "Post Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2025-08-29T00:20:25Z",
+          "completed_at": "2025-08-29T00:20:25Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2025-08-29T00:20:25Z",
+          "completed_at": "2025-08-29T00:20:25Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145249819",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000001816,
+      "runner_name": "GitHub Actions 1000001816",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 49145249825,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUkAIQ",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145249825",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145249825",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2025-08-29T00:19:43Z",
+      "started_at": "2025-08-29T00:19:45Z",
+      "completed_at": "2025-08-29T00:19:55Z",
+      "name": "publish-github-packages",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2025-08-29T00:19:46Z",
+          "completed_at": "2025-08-29T00:19:46Z"
+        },
+        {
+          "name": "Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2025-08-29T00:19:46Z",
+          "completed_at": "2025-08-29T00:19:49Z"
+        },
+        {
+          "name": "Setup Node.js",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2025-08-29T00:19:49Z",
+          "completed_at": "2025-08-29T00:19:51Z"
+        },
+        {
+          "name": "Get version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2025-08-29T00:19:51Z",
+          "completed_at": "2025-08-29T00:19:51Z"
+        },
+        {
+          "name": "Prepare GitHub Package",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2025-08-29T00:19:51Z",
+          "completed_at": "2025-08-29T00:19:52Z"
+        },
+        {
+          "name": "Publish to GitHub Packages",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2025-08-29T00:19:52Z",
+          "completed_at": "2025-08-29T00:19:54Z"
+        },
+        {
+          "name": "Post Setup Node.js",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2025-08-29T00:19:54Z",
+          "completed_at": "2025-08-29T00:19:54Z"
+        },
+        {
+          "name": "Post Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2025-08-29T00:19:54Z",
+          "completed_at": "2025-08-29T00:19:54Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2025-08-29T00:19:54Z",
+          "completed_at": "2025-08-29T00:19:54Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145249825",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000001819,
+      "runner_name": "GitHub Actions 1000001819",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 49145249899,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUkAaw",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145249899",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145249899",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2025-08-29T00:19:43Z",
+      "started_at": "2025-08-29T00:19:43Z",
+      "completed_at": "2025-08-29T00:19:43Z",
+      "name": "publish-winget",
+      "steps": [
+
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145249899",
+      "labels": [
+        "windows-latest"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    },
+    {
+      "id": 49145249957,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUkApQ",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145249957",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145249957",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2025-08-29T00:19:43Z",
+      "started_at": "2025-08-29T00:19:43Z",
+      "completed_at": "2025-08-29T00:19:43Z",
+      "name": "publish-scoop",
+      "steps": [
+
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145249957",
+      "labels": [
+        "windows-latest"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    },
+    {
+      "id": 49145249959,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUkApw",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145249959",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145249959",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2025-08-29T00:19:43Z",
+      "started_at": "2025-08-29T00:19:43Z",
+      "completed_at": "2025-08-29T00:19:43Z",
+      "name": "publish-flathub",
+      "steps": [
+
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145249959",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    },
+    {
+      "id": 49145249961,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUkAqQ",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145249961",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145249961",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2025-08-29T00:19:43Z",
+      "started_at": "2025-08-29T00:19:43Z",
+      "completed_at": "2025-08-29T00:19:43Z",
+      "name": "publish-nix",
+      "steps": [
+
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145249961",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    },
+    {
+      "id": 49145278211,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUlvAw",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145278211",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145278211",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2025-08-29T00:20:19Z",
+      "started_at": "2025-08-29T00:20:24Z",
+      "completed_at": "2025-08-29T00:21:01Z",
+      "name": "publish-snap",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2025-08-29T00:20:25Z",
+          "completed_at": "2025-08-29T00:20:25Z"
+        },
+        {
+          "name": "Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2025-08-29T00:20:25Z",
+          "completed_at": "2025-08-29T00:20:31Z"
+        },
+        {
+          "name": "Install snapcraft",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2025-08-29T00:20:31Z",
+          "completed_at": "2025-08-29T00:20:51Z"
+        },
+        {
+          "name": "Get version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2025-08-29T00:20:51Z",
+          "completed_at": "2025-08-29T00:20:51Z"
+        },
+        {
+          "name": "Check if Snap version exists",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2025-08-29T00:20:51Z",
+          "completed_at": "2025-08-29T00:20:51Z"
+        },
+        {
+          "name": "Update snapcraft.yaml version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2025-08-29T00:20:51Z",
+          "completed_at": "2025-08-29T00:20:51Z"
+        },
+        {
+          "name": "Validate snapcraft.yaml",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2025-08-29T00:20:51Z",
+          "completed_at": "2025-08-29T00:20:53Z"
+        },
+        {
+          "name": "Build snap",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 8,
+          "started_at": "2025-08-29T00:20:53Z",
+          "completed_at": "2025-08-29T00:21:00Z"
+        },
+        {
+          "name": "Login to Snap Store",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2025-08-29T00:21:00Z",
+          "completed_at": "2025-08-29T00:21:00Z"
+        },
+        {
+          "name": "Upload and release snap",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 10,
+          "started_at": "2025-08-29T00:21:00Z",
+          "completed_at": "2025-08-29T00:21:00Z"
+        },
+        {
+          "name": "Post Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20,
+          "started_at": "2025-08-29T00:21:00Z",
+          "completed_at": "2025-08-29T00:21:00Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21,
+          "started_at": "2025-08-29T00:21:00Z",
+          "completed_at": "2025-08-29T00:21:00Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145278211",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000001821,
+      "runner_name": "GitHub Actions 1000001821",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 49145278235,
+      "run_id": 17311090968,
+      "workflow_name": "Publish Packages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/runs/17311090968",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOPfaaU88AAAALcUlvGw",
+      "head_sha": "392d47b274a05d6122bee2cb9bc6d1e4517d594e",
+      "url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/actions/jobs/49145278235",
+      "html_url": "https://github.com/Michael-A-Kuykendall/contextlite/actions/runs/17311090968/job/49145278235",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2025-08-29T00:20:19Z",
+      "started_at": "2025-08-29T00:20:22Z",
+      "completed_at": "2025-08-29T00:21:02Z",
+      "name": "publish-chocolatey",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2025-08-29T00:20:23Z",
+          "completed_at": "2025-08-29T00:20:24Z"
+        },
+        {
+          "name": "Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2025-08-29T00:20:24Z",
+          "completed_at": "2025-08-29T00:20:32Z"
+        },
+        {
+          "name": "Get version",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2025-08-29T00:20:32Z",
+          "completed_at": "2025-08-29T00:20:32Z"
+        },
+        {
+          "name": "Check if Chocolatey version exists",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2025-08-29T00:20:32Z",
+          "completed_at": "2025-08-29T00:20:33Z"
+        },
+        {
+          "name": "Install Chocolatey",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2025-08-29T00:20:33Z",
+          "completed_at": "2025-08-29T00:20:40Z"
+        },
+        {
+          "name": "Prepare package",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2025-08-29T00:20:40Z",
+          "completed_at": "2025-08-29T00:20:54Z"
+        },
+        {
+          "name": "Pack",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2025-08-29T00:20:54Z",
+          "completed_at": "2025-08-29T00:20:56Z"
+        },
+        {
+          "name": "Push",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 8,
+          "started_at": "2025-08-29T00:20:56Z",
+          "completed_at": "2025-08-29T00:20:58Z"
+        },
+        {
+          "name": "Post Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2025-08-29T00:20:58Z",
+          "completed_at": "2025-08-29T00:21:00Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2025-08-29T00:21:00Z",
+          "completed_at": "2025-08-29T00:21:00Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/check-runs/49145278235",
+      "labels": [
+        "windows-latest"
+      ],
+      "runner_id": 1000001822,
+      "runner_name": "GitHub Actions 1000001822",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

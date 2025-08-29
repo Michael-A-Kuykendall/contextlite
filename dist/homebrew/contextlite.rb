@@ -5,21 +5,21 @@
 class Contextlite < Formula
   desc "Single-file, zero-dependency context engine for AI applications"
   homepage "https://contextlite.com"
-  version "0.0.1-next"
+  version "1.1.18-next"
   license "MIT"
 
   on_macos do
     on_intel do
-      url "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v0.0.0/contextlite_Darwin_x86_64.tar.gz"
-      sha256 "a49b46d7343104f4752f85b1dffae5a9248767db1807f5549c32c03891b491ff"
+      url "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v1.1.17/contextlite_Darwin_x86_64.tar.gz"
+      sha256 "f1343c9948c54e32e4ae9108cff9f0a29cd58f34889c60373a3a24ed3206000b"
 
       def install
         bin.install "contextlite"
       end
     end
     on_arm do
-      url "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v0.0.0/contextlite_Darwin_arm64.tar.gz"
-      sha256 "98126b1d12e530b14e7931592d6af674a3f5b98dcf89e12507626e4d442ea62b"
+      url "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v1.1.17/contextlite_Darwin_arm64.tar.gz"
+      sha256 "57c16395bbaf2f6b2128463191c8181f5408102270f5152bed9d41787d6def5d"
 
       def install
         bin.install "contextlite"
@@ -30,8 +30,8 @@ class Contextlite < Formula
   on_linux do
     on_intel do
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v0.0.0/contextlite_Linux_x86_64.tar.gz"
-        sha256 "6e8f4498d61070c5cd85f40d517b3d84171f3546f021c3631af4dfa82e27c573"
+        url "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v1.1.17/contextlite_Linux_x86_64.tar.gz"
+        sha256 "9488febcc1b7549915b2c5fd4155274923716196006faa31930748e10b25924f"
 
         def install
           bin.install "contextlite"
@@ -40,8 +40,8 @@ class Contextlite < Formula
     end
     on_arm do
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v0.0.0/contextlite_Linux_arm64.tar.gz"
-        sha256 "88d0d6859d5df827debc3d5002b45d6d5f9cbfe1fd69d89983c4d147181510d2"
+        url "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/v1.1.17/contextlite_Linux_arm64.tar.gz"
+        sha256 "7c665004878f3d104fdf40f1d2448a75945f5887945537e263d74f87353da8f2"
 
         def install
           bin.install "contextlite"

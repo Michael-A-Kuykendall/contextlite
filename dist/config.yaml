@@ -3,7 +3,7 @@ release:
   github:
     owner: Michael-A-Kuykendall
     name: contextlite
-  prerelease: auto
+  prerelease: "false"
   name_template: '{{.ProjectName}} v{{.Version}}'
   header: |
     ## ContextLite {{.Version}}
