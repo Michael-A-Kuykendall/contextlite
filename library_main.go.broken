@@ -15,7 +15,12 @@ package main
 
 import "C"
 import (
+	"context"
 	"encoding/json"
+	"unsafe"
+
+	// Private imports - only available when building with private binary
+	// These imports are conditionally compiled and gracefully handled
 )
 
 // Conditional compilation: only build this when library tag is present
@@ -47,28 +52,53 @@ func AssembleContext(engineID C.int, requestJSON *C.char) *C.char {
 	// Stub implementation - would call private engine
 	return C.CString(`{"error": "private engine not available - install ContextLite Pro"}`)
 }
+	if err != nil {
+		errorResp := map[string]string{"error": err.Error()}
+		errorJSON, _ := json.Marshal(errorResp)
+		return C.CString(string(errorJSON))
+	}
+	
+	resultJSON, err := json.Marshal(result)
+	if err != nil {
+		return C.CString(`{"error": "serialization failed"}`)
+	}
+	
+	return C.CString(string(resultJSON))
+}
 
 //export GetEngineStats
 func GetEngineStats(engineID C.int) *C.char {
-	// Stub implementation - would return engine statistics
-	errorResp := map[string]string{"error": "private engine not available - install ContextLite Pro"}
-	errorJSON, _ := json.Marshal(errorResp)
-	return C.CString(string(errorJSON))
+	id := int(engineID)
+	engine, exists := engines[id]
+	if !exists {
+		return C.CString(`{"error": "engine not found"}`)
+	}
+	
+	stats, err := engine.GetStats()
+	if err != nil {
+		errorResp := map[string]string{"error": err.Error()}
+		errorJSON, _ := json.Marshal(errorResp)
+		return C.CString(string(errorJSON))
+	}
+	
+	statsJSON, err := json.Marshal(stats)
+	if err != nil {
+		return C.CString(`{"error": "serialization failed"}`)
+	}
+	
+	return C.CString(string(statsJSON))
 }
 
-//export IsEngineReady
-func IsEngineReady(engineID C.int) C.int {
-	// Stub implementation - always return not ready (0) for community version
-	return 0
+//export FreeString
+func FreeString(str *C.char) {
+	C.free(unsafe.Pointer(str))
 }
 
+// Version information
 //export GetVersion
 func GetVersion() *C.char {
-	return C.CString("ContextLite Community v1.1.22 - Pro features require upgrade")
+	return C.CString("1.0.0-private")
 }
 
-// Required main function for library builds
-func main() {
-	// This main function should never be called in library mode
-	// It's only here to satisfy Go's package main requirement
-}
+// Required for shared library
+func main() {}
