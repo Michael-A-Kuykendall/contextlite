@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -639,15 +640,28 @@ func (m *MockStorage) Close() error {
 
 // Helper functions
 func createMockBinary(t *testing.T) string {
-	content := `@echo off
+	if runtime.GOOS == "windows" {
+		content := `@echo off
 echo {"status": "success", "data": {"stats": {"total_queries": 100}, "selected_docs": [0], "docs": [{"id": "test", "content": "test"}]}}
 `
-	return createMockBinaryWithContent(t, content)
+		return createMockBinaryWithContent(t, content)
+	} else {
+		content := `#!/bin/bash
+echo '{"status": "success", "data": {"stats": {"total_queries": 100}, "selected_docs": [0], "docs": [{"id": "test", "content": "test"}}}'
+`
+		return createMockBinaryWithContent(t, content)
+	}
 }
 
 func createMockBinaryWithContent(t *testing.T, content string) string {
 	tmpDir := t.TempDir()
-	binaryPath := filepath.Join(tmpDir, "mock_binary.bat") // Windows batch file
+	
+	var binaryPath string
+	if runtime.GOOS == "windows" {
+		binaryPath = filepath.Join(tmpDir, "mock_binary.bat")
+	} else {
+		binaryPath = filepath.Join(tmpDir, "mock_binary.sh")
+	}
 	
 	err := os.WriteFile(binaryPath, []byte(content), 0755)
 	if err != nil {

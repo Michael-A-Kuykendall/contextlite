@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -355,7 +356,7 @@ func setupClusterTestServer(t *testing.T, cfg *config.Config) *httptest.Server {
 	eng := engine.NewCoreEngine(cfg, store)
 
 	// Create feature gate
-	featureGate := license.NewBasicFeatureGate()
+	featureGate := license.NewEnhancedFeatureGate()
 
 	// Create logger
 	logger := zap.NewNop()
@@ -364,7 +365,7 @@ func setupClusterTestServer(t *testing.T, cfg *config.Config) *httptest.Server {
 	apiServer := api.New(eng, store, cfg, logger, featureGate)
 
 	// Create test server
-	testServer := httptest.NewServer(apiServer.Handler())
+	testServer := httptest.NewServer(apiServer)
 	
 	t.Cleanup(func() {
 		testServer.Close()
@@ -466,7 +467,16 @@ func createWorkspaceRequest(workspaceID, query string) *http.Request {
 }
 
 func executeRequest(t *testing.T, server *httptest.Server, req *http.Request) *http.Response {
-	req.URL = server.URL + req.URL.Path + req.URL.RawQuery
+	// Properly construct the URL
+	fullURL := server.URL + req.URL.Path
+	if req.URL.RawQuery != "" {
+		fullURL += "?" + req.URL.RawQuery
+	}
+	var err error
+	req.URL, err = url.Parse(fullURL)
+	if err != nil {
+		t.Fatalf("Failed to parse URL: %v", err)
+	}
 	
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)

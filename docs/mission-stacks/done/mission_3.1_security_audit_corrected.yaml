@@ -1,0 +1,61 @@
+version: "1.0"
+name: "Security Audit Mission"
+description: "Comprehensive security testing of ContextLite authentication and database systems"
+
+steps:
+  - id: "auth_check"
+    name: "Check Bearer Token Implementation"
+    step_type: "command"
+    parameters:
+      command: "grep"
+      args: ["-r", "Bearer", "internal/auth/", "--include=*.go"]
+    timeout_seconds: 30
+
+  - id: "auth_test"
+    name: "Run Authentication Tests"
+    step_type: "command"
+    parameters:
+      command: "go"
+      args: ["test", "-v", "./internal/auth/..."]
+    timeout_seconds: 60
+    depends_on: ["auth_check"]
+
+  - id: "db_permissions"
+    name: "Check Database File Permissions"
+    step_type: "command"
+    parameters:
+      command: "find"
+      args: [".", "-name", "*.db", "-exec", "ls", "-la", "{}", ";"]
+    timeout_seconds: 30
+
+  - id: "api_security_test"
+    name: "Test API Authentication"
+    step_type: "command"
+    parameters:
+      command: "curl"
+      args: ["-H", "Authorization: Bearer invalid", "http://localhost:8084/api/v1/stats"]
+    timeout_seconds: 30
+    depends_on: ["auth_test"]
+
+  - id: "security_analysis"
+    name: "Analyze Security Findings"
+    step_type: "llm"
+    parameters:
+      prompt: "Analyze the authentication and database security test results. Identify any vulnerabilities and provide recommendations for hardening."
+      model: "llama32-champion:latest"
+      provider: "ollama"
+      temperature: 0.1
+      max_tokens: 1000
+    depends_on: ["auth_test", "db_permissions", "api_security_test"]
+
+  - id: "security_report"
+    name: "Generate Security Report"
+    step_type: "create_file"
+    parameters:
+      path: "docs/security/SECURITY_AUDIT_REPORT.md"
+      content: "Security audit completed successfully. See analysis results."
+    depends_on: ["security_analysis"]
+
+config:
+  max_parallel_steps: 2
+  timeout_seconds: 300

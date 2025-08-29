@@ -52,7 +52,6 @@ func TestHandleStripeWebhook_ErrorPaths_Final(t *testing.T) {
 	defer tracker.Close()
 
 	ls := &LicenseServer{
-		tracker: tracker,
 		config: &Config{
 			StripeWebhookSecret: "whsec_test_secret_12345",
 		},
@@ -99,7 +98,6 @@ func TestSubscriptionHandlers_ErrorPaths_Final(t *testing.T) {
 	defer tracker.Close()
 
 	ls := &LicenseServer{
-		tracker: tracker,
 		config:  &Config{},
 	}
 
@@ -165,15 +163,14 @@ func TestSendLicenseEmail_ErrorPaths_Final(t *testing.T) {
 
 	// Test with SMTP configured (but invalid)
 	config := &Config{
-		SMTPHost:     "invalid.smtp.server.com",
-		SMTPPort:     587,
-		SMTPUser:     "invalid_user",
-		SMTPPassword: "invalid_password",
+		optimizationPHost:     "invalid.smtp.server.com",
+		optimizationPPort:     587,
+		optimizationPUser:     "invalid_user",
+		optimizationPPassword: "invalid_password",
 		FromEmail:    "test@example.com",
 	}
 
 	ls := &LicenseServer{
-		tracker: tracker,
 		config:  config,
 	}
 
@@ -192,11 +189,10 @@ func TestSendLicenseEmail_ErrorPaths_Final(t *testing.T) {
 
 	// Test development mode path (no SMTP configured)
 	devConfig := &Config{
-		SMTPHost: "", // Empty means development mode
+		optimizationPHost: "", // Empty means development mode
 	}
 
 	devLs := &LicenseServer{
-		tracker: tracker,
 		config:  devConfig,
 	}
 
@@ -363,8 +359,8 @@ func TestLoadConfig_ComprehensiveErrorPaths_Final(t *testing.T) {
 	}
 	
 	// Should use default port when invalid port is provided
-	if config.SMTPPort != 587 {
-		t.Errorf("Expected default SMTP port 587, got %d", config.SMTPPort)
+	if config.optimizationPPort != 587 {
+		t.Errorf("Expected default SMTP port 587, got %d", config.optimizationPPort)
 	}
 
 	// Test 3: All environment variables properly set
@@ -386,7 +382,7 @@ func TestLoadConfig_ComprehensiveErrorPaths_Final(t *testing.T) {
 	if config.Port != 9090 {
 		t.Errorf("Expected port 9090, got %d", config.Port)
 	}
-	if config.SMTPPort != 465 {
-		t.Errorf("Expected SMTP port 465, got %d", config.SMTPPort)
+	if config.optimizationPPort != 465 {
+		t.Errorf("Expected SMTP port 465, got %d", config.optimizationPPort)
 	}
 }

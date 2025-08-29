@@ -859,8 +859,8 @@ func TestLoadConfig_Comprehensive_EdgeCases(t *testing.T) {
 				assert.Equal(t, "sk_test_123", config.StripeSecretKey)
 				assert.Equal(t, "whsec_test_123", config.StripeWebhookSecret)
 				assert.Equal(t, "/tmp/private_key.pem", config.PrivateKeyPath)
-				assert.Equal(t, "smtp.test.com", config.SMTPHost)
-				assert.Equal(t, 587, config.SMTPPort)
+				assert.Equal(t, "smtp.test.com", config.optimizationPHost)
+				assert.Equal(t, 587, config.optimizationPPort)
 			},
 		},
 		{
@@ -906,7 +906,7 @@ func TestLoadConfig_Comprehensive_EdgeCases(t *testing.T) {
 			},
 			expectError: false,
 			validateConfig: func(t *testing.T, config *Config) {
-				assert.Equal(t, 587, config.SMTPPort) // Should use default
+				assert.Equal(t, 587, config.optimizationPPort) // Should use default
 			},
 		},
 		{
@@ -934,10 +934,10 @@ func TestLoadConfig_Comprehensive_EdgeCases(t *testing.T) {
 			},
 			expectError: false,
 			validateConfig: func(t *testing.T, config *Config) {
-				assert.Equal(t, "smtp.custom.com", config.SMTPHost)
-				assert.Equal(t, 2525, config.SMTPPort)
-				assert.Equal(t, "custom@example.com", config.SMTPUser)
-				assert.Equal(t, "custom_password", config.SMTPPassword)
+				assert.Equal(t, "smtp.custom.com", config.optimizationPHost)
+				assert.Equal(t, 2525, config.optimizationPPort)
+				assert.Equal(t, "custom@example.com", config.optimizationPUser)
+				assert.Equal(t, "custom_password", config.optimizationPPassword)
 				assert.Equal(t, "noreply@custom.com", config.FromEmail)
 			},
 		},
@@ -950,10 +950,10 @@ func TestLoadConfig_Comprehensive_EdgeCases(t *testing.T) {
 			},
 			expectError: false,
 			validateConfig: func(t *testing.T, config *Config) {
-				assert.Equal(t, "smtp.gmail.com", config.SMTPHost)
-				assert.Equal(t, 587, config.SMTPPort)
-				assert.Equal(t, "", config.SMTPUser)
-				assert.Equal(t, "", config.SMTPPassword)
+				assert.Equal(t, "smtp.gmail.com", config.optimizationPHost)
+				assert.Equal(t, 587, config.optimizationPPort)
+				assert.Equal(t, "", config.optimizationPUser)
+				assert.Equal(t, "", config.optimizationPPassword)
 				assert.Equal(t, "licenses@contextlite.com", config.FromEmail)
 			},
 		},
@@ -1296,10 +1296,10 @@ func TestLicenseServer_SendLicenseEmail_AdditionalEdgeCases(t *testing.T) {
 			name: "smtp_enabled_but_invalid_config",
 			setupServer: func() *LicenseServer {
 				config := getTestConfig()
-				config.SMTPHost = "invalid.smtp.server"
-				config.SMTPPort = 587
-				config.SMTPUser = "invalid@example.com"
-				config.SMTPPassword = "invalid_password"
+				config.optimizationPHost = "invalid.smtp.server"
+				config.optimizationPPort = 587
+				config.optimizationPUser = "invalid@example.com"
+				config.optimizationPPassword = "invalid_password"
 				server, _ := NewLicenseServer(config)
 				return server
 			},
@@ -1312,9 +1312,9 @@ func TestLicenseServer_SendLicenseEmail_AdditionalEdgeCases(t *testing.T) {
 			name: "smtp_enabled_with_custom_from_email",
 			setupServer: func() *LicenseServer {
 				config := getTestConfig()
-				config.SMTPHost = "invalid.smtp.server"
-				config.SMTPUser = "smtp@example.com"
-				config.SMTPPassword = "password"
+				config.optimizationPHost = "invalid.smtp.server"
+				config.optimizationPUser = "smtp@example.com"
+				config.optimizationPPassword = "password"
 				config.FromEmail = "custom-from@example.com"
 				server, _ := NewLicenseServer(config)
 				return server
@@ -1328,9 +1328,9 @@ func TestLicenseServer_SendLicenseEmail_AdditionalEdgeCases(t *testing.T) {
 			name: "smtp_enabled_without_from_email_uses_smtp_user",
 			setupServer: func() *LicenseServer {
 				config := getTestConfig()
-				config.SMTPHost = "invalid.smtp.server"
-				config.SMTPUser = "smtp-user@example.com"
-				config.SMTPPassword = "password"
+				config.optimizationPHost = "invalid.smtp.server"
+				config.optimizationPUser = "smtp-user@example.com"
+				config.optimizationPPassword = "password"
 				config.FromEmail = "" // Empty, should use SMTPUser
 				server, _ := NewLicenseServer(config)
 				return server
@@ -1344,7 +1344,7 @@ func TestLicenseServer_SendLicenseEmail_AdditionalEdgeCases(t *testing.T) {
 			name: "development_mode_with_different_tiers",
 			setupServer: func() *LicenseServer {
 				config := getTestConfig()
-				config.SMTPHost = "" // Development mode
+				config.optimizationPHost = "" // Development mode
 				server, _ := NewLicenseServer(config)
 				return server
 			},
@@ -1357,7 +1357,7 @@ func TestLicenseServer_SendLicenseEmail_AdditionalEdgeCases(t *testing.T) {
 			name: "development_mode_professional_tier",
 			setupServer: func() *LicenseServer {
 				config := getTestConfig()
-				config.SMTPHost = ""
+				config.optimizationPHost = ""
 				server, _ := NewLicenseServer(config)
 				return server
 			},
@@ -1370,7 +1370,7 @@ func TestLicenseServer_SendLicenseEmail_AdditionalEdgeCases(t *testing.T) {
 			name: "development_mode_enterprise_tier",
 			setupServer: func() *LicenseServer {
 				config := getTestConfig()
-				config.SMTPHost = ""
+				config.optimizationPHost = ""
 				server, _ := NewLicenseServer(config)
 				return server
 			},
@@ -1383,8 +1383,8 @@ func TestLicenseServer_SendLicenseEmail_AdditionalEdgeCases(t *testing.T) {
 			name: "empty_smtp_user_development_mode",
 			setupServer: func() *LicenseServer {
 				config := getTestConfig()
-				config.SMTPHost = ""
-				config.SMTPUser = ""
+				config.optimizationPHost = ""
+				config.optimizationPUser = ""
 				server, _ := NewLicenseServer(config)
 				return server
 			},

@@ -1,0 +1,90 @@
+---
+version: "1.0"
+mission:
+  name: "Test Coverage Gap Analysis & Resolution"
+  id: "mission_3.2_test_coverage_fixes"
+  phase: "Phase 3: Quality Assurance"
+  priority: "HIGH"
+  model_assignment: "llama32-champion:latest"
+  estimated_duration: "30-45 minutes"
+
+description: |
+  Address the remaining test failures and gaps identified in the comprehensive test run.
+  Target the failing packages and increase overall test coverage to 95%+.
+  
+  Current Status: 82% success rate (9/11 packages passing). Focus on internal/storage 
+  package issues and integration suite server connectivity problems.
+
+objectives:
+  - "Fix failing internal/storage package tests"
+  - "Resolve integration suite server connectivity issues"  
+  - "Address storage timeout and database constraint handling"
+  - "Increase test coverage to 95%+"
+  - "Achieve 100% package success rate (11/11 packages)"
+
+tasks:
+  task_1:
+    title: "Fix Storage Package Test Failures"
+    action: "debug_and_fix"
+    target: "internal/storage"
+    commands:
+      - "go test -v ./internal/storage/... -run=TestCache"
+      - "go test -v ./internal/storage/... -timeout=30s"
+      - "go test -v ./internal/storage/... -coverprofile=storage_fixed.out"
+    expected_results:
+      - "All storage tests pass without timeouts"
+      - "Cache serialization issues resolved"
+      - "Database constraint handling fixed"
+
+  task_2:
+    title: "Fix Integration Suite Port Configuration"
+    action: "configure"
+    target: "test/integration_suite"
+    commands:
+      - "grep -r '8082' test/integration_suite/ --include='*.go'"
+      - "sed -i 's/8082/8084/g' test/integration_suite/*.go"
+      - "go test -v ./test/integration_suite/..."
+    expected_results:
+      - "Integration tests use correct port 8084"
+      - "Server connectivity issues resolved"
+      - "All integration tests pass"
+
+  task_3:
+    title: "Increase Test Coverage for Uncovered Paths"
+    action: "enhance"
+    target: "all packages"
+    commands:
+      - "go test -coverprofile=coverage_complete.out ./..."
+      - "go tool cover -html=coverage_complete.out -o coverage_report.html"
+      - "go test -v ./... -coverprofile=final_coverage.out"
+    expected_results:
+      - "95%+ test coverage achieved"
+      - "All edge cases covered"
+      - "Test suite runs reliably"
+
+  task_4:
+    title: "Performance Optimization and Benchmarks"
+    action: "optimize"
+    target: "test performance"
+    commands:
+      - "go test -bench=. ./internal/storage/..."
+      - "go test -bench=. ./internal/engine/..."
+      - "go test -timeout=60s ./..."
+    expected_results:
+      - "Tests complete within reasonable time"
+      - "Performance benchmarks established"
+      - "No test timeouts occur"
+
+validation_criteria:
+  - "All 11 packages pass tests (100% success rate)"
+  - "95%+ code coverage achieved across all packages"
+  - "No test timeouts or flaky tests"
+  - "Integration suite connects properly to server"
+  - "Storage serialization works correctly"
+
+success_metrics:
+  - package_success: "100% (11/11 packages passing)"
+  - coverage: "95%+ overall test coverage"
+  - performance: "Test suite completes in <2 minutes"
+  - reliability: "Tests pass consistently across runs"
+

@@ -1,0 +1,89 @@
+---
+version: "1.0"
+mission:
+  name: "Production Deployment Security Hardening"
+  id: "mission_3.4_security_hardening"
+  phase: "Phase 3: Security Implementation"
+  priority: "CRITICAL"
+  model_assignment: "llama32-champion:latest"
+  estimated_duration: "40-50 minutes"
+
+description: |
+  Address the critical security vulnerabilities identified in the public-facing deployment
+  assessment and implement comprehensive security hardening to make ContextLite safe
+  for production use with customer data.
+
+objectives:
+  - "Implement data encryption for PII protection (GDPR/CCPA compliance)"
+  - "Add robust authentication and authorization system"
+  - "Secure database access and prevent file exposure"
+  - "Remove hardcoded credentials and implement secret management"
+  - "Address all 4 critical security vulnerabilities"
+
+tasks:
+  task_1:
+    title: "Implement Data Encryption"
+    action: "secure"
+    target: "data protection"
+    commands:
+      - "grep -r 'password\\|secret\\|key' . --include='*.go' | grep -v test"
+      - "go mod tidy && go get golang.org/x/crypto/..."
+      - "go test -v ./internal/crypto/... || echo 'Need to create crypto package'"
+    expected_results:
+      - "AES-256 encryption implemented for sensitive data"
+      - "Database encryption enabled"
+      - "No plaintext storage of PII"
+
+  task_2:
+    title: "Secure Authentication System"
+    action: "enhance"
+    target: "authentication"
+    commands:
+      - "grep -r 'Bearer\\|JWT\\|Token' internal/auth/ --include='*.go'"
+      - "go test -v ./internal/auth/..."
+      - "curl -H 'Authorization: Bearer invalid' http://localhost:8084/api/v1/stats"
+    expected_results:
+      - "JWT authentication implemented"
+      - "Token validation working correctly"
+      - "Unauthorized access properly blocked"
+
+  task_3:
+    title: "Database Security Hardening"
+    action: "secure"
+    target: "database"
+    commands:
+      - "find . -name '*.db' -exec ls -la {} \\;"
+      - "chmod 600 *.db"
+      - "go test -v ./internal/storage/... -run=Security"
+    expected_results:
+      - "Database files properly secured"
+      - "No web-accessible database exposure"
+      - "Proper access controls implemented"
+
+  task_4:
+    title: "Secret Management Implementation"
+    action: "implement"
+    target: "secret management"
+    commands:
+      - "find . -name '.env*' -exec ls -la {} \\;"
+      - "grep -r 'hardcoded\\|TODO.*secret\\|FIXME.*key' . --include='*.go'"
+      - "go run cmd/secret-manager/main.go || echo 'Need to create secret manager'"
+    expected_results:
+      - "No hardcoded secrets in source code"
+      - "Environment-based secret management"
+      - "Secure secret rotation capability"
+
+validation_criteria:
+  - "All 4 critical vulnerabilities addressed"
+  - "Data encryption implemented and tested"
+  - "Authentication system fully secured"
+  - "Database access properly protected"
+  - "No hardcoded secrets remaining"
+  - "GDPR/CCPA compliance requirements met"
+
+success_metrics:
+  - vulnerabilities: "0 critical, 0 high-severity issues"
+  - encryption: "AES-256 for all sensitive data"
+  - authentication: "JWT-based secure authentication"
+  - compliance: "GDPR/CCPA compliant data handling"
+

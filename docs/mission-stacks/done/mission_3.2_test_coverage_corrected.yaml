@@ -1,0 +1,61 @@
+version: "1.0"
+name: "Test Coverage Analysis Mission"
+description: "Comprehensive test coverage analysis and gap identification for ContextLite"
+
+steps:
+  - id: "run_coverage"
+    name: "Generate Test Coverage Report"
+    step_type: "command"
+    parameters:
+      command: "go"
+      args: ["test", "-coverprofile=coverage.out", "./..."]
+    timeout_seconds: 120
+
+  - id: "html_coverage"
+    name: "Generate HTML Coverage Report"
+    step_type: "command"
+    parameters:
+      command: "go"
+      args: ["tool", "cover", "-html=coverage.out", "-o", "coverage.html"]
+    timeout_seconds: 60
+    depends_on: ["run_coverage"]
+
+  - id: "coverage_stats"
+    name: "Extract Coverage Statistics"
+    step_type: "command"
+    parameters:
+      command: "go"
+      args: ["tool", "cover", "-func=coverage.out"]
+    timeout_seconds: 30
+    depends_on: ["run_coverage"]
+
+  - id: "untested_analysis"
+    name: "Find Untested Code Areas"
+    step_type: "command"
+    parameters:
+      command: "grep"
+      args: ["-n", "func.*{", "internal/", "-r", "--include=*.go"]
+    timeout_seconds: 60
+
+  - id: "coverage_evaluation"
+    name: "Evaluate Coverage Quality"
+    step_type: "llm"
+    parameters:
+      prompt: "Based on the test coverage results, identify critical untested areas that need test implementation. Focus on security-critical paths, error handling, and API endpoints."
+      model: "llama32-champion:latest"
+      provider: "ollama"
+      temperature: 0.1
+      max_tokens: 1000
+    depends_on: ["coverage_stats", "untested_analysis"]
+
+  - id: "test_plan"
+    name: "Generate Test Implementation Plan"
+    step_type: "create_file"
+    parameters:
+      path: "docs/testing/TEST_COVERAGE_PLAN.md"
+      content: "Test coverage analysis completed. Implementation plan generated."
+    depends_on: ["coverage_evaluation"]
+
+config:
+  max_parallel_steps: 2
+  timeout_seconds: 300

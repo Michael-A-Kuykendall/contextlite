@@ -1,0 +1,88 @@
+version: "1.0"
+name: "deployment_ecosystem_fixes"
+description: "Mission 1.3: Fix critical deployment pipeline issues across package managers"
+steps:
+  - id: "analyze_deployment_failures"
+    name: "Analyze current deployment ecosystem status"
+    step_type: "llm"
+    parameters:
+      prompt: |
+        You are the Champion AI analyzing ContextLite's deployment ecosystem failures.
+
+        CURRENT STATUS:
+        ✅ Working: npm, PyPI, GitHub Packages, Chocolatey (4/12)
+        ❌ Failing: build-and-release (Go compilation), Docker, Homebrew, AUR, Crates, Snap
+        ⚫ Missing: WinGet, Flathub, Nix, Scoop
+
+        KEY ISSUES IDENTIFIED:
+        1. Go compilation error in build-and-release job (blocks 5+ packages)
+        2. AUR SSH/permission issues  
+        3. Crates.io token/permission issues
+        4. Docker build dependency on working binaries
+        5. Homebrew checksum calculation failures
+
+        TASK: Create specific fix strategy for each failing package manager:
+        - Root cause analysis
+        - Specific commands/changes needed
+        - Dependencies between fixes
+        - Priority order for maximum impact
+
+        Focus on the build-and-release fix first as it unblocks others.
+        Keep response under 400 words.
+      model: "llama32-champion"
+      provider: "ollama"
+      temperature: 0.1
+      max_tokens: 500
+
+  - id: "create_deployment_fix_plan"
+    name: "Create comprehensive deployment fix checklist"
+    step_type: "create_file"
+    depends_on: ["analyze_deployment_failures"]
+    parameters:
+      path: "docs/mission-stacks/current/DEPLOYMENT_ECOSYSTEM_FIX_PLAN.md"
+      content: |
+        # 🚀 ContextLite Deployment Ecosystem Fix Plan
+        **Goal**: Achieve 10+ working package managers (currently 4/12)
+        **Impact**: Multi-platform distribution for enterprise adoption
+        
+        ## Critical Path Fixes
+        [Champion AI analysis of priority fixes]
+        
+        ## Package Manager Specific Issues
+        [Detailed breakdown by platform]
+        
+        ## Success Metrics
+        - Build-and-release job passes ✅
+        - Docker Hub deployment working ✅  
+        - Homebrew formula functional ✅
+        - AUR package publishing ✅
+        - Crates.io permissions resolved ✅
+
+  - id: "generate_deployment_status_report"
+    name: "Generate deployment ecosystem status report"
+    step_type: "llm"
+    parameters:
+      prompt: |
+        Create a professional deployment status report for ContextLite v1.1.0.
+
+        AUDIENCE: Marketing team and enterprise customers
+        PURPOSE: Highlight multi-platform availability and professional distribution
+
+        STRUCTURE:
+        - Current platform support (emphasize 4+ working channels)
+        - Professional package management across ecosystems
+        - Enterprise installation options
+        - Planned expansion to additional platforms
+        - Competitive advantage in distribution
+
+        Write as positive marketing copy while being technically accurate.
+        Emphasize professional, enterprise-ready distribution.
+        Keep under 250 words.
+      model: "llama32-champion"
+      provider: "ollama"
+      temperature: 0.2
+      max_tokens: 350
+
+config:
+  max_parallel_steps: 2
+  timeout_seconds: 300

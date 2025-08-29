@@ -1,0 +1,88 @@
+---
+version: "1.0"
+mission:
+  name: "Complete Database Import & Workspace Population"
+  id: "mission_3.3_database_import"
+  phase: "Phase 3: Data Completeness"
+  priority: "HIGH"
+  model_assignment: "llama32-champion:latest"
+  estimated_duration: "20-30 minutes"
+
+description: |
+  Complete the database import process to populate ContextLite with all project files,
+  documentation, conversations, and workspace data. Currently only 1 document exists 
+  vs the target of complete project coverage.
+
+objectives:
+  - "Import all source code files into ContextLite database"
+  - "Index all documentation and markdown files"
+  - "Achieve comprehensive project knowledge coverage"
+  - "Increase document count from 1 to 500+"
+  - "Verify database integrity and search functionality"
+
+tasks:
+  task_1:
+    title: "Import Source Code Files"
+    action: "import"
+    target: "source code"
+    commands:
+      - "find . -name '*.go' -not -path './build/*' | head -20"
+      - "./contextlite import --recursive --include='*.go,*.mod,*.sum' ."
+      - "curl -s http://localhost:8084/api/v1/stats"
+    expected_results:
+      - "All Go source files imported"
+      - "Package files and dependencies included"
+      - "Document count significantly increased"
+
+  task_2:
+    title: "Import Documentation and Configuration"
+    action: "import"
+    target: "documentation"
+    commands:
+      - "find . -name '*.md' -o -name '*.yaml' -o -name '*.yml' -o -name '*.json' | head -20"
+      - "./contextlite import --include='*.md,*.yaml,*.yml,*.json,*.txt' ."
+      - "curl -s http://localhost:8084/api/v1/stats"
+    expected_results:
+      - "All documentation files imported"
+      - "Configuration files included"
+      - "Comprehensive project knowledge available"
+
+  task_3:
+    title: "Test Search and Context Assembly"
+    action: "validate"
+    target: "search functionality"
+    commands:
+      - "curl -X POST http://localhost:8084/api/v1/search -H 'Content-Type: application/json' -d '{\"query\":\"storage\"}'"
+      - "curl -X POST http://localhost:8084/api/v1/search -H 'Content-Type: application/json' -d '{\"query\":\"license\"}'"
+      - "curl -X POST http://localhost:8084/api/v1/search -H 'Content-Type: application/json' -d '{\"query\":\"authentication\"}'"
+    expected_results:
+      - "Search returns relevant results from imported files"
+      - "Context assembly works with full dataset"
+      - "Performance remains acceptable with larger dataset"
+
+  task_4:
+    title: "Verify Data Integrity and Statistics"
+    action: "verify"
+    target: "database integrity"
+    commands:
+      - "curl -s http://localhost:8084/api/v1/stats | jq ."
+      - "./contextlite stats --verbose"
+      - "ls -la *.db"
+    expected_results:
+      - "Database statistics show complete import"
+      - "No corruption or data integrity issues"
+      - "Performance metrics within acceptable ranges"
+
+validation_criteria:
+  - "Document count increased from 1 to 500+ documents"
+  - "All source code files successfully imported"
+  - "Documentation and configuration files indexed"
+  - "Search functionality works with full dataset"
+  - "Database integrity maintained"
+
+success_metrics:
+  - documents: "500+ documents in database"
+  - coverage: "95%+ of project files indexed"
+  - performance: "Search response time <500ms"
+  - integrity: "No database corruption or errors"
+

@@ -276,6 +276,7 @@ func TestWorkspaceMiddleware_ResourceLimitRejection(t *testing.T) {
 	
 	// Simulate first request still active
 	middleware.activeRequests["restricted-workspace"] = 1
+	wrappedHandler.ServeHTTP(rr1, req1)
 	
 	// Second request should be rejected
 	req2 := httptest.NewRequest("POST", "/api/v1/assemble", nil)

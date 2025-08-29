@@ -7,9 +7,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
-	"os/signal"
 	"path/filepath"
-	"syscall"
 	"contextlite/pkg/config"
 )
 
@@ -120,7 +118,7 @@ func (lpm *LightweightPortManager) allocatePort(projectName, projectPath string)
 // ReleasePort - Event-driven cleanup (only when actually stopping)
 func (lpm *LightweightPortManager) ReleasePort(port int) error {
 	cmd := exec.Command(lpm.registryPath, "release", fmt.Sprintf("%d", port))
-	output, err := cmd.Output()
+	_, err := cmd.Output()
 	if err != nil {
 		log.Printf("Warning: Failed to release port %d: %v", port, err)
 		return err
@@ -160,20 +158,3 @@ func GetInvisiblePort(cfg *config.Config) (int, error) {
 	return manager.GetProjectPort(cfg)
 }
 
-// SetupGracefulPortRelease - Event-driven cleanup on exit
-func SetupGracefulPortRelease(port int) {
-	// Set up signal handlers for graceful shutdown
-	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-		
-		<-c
-		log.Println("🛑 Graceful shutdown...")
-		
-		// Release port on exit - event-driven
-		manager := NewLightweightPortManager()
-		manager.ReleasePort(port)
-		
-		os.Exit(0)
-	}()
-}

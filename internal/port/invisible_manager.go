@@ -1,27 +1,24 @@
-package main
+package port
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"time"
 	
-	"contextlite/internal/port"
 	"contextlite/pkg/config"
 )
 
 // InvisiblePortManager - Now uses lightweight, event-driven approach
 type InvisiblePortManager struct {
-	lightweightManager *port.LightweightPortManager
-	currentPort        int
+	currentPort         int
+	lightweightManager *LightweightPortManager
 }
 
 // NewInvisiblePortManager creates a zero-overhead port manager
 func NewInvisiblePortManager() *InvisiblePortManager {
 	return &InvisiblePortManager{
-		lightweightManager: port.NewLightweightPortManager(),
+		lightweightManager: NewLightweightPortManager(),
 	}
 }
 
@@ -45,7 +42,7 @@ func (ipm *InvisiblePortManager) StartInvisiblePortManagement(cfg *config.Config
 
 // setupGracefulShutdown - Event-driven cleanup (only on exit signal)
 func (ipm *InvisiblePortManager) setupGracefulShutdown() {
-	port.SetupGracefulPortRelease(ipm.currentPort)
+	SetupGracefulPortRelease(ipm.currentPort)
 }
 
 // GetPortStats - On-demand statistics (no background collection)

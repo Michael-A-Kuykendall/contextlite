@@ -86,9 +86,10 @@ func TestLoader100Percent(t *testing.T) {
 					return dirPath
 				},
 				cleanup: func(string) {},
-				// On Windows, directories return true because they have no extension (ext == "")
-				// On Unix, directories return false unless they have execute permissions
-				expected: runtime.GOOS == "windows",
+				// On both Windows and Unix, directories return true
+				// Windows: ext == "" returns true for directories  
+				// Unix: directories have execute permission (0111) so they return true
+				expected: true,
 			},
 		}
 

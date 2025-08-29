@@ -1,0 +1,52 @@
+version: "1.0"
+name: "security_audit_analysis"
+description: "Mission 1: Analyze and prioritize security vulnerabilities from audit"
+steps:
+  - id: "analyze_security_priorities"
+    name: "Analyze critical security issues" 
+    step_type: "llm"
+    parameters:
+      prompt: |
+        You are the Champion AI analyzing ContextLite security issues. Based on the audit findings, identify the TOP 3 most critical security fixes needed:
+
+        CRITICAL ISSUES FOUND:
+        - Hardcoded authentication tokens ('contextlite-site-token-2025')
+        - No database encryption (SQLite files exposed) 
+        - No field-level PII encryption
+        - Weak bearer token authentication
+        - No tenant isolation (cross-customer data leakage)
+        - No audit logging or compliance features
+
+        For each of the TOP 3, provide:
+        1. Issue name
+        2. Risk level (CRITICAL/HIGH/MEDIUM)
+        3. Business impact 
+        4. Quick fix strategy (1-2 sentences)
+
+        Keep response under 200 words, focus on actionable priorities.
+      model: "llama32-champion"
+      provider: "ollama"
+      temperature: 0.1
+      max_tokens: 250
+
+  - id: "save_security_analysis"
+    name: "Save security priority analysis"
+    step_type: "create_file"
+    depends_on: ["analyze_security_priorities"]
+    parameters:
+      path: "docs/mission-stacks/current/security_priority_analysis.md"
+      content: |
+        # Security Priority Analysis
+        **Generated**: $(date)
+        **Mission**: security_audit_analysis
+        
+        ## Champion AI Analysis Results
+        [Response will be populated during execution]
+        
+        ---
+        **Status**: Analysis complete, ready for implementation missions
+        **Next**: Create specific fix missions for each priority item
+
+config:
+  max_parallel_steps: 1
+  timeout_seconds: 180

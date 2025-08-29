@@ -1,0 +1,71 @@
+---
+version: "1.0"
+mission:
+  name: "Comprehensive Security Audit & Testing"
+  id: "mission_3.1_security_audit"
+  phase: "Phase 3: Security & Compliance"
+  priority: "CRITICAL"
+  model_assignment: "llama32-champion:latest"
+  estimated_duration: "45-60 minutes"
+
+description: |
+  Conduct comprehensive security testing of ContextLite to address previously identified 
+  PII exposure vulnerabilities and validate current security posture against production deployment.
+  
+  CRITICAL: Address 4 critical vulnerabilities and 2 security warnings identified in public-facing
+  deployment assessment to prevent GDPR fines (€20M), CCPA fines ($750/customer), and legal liability.
+
+objectives:
+  - "Audit authentication and authorization mechanisms"
+  - "Test data encryption and storage security"  
+  - "Validate rate limiting and DDoS protection"
+  - "Check for hardcoded credentials and secrets exposure"
+  - "Address 4 critical vulnerabilities identified"
+
+tasks:
+  1:
+    name: "Authentication Security Testing"
+    action: "validate Bearer token system and check for authentication bypasses"
+    expected_output: "Authentication validation report with test results"
+
+  2:
+    name: "Database Security Audit"  
+    action: "scan for hardcoded secrets and validate database file permissions"
+    expected_output: "Database security assessment with vulnerability findings"
+
+  3:
+    name: "API Endpoint Security Testing"
+    action: "test API endpoints for authentication requirements and data leakage"
+    expected_output: "API security report with endpoint vulnerability assessment"
+
+  4:
+    name: "Workspace Isolation Security"
+    action: "validate workspace isolation and cross-workspace access prevention"
+    expected_output: "Workspace security validation with isolation test results"
+
+steps:
+  1:
+    command: "grep -r 'Bearer' internal/auth/ --include='*.go'"
+    description: "Check Bearer token implementation"
+  2:
+    command: "go test -v ./internal/auth/..."
+    description: "Run authentication tests"
+  3:
+    command: "find . -name '*.db' -exec ls -la {} \\;"
+    description: "Check database file permissions"
+  4:
+    command: "curl -H 'Authorization: Bearer invalid' http://localhost:8084/api/v1/stats"
+    description: "Test authentication on API endpoints"
+
+validation_criteria:
+  - "All 4 critical security vulnerabilities addressed"
+  - "Authentication system properly tested and secured"
+  - "Database access controls validated"
+  - "API endpoints secured with proper authentication"
+  - "Workspace isolation functioning correctly"
+
+success_metrics:
+  - coverage: "95%+ security test coverage"
+  - vulnerabilities: "0 critical, 0 high-severity issues"
+  - tests: "All security tests pass"
+  - documentation: "Security audit report generated"

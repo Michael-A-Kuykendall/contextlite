@@ -45,10 +45,10 @@ func getTestConfig() *Config {
 		StripeSecretKey:     "sk_test_fake_key_for_testing",
 		StripeWebhookSecret: "whsec_test_fake_webhook_secret",
 		PrivateKeyPath:      keyPath,
-		SMTPHost:           "",  // Disable email for testing
-		SMTPPort:           587,
-		SMTPUser:           "",
-		SMTPPassword:       "",
+		optimizationPHost:           "",  // Disable email for testing
+		optimizationPPort:           587,
+		optimizationPUser:           "",
+		optimizationPPassword:       "",
 		FromEmail:          "test@contextlite.com",
 	}
 }
@@ -668,7 +668,7 @@ func TestLoadConfig(t *testing.T) {
 		assert.Equal(t, 8081, config.Port)
 		assert.Equal(t, "sk_test_fake", config.StripeSecretKey)
 		assert.Equal(t, "whsec_test_fake", config.StripeWebhookSecret)
-		assert.Equal(t, 587, config.SMTPPort)
+		assert.Equal(t, 587, config.optimizationPPort)
 		assert.Equal(t, "./test_key.pem", config.PrivateKeyPath)
 	})
 }
@@ -916,7 +916,7 @@ func TestLicenseServer_Start_InvalidPort(t *testing.T) {
 func TestLicenseServer_SendLicenseEmail_SMTPDisabled(t *testing.T) {
 	config := getTestConfig()
 	// Ensure SMTP is disabled for testing
-	config.SMTPHost = ""
+	config.optimizationPHost = ""
 	server, err := NewLicenseServer(config)
 	require.NoError(t, err)
 
@@ -1006,10 +1006,10 @@ func TestLicenseServer_StripeWebhookHandlers_Subscriptions(t *testing.T) {
 func TestLicenseServer_SendLicenseEmail_WithSMTP(t *testing.T) {
 	config := getTestConfig()
 	// Configure SMTP (will still fail but will test more code paths)
-	config.SMTPHost = "smtp.test.com"
-	config.SMTPPort = 587
-	config.SMTPUser = "test@test.com"
-	config.SMTPPassword = "password"
+	config.optimizationPHost = "smtp.test.com"
+	config.optimizationPPort = 587
+	config.optimizationPUser = "test@test.com"
+	config.optimizationPPassword = "password"
 	server, err := NewLicenseServer(config)
 	require.NoError(t, err)
 
@@ -1060,10 +1060,10 @@ func TestLoadConfig_EnvironmentVariables(t *testing.T) {
 	assert.Equal(t, "sk_test_env_key", config.StripeSecretKey)
 	assert.Equal(t, "whsec_test_env_secret", config.StripeWebhookSecret)
 	assert.Equal(t, "/tmp/test_key.pem", config.PrivateKeyPath)
-	assert.Equal(t, "smtp.env.com", config.SMTPHost)
-	assert.Equal(t, 587, config.SMTPPort)
-	assert.Equal(t, "env@test.com", config.SMTPUser)
-	assert.Equal(t, "env_password", config.SMTPPassword)
+	assert.Equal(t, "smtp.env.com", config.optimizationPHost)
+	assert.Equal(t, 587, config.optimizationPPort)
+	assert.Equal(t, "env@test.com", config.optimizationPUser)
+	assert.Equal(t, "env_password", config.optimizationPPassword)
 	assert.Equal(t, "env_from@test.com", config.FromEmail)
 }
 
@@ -1337,7 +1337,7 @@ func TestLoadConfig_SMTPConfiguration(t *testing.T) {
 	
 	config, err := loadConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, 2525, config.SMTPPort)
+	assert.Equal(t, 2525, config.optimizationPPort)
 	assert.Equal(t, "custom@example.com", config.FromEmail)
 	assert.Equal(t, "./private_key.pem", config.PrivateKeyPath)
 }
