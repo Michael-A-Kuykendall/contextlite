@@ -170,27 +170,27 @@ aurs:
       # license
       install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/contextlite/LICENSE"
 
-# Snapcraft for Ubuntu/Linux
-snapcrafts:
-  - name: contextlite
-    publish: true
-    summary: Single-file, zero-dependency context engine for AI applications
-    description: |
-      ContextLite is a blazing-fast context optimization engine that transforms 
-      how AI applications handle large codebases and documents. With zero 
-      dependencies and single-file deployment, it provides instant context 
-      retrieval, intelligent chunking, and seamless integration with any AI workflow.
-    grade: stable
-    confinement: strict
-    license: MIT
-    base: core22
-    channel_templates:
-      - "stable"
-      - "candidate"
-    apps:
-      contextlite:
-        command: contextlite
-        plugs: ["home", "network", "network-bind"]
+# Snapcraft for Ubuntu/Linux - DISABLED until snapcraft is available
+# snapcrafts:
+#   - name: contextlite
+#     publish: true
+#     summary: Single-file, zero-dependency context engine for AI applications
+#     description: |
+#       ContextLite is a blazing-fast context optimization engine that transforms 
+#       how AI applications handle large codebases and documents. With zero 
+#       dependencies and single-file deployment, it provides instant context 
+#       retrieval, intelligent chunking, and seamless integration with any AI workflow.
+#     grade: stable
+#     confinement: strict
+#     license: MIT
+#     base: core22
+#     channel_templates:
+#       - "stable"
+#       - "candidate"
+#     apps:
+#       contextlite:
+#         command: contextlite
+#         plugs: ["home", "network", "network-bind"]
 
 # WinGet - NOTE: Manual submission required to Microsoft's winget-pkgs repo
 # See: https://github.com/microsoft/winget-pkgs/blob/master/CONTRIBUTING.md
