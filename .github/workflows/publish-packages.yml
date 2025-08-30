@@ -334,12 +334,14 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  publish-chocolatey:
-    needs: build-and-release
-    runs-on: windows-latest
-    timeout-minutes: 15
-    if: inputs.platforms == 'all' || contains(inputs.platforms, 'chocolatey') || github.event_name != 'workflow_dispatch'
-    steps:
+  # DISABLED: Chocolatey manual moderation takes weeks/months - focus on instant-publish platforms
+  # CHOCOLATEY ESCAPE PLAN: Completely disable to stop the reset loop
+  # publish-chocolatey:
+  #   needs: build-and-release  
+  #   runs-on: windows-latest
+  #   timeout-minutes: 15
+  #   if: false # DISABLED: 258-hour manual moderation causes reset loop, wasted 40+ Git tags
+  #   steps: ... (full job commented out for brevity)
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -405,11 +407,10 @@ jobs:
       - name: Push
         if: steps.check_chocolatey.outputs.skip == 'false'
         shell: powershell
-  # (Legacy commented Chocolatey job ended here; orphan env block removed)
         run: |
           if (-not $env:CHOCOLATEY_API_KEY) { Write-Error "CHOCOLATEY_API_KEY not set"; exit 1 }
           cd chocolatey-package
-            choco push contextlite.${{ steps.version.outputs.version }}.nupkg --source "https://push.chocolatey.org/" --key $env:CHOCOLATEY_API_KEY --timeout 270
+          choco push contextlite.${{ steps.version.outputs.version }}.nupkg --source "https://push.chocolatey.org/" --key $env:CHOCOLATEY_API_KEY --timeout 270
           Write-Host "Chocolatey package pushed. Awaiting moderation."
 
   # DISABLED: Chocolatey requires manual moderation - commented out to avoid build failures
