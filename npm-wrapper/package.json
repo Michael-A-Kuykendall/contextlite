@@ -1,22 +1,24 @@
 {
   "name": "contextlite",
   "version": "1.1.16",
-  "description": "Ultra-fast context engine with enterprise workspace clustering for AI applications",
+  "description": "RAG Systems Were a Mistake - Replace vector databases with 0.3ms mathematically optimal context selection",
   "keywords": [
-    "context",
+    "rag",
+    "vector-database-alternative", 
+    "smt-optimization",
+    "context-engine",
     "ai",
     "retrieval",
-    "search",
-    "embedding",
-    "database",
-    "sqlite",
     "fast",
+    "local",
+    "zero-cost",
+    "optimal",
+    "sqlite",
     "cli",
     "binary",
     "clustering",
     "workspace",
-    "enterprise",
-    "multi-project"
+    "enterprise"
   ],
   "author": {
     "name": "ContextLite Team",

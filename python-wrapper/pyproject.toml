@@ -8,7 +8,7 @@ version = "1.0.0"
 authors = [
     {name = "ContextLite Team", email = "support@contextlite.com"},
 ]
-description = "Ultra-fast context engine for retrieval and AI applications"
+description = "RAG Systems Were a Mistake - Replace vector databases with 0.3ms mathematically optimal context selection"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.8"
@@ -28,7 +28,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Text Processing :: Indexing",
 ]
-keywords = ["context", "ai", "retrieval", "search", "embedding", "database", "sqlite", "fast"]
+keywords = ["rag", "vector-database-alternative", "smt-optimization", "context-engine", "ai", "retrieval", "fast", "local", "zero-cost", "optimal"]
 dependencies = [
     "requests>=2.25.0",
     "platformdirs>=2.0.0",

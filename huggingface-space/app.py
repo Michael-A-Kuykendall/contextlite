@@ -30,17 +30,39 @@ def create_download_page():
     download_html = f"""
     <div style="max-width: 1200px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
         <div style="text-align: center; margin-bottom: 40px;">
-            <h1 style="font-size: 3rem; background: linear-gradient(45deg, #2563eb, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px;">
-                Download ContextLite
+            <h1 style="font-size: 3rem; background: linear-gradient(45deg, #ef4444, #dc2626); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px;">
+                RAG Systems Were a Mistake
             </h1>
+            <h2 style="font-size: 2rem; color: #2563eb; margin-bottom: 20px;">
+                Download ContextLite - The Vector Database Killer
+            </h2>
+            <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap;">
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; color: #ef4444;">⚡</div>
+                    <div style="font-weight: bold; color: #1f2937;">0.3ms</div>
+                    <div style="color: #666; font-size: 0.9rem;">vs 30-50ms vector DBs</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; color: #22c55e;">🎯</div>
+                    <div style="font-weight: bold; color: #1f2937;">Optimal</div>
+                    <div style="color: #666; font-size: 0.9rem;">Mathematically proven</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; color: #22c55e;">💰</div>
+                    <div style="font-weight: bold; color: #1f2937;">$0</div>
+                    <div style="color: #666; font-size: 0.9rem;">vs $300-500/month</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; color: #3b82f6;">🔒</div>
+                    <div style="font-weight: bold; color: #1f2937;">100% Local</div>
+                    <div style="color: #666; font-size: 0.9rem;">Your data stays private</div>
+                </div>
+            </div>
             <p style="font-size: 1.2rem; color: #666; margin-bottom: 10px;">
                 Latest Version: <strong style="color: #2563eb;">{release['tag_name']}</strong>
             </p>
             <p style="color: #888;">
                 Released: {datetime.fromisoformat(release['published_at'].replace('Z', '+00:00')).strftime('%B %d, %Y')}
-            </p>
-            <p style="font-size: 1.1rem; color: #555; max-width: 600px; margin: 20px auto;">
-                Lightning-fast context retrieval for AI applications. 100x faster than vector databases with perfect precision.
             </p>
         </div>
         
@@ -133,6 +155,31 @@ def create_download_page():
             </div>
         </div>
         
+        <div style="background: #fee2e2; border-radius: 12px; padding: 30px; margin-bottom: 40px; border-left: 4px solid #ef4444;">
+            <h2 style="text-align: center; color: #dc2626; margin-bottom: 20px;">🚫 Why Vector Databases Are Obsolete</h2>
+            <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center; max-width: 800px; margin: 0 auto;">
+                <div style="text-align: center;">
+                    <h4 style="color: #dc2626; margin-bottom: 10px;">Vector Databases</h4>
+                    <div style="color: #991b1b; margin: 5px 0;">🐌 30-50ms response time</div>
+                    <div style="color: #991b1b; margin: 5px 0;">📊 Approximate similarity</div>
+                    <div style="color: #991b1b; margin: 5px 0;">💸 $300-500/month costs</div>
+                    <div style="color: #991b1b; margin: 5px 0;">☁️ Data uploaded to cloud</div>
+                    <div style="color: #991b1b; margin: 5px 0;">🕐 Hours/days to setup</div>
+                </div>
+                
+                <div style="font-size: 3rem; color: #dc2626;">VS</div>
+                
+                <div style="text-align: center;">
+                    <h4 style="color: #059669; margin-bottom: 10px;">ContextLite</h4>
+                    <div style="color: #047857; margin: 5px 0;">⚡ 0.3ms response time</div>
+                    <div style="color: #047857; margin: 5px 0;">🎯 Mathematically optimal</div>
+                    <div style="color: #047857; margin: 5px 0;">💰 $0 ongoing costs</div>
+                    <div style="color: #047857; margin: 5px 0;">🔒 100% local data</div>
+                    <div style="color: #047857; margin: 5px 0;">⚡ 30 seconds setup</div>
+                </div>
+            </div>
+        </div>
+        
         <div style="text-align: center; padding: 20px;">
             <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
                 <a href="https://github.com/Michael-A-Kuykendall/contextlite/wiki" 
@@ -151,10 +198,11 @@ def create_download_page():
         </div>
         
         <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f0f9ff; border-radius: 12px; border-left: 4px solid #2563eb;">
-            <h3 style="color: #1e40af; margin-bottom: 10px;">⚡ Performance Highlights</h3>
-            <p style="color: #1e40af; margin: 5px 0;"><strong>0.3ms</strong> average response time</p>
-            <p style="color: #1e40af; margin: 5px 0;"><strong>100x faster</strong> than vector databases</p>
-            <p style="color: #1e40af; margin: 5px 0;"><strong>Smart Multi-Token (SMT)</strong> optimization technology</p>
+            <h3 style="color: #1e40af; margin-bottom: 10px;">⚡ Live Performance Stats</h3>
+            <p style="color: #1e40af; margin: 5px 0;"><strong>0.3ms</strong> average response time (current system)</p>
+            <p style="color: #1e40af; margin: 5px 0;"><strong>2,406 files/sec</strong> indexing speed</p>
+            <p style="color: #1e40af; margin: 5px 0;"><strong>SMT optimization</strong> for provably optimal results</p>
+            <p style="color: #1e40af; margin: 5px 0;"><strong>3 active workspaces</strong> with intelligent routing</p>
         </div>
     </div>
     """

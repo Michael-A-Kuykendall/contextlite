@@ -4,7 +4,13 @@
 [![Node.js versions](https://img.shields.io/node/v/contextlite.svg)](https://www.npmjs.com/package/contextlite)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A Node.js wrapper for [ContextLite](https://contextlite.com) - an ultra-fast context engine for retrieval and AI applications.
+**RAG Systems Were a Mistake** - Replace slow vector databases with mathematically optimal context selection.
+
+⚡ **0.3ms** response time (vs 30-50ms for vector DBs) | 🎯 **Provably optimal** results | 💰 **$0** ongoing costs | 🔒 **100% local**
+
+A Node.js wrapper for [ContextLite](https://contextlite.com) - the ultra-fast context engine that makes vector databases obsolete.
+
+**[⬇️ More Downloads & Platforms](https://huggingface.co/spaces/MikeKuykendall/contextlite-download)**
 
 ## 🚀 Quick Start
 

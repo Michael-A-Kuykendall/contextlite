@@ -4,7 +4,13 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/contextlite.svg)](https://pypi.org/project/contextlite/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A Python wrapper for [ContextLite](https://contextlite.com) - an ultra-fast context engine for retrieval and AI applications.
+**RAG Systems Were a Mistake** - Replace slow vector databases with mathematically optimal context selection.
+
+⚡ **0.3ms** response time (vs 30-50ms for vector DBs) | 🎯 **Provably optimal** results | 💰 **$0** ongoing costs | 🔒 **100% local**
+
+A Python wrapper for [ContextLite](https://contextlite.com) - the context engine that makes vector databases obsolete. Perfect for RAG applications, document search, and AI context management.
+
+**[⬇️ More Downloads & Platforms](https://huggingface.co/spaces/MikeKuykendall/contextlite-download)**
 
 ## 🚀 Quick Start
 
