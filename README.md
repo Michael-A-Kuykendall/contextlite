@@ -6,7 +6,7 @@
 
 ContextLite is a production-ready context assembly engine with **enterprise-grade workspace management** and SMT-powered optimization. Perfect for AI applications that demand speed, accuracy, and cost-effectiveness.
 
-## 🚀 **Download Now**
+## 🚀 **Download ContextLite 2.0 - Auto-Discovery Ready**
 
 **[⬇️ Get ContextLite - All Platforms](https://huggingface.co/spaces/MikeKuykendall/contextlite-download)**
 
@@ -18,23 +18,47 @@ npm install -g contextlite
 # PyPI (Python)  
 pip install contextlite
 
-# Chocolatey (Windows)
+# Chocolatey (Windows) - RECOMMENDED
 choco install contextlite
+
+# Homebrew (macOS)
+brew install contextlite
 ```
 
-## 🆕 **Why ContextLite Beats Vector Databases**
+### ⚡ **30-Second Auto-Setup**
+```bash
+# After installation - ONE COMMAND SETUP
+contextlite --onboard
 
-✨ **SMT-Powered Optimization**: Mathematical precision instead of probabilistic approximations
+# ✅ Finds all your repositories
+# ✅ Preserves existing data  
+# ✅ Configures optimal settings
+# ✅ Sets up VS Code integration
+# ✅ Ready to use immediately
+```
 
-📚 **[Documentation](./docs/)** | 🏘️ **[Management Guide](./docs/CLUSTERING_GUIDE.md)** | 📡 **[API Reference](./docs/API_REFERENCE.md)**
+## 🆕 **ContextLite 2.0: Auto-Discovery Revolution**
 
-| Feature | ContextLite | Vector DBs |
-|---------|-------------|------------|
+### 🎯 **What's New in 2.0**
+- **🔍 Intelligent Auto-Discovery**: Finds all your Git repositories automatically
+- **⚡ 30-Second Setup**: `contextlite --onboard` configures everything  
+- **🔌 VS Code Integration**: Auto-detects projects, one-click start/stop
+- **📊 Multi-Project Management**: Independent RAG systems per repository
+- **🔄 Development Log Integration**: Auto-imports from Git, Claude Code, Copilot
+- **🛡️ Enterprise Security**: Production-ready with comprehensive security hardening
+
+### ✨ **Why ContextLite Beats Vector Databases**
+
+| Feature | ContextLite 2.0 | Vector Databases |
+|---------|----------------|------------------|
+| **Setup Time** | ⚡ 30 seconds (auto-discovery) | 🕐 Hours/days (manual config) |
 | **Response Time** | ⚡ 0.3ms | 🐌 30-50ms |
+| **Multi-Project** | 🎯 Automatic isolation | 🔧 Manual management |
+| **Cost** | 💰 $0 (local) | 💸 $300-500+/month |
+| **Privacy** | 🔒 100% local | ☁️ Cloud uploaded |
 | **Accuracy** | 🎯 Mathematically optimal | 📊 Approximate similarity |
-| **Monthly Costs** | 💰 $0 (local) | 💸 $300-500+ (cloud) |
-| **Data Privacy** | 🔒 100% local | ☁️ Uploaded to cloud |
-| **Setup Time** | ⚡ 30 seconds | 🕐 Hours/days |
+
+📚 **[Auto-Discovery Guide](./docs/AUTO_DISCOVERY_QUICK_START.md)** | 🏘️ **[Multi-Project Workflow](./docs/MULTI_PROJECT_WORKFLOW.md)** | 📡 **[API Reference](./docs/API_REFERENCE.md)**
 
 ## 🏢 **Enterprise Workspace Management**
 

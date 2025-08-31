@@ -1,8 +1,8 @@
 {
   "name": "contextlite",
-  "displayName": "ContextLite - Enterprise Context Engine with Clustering",
-  "description": "Lightning-fast context retrieval with workspace clustering for AI coding assistants. Multi-project isolation and advanced resource management.",
-  "version": "1.1.2",
+  "displayName": "ContextLite 2.0 - Auto-Discovery Context Engine",
+  "description": "30-second auto-discovery setup for all repositories. Lightning-fast context retrieval with multi-project isolation and enterprise security.",
+  "version": "2.0.0",
   "publisher": "ContextLite",
   "engines": {
     "vscode": "^1.85.0"
@@ -20,10 +20,12 @@
     "assistant",
     "rag",
     "retrieval",
+    "auto-discovery",
+    "multi-project",
     "clustering",
     "workspace",
     "enterprise",
-    "multi-project"
+    "onboarding"
   ],
   "activationEvents": [
     "onStartupFinished"

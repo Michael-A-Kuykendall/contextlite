@@ -20,6 +20,19 @@ A Python wrapper for [ContextLite](https://contextlite.com) - the context engine
 pip install contextlite
 ```
 
+### ⚡ Auto-Discovery Setup (NEW in v2.0)
+
+```bash
+# One command setup for all your repositories
+contextlite --onboard
+
+# ✅ Finds all Git repositories automatically
+# ✅ Preserves existing ContextLite databases
+# ✅ Configures optimal settings per project
+# ✅ Sets up development tool integration
+# ✅ Ready to use immediately
+```
+
 ### Basic Usage
 
 ```python
@@ -54,6 +67,14 @@ contextlite --help
 
 ## 📋 Features
 
+### 🆕 v2.0 Auto-Discovery Features
+- **🔍 Intelligent Repository Detection**: Automatically finds all Git repositories
+- **⚡ 30-Second Setup**: `contextlite --onboard` configures everything
+- **🏗️ Multi-Project Management**: Independent ContextLite instances per project
+- **🔌 Development Tool Integration**: Auto-imports from Git, VS Code, Claude Code, JetBrains
+- **🛡️ Enterprise Security**: Production-ready with comprehensive security hardening
+
+### Core Performance
 - **🔥 Ultra-Fast**: Native Go binary performance with Python convenience
 - **🛠️ Auto-Management**: Automatically detects, downloads, and manages ContextLite binary
 - **🔌 Easy Integration**: Simple Python API with context manager support

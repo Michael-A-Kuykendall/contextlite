@@ -52,17 +52,23 @@ ContextLite's **Workspace Management** delivers unprecedented control over AI co
 
 ## 🛠️ **VS Code Integration Features**
 
+### 🆕 **Auto-Discovery (v2.0)**
+- **🔍 Intelligent Project Detection**: Automatically finds all your repositories
+- **⚡ 30-Second Setup**: `contextlite --onboard` configures everything
+- **📂 Multi-Project Support**: Independent instances per repository
+- **🔌 Zero Configuration**: Extension auto-detects onboarded projects
+
 ### 🎮 **One-Click Server Management**
-- **🚀 Start/Stop ContextLite** directly from VS Code
+- **🚀 Start/Stop ContextLite** directly from VS Code per project
 - **📊 Real-time Status** monitoring in status bar
 - **⚙️ Auto-start** when VS Code opens
-- **🔧 Custom Configuration** (port, binary path, log level)
+- **🔧 Project-Specific Control** (individual project management)
 
 ### 📁 **Intelligent Workspace Management**
 - **📂 Auto-Index Current Workspace** for instant AI context
-- **🏢 Multi-Project Clustering** with workspace isolation
-- **🎯 Context-Aware Routing** ensures relevant results
-- **📈 Usage Analytics** and performance monitoring
+- **🏢 Multi-Project Isolation** with automatic port assignment
+- **🎯 Context-Aware Routing** ensures relevant results per project
+- **📈 Development Log Integration** (Git, Copilot, Claude Code)
 
 ### 🌐 **Dashboard & Monitoring**
 - **📊 Web Dashboard Access** with one click
@@ -74,7 +80,7 @@ ContextLite's **Workspace Management** delivers unprecedented control over AI co
 
 ## 🚀 **Installation & Setup**
 
-### **Quick Start (2 minutes)**
+### **v2.0 Auto-Discovery Setup (30 seconds)**
 
 1. **Install Extension**
    ```
@@ -82,15 +88,24 @@ ContextLite's **Workspace Management** delivers unprecedented control over AI co
    ```
 
 2. **Get ContextLite Binary**
-   - 🤗 **HuggingFace**: [Interactive Download](https://huggingface.co/spaces/MikeKuykendall/contextlite-download)
+   - 🍫 **Chocolatey**: `choco install contextlite` (recommended)
    - 📦 **npm**: `npm install -g contextlite`
-   - 🐳 **Docker**: `docker pull makuykendall/contextlite`
-   - 🍫 **Chocolatey**: `choco install contextlite`
+   - 🐍 **PyPI**: `pip install contextlite`
+   - 🤗 **Direct Download**: [All Platforms](https://huggingface.co/spaces/MikeKuykendall/contextlite-download)
 
-3. **Start Coding with AI Superpowers**
-   - ContextLite auto-starts when VS Code opens
-   - Your workspace is automatically indexed
-   - AI assistants now get **perfect context** in **0.3ms**
+3. **Auto-Discovery Setup**
+   ```bash
+   contextlite --onboard
+   ```
+   - ✅ Finds all your Git repositories
+   - ✅ Preserves existing databases
+   - ✅ Configures optimal settings
+   - ✅ Sets up VS Code integration
+
+4. **Start Coding with AI Superpowers**
+   - Extension auto-detects onboarded projects
+   - Each repository gets independent ContextLite instance
+   - AI assistants get **perfect context** in **0.3ms** per project
 
 ---
 
@@ -262,6 +277,6 @@ ContextLite: Mathematically optimal context selection
 
 ---
 
-**License**: MIT | **Version**: 1.1.1 | **Updated**: August 2025
+**License**: MIT | **Version**: 2.0.0 | **Updated**: August 2025
 
 </div>

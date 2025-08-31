@@ -24,12 +24,24 @@ $packageArgs = @{
 # Download and install ZIP package
 Install-ChocolateyZipPackage @packageArgs
 
-# Create a shim for the executable
-$exePath = Join-Path $toolsDir 'contextlite.exe'
-if (Test-Path $exePath) {
-    Install-BinFile -Name 'contextlite' -Path $exePath
-    Write-Host "ContextLite installed successfully!" -ForegroundColor Green
-    Write-Host "Use 'contextlite --help' to get started." -ForegroundColor Yellow
+# Create shims for both executables
+$contextliteExe = Join-Path $toolsDir 'contextlite.exe'
+$onboardExe = Join-Path $toolsDir 'contextlite-onboard.exe'
+
+if (Test-Path $contextliteExe) {
+    Install-BinFile -Name 'contextlite' -Path $contextliteExe
+    Write-Host "ContextLite 2.0 installed successfully!" -ForegroundColor Green
+    
+    if (Test-Path $onboardExe) {
+        Install-BinFile -Name 'contextlite-onboard' -Path $onboardExe
+        Write-Host "ContextLite Onboarding tool installed!" -ForegroundColor Green
+        Write-Host "Run 'contextlite --onboard' for 30-second auto-discovery setup!" -ForegroundColor Cyan
+    } else {
+        Write-Host "Note: contextlite-onboard.exe not found, using integrated onboarding" -ForegroundColor Yellow
+        Write-Host "Run 'contextlite --onboard' for auto-discovery setup!" -ForegroundColor Cyan
+    }
+    
+    Write-Host "Use 'contextlite --help' for all options." -ForegroundColor Yellow
 } else {
-    Write-Error "Installation failed - executable not found at $exePath"
+    Write-Error "Installation failed - contextlite.exe not found at $contextliteExe"
 }

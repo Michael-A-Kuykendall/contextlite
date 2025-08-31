@@ -24,17 +24,33 @@ npm install -g contextlite
 npm install contextlite
 ```
 
+### ⚡ Auto-Discovery Setup (NEW in v2.0)
+
+```bash
+# One command setup for all your repositories
+contextlite --onboard
+
+# ✅ Finds all Git repositories automatically
+# ✅ Preserves existing ContextLite databases
+# ✅ Configures optimal settings per project
+# ✅ Sets up VS Code integration
+# ✅ Ready to use immediately
+```
+
 ### CLI Usage
 
 ```bash
-# Start ContextLite server
+# Quick setup (recommended)
+contextlite --onboard
+
+# Start specific project
 contextlite --port 8080
+
+# Interactive setup with advanced options
+contextlite-onboard
 
 # Get help
 contextlite --help
-
-# Use with npx (no global install needed)
-npx contextlite --port 9090
 ```
 
 ### Programmatic Usage
@@ -78,6 +94,14 @@ await withContextLiteClient({ port: 8080 }, async (client) => {
 
 ## 📋 Features
 
+### 🆕 v2.0 Auto-Discovery Features
+- **🔍 Intelligent Repository Detection**: Automatically finds all Git repositories
+- **⚡ 30-Second Setup**: `contextlite --onboard` configures everything
+- **🏗️ Multi-Project Management**: Independent ContextLite instances per project
+- **🔌 Development Tool Integration**: Auto-imports from Git, VS Code, Claude Code, Copilot
+- **🛡️ Enterprise Security**: Production-ready with comprehensive security hardening
+
+### Core Performance
 - **🔥 Ultra-Fast**: Native Go binary performance with Node.js convenience
 - **🛠️ Auto-Management**: Automatically detects, downloads, and manages ContextLite binary
 - **🔌 Easy Integration**: Simple async/await API with TypeScript support
