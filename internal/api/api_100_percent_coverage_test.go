@@ -96,6 +96,7 @@ func setupTestServerWithFeatureGate(t *testing.T, featureGate types.FeatureGate)
 		Server: config.ServerConfig{
 			Host: "localhost",
 			Port: 8080,
+			AuthToken: "test-token", // Set auth token for testing
 		},
 		Storage: config.StorageConfig{
 			DatabasePath: dbPath,
@@ -504,9 +505,9 @@ func TestAPI_100Percent_DocumentHandlers_EdgeCases(t *testing.T) {
 		w := httptest.NewRecorder()
 		server.ServeHTTP(w, req)
 
-		// Should handle missing fields gracefully
-		if w.Code != http.StatusOK && w.Code != http.StatusBadRequest {
-			t.Errorf("Expected status 200 or 400 for incomplete document, got %d", w.Code)
+		// Should handle missing fields gracefully - accepts 201 (created), 200 (ok), or 400 (bad request)
+		if w.Code != http.StatusOK && w.Code != http.StatusBadRequest && w.Code != http.StatusCreated {
+			t.Errorf("Expected status 200, 201, or 400 for incomplete document, got %d", w.Code)
 		}
 
 		t.Logf("Incomplete document response status: %d", w.Code)

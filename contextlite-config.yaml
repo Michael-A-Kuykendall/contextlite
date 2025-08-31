@@ -1,0 +1,30 @@
+# ContextLite Configuration for contextlite
+server:
+  port: 8084
+  host: "127.0.0.1"
+  cors_enabled: false
+  
+storage:
+  database_path: "C:/Users/micha/repos/contextlite/contextlite.db"
+  cache_size_mb: 64
+  
+smt:
+  solver_timeout_ms: 250
+  max_opt_gap: 0.05
+  
+logging:
+  level: "info"
+  include_timings: true
+
+# Project-specific settings
+project:
+  name: "contextlite"
+  path: "C:/Users/micha/repos/contextlite"
+  
+# Multi-workspace configuration  
+cluster:
+  enabled: true
+  node_id: "contextlite-node"
+  discovery:
+    method: "static"
+    service_name: "contextlite"

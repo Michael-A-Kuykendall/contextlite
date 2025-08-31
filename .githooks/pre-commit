@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# ContextLite Pre-commit Hook: Auto-sync local installation with repository
+
+echo "🔄 ContextLite Pre-commit: Syncing local installation..."
+
+# Build latest version
+echo "📦 Building latest ContextLite..."
+go build -o contextlite.exe ./cmd/contextlite
+go build -o contextlite-cli.exe ./cmd/contextlite-cli  
+go build -o contextlite-setup.exe ./cmd/contextlite-setup
+
+# Copy to user's PATH (if exists)
+if [ -d "/c/Users/micha/bin" ]; then
+    echo "📂 Installing to ~/bin..."
+    cp contextlite.exe /c/Users/micha/bin/
+    cp contextlite-cli.exe /c/Users/micha/bin/
+    cp contextlite-setup.exe /c/Users/micha/bin/
+fi
+
+# Update local .contextlite directory
+CONTEXTLITE_DIR="/c/Users/micha/.contextlite"
+mkdir -p "$CONTEXTLITE_DIR/bin"
+
+echo "🏠 Installing to ~/.contextlite/bin..."
+cp contextlite.exe "$CONTEXTLITE_DIR/bin/"
+cp contextlite-cli.exe "$CONTEXTLITE_DIR/bin/"
+cp contextlite-setup.exe "$CONTEXTLITE_DIR/bin/"
+
+# Re-run setup to sync any new projects discovered since last run
+echo "🔄 Re-syncing project registry..."
+./contextlite-setup.exe discover > /dev/null 2>&1
+
+echo "✅ ContextLite local installation synchronized!"
+echo ""

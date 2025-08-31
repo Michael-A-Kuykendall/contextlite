@@ -47,6 +47,7 @@ func setupTestServer(t *testing.T) (*Server, *storage.Storage, func()) {
 		Server: config.ServerConfig{
 			Host: "localhost",
 			Port: 8080,
+			AuthToken: "test-token", // Set auth token for testing
 		},
 		Storage: config.StorageConfig{
 			DatabasePath: dbPath,
@@ -548,11 +549,12 @@ func TestServer_AuthMiddleware(t *testing.T) {
 	authHandler := server.authMiddleware(testHandler)
 	
 	req := httptest.NewRequest("GET", "/test", nil)
+	req.Header.Set("Authorization", "Bearer test-token") // Add proper auth header
 	w := httptest.NewRecorder()
 	
 	authHandler.ServeHTTP(w, req)
 	
-	// Auth middleware should pass through (no real auth implementation)
+	// Auth middleware should pass through with correct token
 	if w.Code != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", w.Code)
 	}
@@ -690,21 +692,22 @@ func TestServer_AuthMiddleware_Coverage(t *testing.T) {
 	server, _, cleanup := setupTestServer(t)
 	defer cleanup()
 	
-	// Test authMiddleware with various scenarios (currently 23.5% coverage)
+	// Test authMiddleware with various scenarios 
 	
-	// Test with no auth required (config has no API key)
+	// Test with auth token configured in setupTestServer, so need proper Bearer token
 	handler := server.authMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("authenticated"))
 	}))
 	
 	req := httptest.NewRequest("GET", "/test", nil)
+	req.Header.Set("Authorization", "Bearer test-token") // Use the token from setupTestServer
 	w := httptest.NewRecorder()
 	
 	handler.ServeHTTP(w, req)
 	
 	if w.Code != http.StatusOK {
-		t.Errorf("Expected status 200 for no-auth case, got %d", w.Code)
+		t.Errorf("Expected status 200 for valid auth case, got %d", w.Code)
 	}
 	
 	// Test with auth required

@@ -1,5 +1,3 @@
-# ContextLite Project - Claude Development Guide
-
 ## 🦀 **RUSTCHAIN MISSION SYSTEM - COMPLETE PRIMER**
 
 ### **Core Concepts**
@@ -166,3 +164,29 @@ curl -H "Authorization: Bearer $GITHUB_TOKEN" "https://api.github.com/repos/Mich
 - **Root Cause**: `rm -rf` command failing on non-existent files in workflow
 - **Fix**: Added proper error handling with `2>/dev/null || true`  
 - **Result**: Archive creation step now passes, enables Chocolatey deployment to proceed
+
+# ContextLite Configuration
+
+## Project Setup
+- **Project**: contextlite
+- **Port**: 8084
+- **Database**: C:\Users\micha\repos\contextlite\contextlite.db
+- **Config**: C:\Users\micha\repos\contextlite\contextlite-config.yaml
+
+## Quick Commands
+```bash
+# Start ContextLite for this project
+contextlite --config C:\Users\micha\repos\contextlite\contextlite-config.yaml --port 8084
+
+# Connect via CLI
+contextlite-cli connect contextlite
+
+# Query this project's context
+contextlite-cli query contextlite "your search terms"
+```
+
+## Integration Status
+- Port assignment: ✅ Standardized
+- Database: ✅ Preserved existing data
+- Configuration: ✅ Automated
+- Discovery: ✅ Enabled

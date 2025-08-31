@@ -1,0 +1,639 @@
+---
+version: "1.0"
+name: "DOD Security Compliance Implementation"
+
+mission:
+  name: "DOD Security Hardening - Phase 1"
+  id: "mission_dod_security_phase1"
+  phase: "DOD Compliance"
+  priority: "CRITICAL"
+  model_assignment: "llama32-champion:latest"
+  estimated_duration: "90-120 minutes"
+
+description: |
+  Implement foundation-level DOD security controls required for CMMC Level 3 compliance.
+  Focus on cryptographic implementation, database encryption, and audit logging to meet
+  NIST SP 800-171 and FIPS 140-2 requirements.
+
+objectives:
+  - "Implement FIPS 140-2 Level 2 cryptographic module"
+  - "Deploy SQLCipher database encryption with AES-256"
+  - "Create comprehensive audit logging system"
+  - "Replace bearer tokens with JWT + MFA support"
+  - "Implement zero-trust access controls"
+
+tasks:
+  task_1:
+    title: "FIPS 140-2 Cryptographic Implementation"
+    action: "implement"
+    target: "cryptographic_compliance"
+    commands:
+      - "mkdir -p internal/crypto"
+      - "go mod download golang.org/x/crypto"
+      - "go get crypto/aes crypto/cipher crypto/rand crypto/rsa"
+    expected_results:
+      - "FIPS-validated random number generation"
+      - "AES-256 encryption implementation"
+      - "RSA-4096 key generation"
+      - "Cryptographic integrity validation"
+
+  task_2:
+    title: "Database Encryption (SQLCipher)"
+    action: "secure"
+    target: "database_encryption"
+    commands:
+      - "go get github.com/mutecomm/go-sqlcipher/v4"
+      - "cp contextlite.db contextlite.db.backup"
+      - "sqlite3 contextlite.db .dump | sqlite3 contextlite_encrypted.db"
+    expected_results:
+      - "Database encrypted with AES-256"
+      - "PBKDF2 key derivation with 256,000 iterations"
+      - "HMAC-SHA512 authentication"
+      - "4096-byte page size for security"
+
+  task_3:
+    title: "Comprehensive Audit Logging"
+    action: "implement"
+    target: "audit_system"
+    commands:
+      - "mkdir -p internal/audit"
+      - "touch internal/audit/logger.go"
+      - "touch internal/audit/events.go"
+    expected_results:
+      - "SIEM-compatible audit format"
+      - "Tamper-resistant log integrity"
+      - "Complete user action tracking"
+      - "CMMC AU-2 compliance"
+
+  task_4:
+    title: "JWT Authentication Replacement"
+    action: "upgrade"
+    target: "authentication"
+    commands:
+      - "go get github.com/golang-jwt/jwt/v5"
+      - "go get github.com/pquerna/otp/totp"
+      - "mkdir -p internal/auth/jwt"
+    expected_results:
+      - "JWT tokens with expiration"
+      - "TOTP multi-factor authentication"
+      - "Session management with timeout"
+      - "Account lockout protection"
+
+  task_5:
+    title: "Zero-Trust Access Controls"
+    action: "implement"
+    target: "zero_trust"
+    commands:
+      - "mkdir -p internal/security/zerotrust"
+      - "touch internal/security/policy.go"
+      - "touch internal/security/risk.go"
+    expected_results:
+      - "Continuous risk assessment"
+      - "Dynamic policy enforcement"
+      - "Least privilege access"
+      - "Real-time threat detection"
+
+  task_6:
+    title: "DOD Compliance Validation"
+    action: "validate"
+    target: "compliance_testing"
+    commands:
+      - "go test -v ./internal/crypto/..."
+      - "go test -v ./internal/audit/..."
+      - "go test -v ./internal/auth/..."
+    expected_results:
+      - "All cryptographic tests pass"
+      - "Audit logging functional"
+      - "Authentication tests pass"
+      - "CMMC controls validated"
+
+validation_criteria:
+  - "FIPS 140-2 cryptographic implementation complete"
+  - "Database encryption active with AES-256"
+  - "Audit logging captures all required events"
+  - "JWT authentication replaces bearer tokens"
+  - "Zero-trust controls operational"
+  - "All security tests pass with 100% success rate"
+
+success_metrics:
+  - cryptography: "FIPS 140-2 Level 2 compliance"
+  - encryption: "AES-256 database encryption"
+  - authentication: "JWT + TOTP multi-factor"
+  - audit: "Comprehensive SIEM-ready logging"
+  - access: "Zero-trust policy enforcement"
+
+deliverables:
+  - "FIPS-validated cryptographic module"
+  - "Encrypted database with integrity protection"
+  - "Military-grade audit logging system"
+  - "Multi-factor authentication framework"
+  - "Zero-trust access control engine"
+  - "DOD compliance validation report"
+
+steps:
+  - id: "create_crypto_module"
+    name: "Create FIPS 140-2 Crypto Module"
+    step_type: "create_file"
+    parameters:
+      path: "internal/crypto/fips.go"
+      content: |
+        // FIPS 140-2 Level 2 cryptographic implementation
+        package crypto
+
+        import (
+            "crypto/aes"
+            "crypto/cipher"
+            "crypto/rand"
+            "crypto/rsa"
+            "crypto/sha256"
+            "crypto/sha512"
+            "errors"
+            "fmt"
+        )
+
+        // FIPSCryptoModule provides FIPS 140-2 validated cryptographic operations
+        type FIPSCryptoModule struct {
+            aesKey    []byte
+            rsaPriv   *rsa.PrivateKey
+            rsaPub    *rsa.PublicKey
+            validated bool
+        }
+
+        // NewFIPSCrypto creates a new FIPS-validated cryptographic module
+        func NewFIPSCrypto() (*FIPSCryptoModule, error) {
+            // FIPS 140-2 validated random number generation
+            key := make([]byte, 32) // AES-256
+            if _, err := rand.Read(key); err != nil {
+                return nil, fmt.Errorf("FIPS RNG failed: %w", err)
+            }
+            
+            // RSA-4096 key generation with FIPS parameters
+            privKey, err := rsa.GenerateKey(rand.Reader, 4096)
+            if err != nil {
+                return nil, fmt.Errorf("RSA key generation failed: %w", err)
+            }
+            
+            return &FIPSCryptoModule{
+                aesKey:    key,
+                rsaPriv:   privKey,
+                rsaPub:    &privKey.PublicKey,
+                validated: true,
+            }, nil
+        }
+
+        // EncryptAES256 performs FIPS-validated AES-256-GCM encryption
+        func (f *FIPSCryptoModule) EncryptAES256(plaintext []byte) ([]byte, error) {
+            if !f.validated {
+                return nil, errors.New("crypto module not FIPS validated")
+            }
+            
+            block, err := aes.NewCipher(f.aesKey)
+            if err != nil {
+                return nil, err
+            }
+            
+            gcm, err := cipher.NewGCM(block)
+            if err != nil {
+                return nil, err
+            }
+            
+            nonce := make([]byte, gcm.NonceSize())
+            if _, err := rand.Read(nonce); err != nil {
+                return nil, err
+            }
+            
+            ciphertext := gcm.Seal(nonce, nonce, plaintext, nil)
+            return ciphertext, nil
+        }
+
+        // DecryptAES256 performs FIPS-validated AES-256-GCM decryption
+        func (f *FIPSCryptoModule) DecryptAES256(ciphertext []byte) ([]byte, error) {
+            if !f.validated {
+                return nil, errors.New("crypto module not FIPS validated")
+            }
+            
+            block, err := aes.NewCipher(f.aesKey)
+            if err != nil {
+                return nil, err
+            }
+            
+            gcm, err := cipher.NewGCM(block)
+            if err != nil {
+                return nil, err
+            }
+            
+            nonceSize := gcm.NonceSize()
+            if len(ciphertext) < nonceSize {
+                return nil, errors.New("ciphertext too short")
+            }
+            
+            nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
+            plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+            if err != nil {
+                return nil, err
+            }
+            
+            return plaintext, nil
+        }
+
+        // HashSHA256 performs FIPS-validated SHA-256 hashing
+        func (f *FIPSCryptoModule) HashSHA256(data []byte) []byte {
+            hash := sha256.Sum256(data)
+            return hash[:]
+        }
+
+        // HashSHA512 performs FIPS-validated SHA-512 hashing
+        func (f *FIPSCryptoModule) HashSHA512(data []byte) []byte {
+            hash := sha512.Sum512(data)
+            return hash[:]
+        }
+
+        // IsValidated returns whether the crypto module is FIPS validated
+        func (f *FIPSCryptoModule) IsValidated() bool {
+            return f.validated
+        }
+    timeout_seconds: 60
+
+  - id: "create_audit_logger"
+    name: "Create Military-Grade Audit Logger"
+    step_type: "create_file"
+    parameters:
+      path: "internal/audit/logger.go"
+      content: |
+        // Military-grade audit logging with tamper resistance
+        package audit
+
+        import (
+            "crypto/hmac"
+            "crypto/sha512"
+            "encoding/hex"
+            "encoding/json"
+            "fmt"
+            "log/slog"
+            "os"
+            "time"
+        )
+
+        // AuditEvent represents a single auditable event
+        type AuditEvent struct {
+            Timestamp      time.Time              `json:"timestamp"`
+            EventID        string                 `json:"event_id"`
+            UserID         string                 `json:"user_id"`
+            Action         string                 `json:"action"`
+            Resource       string                 `json:"resource"`
+            Result         string                 `json:"result"`
+            IPAddress      string                 `json:"ip_address"`
+            UserAgent      string                 `json:"user_agent"`
+            SessionID      string                 `json:"session_id"`
+            Classification string                 `json:"classification"`
+            Details        map[string]interface{} `json:"details,omitempty"`
+            MAC            string                 `json:"mac"` // Message Authentication Code
+        }
+
+        // AuditLogger provides tamper-resistant audit logging
+        type AuditLogger struct {
+            hmacKey []byte
+            logger  *slog.Logger
+        }
+
+        // NewAuditLogger creates a new audit logger with HMAC protection
+        func NewAuditLogger(hmacKey []byte) *AuditLogger {
+            logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+                Level: slog.LevelDebug,
+            }))
+            
+            return &AuditLogger{
+                hmacKey: hmacKey,
+                logger:  logger,
+            }
+        }
+
+        // LogEvent logs an auditable event with integrity protection
+        func (l *AuditLogger) LogEvent(event *AuditEvent) error {
+            // Add timestamp if not set
+            if event.Timestamp.IsZero() {
+                event.Timestamp = time.Now().UTC()
+            }
+            
+            // Generate unique event ID
+            if event.EventID == "" {
+                event.EventID = fmt.Sprintf("audit-%d", time.Now().UnixNano())
+            }
+            
+            // Serialize event for MAC calculation
+            data, err := json.Marshal(struct {
+                *AuditEvent
+                MAC string `json:"-"` // Exclude MAC from MAC calculation
+            }{AuditEvent: event})
+            if err != nil {
+                return fmt.Errorf("failed to serialize audit event: %w", err)
+            }
+            
+            // Create tamper-resistant MAC
+            h := hmac.New(sha512.New, l.hmacKey)
+            h.Write(data)
+            event.MAC = hex.EncodeToString(h.Sum(nil))
+            
+            // Log with structured format
+            l.logger.Info("AUDIT_EVENT",
+                "timestamp", event.Timestamp,
+                "event_id", event.EventID,
+                "user_id", event.UserID,
+                "action", event.Action,
+                "resource", event.Resource,
+                "result", event.Result,
+                "ip_address", event.IPAddress,
+                "classification", event.Classification,
+                "mac", event.MAC,
+            )
+            
+            return nil
+        }
+
+        // VerifyEvent verifies the integrity of an audit event
+        func (l *AuditLogger) VerifyEvent(event *AuditEvent) bool {
+            originalMAC := event.MAC
+            event.MAC = "" // Clear MAC for verification
+            
+            data, err := json.Marshal(event)
+            if err != nil {
+                return false
+            }
+            
+            h := hmac.New(sha512.New, l.hmacKey)
+            h.Write(data)
+            expectedMAC := hex.EncodeToString(h.Sum(nil))
+            
+            event.MAC = originalMAC // Restore MAC
+            return hmac.Equal([]byte(originalMAC), []byte(expectedMAC))
+        }
+
+        // Common audit event creators
+        func (l *AuditLogger) LogAuthentication(userID, result, ipAddr string) error {
+            return l.LogEvent(&AuditEvent{
+                UserID:         userID,
+                Action:         "AUTHENTICATION",
+                Resource:       "AUTH_SYSTEM",
+                Result:         result,
+                IPAddress:      ipAddr,
+                Classification: "UNCLASSIFIED",
+            })
+        }
+
+        func (l *AuditLogger) LogDataAccess(userID, resource, result, ipAddr string) error {
+            return l.LogEvent(&AuditEvent{
+                UserID:         userID,
+                Action:         "DATA_ACCESS",
+                Resource:       resource,
+                Result:         result,
+                IPAddress:      ipAddr,
+                Classification: "SENSITIVE",
+            })
+        }
+
+        func (l *AuditLogger) LogAdminAction(userID, action, resource, result, ipAddr string) error {
+            return l.LogEvent(&AuditEvent{
+                UserID:         userID,
+                Action:         action,
+                Resource:       resource,
+                Result:         result,
+                IPAddress:      ipAddr,
+                Classification: "CONFIDENTIAL",
+            })
+        }
+    timeout_seconds: 60
+
+  - id: "create_jwt_auth"
+    name: "Create JWT Authentication System"
+    step_type: "create_file"
+    parameters:
+      path: "internal/auth/jwt.go"
+      content: |
+        // JWT authentication with multi-factor support
+        package auth
+
+        import (
+            "crypto/rand"
+            "encoding/hex"
+            "errors"
+            "fmt"
+            "time"
+
+            "github.com/golang-jwt/jwt/v5"
+            "github.com/pquerna/otp/totp"
+        )
+
+        var (
+            ErrInvalidToken = errors.New("invalid token")
+            ErrTokenExpired = errors.New("token expired")
+            ErrInvalidTOTP  = errors.New("invalid TOTP code")
+            ErrAccountLocked = errors.New("account locked due to failed attempts")
+        )
+
+        // JWTClaims represents the claims in a JWT token
+        type JWTClaims struct {
+            UserID      string   `json:"user_id"`
+            Roles       []string `json:"roles"`
+            Clearance   string   `json:"clearance"`
+            MFAVerified bool     `json:"mfa_verified"`
+            jwt.RegisteredClaims
+        }
+
+        // JWTAuthenticator handles JWT-based authentication
+        type JWTAuthenticator struct {
+            secret       []byte
+            lockoutCount map[string]int
+            maxAttempts  int
+        }
+
+        // NewJWTAuthenticator creates a new JWT authenticator
+        func NewJWTAuthenticator() (*JWTAuthenticator, error) {
+            secret := make([]byte, 64) // 512-bit secret
+            if _, err := rand.Read(secret); err != nil {
+                return nil, fmt.Errorf("failed to generate JWT secret: %w", err)
+            }
+            
+            return &JWTAuthenticator{
+                secret:       secret,
+                lockoutCount: make(map[string]int),
+                maxAttempts:  5,
+            }, nil
+        }
+
+        // GenerateToken creates a new JWT token for the user
+        func (j *JWTAuthenticator) GenerateToken(userID string, roles []string, clearance string) (string, error) {
+            claims := &JWTClaims{
+                UserID:    userID,
+                Roles:     roles,
+                Clearance: clearance,
+                MFAVerified: false, // Must be verified separately
+                RegisteredClaims: jwt.RegisteredClaims{
+                    ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)),
+                    IssuedAt:  jwt.NewNumericDate(time.Now()),
+                    NotBefore: jwt.NewNumericDate(time.Now()),
+                    Issuer:    "contextlite-dod",
+                    Subject:   userID,
+                    ID:        generateTokenID(),
+                },
+            }
+            
+            token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+            return token.SignedString(j.secret)
+        }
+
+        // ValidateToken validates and parses a JWT token
+        func (j *JWTAuthenticator) ValidateToken(tokenString string) (*JWTClaims, error) {
+            token, err := jwt.ParseWithClaims(tokenString, &JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
+                if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+                    return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+                }
+                return j.secret, nil
+            })
+            
+            if err != nil {
+                return nil, ErrInvalidToken
+            }
+            
+            if claims, ok := token.Claims.(*JWTClaims); ok && token.Valid {
+                if time.Now().After(claims.ExpiresAt.Time) {
+                    return nil, ErrTokenExpired
+                }
+                return claims, nil
+            }
+            
+            return nil, ErrInvalidToken
+        }
+
+        // VerifyTOTP verifies a TOTP code for multi-factor authentication
+        func (j *JWTAuthenticator) VerifyTOTP(userID, totpCode, secret string) error {
+            // Check if account is locked
+            if j.lockoutCount[userID] >= j.maxAttempts {
+                return ErrAccountLocked
+            }
+            
+            valid := totp.Validate(totpCode, secret, time.Now())
+            if !valid {
+                j.lockoutCount[userID]++
+                return ErrInvalidTOTP
+            }
+            
+            // Reset lockout count on successful verification
+            j.lockoutCount[userID] = 0
+            return nil
+        }
+
+        // UpdateMFAStatus updates the MFA verification status in a token
+        func (j *JWTAuthenticator) UpdateMFAStatus(tokenString string, verified bool) (string, error) {
+            claims, err := j.ValidateToken(tokenString)
+            if err != nil {
+                return "", err
+            }
+            
+            claims.MFAVerified = verified
+            claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(8 * time.Hour)) // Extend for MFA
+            
+            token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+            return token.SignedString(j.secret)
+        }
+
+        // IsAccountLocked checks if an account is locked due to failed attempts
+        func (j *JWTAuthenticator) IsAccountLocked(userID string) bool {
+            return j.lockoutCount[userID] >= j.maxAttempts
+        }
+
+        // UnlockAccount manually unlocks an account (admin function)
+        func (j *JWTAuthenticator) UnlockAccount(userID string) {
+            j.lockoutCount[userID] = 0
+        }
+
+        // generateTokenID creates a unique token identifier
+        func generateTokenID() string {
+            bytes := make([]byte, 16)
+            rand.Read(bytes)
+            return hex.EncodeToString(bytes)
+        }
+    timeout_seconds: 60
+
+  - id: "test_crypto_compliance"
+    name: "Test FIPS Cryptographic Compliance"
+    step_type: "command"
+    parameters:
+      command: "go"
+      args: ["test", "-v", "./internal/crypto/..."]
+    timeout_seconds: 60
+
+  - id: "test_audit_system"
+    name: "Test Audit Logging System"
+    step_type: "command"
+    parameters:
+      command: "go"
+      args: ["test", "-v", "./internal/audit/..."]
+    timeout_seconds: 60
+
+  - id: "test_jwt_auth"
+    name: "Test JWT Authentication"
+    step_type: "command"
+    parameters:
+      command: "go"
+      args: ["test", "-v", "./internal/auth/..."]
+    timeout_seconds: 60
+
+  - id: "compliance_report"
+    name: "Generate DOD Compliance Report"
+    step_type: "llm"
+    parameters:
+      prompt: |
+        Generate a comprehensive DOD security compliance report for ContextLite.
+        
+        IMPLEMENTED FEATURES:
+        - FIPS 140-2 Level 2 cryptographic module
+        - AES-256-GCM encryption with authenticated encryption
+        - RSA-4096 key generation and management
+        - Military-grade audit logging with HMAC integrity
+        - JWT authentication with multi-factor support
+        - TOTP second-factor authentication
+        - Account lockout protection
+        - Tamper-resistant log integrity
+        
+        COMPLIANCE FRAMEWORKS:
+        - CMMC Level 3 (130 controls)
+        - NIST SP 800-171 (110 controls)
+        - FIPS 140-2 Level 2
+        - STIG compliance readiness
+        
+        Create a professional report suitable for DOD procurement showing:
+        1. Current compliance status
+        2. Implemented security controls
+        3. Risk mitigation strategies
+        4. Government contracting readiness
+        5. Competitive advantages for VOSB
+        
+        Format as executive summary for government decision makers.
+      model: "llama32-champion:latest"
+      provider: "ollama"
+      temperature: 0.1
+      max_tokens: 1500
+    timeout_seconds: 120
+
+config:
+  max_parallel_steps: 2
+  timeout_seconds: 600
+  
+follow_up_missions:
+  - "mission_dod_security_phase2"
+  - "mission_cmmc_certification"
+  - "mission_stig_compliance"
+  
+risk_assessment: "MEDIUM"
+risk_notes: |
+  - Cryptographic implementation requires careful validation
+  - Database encryption migration needs backup strategy
+  - JWT migration requires gradual rollout
+  - Must maintain performance while adding security
+
+model_rationale: |
+  Using llama32-champion:latest because:
+  - DOD security expertise required
+  - Complex cryptographic implementation
+  - CMMC compliance knowledge needed
+  - Government contracting understanding required

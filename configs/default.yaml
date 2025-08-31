@@ -3,7 +3,7 @@ server:
   port: 8084
   host: "127.0.0.1"
   cors_enabled: false
-  auth_token: "contextlite-dev-token-2025"  # Default token for development
+  auth_token: ""  # Set via CONTEXTLITE_AUTH_TOKEN environment variable
   rate_limiting:
     enabled: true
     requests_per_minute: 60

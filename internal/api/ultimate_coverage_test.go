@@ -42,6 +42,7 @@ func TestAPI_UltimateCoverage_TargetedBoost(t *testing.T) {
 				tc.setup()
 				
 				req := httptest.NewRequest("GET", "/api/v1/license/status", nil)
+				req.Header.Set("Authorization", "Bearer test-token")
 				w := httptest.NewRecorder()
 				
 				server.ServeHTTP(w, req)
@@ -69,12 +70,14 @@ func TestAPI_UltimateCoverage_TargetedBoost(t *testing.T) {
 
 		// Test with malformed requests
 		req := httptest.NewRequest("GET", "/api/v1/license/status?invalid=param", nil)
+		req.Header.Set("Authorization", "Bearer test-token")
 		w := httptest.NewRecorder()
 		server.ServeHTTP(w, req)
 		t.Logf("License status with invalid param: %d", w.Code)
 
 		// Test with different HTTP methods
 		req = httptest.NewRequest("POST", "/api/v1/license/status", nil)
+		req.Header.Set("Authorization", "Bearer test-token")
 		w = httptest.NewRecorder()
 		server.ServeHTTP(w, req)
 		t.Logf("License status POST method: %d", w.Code)
@@ -85,6 +88,7 @@ func TestAPI_UltimateCoverage_TargetedBoost(t *testing.T) {
 		
 		// Test basic trial info
 		req := httptest.NewRequest("GET", "/api/v1/trial/info", nil)
+		req.Header.Set("Authorization", "Bearer test-token")
 		w := httptest.NewRecorder()
 		
 		server.ServeHTTP(w, req)
@@ -103,12 +107,14 @@ func TestAPI_UltimateCoverage_TargetedBoost(t *testing.T) {
 
 		// Test with query parameters
 		req = httptest.NewRequest("GET", "/api/v1/trial/info?detailed=true", nil)
+		req.Header.Set("Authorization", "Bearer test-token")
 		w = httptest.NewRecorder()
 		server.ServeHTTP(w, req)
 		t.Logf("Detailed trial info: %d", w.Code)
 
 		// Test with invalid method
 		req = httptest.NewRequest("PUT", "/api/v1/trial/info", nil)
+		req.Header.Set("Authorization", "Bearer test-token")
 		w = httptest.NewRecorder()
 		server.ServeHTTP(w, req)
 		t.Logf("Trial info PUT method: %d", w.Code)

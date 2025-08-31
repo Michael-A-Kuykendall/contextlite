@@ -62,6 +62,7 @@ func setupSimpleTestServer(t *testing.T) *Server {
 		Server: config.ServerConfig{
 			Host: "localhost",
 			Port: 8080,
+			AuthToken: "test-token", // Set auth token for testing
 		},
 		Storage: config.StorageConfig{
 			DatabasePath: dbPath,

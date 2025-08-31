@@ -16,13 +16,13 @@
     <docsUrl>https://docs.contextlite.com</docsUrl>
     <bugTrackerUrl>https://github.com/Michael-A-Kuykendall/contextlite/issues</bugTrackerUrl>
     <tags>rag vector-database-alternative smt-optimization context-engine ai contextlite retrieval fast local zero-cost optimal workspace</tags>
-    <summary>RAG Systems Were a Mistake - Replace vector databases with 0.3ms mathematically optimal context selection</summary>
+    <summary>ContextLite 2.0: Auto-Discovery RAG Systems - 30-second setup for all your repositories</summary>
     <description><![CDATA[
-# ContextLite: RAG Systems Were a Mistake
+# ContextLite 2.0: Auto-Discovery Revolution
 
-⚡ **0.3ms** response time (vs 30-50ms for vector DBs) | 🎯 **Provably optimal** results | 💰 **$0** ongoing costs | 🔒 **100% local**
+⚡ **30-second setup** for all repositories | 🔍 **Intelligent auto-discovery** | 🎯 **Multi-project isolation** | 💰 **$0** ongoing costs | 🔒 **100% local**
 
-Replace slow, approximate vector databases with mathematically optimal context selection. ContextLite delivers lightning-fast, precise results without the complexity and costs of traditional vector database solutions.
+ContextLite 2.0 introduces revolutionary auto-discovery that finds all your Git repositories and sets up optimized RAG systems automatically. No more manual configuration - just install and run `contextlite --onboard`.
 
 ## Why Vector Databases Are Obsolete
 
