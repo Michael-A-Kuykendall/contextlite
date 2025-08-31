@@ -82,6 +82,7 @@ validation_test.json
 docs/internal/
 private-docs/
 .claude/
+internal-docs/
 
 # Specific Internal Files (PRIVATE - DO NOT COMMIT) 
 *_INTERNAL*.md

@@ -1,3 +1,24 @@
+## 📁 **INTERNAL DOCUMENTATION POLICY** 
+
+**⚠️ CRITICAL: All internal planning documents MUST be created in `internal-docs/` folder**
+
+### **Directory Structure**
+- `internal-docs/planning/` - Project plans, task lists, integration strategies
+- `internal-docs/security/` - Security audits, compliance reports, vulnerability assessments  
+- `internal-docs/deployment-audits/` - Deployment analysis, workflow investigations
+- `internal-docs/business-strategy/` - Marketing plans, enterprise strategies, revenue analysis
+- `internal-docs/mission-stacks/` - Mission execution plans and AI automation strategies
+
+### **IP Protection Rules**
+1. **Confidential Content**: Business strategies, internal processes, security audits → `internal-docs/`
+2. **Public Content**: User documentation, API guides, installation instructions → `docs/`
+3. **Git Ignore**: `internal-docs/` is automatically git-ignored to prevent accidental exposure
+4. **Source Protection**: No proprietary methods, internal architecture details, or competitive intelligence in public docs
+
+### **Document Classification**
+- **Internal**: Task master lists, deployment audits, security reports, business plans
+- **Public**: README files, user guides, API documentation, contributing guidelines
+
 ## 🦀 **RUSTCHAIN MISSION SYSTEM - COMPLETE PRIMER**
 
 ### **Core Concepts**

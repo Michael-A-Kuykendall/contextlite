@@ -5,6 +5,27 @@ Purpose: Enable an AI agent to be productive immediately in this repo. Follow th
 ## 🎯 COMMUNICATION PROTOCOL
 **MANDATORY**: Always use professional language when communicating with the user. Maintain a respectful, technical, and business-appropriate tone in all interactions.
 
+## 📁 INTERNAL DOCUMENTATION POLICY 
+**⚠️ CRITICAL**: All internal planning documents MUST be created in `internal-docs/` folder to protect IP
+
+### **Internal Document Classification**
+- **`internal-docs/planning/`** - Task lists, integration plans, project roadmaps
+- **`internal-docs/security/`** - Security audits, compliance reports, vulnerability assessments
+- **`internal-docs/deployment-audits/`** - Deployment failures, workflow analysis, chaos audits
+- **`internal-docs/business-strategy/`** - Marketing plans, enterprise strategies, competitive analysis
+- **`internal-docs/mission-stacks/`** - Mission execution plans, AI automation strategies
+
+### **Content Guidelines**
+1. **Confidential → `internal-docs/`**: Business strategies, security audits, internal processes, competitive intelligence
+2. **Public → `docs/`**: User guides, API documentation, installation instructions, contribution guidelines
+3. **IP Protection**: Never expose proprietary methods, internal architecture details, or sensitive business information in public docs
+4. **Git Ignore**: `internal-docs/` automatically excluded from repository to prevent accidental exposure
+
+### **Document Creation Rules**
+- Planning documents, task master lists, strategy papers → Always `internal-docs/`
+- User-facing documentation, tutorials, API guides → Always `docs/`
+- When in doubt about classification → Default to `internal-docs/` for safety
+
 ## 🎯 CURRENT MISSION: DEPLOYMENT ECOSYSTEM HARDENING  
 **Status: PRODUCTION LIVE → DEPLOYMENT AUDIT & FIXES**
 **Active Documents**: 
