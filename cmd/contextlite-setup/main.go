@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 )
 
 // ProjectConfig represents a ContextLite project configuration
@@ -287,7 +288,10 @@ func (s *ContextLiteSetup) removeOldContextLiteSection(content string) string {
 
 // SaveRegistry saves the project registry to disk
 func (s *ContextLiteSetup) SaveRegistry() error {
-	s.registry.LastUpdated = fmt.Sprintf("%d", os.Getenv("USER_TIMESTAMP"))
+	s.registry.LastUpdated = os.Getenv("USER_TIMESTAMP")
+	if s.registry.LastUpdated == "" {
+		s.registry.LastUpdated = fmt.Sprintf("%d", time.Now().Unix())
+	}
 	s.registry.RegistryVersion = "2.0"
 	
 	data, err := json.MarshalIndent(s.registry, "", "  ")

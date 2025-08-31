@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -71,6 +72,10 @@ func setupTestServer(t *testing.T) (*Server, *storage.Storage, func()) {
 	
 	cleanup := func() {
 		store.Close()
+		// Add small delay on Windows to prevent file locking issues
+		if runtime.GOOS == "windows" {
+			time.Sleep(10 * time.Millisecond)
+		}
 		os.Remove(dbPath)
 	}
 	
