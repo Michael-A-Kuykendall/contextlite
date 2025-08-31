@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-31T15:14:19.8985618-05:00",
+  "timestamp": "2025-08-31T16:22:36.9711508-05:00",
   "config": {
     "output_path": "test_edge_case.json",
     "systems_to_test": [
@@ -35,7 +35,7 @@
       "mean_memory_mb": 22,
       "mean_context_length": 4350,
       "std_recall_at_5": 0.21295885499997996,
-      "std_ndcg_at_5": 0.308028922860754,
+      "std_ndcg_at_5": 0.30802892286075395,
       "std_latency_ms": 0
     }
   },

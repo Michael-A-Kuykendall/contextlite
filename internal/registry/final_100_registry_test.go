@@ -121,7 +121,7 @@ func TestRegistryFinal100Percent(t *testing.T) {
 		report := registry.GenerateMarkdownReport()
 		
 		// Verify the report contains expected sections
-		if !strings.Contains(report, "# System Registry Report") {
+		if !strings.Contains(report, "# ContextLite System Registry & Test Dashboard") {
 			t.Error("Report missing main header")
 		}
 		if !strings.Contains(report, "Test Component 1") {

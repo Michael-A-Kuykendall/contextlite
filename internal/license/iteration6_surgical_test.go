@@ -3,6 +3,7 @@ package license
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"encoding/base64"
 	"encoding/json"
 	"os"
 	"testing"
@@ -24,11 +25,17 @@ func TestIteration6_ValidateLicense_100Percent(t *testing.T) {
 			t.Fatalf("Failed to generate license: %v", err)
 		}
 
-		// Decode the license to get the License struct
-		var licenseObj License
-		err = json.Unmarshal([]byte(validLicense), &licenseObj)
+		// Decode the base64-encoded license first
+		licenseJSON, err := base64.StdEncoding.DecodeString(validLicense)
 		if err != nil {
-			t.Fatalf("Failed to decode license: %v", err)
+			t.Fatalf("Failed to decode base64 license: %v", err)
+		}
+
+		// Then decode the JSON to get the License struct
+		var licenseObj License
+		err = json.Unmarshal(licenseJSON, &licenseObj)
+		if err != nil {
+			t.Fatalf("Failed to decode license JSON: %v", err)
 		}
 
 		lm := NewLicenseManager()

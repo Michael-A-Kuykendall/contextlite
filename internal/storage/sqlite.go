@@ -648,7 +648,7 @@ func (s *Storage) GetCachedResultByKey(ctx context.Context, cacheKey string) (*t
 	
 	var resultContext, quantumMetrics, documentScores string
 	var coherenceScore float64
-	var solveTimeMs sql.NullInt64
+	var solveTimeMs sql.NullFloat64  // Changed from NullInt64 to NullFloat64 to handle type mismatch
 	var fallbackUsed bool
 	var createdAt time.Time
 	
@@ -667,6 +667,11 @@ func (s *Storage) GetCachedResultByKey(ctx context.Context, cacheKey string) (*t
 	var result types.QueryResult
 	if err := json.Unmarshal([]byte(resultContext), &result); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal cached result: %w", err)
+	}
+	
+	// Set solve time from scanned value if available
+	if solveTimeMs.Valid {
+		result.SMTMetrics.SolveTimeMs = solveTimeMs.Float64
 	}
 	
 	return &result, nil

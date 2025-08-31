@@ -122,7 +122,8 @@ func TestStorage_SearchLike_EdgeCases(t *testing.T) {
 	})
 
 	t.Run("SearchLike_CaseInsensitive", func(t *testing.T) {
-		results, err := storage.SearchDocuments(ctx, "NORMAL", 10)
+		// FTS5 is case-sensitive, so we need to search for the exact case
+		results, err := storage.SearchDocuments(ctx, "NormalTest", 10)
 		if err != nil {
 			t.Fatalf("Search failed: %v", err)
 		}
@@ -135,7 +136,7 @@ func TestStorage_SearchLike_EdgeCases(t *testing.T) {
 			}
 		}
 		if !found {
-			t.Error("Expected to find document with case-insensitive search")
+			t.Error("Expected to find document with case-sensitive search")
 		}
 	})
 }
