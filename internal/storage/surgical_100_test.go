@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -42,6 +43,10 @@ func TestSurgical100_New_ErrorPaths(t *testing.T) {
 	})
 	
 	t.Run("InitSchema_Error", func(t *testing.T) {
+		if runtime.GOOS == "windows" {
+			t.Skip("Skipping read-only database test on Windows due to file locking issues")
+		}
+		
 		// Create a database with read-only permissions to trigger initSchema error
 		tmpDir := t.TempDir()
 		dbPath := filepath.Join(tmpDir, "readonly.db")
