@@ -528,28 +528,28 @@ func (fg *LicenseFeatureGate) ValidateMultiTenant() error {
 
 // ValidateLicense validates a license string using RSA public key verification
 func ValidateLicense(licenseString string, publicKey *rsa.PublicKey) (bool, error) {
+	// Try to decode as base64 first, if that fails, assume it's raw JSON
+	var licenseJSON []byte
+	if decoded, err := base64.StdEncoding.DecodeString(licenseString); err == nil {
+		licenseJSON = decoded
+	} else {
+		licenseJSON = []byte(licenseString)
+	}
+	
 	// Parse the license JSON
 	var license License
-	if err := json.Unmarshal([]byte(licenseString), &license); err != nil {
+	if err := json.Unmarshal(licenseJSON, &license); err != nil {
 		return false, fmt.Errorf("invalid license JSON: %w", err)
 	}
 	
-	// Create verification payload (excluding signature)
-	licenseData := map[string]interface{}{
-		"key":           license.Key,
-		"email":         license.Email,
-		"tier":          license.Tier,
-		"issued_at":     license.IssuedAt,
-		"expires_at":    license.ExpiresAt,
-		"max_documents": license.MaxDocuments,
-		"max_users":     license.MaxUsers,
-		"hardware_id":   license.HardwareID,
-		"features":      license.Features,
-	}
+	// Create verification payload matching generation format
+	payload := fmt.Sprintf("%s:%s:%s:%d:%d:%d:%s",
+		license.Key, license.Email, license.Tier,
+		license.IssuedAt.Unix(), license.MaxDocuments,
+		license.MaxUsers, license.HardwareID)
 	
 	// Create hash of license data
-	dataBytes, _ := json.Marshal(licenseData)
-	hash := sha256.Sum256(dataBytes)
+	hash := sha256.Sum256([]byte(payload))
 	
 	// Decode signature
 	signature, err := base64.StdEncoding.DecodeString(license.Signature)

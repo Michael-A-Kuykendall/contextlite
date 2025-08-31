@@ -676,7 +676,7 @@ func (s *Storage) GetCachedResultByKey(ctx context.Context, cacheKey string) (*t
 func (s *Storage) SaveQueryCacheWithKey(ctx context.Context, queryHash, corpusHash, modelID, tokenizerVersion, cacheKey string,
 	result *types.QueryResult, expiresAt time.Time) error {
 	
-	resultJSON, err := json.Marshal(result.Documents)
+	resultJSON, err := json.Marshal(result)
 	if err != nil {
 		return err
 	}
