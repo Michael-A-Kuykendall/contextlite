@@ -96,20 +96,20 @@ changelog:
 #     goos: linux
 #     goarch: amd64
 
-# Homebrew tap
-brews:
-  - name: contextlite
-    repository:
-      owner: Michael-A-Kuykendall
-      name: homebrew-tap
-      token: "{{ .Env.GITHUB_TOKEN }}"
-    homepage: "https://contextlite.com"
-    description: "Single-file, zero-dependency context engine for AI applications"
-    license: "MIT"
-    test: |
-      system "#{bin}/contextlite", "--version"
-    install: |
-      bin.install "contextlite"
+# Homebrew tap - DISABLED: Token permission issues
+# brews:
+#   - name: contextlite
+#     repository:
+#       owner: Michael-A-Kuykendall
+#       name: homebrew-tap
+#       token: "{{ .Env.GITHUB_TOKEN }}"
+#     homepage: "https://contextlite.com"
+#     description: "Single-file, zero-dependency context engine for AI applications"
+#     license: "MIT"
+#     test: |
+#       system "#{bin}/contextlite", "--version"
+#     install: |
+#       bin.install "contextlite"
 
 # Chocolatey package for Windows - DISABLED FOR TESTING (moderation protection)
 # SAFETY: Chocolatey deployment disabled to protect moderation timeline
@@ -142,16 +142,18 @@ brews:
 #     release_notes: "https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/{{ .Tag }}"
 #     api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
 
-# Scoop bucket for Windows
-scoops:
-  - name: contextlite
-    repository:
-      owner: Michael-A-Kuykendall
-      name: scoop-bucket
-      token: "{{ .Env.GITHUB_TOKEN }}"
-    homepage: "https://contextlite.com"
-    description: "Single-file, zero-dependency context engine for AI applications"
-    license: "MIT"
+# Scoop bucket for Windows - DISABLED: Token permission issues
+# SAFETY: Scoop deployment disabled due to GITHUB_TOKEN lacking cross-repo permissions
+# Will be re-enabled with proper PAT token configuration
+# scoops:
+#   - name: contextlite
+#     repository:
+#       owner: Michael-A-Kuykendall
+#       name: scoop-bucket
+#       token: "{{ .Env.GITHUB_TOKEN }}"
+#     homepage: "https://contextlite.com"
+#     description: "Single-file, zero-dependency context engine for AI applications"
+#     license: "MIT"
 
 # AUR package for Arch Linux - DISABLED FOR TESTING (missing SSH key)
 # SAFETY: AUR deployment disabled due to missing AUR_KEY environment variable
