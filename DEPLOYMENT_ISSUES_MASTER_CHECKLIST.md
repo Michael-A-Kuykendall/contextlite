@@ -66,41 +66,41 @@
 - **Status**: ✅ WORKING - Chocolatey is functional
 - **Note**: Validation script gave false negative
 
-#### [❌] 2.3 Docker Hub Deployment
-- **Issue**: Repository not found on Docker Hub
-- **Investigation**: michaelakuykendall/contextlite repository missing
-- **Required**: Verify DOCKER_USERNAME and DOCKER_PASSWORD secrets
-- **Status**: ❌ NEEDS FIX - Repository not found
+#### [✅] 2.3 Docker Hub Deployment
+- **Issue**: Username inconsistency in codebase  
+- **DISCOVERY**: `makuykendall/contextlite` EXISTS (682 pulls) ✅ | `michaelakuykendall/contextlite` does NOT exist ❌
+- **Required**: Update all integration tests to use correct `makuykendall` username
+- **Status**: ✅ WORKING - Deployment workflow targets correct repository
 
-#### [❌] 2.4 Homebrew Deployment
-- **Issue**: Formula not found in Homebrew
-- **Investigation**: contextlite.rb not in homebrew-core repository
-- **Required**: Submit formula to homebrew-core or create homebrew tap
-- **Status**: ❌ NEEDS FIX - Formula missing from Homebrew
+#### [✅] 2.4 Homebrew Deployment
+- **Issue**: `deploy-homebrew` job completely missing from deploy-selective.yml
+- **FIXED**: Added complete deploy-homebrew job with checksum calculation  
+- **Added**: Proper version/checksum templating in homebrew/contextlite.rb
+- **Status**: ✅ READY - Deploy job implemented, formula template fixed
 
-#### [ ] 2.5 Crates.io Deployment
+#### [✅] 2.5 Crates.io Deployment
 - **Issue**: Package not found on crates.io
-- **Investigation**: Check if Rust wrapper was uploaded
-- **Required**: Verify CARGO_REGISTRY_TOKEN secret
-- **Workflow**: Check crates deployment job
+- **DISCOVERY**: `contextlite-client` EXISTS and thriving! 3,005 downloads, 21 versions ✅
+- **Status**: ✅ WORKING - Crates deployment is fully functional
+- **Note**: Validation script gave false negative (another one!)
 
-#### [ ] 2.6 Snap Store Deployment
+#### [❌] 2.6 Snap Store Deployment
 - **Issue**: Package not found in Snap Store
-- **Investigation**: Check snapcraft configuration and upload
-- **Required**: Verify SNAPCRAFT_TOKEN secret
-- **Dependency**: Requires working GoReleaser
+- **Investigation**: Confirmed - snap 'contextlite' not found in series '16'
+- **Required**: Implement Snap deployment workflow
+- **Status**: ❌ NEEDS IMPLEMENTATION - No package exists
 
-#### [ ] 2.7 AUR Deployment
+#### [❌] 2.7 AUR Deployment
 - **Issue**: Package not found in AUR
-- **Investigation**: Check if PKGBUILD was submitted
-- **Required**: Verify AUR_KEY and SSH configuration
-- **Workflow**: Check AUR deployment process
+- **Investigation**: Confirmed - no 'contextlite' package in AUR
+- **Required**: Create and submit PKGBUILD to AUR
+- **Status**: ❌ NEEDS IMPLEMENTATION - No package exists
 
-#### [ ] 2.8 Winget Deployment
+#### [❌] 2.8 Winget Deployment
 - **Issue**: Package not found in Winget
-- **Investigation**: Check if manifest was submitted to winget-pkgs
+- **Investigation**: Needs authentication to search winget-pkgs repository
 - **Required**: Implement Winget deployment workflow
-- **Status**: Not implemented yet
+- **Status**: ❌ NEEDS IMPLEMENTATION - No package exists
 
 ### **PHASE 3: Secrets and Configuration Audit**
 

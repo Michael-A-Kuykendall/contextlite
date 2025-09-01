@@ -49,7 +49,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.24'
 
       - name: Build multi-platform binaries
         run: |
@@ -481,10 +481,79 @@ jobs:
           
           echo "✅ Published contextlite-client v${{ inputs.version }} to crates.io"
 
+  # Homebrew deployment
+  deploy-homebrew:
+    runs-on: macos-latest
+    if: contains(inputs.platforms, 'homebrew') || contains(inputs.platforms, 'all-major')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check if Homebrew formula exists
+        id: check_homebrew
+        run: |
+          if curl -f "https://formulae.brew.sh/api/formula/contextlite.json" 2>/dev/null | grep -q "${{ inputs.version }}" 2>/dev/null; then
+            if [ '${{ inputs.force_deploy }}' = 'true' ]; then
+              echo "⚠️ Formula exists but force_deploy=true, proceeding"
+              echo "skip=false" >> $GITHUB_OUTPUT
+            else
+              echo "✅ Homebrew formula already has this version, skipping"
+              echo "skip=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "🚀 Homebrew formula not found, proceeding"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get checksums from GitHub API
+        if: steps.check_homebrew.outputs.skip == 'false'
+        run: |
+          # Get checksums directly from GitHub API (pre-computed)
+          RELEASE_DATA=$(curl -s "https://api.github.com/repos/Michael-A-Kuykendall/contextlite/releases/tags/v${{ inputs.version }}")
+          AMD64_SHA=$(echo "$RELEASE_DATA" | grep -A2 "darwin-amd64.tar.gz" | grep '"digest"' | sed 's/.*sha256:\([^"]*\)".*/\1/')
+          ARM64_SHA=$(echo "$RELEASE_DATA" | grep -A2 "darwin-arm64.tar.gz" | grep '"digest"' | sed 's/.*sha256:\([^"]*\)".*/\1/')
+          echo "AMD64_SHA=$AMD64_SHA" >> $GITHUB_ENV
+          echo "ARM64_SHA=$ARM64_SHA" >> $GITHUB_ENV
+          echo "✅ AMD64 SHA: $AMD64_SHA"
+          echo "✅ ARM64 SHA: $ARM64_SHA"
+
+      - name: Update formula with new version and checksums
+        if: steps.check_homebrew.outputs.skip == 'false'
+        run: |
+          # Update the formula in our repository with current version and checksums
+          cp homebrew/contextlite.rb homebrew/contextlite.rb.tmp
+          
+          # Update version and checksums
+          sed -i '' 's/v[0-9]\+\.[0-9]\+\.[0-9]\+/v${{ inputs.version }}/g' homebrew/contextlite.rb.tmp
+          sed -i '' 's/1\.[0-9]\+\.[0-9]\+/${{ inputs.version }}/g' homebrew/contextlite.rb.tmp
+          sed -i '' "s/YOUR_SHA256_AMD64_HERE/$AMD64_SHA/" homebrew/contextlite.rb.tmp
+          sed -i '' "s/YOUR_SHA256_ARM64_HERE/$ARM64_SHA/" homebrew/contextlite.rb.tmp
+          
+          # Replace the original with updated version
+          mv homebrew/contextlite.rb.tmp homebrew/contextlite.rb
+
+      - name: Commit updated formula to repository
+        if: steps.check_homebrew.outputs.skip == 'false'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          
+          git add homebrew/contextlite.rb
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update Homebrew formula for v${{ inputs.version }}"
+            git push origin HEAD:main
+          fi
+          
+          echo "✅ Updated Homebrew formula for v${{ inputs.version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   # Summary job
   deployment-summary:
     runs-on: ubuntu-latest
-    needs: [create-release, deploy-chocolatey, deploy-npm, deploy-pypi, deploy-docker, deploy-crates]
+    needs: [create-release, deploy-chocolatey, deploy-npm, deploy-pypi, deploy-docker, deploy-crates, deploy-homebrew]
     if: always()
     steps:
       - name: Deployment Summary
@@ -534,6 +603,14 @@ jobs:
             echo "⏭️ **Crates**: Skipped (not requested)"
           else
             echo "❌ **Crates**: Failed or cancelled"
+          fi
+          
+          if [ '${{ needs.deploy-homebrew.result }}' = 'success' ]; then
+            echo "✅ **Homebrew**: Successfully deployed"
+          elif [ '${{ needs.deploy-homebrew.result }}' = 'skipped' ]; then
+            echo "⏭️ **Homebrew**: Skipped (not requested)"
+          else
+            echo "❌ **Homebrew**: Failed or cancelled"
           fi
           
           echo ""

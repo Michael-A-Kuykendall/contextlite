@@ -229,20 +229,20 @@ echo "🧪 Testing Docker Container"
 
 # Test docker pull
 echo "📥 Pulling Docker image..."
-docker pull michaelakuykendall/contextlite:latest || {
+docker pull makuykendall/contextlite:latest || {
     echo "❌ Docker pull failed"
     exit 1
 }
 
 # Test version
 echo "🔍 Testing version..."
-VERSION=$(docker run --rm michaelakuykendall/contextlite:latest --version 2>&1 || echo "FAILED")
+VERSION=$(docker run --rm makuykendall/contextlite:latest --version 2>&1 || echo "FAILED")
 echo "Version output: $VERSION"
 
 # Test server in container
 echo "🚀 Testing containerized server..."
 PORT=19004
-docker run -d --name contextlite-test -p $PORT:8080 michaelakuykendall/contextlite:latest
+docker run -d --name contextlite-test -p $PORT:8080 makuykendall/contextlite:latest
 sleep 15
 
 # Test endpoints
@@ -458,7 +458,7 @@ ENDPOINTS=(
     "https://huggingface.co/spaces/MikeKuykendall/contextlite-download"
     "https://registry.npmjs.org/contextlite"
     "https://pypi.org/project/contextlite/"
-    "https://hub.docker.com/r/michaelakuykendall/contextlite"
+    "https://hub.docker.com/r/makuykendall/contextlite"
 )
 
 for endpoint in "${ENDPOINTS[@]}"; do
@@ -546,7 +546,7 @@ case "$FAILURE_TYPE" in
     "docker")
         echo "🐳 Docker Issues:"
         docker images | grep contextlite
-        docker history michaelakuykendall/contextlite:latest
+        docker history makuykendall/contextlite:latest
         ;;
     "direct")
         echo "💾 Direct Binary Issues:"

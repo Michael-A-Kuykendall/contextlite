@@ -12,21 +12,21 @@ fi
 
 # Test docker pull
 echo "📥 Pulling Docker image..."
-docker pull michaelakuykendall/contextlite:latest || {
+docker pull makuykendall/contextlite:latest || {
     echo "❌ Docker pull failed"
     exit 1
 }
 
 # Test version
 echo "🔍 Testing version..."
-VERSION=$(docker run --rm michaelakuykendall/contextlite:latest --version 2>&1 || echo "FAILED")
+VERSION=$(docker run --rm makuykendall/contextlite:latest --version 2>&1 || echo "FAILED")
 echo "Version output: $VERSION"
 
 # Test server in container
 echo "🚀 Testing containerized server..."
 PORT=19004
 echo "Starting container on port $PORT..."
-docker run -d --name contextlite-test -p $PORT:8080 michaelakuykendall/contextlite:latest
+docker run -d --name contextlite-test -p $PORT:8080 makuykendall/contextlite:latest
 sleep 15
 
 # Test endpoints
