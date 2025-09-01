@@ -1,0 +1,275 @@
+project_name: contextlite
+
+dist: dist
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - id: contextlite
+    main: ./cmd/contextlite
+    binary: contextlite
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.builtBy=goreleaser
+
+archives:
+  - id: default
+    builds:
+      - contextlite
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE*
+      - README*
+      - CHANGELOG*
+      - docs/**/*
+
+checksum:
+  name_template: 'checksums.txt'
+  algorithm: sha256
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  use: github
+  sort: asc
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: Bug fixes
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: Performance improvements
+      regexp: '^.*?perf(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: Others
+      order: 999
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+
+# Signing with cosign (disabled - requires cosign installation and keys)
+# signs:
+#   - cmd: cosign
+#     args:
+#       - sign-blob
+#       - '--yes'
+#       - '--key=env://COSIGN_PRIVATE_KEY'
+#       - '--output-signature=${signature}'
+#       - '${artifact}'
+#     artifacts: all
+
+# Docker images
+dockers:
+  - image_templates:
+      - "ghcr.io/michael-a-kuykendall/contextlite:{{ .Tag }}"
+      - "ghcr.io/michael-a-kuykendall/contextlite:v{{ .Major }}"
+      - "ghcr.io/michael-a-kuykendall/contextlite:v{{ .Major }}.{{ .Minor }}"
+      - "ghcr.io/michael-a-kuykendall/contextlite:latest"
+    dockerfile: Dockerfile
+    goos: linux
+    goarch: amd64
+
+# Homebrew tap
+brews:
+  - name: contextlite
+    repository:
+      owner: Michael-A-Kuykendall
+      name: homebrew-tap
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    homepage: "https://contextlite.com"
+    description: "Single-file, zero-dependency context engine for AI applications"
+    license: "MIT"
+    test: |
+      system "#{bin}/contextlite", "--version"
+    install: |
+      bin.install "contextlite"
+
+# Chocolatey package for Windows (YOUR PAIN POINT SOLVED!)
+chocolateys:
+  - name: contextlite
+    owners: Michael-A-Kuykendall
+    title: ContextLite
+    authors: Michael A. Kuykendall
+    project_url: https://contextlite.com
+    url_template: "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    icon_url: https://contextlite.com/favicon.ico
+    copyright: 2025 Michael A. Kuykendall
+    license_url: https://github.com/Michael-A-Kuykendall/contextlite/blob/main/LICENSE
+    require_license_acceptance: false
+    project_source_url: https://github.com/Michael-A-Kuykendall/contextlite
+    docs_url: https://github.com/Michael-A-Kuykendall/contextlite/wiki
+    bug_tracker_url: https://github.com/Michael-A-Kuykendall/contextlite/issues
+    tags: "context ai cli tool search optimization"
+    summary: Single-file, zero-dependency context engine for AI applications
+    description: |
+      ContextLite is a blazing-fast context optimization engine that transforms how AI applications handle large codebases and documents. With zero dependencies and single-file deployment, it provides instant context retrieval, intelligent chunking, and seamless integration with any AI workflow.
+      
+      Features:
+      - Lightning-fast BM25 + semantic search
+      - Zero-dependency single binary
+      - Cross-platform (Windows, macOS, Linux)
+      - 14-day full-featured trial
+      - Professional license available
+    release_notes: "https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/{{ .Tag }}"
+    api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
+
+# Scoop bucket for Windows
+scoops:
+  - name: contextlite
+    repository:
+      owner: Michael-A-Kuykendall
+      name: scoop-bucket
+      token: "{{ .Env.GITHUB_TOKEN }}"
+    homepage: "https://contextlite.com"
+    description: "Single-file, zero-dependency context engine for AI applications"
+    license: "MIT"
+
+# AUR package for Arch Linux
+aurs:
+  - name: contextlite-bin
+    homepage: https://contextlite.com
+    description: Single-file, zero-dependency context engine for AI applications
+    maintainers:
+      - 'Michael A. Kuykendall <michael@contextlite.com>'
+    license: MIT
+    private_key: "{{ .Env.AUR_KEY }}"
+    git_url: 'ssh://aur@aur.archlinux.org/contextlite-bin.git'
+    depends:
+      - glibc
+    package: |-
+      # bin
+      install -Dm755 "./contextlite" "${pkgdir}/usr/bin/contextlite"
+      
+      # license
+      install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/contextlite/LICENSE"
+
+# Snapcraft for Ubuntu/Linux - DISABLED until snapcraft is available
+# snapcrafts:
+#   - name: contextlite
+#     publish: true
+#     summary: Single-file, zero-dependency context engine for AI applications
+#     description: |
+#       ContextLite is a blazing-fast context optimization engine that transforms 
+#       how AI applications handle large codebases and documents. With zero 
+#       dependencies and single-file deployment, it provides instant context 
+#       retrieval, intelligent chunking, and seamless integration with any AI workflow.
+#     grade: stable
+#     confinement: strict
+#     license: MIT
+#     base: core22
+#     channel_templates:
+#       - "stable"
+#       - "candidate"
+#     apps:
+#       contextlite:
+#         command: contextlite
+#         plugs: ["home", "network", "network-bind"]
+
+# WinGet - NOTE: Manual submission required to Microsoft's winget-pkgs repo
+# See: https://github.com/microsoft/winget-pkgs/blob/master/CONTRIBUTING.md
+# GoReleaser doesn't support WinGet directly yet (as of 2024)
+
+# Generate SBOM (disabled - requires syft installation)
+# sboms:
+#   - artifacts: archive
+
+# Release notes
+release:
+  github:
+    owner: Michael-A-Kuykendall
+    name: contextlite
+  prerelease: "false"
+  name_template: "{{.ProjectName}} v{{.Version}}"
+  header: |
+    ## ContextLite {{.Version}}
+
+    **Single-file, zero-dependency context engine for AI applications**
+
+    ### 🚀 Installation Methods
+
+    #### 🍫 Chocolatey (Windows)
+    ```powershell
+    choco install contextlite
+    ```
+
+    #### 🍺 Homebrew (macOS/Linux)
+    ```bash
+    brew tap Michael-A-Kuykendall/tap
+    brew install contextlite
+    ```
+
+    #### 🥄 Scoop (Windows)
+    ```bash
+    scoop bucket add contextlite https://github.com/Michael-A-Kuykendall/scoop-bucket
+    scoop install contextlite
+    ```
+
+    #### 📦 Snap (Ubuntu/Linux)
+    ```bash
+    sudo snap install contextlite
+    ```
+
+    #### 🏗️ AUR (Arch Linux)
+    ```bash
+    yay -S contextlite-bin
+    # or
+    paru -S contextlite-bin
+    ```
+
+    #### 🐹 Go Install
+    ```bash
+    go install github.com/Michael-A-Kuykendall/contextlite/cmd/contextlite@latest
+    ```
+
+    #### 🐳 Docker
+    ```bash
+    docker pull ghcr.io/michael-a-kuykendall/contextlite:{{.Tag}}
+    ```
+
+    #### 📱 npm (Node.js wrapper)
+    ```bash
+    npm install -g contextlite
+    ```
+
+    #### 🐍 PyPI (Python wrapper)
+    ```bash
+    pip install contextlite
+    ```
+
+    ### 💾 Direct Downloads
+  footer: |
+    **Full Changelog**: https://github.com/Michael-A-Kuykendall/contextlite/compare/{{.PreviousTag}}...{{.Tag}}
+
+    ---
+    
+    **Verification**: All binaries are signed with cosign. Verify with:
+    ```bash
+    cosign verify-blob --key https://github.com/Michael-A-Kuykendall/contextlite/releases/download/{{.Tag}}/contextlite_Linux_x86_64.tar.gz.sig contextlite_Linux_x86_64.tar.gz
+    ```

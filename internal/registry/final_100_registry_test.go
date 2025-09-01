@@ -58,8 +58,8 @@ func TestRegistryFinal100Percent(t *testing.T) {
 	t.Run("SaveToFile_ErrorPaths", func(t *testing.T) {
 		registry := NewSystemRegistry()
 		
-		// Test 1: Invalid directory path
-		err := registry.SaveToFile("/invalid/nonexistent/path/registry.json")
+		// Test 1: Invalid directory path (Windows-compatible)
+		err := registry.SaveToFile("Z:\\nonexistent\\path\\registry.json")
 		if err == nil {
 			t.Error("Expected error when saving to invalid path")
 		} else {

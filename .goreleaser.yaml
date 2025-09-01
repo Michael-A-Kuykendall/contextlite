@@ -5,11 +5,11 @@ dist: dist
 before:
   hooks:
     - go mod tidy
-    - go generate ./...
+    # Removed go generate due to timeout issues in CI
 
 builds:
   - id: contextlite
-    main: .
+    main: ./cmd/contextlite
     binary: contextlite
     env:
       - CGO_ENABLED=0
@@ -85,16 +85,16 @@ changelog:
 #       - '${artifact}'
 #     artifacts: all
 
-# Docker images
-dockers:
-  - image_templates:
-      - "ghcr.io/michael-a-kuykendall/contextlite:{{ .Tag }}"
-      - "ghcr.io/michael-a-kuykendall/contextlite:v{{ .Major }}"
-      - "ghcr.io/michael-a-kuykendall/contextlite:v{{ .Major }}.{{ .Minor }}"
-      - "ghcr.io/michael-a-kuykendall/contextlite:latest"
-    dockerfile: Dockerfile
-    goos: linux
-    goarch: amd64
+# Docker images - DISABLED FOR DRY RUN TESTING (Docker Desktop not required)
+# dockers:
+#   - image_templates:
+#       - "ghcr.io/michael-a-kuykendall/contextlite:{{ .Tag }}"
+#       - "ghcr.io/michael-a-kuykendall/contextlite:v{{ .Major }}"
+#       - "ghcr.io/michael-a-kuykendall/contextlite:v{{ .Major }}.{{ .Minor }}"
+#       - "ghcr.io/michael-a-kuykendall/contextlite:latest"
+#     dockerfile: Dockerfile
+#     goos: linux
+#     goarch: amd64
 
 # Homebrew tap
 brews:

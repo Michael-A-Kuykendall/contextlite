@@ -34,33 +34,6 @@ brews:
     license: MIT
     goarm: "6"
     goamd64: v1
-aurs:
-  - name: contextlite-bin
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
-    commit_msg_template: Update to {{ .Tag }}
-    description: Single-file, zero-dependency context engine for AI applications
-    homepage: https://contextlite.com
-    license: MIT
-    maintainers:
-      - Michael A. Kuykendall <michael@contextlite.com>
-    provides:
-      - contextlite
-    conflicts:
-      - contextlite
-    depends:
-      - glibc
-    rel: "1"
-    package: |-
-      # bin
-      install -Dm755 "./contextlite" "${pkgdir}/usr/bin/contextlite"
-
-      # license
-      install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/contextlite/LICENSE"
-    git_url: ssh://aur@aur.archlinux.org/contextlite-bin.git
-    private_key: '{{ .Env.AUR_KEY }}'
-    goamd64: v1
 scoops:
   - name: contextlite
     repository:
@@ -130,18 +103,6 @@ snapshot:
 checksum:
   name_template: checksums.txt
   algorithm: sha256
-dockers:
-  - goos: linux
-    goarch: amd64
-    goarm: "6"
-    goamd64: v1
-    dockerfile: Dockerfile
-    image_templates:
-      - ghcr.io/michael-a-kuykendall/contextlite:{{ .Tag }}
-      - ghcr.io/michael-a-kuykendall/contextlite:v{{ .Major }}
-      - ghcr.io/michael-a-kuykendall/contextlite:v{{ .Major }}.{{ .Minor }}
-      - ghcr.io/michael-a-kuykendall/contextlite:latest
-    use: docker
 changelog:
   filters:
     exclude:
@@ -218,34 +179,6 @@ announce:
     message_template: '{{ .ProjectName }} {{ .Tag }} is out!<br/>Check it out at <a href="{{ .ReleaseURL }}">{{ .ReleaseURL }}</a>'
   bluesky:
     message_template: '{{ .ProjectName }} {{ .Tag }} is out! Check it out at {{ .ReleaseURL }}'
-chocolateys:
-  - name: contextlite
-    owners: Michael-A-Kuykendall
-    title: ContextLite
-    authors: Michael A. Kuykendall
-    project_url: https://contextlite.com
-    url_template: https://github.com/Michael-A-Kuykendall/contextlite/releases/download/{{ .Tag }}/{{ .ArtifactName }}
-    icon_url: https://contextlite.com/favicon.ico
-    copyright: 2025 Michael A. Kuykendall
-    license_url: https://github.com/Michael-A-Kuykendall/contextlite/blob/main/LICENSE
-    project_source_url: https://github.com/Michael-A-Kuykendall/contextlite
-    docs_url: https://github.com/Michael-A-Kuykendall/contextlite/wiki
-    bug_tracker_url: https://github.com/Michael-A-Kuykendall/contextlite/issues
-    tags: context ai cli tool search optimization
-    summary: Single-file, zero-dependency context engine for AI applications
-    description: |
-      ContextLite is a blazing-fast context optimization engine that transforms how AI applications handle large codebases and documents. With zero dependencies and single-file deployment, it provides instant context retrieval, intelligent chunking, and seamless integration with any AI workflow.
-
-      Features:
-      - Lightning-fast BM25 + semantic search
-      - Zero-dependency single binary
-      - Cross-platform (Windows, macOS, Linux)
-      - 14-day full-featured trial
-      - Professional license available
-    release_notes: https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/{{ .Tag }}
-    api_key: '{{ .Env.CHOCOLATEY_API_KEY }}'
-    source_repo: https://push.chocolatey.org/
-    goamd64: v1
 git:
   tag_sort: -version:refname
 github_urls:

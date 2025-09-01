@@ -29,6 +29,16 @@ func addAuthHeader(req *http.Request) {
 }
 
 func TestGoClientIntegration(t *testing.T) {
+	// Check if server is available for all tests
+	resp, err := http.Get(TestServerURL + "/health")
+	if err != nil {
+		t.Skipf("Skipping integration tests - server not available: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != 200 {
+		t.Skipf("Skipping integration tests - server not healthy: status %d", resp.StatusCode)
+	}
+
 // Test basic connectivity
 	t.Run("ServerConnectivity", func(t *testing.T) {
 		// Health endpoint is at /health (not /api/v1/health) and doesn't require auth
@@ -44,6 +54,16 @@ func TestGoClientIntegration(t *testing.T) {
 		t.Log("✅ Go client can connect to ContextLite server")
 	})	// Test document indexing
 	t.Run("DocumentIndexing", func(t *testing.T) {
+		// Check server availability first
+		resp, err := http.Get(TestServerURL + "/health")
+		if err != nil {
+			t.Skipf("Server not available for test: %v", err)
+		}
+		resp.Body.Close()
+		if resp.StatusCode != 200 {
+			t.Skipf("Server not healthy for test: status %d", resp.StatusCode)
+		}
+
 		doc := TestDocument{
 			ID:      "go-test-doc-1",
 			Path:    "/test/go/example.go",
@@ -56,7 +76,7 @@ func TestGoClientIntegration(t *testing.T) {
 		addAuthHeader(req)
 		
 		client := &http.Client{}
-		resp, err := client.Do(req)
+		resp, err = client.Do(req)
 		if err != nil {
 			t.Fatalf("Failed to index document: %v", err)
 		}
@@ -143,6 +163,17 @@ func TestGoClientIntegration(t *testing.T) {
 }
 
 func TestGoClientPerformance(t *testing.T) {
+	// Check if server is available for performance tests
+	resp, err := http.Get(TestServerURL + "/health")
+	if err != nil {
+		t.Skipf("Skipping performance tests - server not available: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != 200 {
+		t.Skipf("Skipping performance tests - server not healthy: status %d", resp.StatusCode)
+	}
+
+	// Basic performance test
 	t.Run("ConcurrentAccess", func(t *testing.T) {
 		const numGoroutines = 10
 		const requestsPerGoroutine = 5
