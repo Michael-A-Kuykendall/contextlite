@@ -111,34 +111,36 @@ brews:
     install: |
       bin.install "contextlite"
 
-# Chocolatey package for Windows (YOUR PAIN POINT SOLVED!)
-chocolateys:
-  - name: contextlite
-    owners: Michael-A-Kuykendall
-    title: ContextLite
-    authors: Michael A. Kuykendall
-    project_url: https://contextlite.com
-    url_template: "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    icon_url: https://contextlite.com/favicon.ico
-    copyright: 2025 Michael A. Kuykendall
-    license_url: https://github.com/Michael-A-Kuykendall/contextlite/blob/main/LICENSE
-    require_license_acceptance: false
-    project_source_url: https://github.com/Michael-A-Kuykendall/contextlite
-    docs_url: https://github.com/Michael-A-Kuykendall/contextlite/wiki
-    bug_tracker_url: https://github.com/Michael-A-Kuykendall/contextlite/issues
-    tags: "context ai cli tool search optimization"
-    summary: Single-file, zero-dependency context engine for AI applications
-    description: |
-      ContextLite is a blazing-fast context optimization engine that transforms how AI applications handle large codebases and documents. With zero dependencies and single-file deployment, it provides instant context retrieval, intelligent chunking, and seamless integration with any AI workflow.
-      
-      Features:
-      - Lightning-fast BM25 + semantic search
-      - Zero-dependency single binary
-      - Cross-platform (Windows, macOS, Linux)
-      - 14-day full-featured trial
-      - Professional license available
-    release_notes: "https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/{{ .Tag }}"
-    api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
+# Chocolatey package for Windows - DISABLED FOR TESTING (moderation protection)
+# SAFETY: Chocolatey deployment disabled to protect moderation timeline
+# Will be re-enabled only after all other package managers work perfectly
+# chocolateys:
+#   - name: contextlite
+#     owners: Michael-A-Kuykendall
+#     title: ContextLite
+#     authors: Michael A. Kuykendall
+#     project_url: https://contextlite.com
+#     url_template: "https://github.com/Michael-A-Kuykendall/contextlite/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+#     icon_url: https://contextlite.com/favicon.ico
+#     copyright: 2025 Michael A. Kuykendall
+#     license_url: https://github.com/Michael-A-Kuykendall/contextlite/blob/main/LICENSE
+#     require_license_acceptance: false
+#     project_source_url: https://github.com/Michael-A-Kuykendall/contextlite
+#     docs_url: https://github.com/Michael-A-Kuykendall/contextlite/wiki
+#     bug_tracker_url: https://github.com/Michael-A-Kuykendall/contextlite/issues
+#     tags: "context ai cli tool search optimization"
+#     summary: Single-file, zero-dependency context engine for AI applications
+#     description: |
+#       ContextLite is a blazing-fast context optimization engine that transforms how AI applications handle large codebases and documents. With zero dependencies and single-file deployment, it provides instant context retrieval, intelligent chunking, and seamless integration with any AI workflow.
+#       
+#       Features:
+#       - Lightning-fast BM25 + semantic search
+#       - Zero-dependency single binary
+#       - Cross-platform (Windows, macOS, Linux)
+#       - 14-day full-featured trial
+#       - Professional license available
+#     release_notes: "https://github.com/Michael-A-Kuykendall/contextlite/releases/tag/{{ .Tag }}"
+#     api_key: "{{ .Env.CHOCOLATEY_API_KEY }}"
 
 # Scoop bucket for Windows
 scoops:
@@ -151,24 +153,26 @@ scoops:
     description: "Single-file, zero-dependency context engine for AI applications"
     license: "MIT"
 
-# AUR package for Arch Linux
-aurs:
-  - name: contextlite-bin
-    homepage: https://contextlite.com
-    description: Single-file, zero-dependency context engine for AI applications
-    maintainers:
-      - 'Michael A. Kuykendall <michael@contextlite.com>'
-    license: MIT
-    private_key: "{{ .Env.AUR_KEY }}"
-    git_url: 'ssh://aur@aur.archlinux.org/contextlite-bin.git'
-    depends:
-      - glibc
-    package: |-
-      # bin
-      install -Dm755 "./contextlite" "${pkgdir}/usr/bin/contextlite"
-      
-      # license
-      install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/contextlite/LICENSE"
+# AUR package for Arch Linux - DISABLED FOR TESTING (missing SSH key)
+# SAFETY: AUR deployment disabled due to missing AUR_KEY environment variable
+# Will be re-enabled only if SSH key is properly configured
+# aurs:
+#   - name: contextlite-bin
+#     homepage: https://contextlite.com
+#     description: Single-file, zero-dependency context engine for AI applications
+#     maintainers:
+#       - 'Michael A. Kuykendall <michael@contextlite.com>'
+#     license: MIT
+#     private_key: "{{ .Env.AUR_KEY }}"
+#     git_url: 'ssh://aur@aur.archlinux.org/contextlite-bin.git'
+#     depends:
+#       - glibc
+#     package: |-
+#       # bin
+#       install -Dm755 "./contextlite" "${pkgdir}/usr/bin/contextlite"
+#       
+#       # license
+#       install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/contextlite/LICENSE"
 
 # Snapcraft for Ubuntu/Linux - DISABLED until snapcraft is available
 # snapcrafts:
