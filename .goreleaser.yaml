@@ -9,7 +9,7 @@ before:
 
 builds:
   - id: contextlite
-    main: ./cmd/contextlite
+    main: .
     binary: contextlite
     env:
       - CGO_ENABLED=0
